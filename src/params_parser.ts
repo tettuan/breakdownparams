@@ -28,6 +28,9 @@ export class ParamsParser {
         return true;
       });
       
+      // オプションを解析
+      const options = this.parseOptions(args);
+      
       switch (nonOptionArgs.length) {
         case 0:
           return this.parseNoParams(args);
@@ -94,7 +97,12 @@ export class ParamsParser {
    * 2つのパラメータとオプションを解析
    */
   private parseDoubleParams(args: string[]): DoubleParamsResult | NoParamsResult {
-    const [demonstrativeType, layerType] = args.filter(arg => !arg.startsWith("-"));
+    const [demonstrativeType, layerType] = args.filter((arg, index) => {
+      if (arg.startsWith("-")) return false;
+      const prevArg = args[index - 1];
+      if (prevArg && prevArg.startsWith("-")) return false;
+      return true;
+    });
 
     if (!this.demonstrativeTypes.has(demonstrativeType)) {
       return this.createErrorResult(`Invalid demonstrative type: ${demonstrativeType}`);
