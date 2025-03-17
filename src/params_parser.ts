@@ -1,11 +1,11 @@
-import {
+import { LayerTypeAliasMap } from "./types.ts";
+import type {
   ParamsResult,
   NoParamsResult,
   SingleParamResult,
   DoubleParamsResult,
   DemonstrativeType,
   LayerType,
-  LayerTypeAliasMap,
   FromLayerTypeAlias,
 } from "./types.ts";
 
