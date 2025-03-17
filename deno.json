@@ -3,13 +3,12 @@
     "test": "deno test --allow-read"
   },
   "fmt": {
-    "include": ["src/", "mod.ts"]
+    "include": ["src/", "mod.ts", "tests/"]
   },
   "lint": {
-    "include": ["src/", "mod.ts"]
+    "include": ["src/", "mod.ts", "tests/"]
   },
   "compilerOptions": {
-    "strict": true,
-    "allowJs": false
+    "strict": true
   }
 } 
