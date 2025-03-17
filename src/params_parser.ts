@@ -28,9 +28,6 @@ export class ParamsParser {
         return true;
       });
       
-      // オプションを解析
-      const options = this.parseOptions(args);
-      
       switch (nonOptionArgs.length) {
         case 0:
           return this.parseNoParams(args);
