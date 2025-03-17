@@ -1,0 +1,15 @@
+{
+  "tasks": {
+    "test": "deno test --allow-read"
+  },
+  "fmt": {
+    "include": ["src/", "mod.ts"]
+  },
+  "lint": {
+    "include": ["src/", "mod.ts"]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": false
+  }
+} 
