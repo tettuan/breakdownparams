@@ -1,4 +1,9 @@
 {
+  "name": "@tettuan/breakdownparams",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./mod.ts"
+  },
   "tasks": {
     "test": "deno test --allow-read"
   },
@@ -10,5 +15,8 @@
   },
   "compilerOptions": {
     "strict": true
+  },
+  "publish": {
+    "include": ["src/", "mod.ts", "README.md", "LICENSE"]
   }
 } 
