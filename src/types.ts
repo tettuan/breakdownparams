@@ -10,7 +10,7 @@ export interface ParamsResult {
 /**
  * Result type for when no parameters are provided
  */
-export interface NoParamsResult extends ParamsResult {
+export interface NoParamsResult {
   type: "no-params";
   help: boolean;
   version: boolean;
@@ -19,7 +19,7 @@ export interface NoParamsResult extends ParamsResult {
 /**
  * Result type for when a single parameter is provided
  */
-export interface SingleParamResult extends ParamsResult {
+export interface SingleParamResult {
   type: "single";
   command: "init";
 }
@@ -64,4 +64,9 @@ export const LayerTypeAliasMap = {
   "bug": "task"
 } as const;
 
-export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap; 
+export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
+
+/**
+ * Union type of all possible parameter result types
+ */
+export type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult; 
