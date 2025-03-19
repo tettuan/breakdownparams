@@ -1,80 +1,93 @@
-import { LayerTypeAliasMap } from "./types.ts";
-import type {
+import {
   ParamsResult,
   NoParamsResult,
   SingleParamResult,
   DoubleParamsResult,
   DemonstrativeType,
   LayerType,
-  FromLayerTypeAlias,
+  OptionParams,
+  LayerTypeAliasMap,
 } from "./types.ts";
 
 /**
- * A parser for command-line arguments that handles parameter breakdown
+ * A class to parse and validate command line arguments.
  * 
- * This parser supports the following formats:
- * - No parameters: Returns help/version status
- * - Single parameter: Command (e.g., "init")
- * - Double parameters: Command and layer type (e.g., "init", "component")
+ * This class provides functionality to parse command line arguments
+ * with type safety and validation.
  * 
  * @example
  * ```ts
  * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
+ * 
+ * if (result.type === "no-params") {
+ *   console.log(`Help: ${result.help}, Version: ${result.version}`);
+ * } else if (result.type === "single") {
+ *   console.log(`Command: ${result.command}`);
+ * } else if (result.type === "double") {
+ *   console.log(`Type: ${result.demonstrativeType}, Layer: ${result.layerType}`);
+ * }
  * ```
  */
 export class ParamsParser {
-  private readonly demonstrativeTypes = new Set<string>(["to", "summary", "defect"]);
+  private readonly demonstrativeTypes = new Set<DemonstrativeType>(["to", "summary", "defect"]);
   private readonly validSingleCommands = new Set<string>(["init"]);
 
   /**
-   * Parses command-line arguments and returns a structured result
+   * Parse command line arguments.
    * 
-   * @param args - Array of command-line arguments
-   * @returns A ParamsResult object containing parsed parameters
-   * @throws {Error} If invalid parameters are provided
+   * This method parses the command line arguments and returns a result
+   * indicating whether the parsing was successful or not.
+   * 
+   * @param args - The command line arguments to parse
+   * @returns A result object containing either the parsed data or an error message
    */
   parse(args: string[]): ParamsResult {
     try {
       // オプションとその値を除外して、実際のパラメータのみを取得
-      const nonOptionArgs = args.filter((arg, index) => {
-        if (arg.startsWith("-")) return false;
-        const prevArg = args[index - 1];
-        if (prevArg && prevArg.startsWith("-")) return false;
-        return true;
-      });
+      const nonOptionArgs: string[] = [];
+      for (let i = 0; i < args.length; i++) {
+        const arg = args[i];
+        if (!arg.startsWith("-")) {
+          nonOptionArgs.push(arg);
+        } else {
+          // Skip the next argument if it's a value for this option
+          const nextArg = args[i + 1];
+          if (nextArg && !nextArg.startsWith("-")) {
+            i++;
+          }
+        }
+      }
       
-      switch (nonOptionArgs.length) {
-        case 0:
-          return this.parseNoParams(args);
-        case 1:
-          return this.parseSingleParam(args);
-        case 2:
-          return this.parseDoubleParams(args);
-        default:
-          return this.createErrorResult("Too many arguments. Maximum 2 arguments are allowed.");
+      if (nonOptionArgs.length === 0) {
+        return this.parseNoParams(args);
+      } else if (nonOptionArgs.length === 1) {
+        return this.parseSingleParam(nonOptionArgs[0]);
+      } else if (nonOptionArgs.length === 2) {
+        return this.parseDoubleParams(nonOptionArgs[0], nonOptionArgs[1], args);
+      } else {
+        return {
+          type: "no-params",
+          help: false,
+          version: false,
+          error: "Too many arguments. Maximum 2 arguments are allowed."
+        };
       }
     } catch (error) {
-      return this.createErrorResult(
-        error instanceof Error ? error.message : "Unknown error occurred"
-      );
+      return {
+        type: "no-params",
+        help: false,
+        version: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred"
+      };
     }
   }
 
   /**
-   * エラー結果を作成
-   */
-  private createErrorResult(message: string): NoParamsResult {
-    return {
-      type: "no-params",
-      help: false,
-      version: false,
-      error: message
-    };
-  }
-
-  /**
-   * オプションのみのパラメータを解析
+   * Parse arguments when no parameters are expected.
+   * 
+   * @param args - The command line arguments
+   * @returns A result object containing help and version flags
    */
   private parseNoParams(args: string[]): NoParamsResult {
     const result: NoParamsResult = {
@@ -92,12 +105,18 @@ export class ParamsParser {
   }
 
   /**
-   * 単一パラメータを解析
+   * Parse arguments when a single parameter is expected.
+   * 
+   * @param command - The command parameter
+   * @returns A result object containing the parsed command
    */
-  private parseSingleParam(args: string[]): SingleParamResult | NoParamsResult {
-    const command = args.find(arg => !arg.startsWith("-"));
-    if (!command || !this.validSingleCommands.has(command)) {
-      return this.createErrorResult(`Invalid command: ${command}`);
+  private parseSingleParam(command: string): SingleParamResult {
+    if (!this.validSingleCommands.has(command)) {
+      return {
+        type: "single",
+        command: "init",
+        error: `Invalid command: ${command}. Only "init" is allowed.`
+      };
     }
 
     return {
@@ -107,107 +126,83 @@ export class ParamsParser {
   }
 
   /**
-   * 2つのパラメータとオプションを解析
+   * Parse arguments when two parameters are expected.
+   * 
+   * @param demonstrativeType - The demonstrative type parameter
+   * @param layerType - The layer type parameter
+   * @param args - The command line arguments
+   * @returns A result object containing the parsed parameters
    */
-  private parseDoubleParams(args: string[]): DoubleParamsResult | NoParamsResult {
-    const [demonstrativeType, layerType] = args.filter((arg, index) => {
-      if (arg.startsWith("-")) return false;
-      const prevArg = args[index - 1];
-      if (prevArg && prevArg.startsWith("-")) return false;
-      return true;
-    });
-
-    if (!this.demonstrativeTypes.has(demonstrativeType)) {
-      return this.createErrorResult(`Invalid demonstrative type: ${demonstrativeType}`);
+  private parseDoubleParams(
+    demonstrativeType: string,
+    layerType: string,
+    args: string[]
+  ): DoubleParamsResult {
+    if (!this.demonstrativeTypes.has(demonstrativeType as DemonstrativeType)) {
+      return {
+        type: "double",
+        demonstrativeType: "to", // default value
+        layerType: "project", // default value
+        options: {},
+        error: `Invalid demonstrative type: ${demonstrativeType}. Must be one of: to, summary, defect`
+      };
     }
 
-    const normalizedLayerType = this.normalizeLayerType(layerType.toLowerCase());
-    if (!normalizedLayerType) {
-      return this.createErrorResult(`Invalid layer type: ${layerType}`);
+    const normalizedLayerType = layerType.toLowerCase();
+    const mappedLayerType = LayerTypeAliasMap[normalizedLayerType as keyof typeof LayerTypeAliasMap];
+
+    if (!mappedLayerType) {
+      return {
+        type: "double",
+        demonstrativeType: demonstrativeType as DemonstrativeType,
+        layerType: "project", // default value
+        options: {},
+        error: `Invalid layer type: ${layerType}`
+      };
     }
+
+    const options = this.parseOptions(args);
 
     return {
       type: "double",
       demonstrativeType: demonstrativeType as DemonstrativeType,
-      layerType: normalizedLayerType,
-      options: this.parseOptions(args)
+      layerType: mappedLayerType,
+      options
     };
   }
 
   /**
-   * Parses command-line options (--help, --version)
+   * Parse command line options.
    * 
-   * @param args - Array of command-line arguments
-   * @returns Object containing help and version flags
+   * This method extracts and parses command line options from the arguments.
+   * 
+   * @param args - The command line arguments to parse
+   * @returns An object containing the parsed options
    */
-  private parseOptions(args: string[]): Record<string, string | LayerType> {
-    const options: Record<string, string> = {};
+  private parseOptions(args: string[]): OptionParams {
+    const options: OptionParams = {};
     
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
       const nextArg = args[i + 1];
-
-      switch (arg) {
-        case "--from":
-        case "-f":
-          if (nextArg && !nextArg.startsWith("-")) {
-            options.fromFile = nextArg;
-            i++;
-          }
-          break;
-        case "--destination":
-        case "-o":
-          if (nextArg && !nextArg.startsWith("-")) {
-            options.destinationFile = nextArg;
-            i++;
-          }
-          break;
-        case "--input":
-        case "-i":
-          if (nextArg && !nextArg.startsWith("-")) {
-            const normalizedType = this.normalizeLayerType(nextArg.toLowerCase());
-            if (normalizedType) {
-              options.fromLayerType = normalizedType;
-            }
-            i++;
-          }
-          break;
+      
+      if (!nextArg || nextArg.startsWith("-")) continue;
+      
+      if (arg === "--from" || arg === "-f") {
+        options.fromFile = nextArg;
+        i++;
+      } else if (arg === "--destination" || arg === "-o") {
+        options.destinationFile = nextArg;
+        i++;
+      } else if (arg === "--input" || arg === "-i") {
+        const value = nextArg.toLowerCase();
+        if (value in LayerTypeAliasMap) {
+          options.fromLayerType = LayerTypeAliasMap[value as keyof typeof LayerTypeAliasMap];
+        }
+        i++;
       }
     }
 
-    // 定義されたプロパティのみを含むオブジェクトを返す
-    const result: Record<string, string | LayerType> = {};
-    if (options.fromFile) result.fromFile = options.fromFile;
-    if (options.destinationFile) result.destinationFile = options.destinationFile;
-    if (options.fromLayerType) result.fromLayerType = options.fromLayerType;
-    return result;
-  }
-
-  /**
-   * レイヤータイプのエイリアスを正規化
-   */
-  private normalizeLayerType(alias: string): LayerType | null {
-    const normalized = LayerTypeAliasMap[alias as FromLayerTypeAlias];
-    return normalized as LayerType || null;
-  }
-
-  /**
-   * Validates a command parameter
-   * 
-   * @param command - The command to validate
-   * @returns true if the command is valid
-   */
-  private isValidCommand(command: string): boolean {
-    return this.validSingleCommands.has(command);
-  }
-
-  /**
-   * Validates a layer type parameter
-   * 
-   * @param layerType - The layer type to validate
-   * @returns true if the layer type is valid
-   */
-  private isValidLayerType(layerType: string): boolean {
-    return this.demonstrativeTypes.has(layerType);
+    return options;
   }
 } 

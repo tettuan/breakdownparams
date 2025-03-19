@@ -15,62 +15,67 @@
 
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ParamsParser } from "../src/params_parser.ts";
-import type { NoParamsResult } from "../src/types.ts";
 
-Deno.test("No Parameters", async (t) => {
-  const parser = new ParamsParser();
+const defaultOptions = {
+  command: "test-cli",
+  help: "Test CLI tool",
+  version: "1.0.0",
+  demonstrativeType: "command"
+};
 
-  await t.step("should handle empty arguments", () => {
-    const result = parser.parse([]) as NoParamsResult;
-    assertEquals(result, {
-      type: "no-params",
-      help: false,
-      version: false
-    });
-  });
+Deno.test("parse - no parameters", () => {
+  const parser = new ParamsParser(defaultOptions);
+  const testCases = [
+    {
+      args: [],
+      expected: {
+        help: false,
+        version: false
+      }
+    },
+    {
+      args: ["--help"],
+      expected: {
+        help: true,
+        version: false
+      }
+    },
+    {
+      args: ["-h"],
+      expected: {
+        help: true,
+        version: false
+      }
+    },
+    {
+      args: ["--version"],
+      expected: {
+        help: false,
+        version: true
+      }
+    },
+    {
+      args: ["-v"],
+      expected: {
+        help: false,
+        version: true
+      }
+    },
+    {
+      args: ["-h", "--version"],
+      expected: {
+        help: true,
+        version: true
+      }
+    }
+  ];
 
-  await t.step("should handle help option with long form", () => {
-    const result = parser.parse(["--help"]) as NoParamsResult;
-    assertEquals(result, {
-      type: "no-params",
-      help: true,
-      version: false
-    });
-  });
-
-  await t.step("should handle help option with short form", () => {
-    const result = parser.parse(["-h"]) as NoParamsResult;
-    assertEquals(result, {
-      type: "no-params",
-      help: true,
-      version: false
-    });
-  });
-
-  await t.step("should handle version option with long form", () => {
-    const result = parser.parse(["--version"]) as NoParamsResult;
-    assertEquals(result, {
-      type: "no-params",
-      help: false,
-      version: true
-    });
-  });
-
-  await t.step("should handle version option with short form", () => {
-    const result = parser.parse(["-v"]) as NoParamsResult;
-    assertEquals(result, {
-      type: "no-params",
-      help: false,
-      version: true
-    });
-  });
-
-  await t.step("should handle both help and version options", () => {
-    const result = parser.parse(["-h", "--version"]) as NoParamsResult;
-    assertEquals(result, {
-      type: "no-params",
-      help: true,
-      version: true
-    });
-  });
+  for (const { args, expected } of testCases) {
+    const result = parser.parse(args);
+    assertEquals(result.type, "success");
+    if (result.type === "success") {
+      assertEquals(result.data.help, expected.help);
+      assertEquals(result.data.version, expected.version);
+    }
+  }
 }); 

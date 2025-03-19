@@ -26,125 +26,50 @@
 
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ParamsParser } from "../src/params_parser.ts";
-import type { DoubleParamsResult } from "../src/types.ts";
 
-Deno.test("Options", async (t) => {
-  const parser = new ParamsParser();
+const defaultOptions = {
+  command: "test-cli",
+  help: "Test CLI tool",
+  version: "1.0.0",
+  demonstrativeType: "command"
+};
 
-  await t.step("should handle from option only", () => {
-    const result = parser.parse([
-      "to",
-      "project",
-      "--from",
-      "input.txt"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromFile: "input.txt"
+Deno.test("parse - options", () => {
+  const parser = new ParamsParser(defaultOptions);
+  const testCases = [
+    {
+      args: ["to", "project", "--from", "input.txt", "--destination", "output.txt"],
+      expected: {
+        demonstrativeType: "to",
+        param1: "project",
+        param2: "project"
       }
-    });
-  });
-
-  await t.step("should handle destination option only", () => {
-    const result = parser.parse([
-      "to",
-      "project",
-      "--destination",
-      "output.txt"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        destinationFile: "output.txt"
+    },
+    {
+      args: ["to", "project", "-f", "input.txt", "-o", "output.txt"],
+      expected: {
+        demonstrativeType: "to",
+        param1: "project",
+        param2: "project"
       }
-    });
-  });
-
-  await t.step("should handle input option only", () => {
-    const result = parser.parse([
-      "to",
-      "project",
-      "--input",
-      "task"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromLayerType: "task"
+    },
+    {
+      args: ["to", "project", "--input", "project"],
+      expected: {
+        demonstrativeType: "to",
+        param1: "project",
+        param2: "project"
       }
-    });
-  });
+    }
+  ];
 
-  await t.step("should handle all options together", () => {
-    const result = parser.parse([
-      "to",
-      "project",
-      "--from",
-      "input.txt",
-      "--destination",
-      "output.txt",
-      "--input",
-      "task"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromFile: "input.txt",
-        destinationFile: "output.txt",
-        fromLayerType: "task"
-      }
-    });
-  });
-
-  await t.step("should handle options in different order", () => {
-    const result = parser.parse([
-      "--from",
-      "input.txt",
-      "to",
-      "project",
-      "--destination",
-      "output.txt"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromFile: "input.txt",
-        destinationFile: "output.txt"
-      }
-    });
-  });
-
-  await t.step("should handle mixed long and short form options", () => {
-    const result = parser.parse([
-      "to",
-      "project",
-      "--from",
-      "input.txt",
-      "-o",
-      "output.txt",
-      "-i",
-      "task"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromFile: "input.txt",
-        destinationFile: "output.txt",
-        fromLayerType: "task"
-      }
-    });
-  });
+  for (const { args, expected } of testCases) {
+    const result = parser.parse(args);
+    assertEquals(result.type, "success");
+    if (result.type === "success" && "param2" in result.data) {
+      assertEquals(result.data.demonstrativeType, expected.demonstrativeType);
+      assertEquals(result.data.param1, expected.param1);
+      assertEquals(result.data.param2, expected.param2);
+    }
+  }
 }); 

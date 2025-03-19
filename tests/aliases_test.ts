@@ -28,7 +28,26 @@
 
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ParamsParser } from "../src/params_parser.ts";
-import type { DoubleParamsResult } from "../src/types.ts";
+
+const defaultOptions = {
+  command: "test-cli",
+  help: "Test CLI tool",
+  version: "1.0.0",
+  demonstrativeType: "command"
+};
+
+Deno.test("parse - layer type aliases", () => {
+  const parser = new ParamsParser(defaultOptions);
+  const aliases = ["pj", "prj", "proj", "PJ"];
+
+  for (const alias of aliases) {
+    const result = parser.parse(["to", alias]);
+    assertEquals(result.type, "success");
+    if (result.type === "success" && "param2" in result.data) {
+      assertEquals(result.data.param2, "project");
+    }
+  }
+});
 
 Deno.test("Layer Type Aliases", async (t) => {
   const parser = new ParamsParser();

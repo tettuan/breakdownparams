@@ -17,6 +17,7 @@ export interface NoParamsResult {
 export interface SingleParamResult {
   type: "single";
   command: "init";
+  error?: string;
 }
 
 /**
@@ -27,6 +28,7 @@ export interface DoubleParamsResult {
   demonstrativeType: DemonstrativeType;
   layerType: LayerType;
   options: OptionParams;
+  error?: string;
 }
 
 /**

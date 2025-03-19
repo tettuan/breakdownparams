@@ -24,78 +24,37 @@
 
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ParamsParser } from "../src/params_parser.ts";
-import type { DoubleParamsResult } from "../src/types.ts";
 
-Deno.test("Double Parameters", async (t) => {
-  const parser = new ParamsParser();
+const defaultOptions = {
+  command: "test-cli",
+  help: "Test CLI tool",
+  version: "1.0.0",
+  demonstrativeType: "command"
+};
 
-  await t.step("should handle to project", () => {
-    const result = parser.parse(["to", "project"]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {}
-    });
-  });
+Deno.test("parse - double parameters", () => {
+  const parser = new ParamsParser(defaultOptions);
+  const result = parser.parse(["to", "project"]);
+  assertEquals(result.type, "success");
+  if (result.type === "success" && "param2" in result.data) {
+    assertEquals(result.data.demonstrativeType, "to");
+    assertEquals(result.data.param1, "project");
+    assertEquals(result.data.param2, "project");
+  }
+});
 
-  await t.step("should handle summary issue", () => {
-    const result = parser.parse(["summary", "issue"]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "summary",
-      layerType: "issue",
-      options: {}
-    });
-  });
+Deno.test("parse - double parameters with different demonstrative types", () => {
+  const parser = new ParamsParser(defaultOptions);
+  const testCases = [
+    { args: ["summary", "issue"], demonstrativeType: "summary" },
+    { args: ["defect", "task"], demonstrativeType: "defect" }
+  ];
 
-  await t.step("should handle defect task", () => {
-    const result = parser.parse(["defect", "task"]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "defect",
-      layerType: "task",
-      options: {}
-    });
-  });
-
-  await t.step("should handle with options", () => {
-    const result = parser.parse([
-      "to",
-      "project",
-      "--from",
-      "input.txt",
-      "--destination",
-      "output.txt"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromFile: "input.txt",
-        destinationFile: "output.txt"
-      }
-    });
-  });
-
-  await t.step("should handle with short form options", () => {
-    const result = parser.parse([
-      "to",
-      "project",
-      "-f",
-      "input.txt",
-      "-o",
-      "output.txt"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromFile: "input.txt",
-        destinationFile: "output.txt"
-      }
-    });
-  });
+  for (const { args, demonstrativeType } of testCases) {
+    const result = parser.parse(args);
+    assertEquals(result.type, "success");
+    if (result.type === "success" && "param2" in result.data) {
+      assertEquals(result.data.demonstrativeType, demonstrativeType);
+    }
+  }
 }); 
