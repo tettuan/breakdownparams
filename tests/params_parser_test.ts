@@ -91,7 +91,6 @@ Deno.test("Single parameter with invalid command", () => {
   const result = parser.parse(["invalid"]);
   assertEquals(result.type, "single");
   if (result.type === "single") {
-    assertEquals(result.command, "init");
     assertExists(result.error);
     assertEquals(result.error, 'Invalid command: invalid. Only "init" is allowed.');
   }
@@ -147,8 +146,6 @@ Deno.test("Double parameters with invalid demonstrative type", () => {
   const result = parser.parse(["invalid", "issue"]);
   assertEquals(result.type, "double");
   if (result.type === "double") {
-    assertEquals(result.demonstrativeType, "to");
-    assertEquals(result.layerType, "project");
     assertExists(result.error);
     assertEquals(result.error, "Invalid demonstrative type: invalid. Must be one of: to, summary, defect");
   }
@@ -167,8 +164,6 @@ Deno.test("Double parameters with invalid layer type", () => {
   const result = parser.parse(["to", "invalid"]);
   assertEquals(result.type, "double");
   if (result.type === "double") {
-    assertEquals(result.demonstrativeType, "to");
-    assertEquals(result.layerType, "project");
     assertExists(result.error);
     assertEquals(result.error, "Invalid layer type: invalid");
   }
@@ -247,10 +242,124 @@ Deno.test("Double parameters with short form options", () => {
 Deno.test("Too many parameters", () => {
   const result = parser.parse(["to", "issue", "extra"]);
   assertEquals(result.type, "no-params");
-  if (result.type === "no-params") {
-    assertEquals(result.help, false);
-    assertEquals(result.version, false);
+  assertExists(result.error);
+  assertEquals(result.error, "Too many arguments. Maximum 2 arguments are allowed.");
+});
+
+/**
+ * 目的: オプションの複合的な組み合わせを確認
+ * 背景: CLIツールでは、複数のオプションを組み合わせて使用するケースがある
+ * 期待される成果:
+ * - パラメータタイプが"double"であること
+ * - demonstrativeTypeとlayerTypeが正しく設定されていること
+ * - すべてのオプションが正しく解析されていること
+ */
+Deno.test("Double parameters with multiple options", () => {
+  const result = parser.parse([
+    "to",
+    "issue",
+    "--from",
+    "input.md",
+    "--destination",
+    "output.md",
+    "--input",
+    "project",
+    "-f",
+    "another.md",
+    "-o",
+    "another.md",
+    "-i",
+    "task"
+  ]);
+  assertEquals(result.type, "double");
+  if (result.type === "double") {
+    assertEquals(result.demonstrativeType, "to");
+    assertEquals(result.layerType, "issue");
+    assertEquals(result.options, {
+      fromFile: "input.md",
+      destinationFile: "output.md",
+      fromLayerType: "project"
+    });
+  }
+});
+
+/**
+ * 目的: レイヤータイプの大文字小文字の扱いを確認
+ * 背景: 仕様では小文字のみが有効とされている
+ * 期待される成果:
+ * - パラメータタイプが"double"であること
+ * - 大文字のエイリアスは無視され、デフォルト値が使用されること
+ * - エラーメッセージが適切に設定されていること
+ */
+Deno.test("Double parameters with uppercase layer type", () => {
+  const result = parser.parse(["to", "STORY"]);
+  assertEquals(result.type, "double");
+  if (result.type === "double") {
     assertExists(result.error);
-    assertEquals(result.error, "Too many arguments. Maximum 2 arguments are allowed.");
+    assertEquals(result.error, "Invalid layer type: STORY");
+  }
+});
+
+/**
+ * 目的: オプションの値が不正な場合のエラーハンドリングを確認
+ * 背景: オプションの値が不正な場合でも、パースは継続される必要がある
+ * 期待される成果:
+ * - パラメータタイプが"double"であること
+ * - demonstrativeTypeとlayerTypeが正しく設定されていること
+ * - 不正なオプション値は無視されること
+ */
+Deno.test("Double parameters with invalid option values", () => {
+  const result = parser.parse([
+    "to",
+    "issue",
+    "--from",
+    "--invalid",
+    "--destination",
+    "--invalid",
+    "--input",
+    "invalid"
+  ]);
+  assertEquals(result.type, "double");
+  if (result.type === "double") {
+    assertEquals(result.demonstrativeType, "to");
+    assertEquals(result.layerType, "issue");
+    assertEquals(result.options, {});
+  }
+});
+
+/**
+ * 目的: オプションの重複指定時の挙動を確認
+ * 背景: 仕様ではロングフォームが優先される
+ * 期待される成果:
+ * - パラメータタイプが"double"であること
+ * - ロングフォームの値が優先されること
+ * - ショートハンドの値は無視されること
+ */
+Deno.test("Double parameters with duplicate options", () => {
+  const result = parser.parse([
+    "to",
+    "issue",
+    "--from",
+    "long.md",
+    "-f",
+    "short.md",
+    "--destination",
+    "long.md",
+    "-o",
+    "short.md",
+    "--input",
+    "project",
+    "-i",
+    "task"
+  ]);
+  assertEquals(result.type, "double");
+  if (result.type === "double") {
+    assertEquals(result.demonstrativeType, "to");
+    assertEquals(result.layerType, "issue");
+    assertEquals(result.options, {
+      fromFile: "long.md",
+      destinationFile: "long.md",
+      fromLayerType: "project"
+    });
   }
 }); 

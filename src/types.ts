@@ -6,8 +6,8 @@ export type ParamsType = "no-params" | "single" | "double";
  */
 export interface NoParamsResult {
   type: "no-params";
-  help: boolean;
-  version: boolean;
+  help?: boolean;
+  version?: boolean;
   error?: string;
 }
 
@@ -16,7 +16,7 @@ export interface NoParamsResult {
  */
 export interface SingleParamResult {
   type: "single";
-  command: "init";
+  command?: "init";
   error?: string;
 }
 
@@ -25,9 +25,9 @@ export interface SingleParamResult {
  */
 export interface DoubleParamsResult {
   type: "double";
-  demonstrativeType: DemonstrativeType;
-  layerType: LayerType;
-  options: OptionParams;
+  demonstrativeType?: DemonstrativeType;
+  layerType?: LayerType;
+  options?: OptionParams;
   error?: string;
 }
 

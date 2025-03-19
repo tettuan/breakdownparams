@@ -43,14 +43,12 @@ export class ParamsParser {
    */
   parse(args: string[]): ParamsResult {
     try {
-      // オプションとその値を除外して、実際のパラメータのみを取得
       const nonOptionArgs: string[] = [];
       for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         if (!arg.startsWith("-")) {
           nonOptionArgs.push(arg);
         } else {
-          // Skip the next argument if it's a value for this option
           const nextArg = args[i + 1];
           if (nextArg && !nextArg.startsWith("-")) {
             i++;
@@ -67,16 +65,12 @@ export class ParamsParser {
       } else {
         return {
           type: "no-params",
-          help: false,
-          version: false,
           error: "Too many arguments. Maximum 2 arguments are allowed."
         };
       }
     } catch (error) {
       return {
         type: "no-params",
-        help: false,
-        version: false,
         error: error instanceof Error ? error.message : "Unknown error occurred"
       };
     }
@@ -113,7 +107,6 @@ export class ParamsParser {
     if (!this.validSingleCommands.has(command)) {
       return {
         type: "single",
-        command: "init",
         error: `Invalid command: ${command}. Only "init" is allowed.`
       };
     }
@@ -140,22 +133,17 @@ export class ParamsParser {
     if (!this.demonstrativeTypes.has(demonstrativeType as DemonstrativeType)) {
       return {
         type: "double",
-        demonstrativeType: "to", // default value
-        layerType: "project", // default value
-        options: {},
         error: `Invalid demonstrative type: ${demonstrativeType}. Must be one of: to, summary, defect`
       };
     }
 
+    // 大文字小文字を区別せずにエイリアスを検証
     const normalizedLayerType = layerType.toLowerCase();
     const mappedLayerType = LayerTypeAliasMap[normalizedLayerType as keyof typeof LayerTypeAliasMap];
 
-    if (!mappedLayerType) {
+    if (!mappedLayerType || layerType !== normalizedLayerType) {
       return {
         type: "double",
-        demonstrativeType: demonstrativeType as DemonstrativeType,
-        layerType: "project", // default value
-        options: {},
         error: `Invalid layer type: ${layerType}`
       };
     }
@@ -181,19 +169,40 @@ export class ParamsParser {
   private parseOptions(args: string[]): OptionParams {
     const options: OptionParams = {};
     
+    // ロングフォームを先に処理
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
       const nextArg = args[i + 1];
       
       if (!nextArg || nextArg.startsWith("-")) continue;
       
-      if (arg === "--from" || arg === "-f") {
+      if (arg === "--from" || arg === "--destination" || arg === "--input") {
+        if (arg === "--from") options.fromFile = nextArg;
+        if (arg === "--destination") options.destinationFile = nextArg;
+        if (arg === "--input") {
+          const value = nextArg.toLowerCase();
+          if (value in LayerTypeAliasMap) {
+            options.fromLayerType = LayerTypeAliasMap[value as keyof typeof LayerTypeAliasMap];
+          }
+        }
+        i++;
+      }
+    }
+    
+    // ショートハンドは、ロングフォームが未設定の場合のみ処理
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      const nextArg = args[i + 1];
+      
+      if (!nextArg || nextArg.startsWith("-")) continue;
+      
+      if (arg === "-f" && !options.fromFile) {
         options.fromFile = nextArg;
         i++;
-      } else if (arg === "--destination" || arg === "-o") {
+      } else if (arg === "-o" && !options.destinationFile) {
         options.destinationFile = nextArg;
         i++;
-      } else if (arg === "--input" || arg === "-i") {
+      } else if (arg === "-i" && !options.fromLayerType) {
         const value = nextArg.toLowerCase();
         if (value in LayerTypeAliasMap) {
           options.fromLayerType = LayerTypeAliasMap[value as keyof typeof LayerTypeAliasMap];
