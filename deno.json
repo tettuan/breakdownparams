@@ -15,7 +15,7 @@
     "strict": true
   },
   "publish": {
-    "include": ["src/", "mod.ts", "README.md", "LICENSE"]
+    "include": ["src/", "mod.ts", "README.md", "LICENSE", "deno.json"]
   },
   "runtimes": ["deno", "node"]
 } 
