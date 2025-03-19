@@ -24,7 +24,7 @@ jobs:
         run: deno test --check --no-lock
 
       - name: Run linter
-        run: deno lint --no-lock
+        run: deno lint
 
       - name: Publish to JSR
         run: deno publish --no-lock
