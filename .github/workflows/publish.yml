@@ -20,16 +20,13 @@ jobs:
         with:
           deno-version: v1.41.3
 
-      - name: Rebuild deno.lock
-        run: deno cache --reload mod.ts
-
       - name: Run tests
-        run: deno test --check
+        run: deno test --check --no-lock
 
       - name: Run linter
-        run: deno lint
+        run: deno lint --no-lock
 
       - name: Publish to JSR
-        run: deno publish
+        run: deno publish --no-lock
         env:
           DENO_AUTH_TOKEN: ${{ secrets.DENO_AUTH_TOKEN }} 
