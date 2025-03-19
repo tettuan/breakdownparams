@@ -17,6 +17,7 @@ export interface NoParamsResult {
 export interface SingleParamResult {
   type: "single";
   command?: "init";
+  options?: OptionParams;
   error?: string;
 }
 
@@ -53,9 +54,12 @@ export const LayerTypeAliasMap = {
   "project": "project",
   "pj": "project",
   "prj": "project",
+  "p": "project",
   // issue aliases
   "issue": "issue",
   "story": "issue",
+  "i": "issue",
+  "iss": "issue",
   // task aliases
   "task": "task",
   "todo": "task",
@@ -63,7 +67,8 @@ export const LayerTypeAliasMap = {
   "style": "task",
   "fix": "task",
   "error": "task",
-  "bug": "task"
+  "bug": "task",
+  "t": "task"
 } as const;
 
 export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap; 

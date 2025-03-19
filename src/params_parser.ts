@@ -59,7 +59,7 @@ export class ParamsParser {
       if (nonOptionArgs.length === 0) {
         return this.parseNoParams(args);
       } else if (nonOptionArgs.length === 1) {
-        return this.parseSingleParam(nonOptionArgs[0]);
+        return this.parseSingleParam(nonOptionArgs[0], args);
       } else if (nonOptionArgs.length === 2) {
         return this.parseDoubleParams(nonOptionArgs[0], nonOptionArgs[1], args);
       } else {
@@ -101,19 +101,23 @@ export class ParamsParser {
    * Parse arguments when a single parameter is expected.
    * 
    * @param command - The command parameter
+   * @param args - The command line arguments
    * @returns A result object containing the parsed command
    */
-  private parseSingleParam(command: string): SingleParamResult {
+  private parseSingleParam(command: string, args: string[]): ParamsResult {
     if (!this.validSingleCommands.has(command)) {
       return {
-        type: "single",
-        error: `Invalid command: ${command}. Only "init" is allowed.`
+        type: "no-params",
+        error: `Invalid command: ${command}`,
+        help: false,
+        version: false
       };
     }
 
     return {
       type: "single",
-      command: "init"
+      command: "init",
+      options: this.parseOptions(args)
     };
   }
 
@@ -130,7 +134,8 @@ export class ParamsParser {
     layerType: string,
     args: string[]
   ): DoubleParamsResult {
-    if (!this.demonstrativeTypes.has(demonstrativeType as DemonstrativeType)) {
+    const normalizedDemonstrativeType = demonstrativeType.toLowerCase();
+    if (!this.demonstrativeTypes.has(normalizedDemonstrativeType as DemonstrativeType)) {
       return {
         type: "double",
         error: `Invalid demonstrative type: ${demonstrativeType}. Must be one of: to, summary, defect`
@@ -141,7 +146,7 @@ export class ParamsParser {
     const normalizedLayerType = layerType.toLowerCase();
     const mappedLayerType = LayerTypeAliasMap[normalizedLayerType as keyof typeof LayerTypeAliasMap];
 
-    if (!mappedLayerType || layerType !== normalizedLayerType) {
+    if (!mappedLayerType) {
       return {
         type: "double",
         error: `Invalid layer type: ${layerType}`
@@ -152,7 +157,7 @@ export class ParamsParser {
 
     return {
       type: "double",
-      demonstrativeType: demonstrativeType as DemonstrativeType,
+      demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
       layerType: mappedLayerType,
       options
     };

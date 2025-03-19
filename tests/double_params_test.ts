@@ -25,36 +25,77 @@
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ParamsParser } from "../src/params_parser.ts";
 
-const defaultOptions = {
-  command: "test-cli",
-  help: "Test CLI tool",
-  version: "1.0.0",
-  demonstrativeType: "command"
-};
+Deno.test("Double Parameters", async (t) => {
+  const parser = new ParamsParser();
 
-Deno.test("parse - double parameters", () => {
-  const parser = new ParamsParser(defaultOptions);
-  const result = parser.parse(["to", "project"]);
-  assertEquals(result.type, "success");
-  if (result.type === "success" && "param2" in result.data) {
-    assertEquals(result.data.demonstrativeType, "to");
-    assertEquals(result.data.param1, "project");
-    assertEquals(result.data.param2, "project");
-  }
-});
-
-Deno.test("parse - double parameters with different demonstrative types", () => {
-  const parser = new ParamsParser(defaultOptions);
-  const testCases = [
-    { args: ["summary", "issue"], demonstrativeType: "summary" },
-    { args: ["defect", "task"], demonstrativeType: "defect" }
-  ];
-
-  for (const { args, demonstrativeType } of testCases) {
-    const result = parser.parse(args);
-    assertEquals(result.type, "success");
-    if (result.type === "success" && "param2" in result.data) {
-      assertEquals(result.data.demonstrativeType, demonstrativeType);
+  await t.step("should handle basic combinations", () => {
+    const result = parser.parse(["to", "project"]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "project");
+      assertEquals(result.options, {});
     }
-  }
+  });
+
+  await t.step("should handle different demonstrative types", () => {
+    const testCases = [
+      { args: ["summary", "issue"], demonstrativeType: "summary" },
+      { args: ["defect", "task"], demonstrativeType: "defect" }
+    ];
+
+    for (const { args, demonstrativeType } of testCases) {
+      const result = parser.parse(args);
+      assertEquals(result.type, "double");
+      if (result.type === "double") {
+        assertEquals(result.demonstrativeType, demonstrativeType);
+      }
+    }
+  });
+
+  await t.step("should handle options", () => {
+    const result = parser.parse([
+      "to",
+      "project",
+      "--from",
+      "input.txt",
+      "--destination",
+      "output.txt",
+      "--input",
+      "issue"
+    ]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "project");
+      assertEquals(result.options, {
+        fromFile: "input.txt",
+        destinationFile: "output.txt",
+        fromLayerType: "issue"
+      });
+    }
+  });
+
+  await t.step("should handle short form options", () => {
+    const result = parser.parse([
+      "to",
+      "project",
+      "-f",
+      "input.txt",
+      "-o",
+      "output.txt",
+      "-i",
+      "issue"
+    ]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "project");
+      assertEquals(result.options, {
+        fromFile: "input.txt",
+        destinationFile: "output.txt",
+        fromLayerType: "issue"
+      });
+    }
+  });
 }); 

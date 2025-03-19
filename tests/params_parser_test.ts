@@ -110,16 +110,16 @@ Deno.test("Single parameter with init command", () => {
  * - ユーザーが誤ったコマンドを入力した場合、適切なエラーメッセージを返す必要がある
  * - エラーメッセージは具体的で、ユーザーが正しいコマンドを特定できる必要がある
  * 期待される成果:
- * - パラメータタイプが"single"であること
+ * - パラメータタイプが"no-params"であること
  * - エラーメッセージが適切に設定されていること
- * - エラーメッセージに許可されるコマンドが含まれていること
+ * - エラーメッセージに無効なコマンドが含まれていること
  */
 Deno.test("Single parameter with invalid command", () => {
   const result = parser.parse(["invalid"]);
-  assertEquals(result.type, "single");
-  if (result.type === "single") {
+  assertEquals(result.type, "no-params");
+  if (result.type === "no-params") {
     assertExists(result.error);
-    assertEquals(result.error, 'Invalid command: invalid. Only "init" is allowed.');
+    assertEquals(result.error, "Invalid command: invalid");
   }
 });
 
@@ -330,21 +330,23 @@ Deno.test("Double parameters with multiple options", () => {
 });
 
 /**
- * 目的: レイヤータイプの大文字小文字の扱いを確認
+ * 目的: 大文字のレイヤータイプが正しく解析されることを確認
  * 背景: 
- * - 仕様では小文字のみが有効とされている
- * - 大文字を含むエイリアスは無効として扱う
+ * - レイヤータイプは大文字小文字を区別しない
+ * - 大文字で入力されたエイリアスも正しく解決される必要がある
  * 期待される成果:
  * - パラメータタイプが"double"であること
- * - 大文字のエイリアスは無効として扱われ、エラーメッセージが返されること
- * - エラーメッセージに無効な値が含まれていること
+ * - demonstrativeTypeが"to"であること
+ * - layerTypeが"issue"であること（"STORY"から正しく解決されること）
+ * - エラーが発生しないこと
  */
 Deno.test("Double parameters with uppercase layer type", () => {
   const result = parser.parse(["to", "STORY"]);
   assertEquals(result.type, "double");
   if (result.type === "double") {
-    assertExists(result.error);
-    assertEquals(result.error, "Invalid layer type: STORY");
+    assertEquals(result.demonstrativeType, "to");
+    assertEquals(result.layerType, "issue");
+    assertEquals(result.options, {});
   }
 });
 

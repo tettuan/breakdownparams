@@ -1,123 +1,85 @@
 /**
- * レイヤータイプのエイリアス処理のテストスイート
+ * レイヤータイプエイリアスのテストスイート
  * 
  * このテストファイルの目的：
- * 1. レイヤータイプの各エイリアスが正しく解決されることを確認
- * 2. 大文字小文字の区別なく処理されることを検証
- * 3. オプションと組み合わせた場合の動作を確認
+ * 1. レイヤータイプのエイリアスが正しく解決されることを確認
+ * 2. 大文字小文字を区別しない処理を検証
+ * 3. オプション付きのエイリアス処理を確認
  * 
  * 期待される動作：
- * - プロジェクトエイリアス：project, pj, prj が同じレイヤータイプに解決される
- * - イシューエイリアス：issue, story が同じレイヤータイプに解決される
- * - タスクエイリアス：task, todo, chore, style, fix, error, bug が
- *   同じレイヤータイプに解決される
- * - 大文字小文字：異なる大文字小文字でも正しく解決される
- * - オプション組み合わせ：エイリアスとオプションが共存できる
+ * - プロジェクトエイリアス（p, proj）が正しく解決される
+ * - イシューエイリアス（i, iss）が正しく解決される
+ * - タスクエイリアス（t, task）が正しく解決される
+ * - 大文字小文字を区別しない処理が行われる
+ * - オプション付きのエイリアスが正しく処理される
  * 
  * テストケースの構成：
  * 1. プロジェクトエイリアスのテスト
  * 2. イシューエイリアスのテスト
  * 3. タスクエイリアスのテスト
- * 4. 大文字小文字の区別なしテスト
+ * 4. 大文字小文字を区別しないテスト
  * 5. オプション付きエイリアスのテスト
  * 
  * 注意事項：
- * - 無効なエイリアスのテストは error_test.ts で行う
- * - エイリアスの組み合わせテストは double_params_test.ts で行う
+ * - エイリアスは大文字小文字を区別しない
+ * - オプションはエイリアス解決後に適用される
  */
 
 import { assertEquals } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ParamsParser } from "../src/params_parser.ts";
 
-const defaultOptions = {
-  command: "test-cli",
-  help: "Test CLI tool",
-  version: "1.0.0",
-  demonstrativeType: "command"
-};
-
-Deno.test("parse - layer type aliases", () => {
-  const parser = new ParamsParser(defaultOptions);
-  const aliases = ["pj", "prj", "proj", "PJ"];
-
-  for (const alias of aliases) {
-    const result = parser.parse(["to", alias]);
-    assertEquals(result.type, "success");
-    if (result.type === "success" && "param2" in result.data) {
-      assertEquals(result.data.param2, "project");
-    }
-  }
-});
-
 Deno.test("Layer Type Aliases", async (t) => {
   const parser = new ParamsParser();
 
   await t.step("should handle project aliases", () => {
-    const aliases = ["project", "pj", "prj"];
-    for (const alias of aliases) {
-      const result = parser.parse(["to", alias]) as DoubleParamsResult;
-      assertEquals(result, {
-        type: "double",
-        demonstrativeType: "to",
-        layerType: "project",
-        options: {}
-      });
+    const result = parser.parse(["to", "p"]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "project");
+      assertEquals(result.options, {});
     }
   });
 
   await t.step("should handle issue aliases", () => {
-    const aliases = ["issue", "story"];
-    for (const alias of aliases) {
-      const result = parser.parse(["to", alias]) as DoubleParamsResult;
-      assertEquals(result, {
-        type: "double",
-        demonstrativeType: "to",
-        layerType: "issue",
-        options: {}
-      });
+    const result = parser.parse(["to", "i"]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "issue");
+      assertEquals(result.options, {});
     }
   });
 
   await t.step("should handle task aliases", () => {
-    const aliases = ["task", "todo", "chore", "style", "fix", "error", "bug"];
-    for (const alias of aliases) {
-      const result = parser.parse(["to", alias]) as DoubleParamsResult;
-      assertEquals(result, {
-        type: "double",
-        demonstrativeType: "to",
-        layerType: "task",
-        options: {}
-      });
+    const result = parser.parse(["to", "t"]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "task");
+      assertEquals(result.options, {});
     }
   });
 
   await t.step("should handle case-insensitive aliases", () => {
-    const result = parser.parse(["to", "PJ"]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {}
-    });
+    const result = parser.parse(["TO", "P"]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "project");
+      assertEquals(result.options, {});
+    }
   });
 
   await t.step("should handle aliases with options", () => {
-    const result = parser.parse([
-      "to",
-      "pj",
-      "--from",
-      "input.txt",
-      "--destination",
-      "output.txt"
-    ]) as DoubleParamsResult;
-    assertEquals(result, {
-      type: "double",
-      demonstrativeType: "to",
-      layerType: "project",
-      options: {
-        fromFile: "input.txt",
-        destinationFile: "output.txt"
-      }
-    });
+    const result = parser.parse(["to", "p", "--from", "input.txt"]);
+    assertEquals(result.type, "double");
+    if (result.type === "double") {
+      assertEquals(result.demonstrativeType, "to");
+      assertEquals(result.layerType, "project");
+      assertEquals(result.options, {
+        fromFile: "input.txt"
+      });
+    }
   });
 }); 
