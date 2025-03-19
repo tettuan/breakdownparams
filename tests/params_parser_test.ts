@@ -1,12 +1,5 @@
 import { assertEquals, assertExists } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ParamsParser } from "../src/params_parser.ts";
-import type {
-  NoParamsResult,
-  SingleParamResult,
-  DoubleParamsResult,
-  DemonstrativeType,
-  LayerType,
-} from "../src/types.ts";
 
 /**
  * ParamsParserのテストスイート
@@ -17,13 +10,6 @@ import type {
  * 4. 2パラメータのケース
  * 5. エラーケース
  */
-
-const defaultOptions = {
-  command: "test-cli",
-  help: "Test CLI tool",
-  version: "1.0.0",
-  demonstrativeType: "command"
-};
 
 const parser = new ParamsParser();
 

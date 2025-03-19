@@ -4,7 +4,6 @@ import {
   SingleParamResult,
   DoubleParamsResult,
   DemonstrativeType,
-  LayerType,
   OptionParams,
   LayerTypeAliasMap,
 } from "./types.ts";
