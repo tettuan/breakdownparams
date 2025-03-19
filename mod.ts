@@ -1,12 +1,32 @@
 /**
- * A command line argument parser for breakdown tasks.
- * This module provides functionality to parse command line arguments
- * for task breakdown operations.
+ * A utility to parse and validate command line arguments with type safety.
+ * 
+ * This module provides a type-safe way to parse command line arguments,
+ * supporting various parameter types and validation rules.
+ * 
+ * @example
+ * ```ts
+ * import { ParamsParser } from "@tettuan/breakdownparams";
+ * 
+ * const parser = new ParamsParser({
+ *   command: "my-cli",
+ *   help: "A command line tool",
+ *   version: "1.0.0",
+ *   demonstrativeType: "command",
+ * });
+ * 
+ * const result = parser.parse(Deno.args);
+ * if (result.type === "success") {
+ *   console.log(result.data);
+ * } else {
+ *   console.error(result.error);
+ * }
+ * ```
  * 
  * @module
  */
 
-export { ParamsParser } from "./src/params_parser.ts";
+export * from "./src/params_parser.ts";
 export type {
   NoParamsResult,
   SingleParamResult,
