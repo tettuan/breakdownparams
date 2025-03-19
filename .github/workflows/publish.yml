@@ -18,7 +18,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: v1.41.3
 
       - name: Rebuild deno.lock
         run: deno cache --reload mod.ts
