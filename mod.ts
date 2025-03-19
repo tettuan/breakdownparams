@@ -24,6 +24,7 @@
  * ```
  * 
  * @module
+ * @packageDocumentation
  */
 
 export * from "./src/params_parser.ts";

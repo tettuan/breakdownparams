@@ -3,6 +3,9 @@
   "version": "0.1.3",
   "description": "A utility to parse and validate command line arguments with type safety",
   "repository": "https://github.com/tettuan/breakdownparams",
+  "keywords": ["cli", "args", "parser", "typescript", "deno"],
+  "license": "MIT",
+  "author": "tettuan",
   "exports": "./mod.ts",
   "tasks": {
     "test": "deno test --allow-read",
