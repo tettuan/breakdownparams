@@ -27,6 +27,4 @@ jobs:
         run: deno lint
 
       - name: Publish to JSR
-        run: deno publish
-        env:
-          DENO_AUTH_TOKEN: ${{ secrets.DENO_AUTH_TOKEN }} 
+        run: deno publish 
