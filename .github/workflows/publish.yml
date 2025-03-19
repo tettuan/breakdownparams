@@ -20,6 +20,9 @@ jobs:
         with:
           deno-version: v1.x
 
+      - name: Rebuild deno.lock
+        run: deno cache --reload mod.ts
+
       - name: Run tests
         run: deno test --check
 
