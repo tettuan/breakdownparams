@@ -1,21 +1,18 @@
 {
   "name": "@tettuan/breakdownparams",
-  "version": "0.1.0",
-  "exports": {
-    ".": "./mod.ts"
-  },
+  "version": "0.1.2",
+  "exports": "./mod.ts",
   "tasks": {
     "test": "deno test --allow-read"
   },
   "fmt": {
-    "include": ["src/", "mod.ts"]
+    "include": ["src/", "mod.ts", "tests/"]
   },
   "lint": {
-    "include": ["src/", "mod.ts"]
+    "include": ["src/", "mod.ts", "tests/"]
   },
   "compilerOptions": {
-    "strict": true,
-    "allowJs": false
+    "strict": true
   },
   "publish": {
     "include": ["src/", "mod.ts", "README.md", "LICENSE"]
