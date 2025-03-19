@@ -1,5 +1,5 @@
 {
-  "name": "breakdownparams",
+  "name": "@tettuan/breakdownparams",
   "version": "0.1.5",
   "description": "A utility to parse and validate command line arguments with type safety",
   "repository": "https://github.com/tettuan/breakdownparams",
