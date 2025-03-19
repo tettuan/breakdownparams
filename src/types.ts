@@ -1,12 +1,6 @@
 // パラメータの種類
 export type ParamsType = "no-params" | "single" | "double";
 
-// 基本型
-export interface ParamsResult {
-  type: ParamsType;
-  error?: string;
-}
-
 /**
  * Result type for when no parameters are provided
  */
@@ -14,6 +8,7 @@ export interface NoParamsResult {
   type: "no-params";
   help: boolean;
   version: boolean;
+  error?: string;
 }
 
 /**
@@ -27,12 +22,17 @@ export interface SingleParamResult {
 /**
  * Result type for when two parameters are provided
  */
-export interface DoubleParamsResult extends ParamsResult {
+export interface DoubleParamsResult {
   type: "double";
   demonstrativeType: DemonstrativeType;
   layerType: LayerType;
   options: OptionParams;
 }
+
+/**
+ * Union type of all possible parameter result types
+ */
+export type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
 
 // オプション
 export interface OptionParams {
@@ -64,9 +64,4 @@ export const LayerTypeAliasMap = {
   "bug": "task"
 } as const;
 
-export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
-
-/**
- * Union type of all possible parameter result types
- */
-export type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult; 
+export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap; 
