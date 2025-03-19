@@ -1,35 +1,44 @@
 {
-  "name": "@tettuan/breakdownparams",
+  "name": "breakdownparams",
   "version": "0.1.4",
   "description": "A utility to parse and validate command line arguments with type safety",
   "repository": "https://github.com/tettuan/breakdownparams",
   "keywords": ["cli", "args", "parser", "typescript", "deno"],
   "license": "MIT",
   "author": "tettuan",
-  "exports": "./mod.ts",
+  "exports": "./src/mod.ts",
+  "imports": {
+    "@": "./src/"
+  },
   "tasks": {
-    "test": "deno test --allow-read",
+    "test": "deno test -A --env",
     "check": "deno check **/*.ts",
     "fmt": "deno fmt",
     "lint": "deno lint"
   },
   "fmt": {
-    "include": ["src/", "mod.ts", "tests/"],
-    "lineWidth": 100,
-    "indentWidth": 2,
-    "semiColons": true,
-    "singleQuote": false
+    "files": {
+      "include": ["src/", "tests/"]
+    },
+    "options": {
+      "lineWidth": 100,
+      "indentWidth": 2,
+      "singleQuote": true,
+      "proseWrap": "preserve"
+    }
   },
   "lint": {
-    "include": ["src/", "mod.ts", "tests/"],
+    "files": {
+      "include": ["src/", "tests/"]
+    },
     "rules": {
       "tags": ["recommended"]
     }
   },
   "compilerOptions": {
-    "strict": true,
-    "allowJs": false,
-    "lib": ["deno.window", "deno.ns"]
+    "allowJs": true,
+    "lib": ["deno.window", "dom", "esnext"],
+    "strict": true
   },
   "publish": {
     "include": ["src/", "mod.ts", "README.md", "LICENSE", "deno.json"],
