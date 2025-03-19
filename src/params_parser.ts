@@ -104,7 +104,7 @@ export class ParamsParser {
    * @param args - The command line arguments
    * @returns A result object containing the parsed command
    */
-  private parseSingleParam(command: string, args: string[]): ParamsResult {
+  private parseSingleParam(command: string, args: string[]): SingleParamResult | NoParamsResult {
     if (!this.validSingleCommands.has(command)) {
       return {
         type: "no-params",
