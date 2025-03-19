@@ -9,14 +9,30 @@ import type {
   FromLayerTypeAlias,
 } from "./types.ts";
 
+/**
+ * A parser for command-line arguments that handles parameter breakdown
+ * 
+ * This parser supports the following formats:
+ * - No parameters: Returns help/version status
+ * - Single parameter: Command (e.g., "init")
+ * - Double parameters: Command and layer type (e.g., "init", "component")
+ * 
+ * @example
+ * ```ts
+ * const parser = new ParamsParser();
+ * const result = parser.parse(Deno.args);
+ * ```
+ */
 export class ParamsParser {
   private readonly demonstrativeTypes = new Set<string>(["to", "summary", "defect"]);
   private readonly validSingleCommands = new Set<string>(["init"]);
 
   /**
-   * コマンドライン引数を解析し、構造化されたパラメータオブジェクトを返す
-   * @param args コマンドライン引数の配列
-   * @returns パース結果
+   * Parses command-line arguments and returns a structured result
+   * 
+   * @param args - Array of command-line arguments
+   * @returns A ParamsResult object containing parsed parameters
+   * @throws {Error} If invalid parameters are provided
    */
   parse(args: string[]): ParamsResult {
     try {
@@ -119,9 +135,12 @@ export class ParamsParser {
   }
 
   /**
-   * オプションを解析
+   * Parses command-line options (--help, --version)
+   * 
+   * @param args - Array of command-line arguments
+   * @returns Object containing help and version flags
    */
-  private parseOptions(args: string[]) {
+  private parseOptions(args: string[]): Record<string, string | LayerType> {
     const options: Record<string, string> = {};
     
     for (let i = 0; i < args.length; i++) {
@@ -170,5 +189,25 @@ export class ParamsParser {
   private normalizeLayerType(alias: string): LayerType | null {
     const normalized = LayerTypeAliasMap[alias as FromLayerTypeAlias];
     return normalized as LayerType || null;
+  }
+
+  /**
+   * Validates a command parameter
+   * 
+   * @param command - The command to validate
+   * @returns true if the command is valid
+   */
+  private isValidCommand(command: string): boolean {
+    return this.validSingleCommands.has(command);
+  }
+
+  /**
+   * Validates a layer type parameter
+   * 
+   * @param layerType - The layer type to validate
+   * @returns true if the layer type is valid
+   */
+  private isValidLayerType(layerType: string): boolean {
+    return this.demonstrativeTypes.has(layerType);
   }
 } 

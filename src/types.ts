@@ -7,20 +7,26 @@ export interface ParamsResult {
   error?: string;
 }
 
-// パラメータなし
+/**
+ * Result type for when no parameters are provided
+ */
 export interface NoParamsResult extends ParamsResult {
   type: "no-params";
   help: boolean;
   version: boolean;
 }
 
-// 単一パラメータ
+/**
+ * Result type for when a single parameter is provided
+ */
 export interface SingleParamResult extends ParamsResult {
   type: "single";
   command: "init";
 }
 
-// 2パラメータ
+/**
+ * Result type for when two parameters are provided
+ */
 export interface DoubleParamsResult extends ParamsResult {
   type: "double";
   demonstrativeType: DemonstrativeType;

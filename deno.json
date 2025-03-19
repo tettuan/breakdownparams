@@ -8,15 +8,17 @@
     "test": "deno test --allow-read"
   },
   "fmt": {
-    "include": ["src/", "mod.ts", "tests/"]
+    "include": ["src/", "mod.ts"]
   },
   "lint": {
-    "include": ["src/", "mod.ts", "tests/"]
+    "include": ["src/", "mod.ts"]
   },
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "allowJs": false
   },
   "publish": {
     "include": ["src/", "mod.ts", "README.md", "LICENSE"]
-  }
+  },
+  "runtimes": ["deno", "node"]
 } 
