@@ -68,6 +68,56 @@ The main class for parsing command line arguments.
 - `--destination` or `-o`: Specify destination file
 - `--input` or `-i`: Specify input layer type
 
+## Development
+
+### Prerequisites
+
+- Deno
+- GitHub CLI (`gh`)
+- `jq` command line tool
+
+### Testing
+
+```bash
+deno task test
+```
+
+## Publishing
+
+The package is published to JSR using GitHub Actions. To publish a new version:
+
+1. Ensure all changes are committed and pushed
+2. Run the publish script to prepare the release:
+```bash
+./scripts/publish.sh
+```
+
+This script will:
+- Check for uncommitted changes
+- Verify GitHub Actions tests have passed
+- Regenerate `deno.lock`
+- Run format, lint, and test checks
+- Commit and push the updated lock file
+
+## Version Management
+
+To bump the version and create a new release:
+
+```bash
+./scripts/bump_version.sh
+```
+
+This script will:
+- Check for uncommitted changes
+- Verify GitHub Actions tests have passed
+- Check the latest version from JSR
+- Remove any tags newer than the latest JSR version
+- Increment the patch version
+- Update `deno.json`
+- Create and push a new git tag
+
+The new version will be automatically published to JSR when the tag is pushed.
+
 ## License
 
 MIT License - see LICENSE file for details. 
