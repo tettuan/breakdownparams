@@ -48,7 +48,11 @@ export interface OptionParams {
 export type DemonstrativeType = 'to' | 'summary' | 'defect';
 export type LayerType = 'project' | 'issue' | 'task';
 
-// エイリアスマッピング
+/**
+ * Mapping of layer type aliases to their canonical layer types.
+ * This constant maps various shorthand and alternative names to their standardized layer types.
+ * For example, 'pj' and 'prj' both map to 'project'.
+ */
 export const LayerTypeAliasMap = {
   // project aliases
   'project': 'project',
@@ -71,4 +75,9 @@ export const LayerTypeAliasMap = {
   't': 'task',
 } as const;
 
+/**
+ * Type representing all possible layer type aliases.
+ * This type is derived from the keys of LayerTypeAliasMap and includes all valid alias strings
+ * that can be used to specify a layer type.
+ */
 export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
