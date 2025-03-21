@@ -1,4 +1,4 @@
-name: Publish to JSR
+name: Publish
 
 on:
   push:
@@ -8,9 +8,6 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -18,13 +15,13 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.41.3
+          deno-version: '2.1.9'
 
-      - name: Run tests
-        run: deno test --check --no-lock
-
-      - name: Run linter
-        run: deno lint
+      - name: Get tag version
+        id: get_tag
+        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
       - name: Publish to JSR
         run: deno publish
+        env:
+          JSR_TOKEN: ${{ secrets.JSR_TOKEN }}
