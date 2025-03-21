@@ -25,7 +25,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 
 ```typescript
 // パラメータの種類
-type ParamsType = "no-params" | "single" | "double";
+type ParamsType = 'no-params' | 'single' | 'double';
 
 // 基本型
 interface ParamsResult {
@@ -35,20 +35,20 @@ interface ParamsResult {
 
 // パラメータなし
 interface NoParamsResult extends ParamsResult {
-  type: "no-params";
+  type: 'no-params';
   help: boolean;
   version: boolean;
 }
 
 // 単一パラメータ
 interface SingleParamResult extends ParamsResult {
-  type: "single";
-  command: "init";
+  type: 'single';
+  command: 'init';
 }
 
 // 2パラメータ
 interface DoubleParamsResult extends ParamsResult {
-  type: "double";
+  type: 'double';
   demonstrativeType: DemonstrativeType;
   layerType: LayerType;
   options: OptionParams;
@@ -62,26 +62,26 @@ interface OptionParams {
 }
 
 // 値の定義
-type DemonstrativeType = "to" | "summary" | "defect";
-type LayerType = "project" | "issue" | "task";
+type DemonstrativeType = 'to' | 'summary' | 'defect';
+type LayerType = 'project' | 'issue' | 'task';
 
 // エイリアスマッピング
 const LayerTypeAliasMap = {
   // project aliases
-  "project": "project",
-  "pj": "project",
-  "prj": "project",
+  'project': 'project',
+  'pj': 'project',
+  'prj': 'project',
   // issue aliases
-  "issue": "issue",
-  "story": "issue",
+  'issue': 'issue',
+  'story': 'issue',
   // task aliases
-  "task": "task",
-  "todo": "task",
-  "chore": "task",
-  "style": "task",
-  "fix": "task",
-  "error": "task",
-  "bug": "task"
+  'task': 'task',
+  'todo': 'task',
+  'chore': 'task',
+  'style': 'task',
+  'fix': 'task',
+  'error': 'task',
+  'bug': 'task',
 } as const;
 
 type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
@@ -89,13 +89,13 @@ type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
 
 ### 2. オプション定義
 
-| ロングフォーム | ショートハンド | 説明 |
-|--------------|--------------|------|
-| --help      | -h          | ヘルプ表示 |
-| --version   | -v          | バージョン表示 |
-| --from      | -f          | 入力ファイル指定 |
-| --destination| -o          | 出力ファイル指定 |
-| --input     | -i          | 入力レイヤー指定 |
+| ロングフォーム | ショートハンド | 説明             |
+| -------------- | -------------- | ---------------- |
+| --help         | -h             | ヘルプ表示       |
+| --version      | -v             | バージョン表示   |
+| --from         | -f             | 入力ファイル指定 |
+| --destination  | -o             | 出力ファイル指定 |
+| --input        | -i             | 入力レイヤー指定 |
 
 ### 3. バリデーション規則
 
@@ -123,16 +123,16 @@ type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
 
 ### 4. エラー定義
 
-| エラーケース | メッセージ例 |
-|------------|------------|
-| 引数過多 | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正な値 | "Invalid value for demonstrativeType: {value}" |
-| 必須パラメータ不足 | "Missing required parameter: {param}" |
+| エラーケース       | メッセージ例                                           |
+| ------------------ | ------------------------------------------------------ |
+| 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
+| 不正な値           | "Invalid value for demonstrativeType: {value}"         |
+| 必須パラメータ不足 | "Missing required parameter: {param}"                  |
 
 ## 使用例
 
 ```typescript
-import { ParamsParser } from "./mod.ts";
+import { ParamsParser } from './mod.ts';
 
 const parser = new ParamsParser();
 
@@ -140,18 +140,18 @@ const parser = new ParamsParser();
 const result = parser.parse(Deno.args);
 
 // 使用例と期待される戻り値
-parser.parse([]); 
+parser.parse([]);
 // { type: "no-params" }
 
-parser.parse(["-h"]); 
+parser.parse(['-h']);
 // { type: "no-params", help: true }
 
-parser.parse(["init"]); 
+parser.parse(['init']);
 // { type: "single", command: "init" }
 
-parser.parse(["to", "issue", "--from", "./input.md"]); 
-// { 
-//   type: "double", 
+parser.parse(['to', 'issue', '--from', './input.md']);
+// {
+//   type: "double",
 //   demonstrativeType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
@@ -169,4 +169,4 @@ parser.parse(["to", "issue", "--from", "./input.md"]);
    - パラメータは最大2個まで
    - エイリアスは小文字のみ
    - パス文字列の加工なし
-   - オプションの重複時は最後の指定が有効 
+   - オプションの重複時は最後の指定が有効

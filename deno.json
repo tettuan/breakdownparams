@@ -46,4 +46,4 @@
     "exclude": ["tests/", ".github/"]
   },
   "runtimes": ["deno", "node"]
-} 
+}

@@ -1,20 +1,20 @@
-import { BreakdownLogger } from "@tettuan/breakdownlogger";
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
-export { ParamsParser } from "./params_parser.ts";
+export { ParamsParser } from './params_parser.ts';
 export type {
-  ParamsResult,
-  NoParamsResult,
-  SingleParamResult,
-  DoubleParamsResult,
   DemonstrativeType,
-  OptionParams,
+  DoubleParamsResult,
   LayerTypeAliasMap,
-} from "./types.ts";
+  NoParamsResult,
+  OptionParams,
+  ParamsResult,
+  SingleParamResult,
+} from './types.ts';
 
 // Example usage of BreakdownLogger
 const logger = new BreakdownLogger({
-  name: "breakdownparams",
-  level: "debug",
+  name: 'breakdownparams',
+  level: 'debug',
 });
 
-logger.info("Initializing breakdownparams..."); 
+logger.info('Initializing breakdownparams...');

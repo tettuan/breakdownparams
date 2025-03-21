@@ -5,13 +5,13 @@ A command line argument parser for breakdown tasks. This module provides functio
 ## Installation
 
 ```ts
-import { ParamsParser } from "jsr:@tettuan/breakdownparams@0.1.0";
+import { ParamsParser } from 'jsr:@tettuan/breakdownparams@0.1.0';
 ```
 
 ## Usage
 
 ```ts
-import { ParamsParser } from "jsr:@tettuan/breakdownparams@0.1.0";
+import { ParamsParser } from 'jsr:@tettuan/breakdownparams@0.1.0';
 
 const parser = new ParamsParser();
 
@@ -20,22 +20,22 @@ const result = parser.parse(Deno.args);
 
 // Handle different result types
 switch (result.type) {
-  case "no-params":
+  case 'no-params':
     if (result.help) {
-      console.log("Show help message");
+      console.log('Show help message');
     }
     if (result.version) {
-      console.log("Show version");
+      console.log('Show version');
     }
     break;
 
-  case "single":
-    if (result.command === "init") {
-      console.log("Initialize project");
+  case 'single':
+    if (result.command === 'init') {
+      console.log('Initialize project');
     }
     break;
 
-  case "double":
+  case 'double':
     console.log(`Demonstrative: ${result.demonstrativeType}`);
     console.log(`Layer: ${result.layerType}`);
     if (result.options.fromFile) {
@@ -88,11 +88,13 @@ The package is published to JSR using GitHub Actions. To publish a new version:
 
 1. Ensure all changes are committed and pushed
 2. Run the publish script to prepare the release:
+
 ```bash
 ./scripts/publish.sh
 ```
 
 This script will:
+
 - Check for uncommitted changes
 - Verify GitHub Actions tests have passed
 - Regenerate `deno.lock`
@@ -108,6 +110,7 @@ To bump the version and create a new release:
 ```
 
 This script will:
+
 - Check for uncommitted changes
 - Verify GitHub Actions tests have passed
 - Check the latest version from JSR
@@ -120,4 +123,4 @@ The new version will be automatically published to JSR when the tag is pushed.
 
 ## License
 
-MIT License - see LICENSE file for details. 
+MIT License - see LICENSE file for details.
