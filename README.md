@@ -68,6 +68,44 @@ The main class for parsing command line arguments.
 - `--destination` or `-o`: Specify destination file
 - `--input` or `-i`: Specify input layer type
 
+## Examples
+
+The `examples/` directory contains three CLI examples that demonstrate different aspects of the parser:
+
+1. `basic_usage.ts`: Basic command parsing and help display
+   ```bash
+   # Show help
+   deno run examples/basic_usage.ts --help
+
+   # Initialize project
+   deno run examples/basic_usage.ts init
+
+   # Convert task to issue
+   deno run examples/basic_usage.ts to issue --from input.md
+   ```
+
+2. `error_handling.ts`: Demonstrates error handling and validation
+   ```bash
+   # Show available error examples
+   deno run examples/error_handling.ts --help
+
+   # Try different error cases
+   deno run examples/error_handling.ts unknown
+   deno run examples/error_handling.ts to issue extra
+   ```
+
+3. `options_usage.ts`: Shows how to work with command line options
+   ```bash
+   # Show options help
+   deno run examples/options_usage.ts --help
+
+   # Try different option formats
+   deno run examples/options_usage.ts to issue --from input.md --destination output.md
+   deno run examples/options_usage.ts to issue -f input.md -o output.md
+   ```
+
+Each example includes detailed help text and usage instructions. Run them with `--help` to see available options.
+
 ## Development
 
 ### Prerequisites

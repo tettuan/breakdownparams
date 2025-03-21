@@ -1,9 +1,4 @@
-/**
- * Type of parameter pattern based on the number of non-hyphenated parameters.
- * - 'no-params': No parameters or only flags
- * - 'single': Single parameter (e.g., 'init' command)
- * - 'double': Two parameters (demonstrative type and layer type)
- */
+// パラメータの種類
 export type ParamsType = 'no-params' | 'single' | 'double';
 
 /**
@@ -42,30 +37,15 @@ export interface DoubleParamsResult {
  */
 export type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
 
-/**
- * Optional parameters that can be provided with any command.
- * These are specified using either long form (--option) or short form (-o) flags.
- */
+// オプション
 export interface OptionParams {
   fromFile?: string;
   destinationFile?: string;
   fromLayerType?: LayerType;
 }
 
-/**
- * Valid demonstrative types that indicate the action or purpose.
- * - 'to': Convert or transform to another format
- * - 'summary': Generate a summary
- * - 'defect': Report or analyze defects
- */
+// 値の定義
 export type DemonstrativeType = 'to' | 'summary' | 'defect';
-
-/**
- * Valid layer types that represent different levels of task breakdown.
- * - 'project': Project level tasks or components
- * - 'issue': Issue or story level items
- * - 'task': Individual tasks or work items
- */
 export type LayerType = 'project' | 'issue' | 'task';
 
 /**
