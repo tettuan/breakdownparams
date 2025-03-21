@@ -1,4 +1,9 @@
-// パラメータの種類
+/**
+ * Type representing the different kinds of parameter combinations that can be parsed.
+ * - 'no-params': No parameters provided, may include help or version flags
+ * - 'single': Single command parameter (e.g., 'init')
+ * - 'double': Two parameters (demonstrative type and layer type)
+ */
 export type ParamsType = 'no-params' | 'single' | 'double';
 
 /**
@@ -37,15 +42,33 @@ export interface DoubleParamsResult {
  */
 export type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
 
-// オプション
+/**
+ * Interface representing optional parameters that can be provided with commands.
+ * These options can be specified using either long form (--option) or short form (-o).
+ */
 export interface OptionParams {
+  /** The input file path when specified with --from or -f */
   fromFile?: string;
+  /** The output file path when specified with --destination or -o */
   destinationFile?: string;
+  /** The source layer type when specified with --input or -i */
   fromLayerType?: LayerType;
 }
 
-// 値の定義
+/**
+ * Type representing the available demonstrative types that indicate the action to perform.
+ * - 'to': Convert to a specified layer
+ * - 'summary': Generate a summary for a layer
+ * - 'defect': Report defects for a layer
+ */
 export type DemonstrativeType = 'to' | 'summary' | 'defect';
+
+/**
+ * Type representing the available layer types in the breakdown structure.
+ * - 'project': Project level items
+ * - 'issue': Issue/story level items
+ * - 'task': Task/todo level items
+ */
 export type LayerType = 'project' | 'issue' | 'task';
 
 /**
