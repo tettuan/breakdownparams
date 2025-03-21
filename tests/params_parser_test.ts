@@ -1,4 +1,5 @@
 import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../src/params_parser.ts';
 
 /**
@@ -24,6 +25,7 @@ import { ParamsParser } from '../src/params_parser.ts';
  * - エイリアスと大文字小文字の扱いが仕様通りであること
  */
 
+const logger = new BreakdownLogger();
 const parser = new ParamsParser();
 
 /**
