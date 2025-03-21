@@ -1,5 +1,13 @@
 {
   "version": "4",
+  "specifiers": {
+    "jsr:@tettuan/breakdownlogger@0.1": "0.1.10"
+  },
+  "jsr": {
+    "@tettuan/breakdownlogger@0.1.10": {
+      "integrity": "3094af14f9271234b01280c4cf379d36f7b429531a434f169d3dce569d60e146"
+    }
+  },
   "remote": {
     "https://deno.land/std@0.220.1/assert/_constants.ts": "a271e8ef5a573f1df8e822a6eb9d09df064ad66a4390f21b3e31f820a38e0975",
     "https://deno.land/std@0.220.1/assert/_diff.ts": "4bf42969aa8b1a33aaf23eb8e478b011bfaa31b82d85d2ff4b5c4662d8780d2b",
