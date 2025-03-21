@@ -8,7 +8,8 @@
   "author": "tettuan",
   "exports": "./src/mod.ts",
   "imports": {
-    "@": "./src/"
+    "@": "./src/",
+    "@tettuan/breakdownlogger": "jsr:@tettuan/breakdownlogger@^0.1.0"
   },
   "tasks": {
     "test": "deno test -A --env",
