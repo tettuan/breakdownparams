@@ -25,7 +25,8 @@ import { ParamsParser } from '../src/params_parser.ts';
  * - エイリアスと大文字小文字の扱いが仕様通りであること
  */
 
-const logger = new BreakdownLogger();
+// Initialize logger for testing
+const _logger = new BreakdownLogger();
 const parser = new ParamsParser();
 
 /**

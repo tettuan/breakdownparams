@@ -26,9 +26,8 @@
     "proseWrap": "preserve"
   },
   "lint": {
-    "files": {
-      "include": ["src/", "tests/"]
-    },
+    "include": ["src/", "tests/"],
+    "exclude": ["**/node_modules/", "**/.git/"],
     "rules": {
       "tags": ["recommended"]
     }
