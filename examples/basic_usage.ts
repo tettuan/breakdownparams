@@ -4,7 +4,7 @@ const parser = new ParamsParser();
 const result = parser.parse(Deno.args);
 
 switch (result.type) {
-  case 'no-params':
+  case 'no-params': {
     if (result.help) {
       console.log(`
 Usage: basic_usage [command] [options]
@@ -28,15 +28,17 @@ Options:
       console.log('v0.1.0');
     }
     break;
+  }
 
-  case 'single':
+  case 'single': {
     if (result.command === 'init') {
       console.log('Initializing new project...');
       // Add initialization logic here
     }
     break;
+  }
 
-  case 'double':
+  case 'double': {
     const { demonstrativeType, layerType, options = {} } = result;
     console.log(`Action: ${demonstrativeType} ${layerType}`);
     
@@ -50,6 +52,7 @@ Options:
       console.log(`Converting from layer: ${options.fromLayerType}`);
     }
     break;
+  }
 }
 
 // If there's an error, display it and exit with status code 1
