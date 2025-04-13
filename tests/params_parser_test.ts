@@ -41,7 +41,9 @@ const parser = new ParamsParser();
  * - エラーが発生しないこと
  */
 Deno.test('No parameters with help flag', () => {
+  _logger.debug('Testing help flag parsing');
   const result = parser.parse(['-h']);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'no-params');
   if (result.type === 'no-params') {
     assertEquals(result.help, true);
@@ -100,7 +102,9 @@ Deno.test('No parameters with both help and version flags', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Single parameter with init command', () => {
+  _logger.debug('Testing init command parsing');
   const result = parser.parse(['init']);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'single');
   if (result.type === 'single') {
     assertEquals(result.command, 'init');
@@ -139,7 +143,9 @@ Deno.test('Single parameter with invalid command', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Double parameters with valid values', () => {
+  _logger.debug('Testing valid double parameter parsing');
   const result = parser.parse(['to', 'issue']);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertEquals(result.demonstrativeType, 'to');
@@ -160,7 +166,9 @@ Deno.test('Double parameters with valid values', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Double parameters with layer type alias', () => {
+  _logger.debug('Testing layer type alias parsing');
   const result = parser.parse(['summary', 'story']);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertEquals(result.demonstrativeType, 'summary');
@@ -180,7 +188,9 @@ Deno.test('Double parameters with layer type alias', () => {
  * - エラーメッセージに許可される値の一覧が含まれていること
  */
 Deno.test('Double parameters with invalid demonstrative type', () => {
+  _logger.debug('Testing invalid demonstrative type handling');
   const result = parser.parse(['invalid', 'issue']);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertExists(result.error);
@@ -202,7 +212,9 @@ Deno.test('Double parameters with invalid demonstrative type', () => {
  * - エラーメッセージに無効な値が含まれていること
  */
 Deno.test('Double parameters with invalid layer type', () => {
+  _logger.debug('Testing invalid layer type handling');
   const result = parser.parse(['to', 'invalid']);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertExists(result.error);
@@ -222,6 +234,7 @@ Deno.test('Double parameters with invalid layer type', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Double parameters with options', () => {
+  _logger.debug('Testing option parsing');
   const result = parser.parse([
     'to',
     'issue',
@@ -232,6 +245,7 @@ Deno.test('Double parameters with options', () => {
     '--input',
     'project',
   ]);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertEquals(result.demonstrativeType, 'to');
@@ -256,6 +270,7 @@ Deno.test('Double parameters with options', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Double parameters with short form options', () => {
+  _logger.debug('Testing short form option parsing');
   const result = parser.parse([
     'to',
     'issue',
@@ -266,6 +281,7 @@ Deno.test('Double parameters with short form options', () => {
     '-i',
     'project',
   ]);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertEquals(result.demonstrativeType, 'to');
@@ -307,6 +323,7 @@ Deno.test('Too many parameters', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Double parameters with multiple options', () => {
+  _logger.debug('Testing multiple option parsing');
   const result = parser.parse([
     'to',
     'issue',
@@ -323,6 +340,7 @@ Deno.test('Double parameters with multiple options', () => {
     '-i',
     'task',
   ]);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertEquals(result.demonstrativeType, 'to');
@@ -368,6 +386,7 @@ Deno.test('Double parameters with uppercase layer type', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Double parameters with invalid option values', () => {
+  _logger.debug('Testing invalid option value handling');
   const result = parser.parse([
     'to',
     'issue',
@@ -378,6 +397,7 @@ Deno.test('Double parameters with invalid option values', () => {
     '--input',
     'invalid',
   ]);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertEquals(result.demonstrativeType, 'to');
@@ -398,6 +418,7 @@ Deno.test('Double parameters with invalid option values', () => {
  * - エラーが発生しないこと
  */
 Deno.test('Double parameters with duplicate options', () => {
+  _logger.debug('Testing duplicate option handling');
   const result = parser.parse([
     'to',
     'issue',
@@ -414,6 +435,7 @@ Deno.test('Double parameters with duplicate options', () => {
     '-i',
     'task',
   ]);
+  _logger.debug('Parse result', result);
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertEquals(result.demonstrativeType, 'to');

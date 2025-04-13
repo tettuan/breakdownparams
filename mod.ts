@@ -1,37 +1,33 @@
 /**
- * A utility to parse and validate command line arguments with type safety.
+ * A module for parsing and validating command line arguments in a type-safe manner.
  *
- * This module provides a type-safe way to parse command line arguments,
- * supporting various parameter types and validation rules.
+ * This module provides:
+ * - {@link ParamsParser} class for parsing command line arguments
+ * - Type definitions for parameter results and options
+ * - Layer type aliases and demonstrative type definitions
  *
  * @example
  * ```ts
  * import { ParamsParser } from "@tettuan/breakdownparams";
  *
- * const parser = new ParamsParser({
- *   command: "my-cli",
- *   help: "A command line tool",
- *   version: "1.0.0",
- *   demonstrativeType: "command",
- * });
- *
+ * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
- * if (result.type === "success") {
- *   console.log(result.data);
- * } else {
- *   console.error(result.error);
+ *
+ * if (result.type === "double") {
+ *   // Process the parameters
+ *   const { demonstrativeType, layerType, options } = result;
+ *   // Handle the conversion
+ * } else if (result.error) {
+ *   // Handle error case
  * }
  * ```
- *
- * @module
- * @packageDocumentation
  */
 
-export * from './src/params_parser.ts';
+export { ParamsParser } from './src/params_parser.ts';
 export type {
   DemonstrativeType,
   DoubleParamsResult,
-  LayerType,
+  LayerTypeAliasMap,
   NoParamsResult,
   OptionParams,
   ParamsResult,
@@ -52,8 +48,12 @@ export type {
  * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
  *
- * if ("command" in result) {
- *   console.log(`Command: ${result.command}`);
+ * if (result.type === "double") {
+ *   // Process the parameters
+ *   const { demonstrativeType, layerType, options } = result;
+ *   // Handle the conversion
+ * } else if (result.error) {
+ *   // Handle error case
  * }
  * ```
  */

@@ -23,13 +23,19 @@
  */
 
 import { assertEquals } from '@std/assert';
+import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
 import { ParamsParser } from '../src/params_parser.ts';
+
+// Initialize logger for testing
+const _logger = new BreakdownLogger();
 
 Deno.test('Double Parameters', async (t) => {
   const parser = new ParamsParser();
 
   await t.step('should handle basic combinations', () => {
+    _logger.debug('Testing basic parameter combinations');
     const result = parser.parse(['to', 'project']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
     if (result.type === 'double') {
       assertEquals(result.demonstrativeType, 'to');
@@ -45,7 +51,9 @@ Deno.test('Double Parameters', async (t) => {
     ];
 
     for (const { args, demonstrativeType } of testCases) {
+      _logger.debug('Testing demonstrative type', { args, demonstrativeType });
       const result = parser.parse(args);
+      _logger.debug('Parse result', result);
       assertEquals(result.type, 'double');
       if (result.type === 'double') {
         assertEquals(result.demonstrativeType, demonstrativeType);
@@ -54,6 +62,7 @@ Deno.test('Double Parameters', async (t) => {
   });
 
   await t.step('should handle options', () => {
+    _logger.debug('Testing option handling');
     const result = parser.parse([
       'to',
       'project',
@@ -64,6 +73,7 @@ Deno.test('Double Parameters', async (t) => {
       '--input',
       'issue',
     ]);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
     if (result.type === 'double') {
       assertEquals(result.demonstrativeType, 'to');
@@ -77,6 +87,7 @@ Deno.test('Double Parameters', async (t) => {
   });
 
   await t.step('should handle short form options', () => {
+    _logger.debug('Testing short form option handling');
     const result = parser.parse([
       'to',
       'project',
@@ -87,6 +98,7 @@ Deno.test('Double Parameters', async (t) => {
       '-i',
       'issue',
     ]);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
     if (result.type === 'double') {
       assertEquals(result.demonstrativeType, 'to');

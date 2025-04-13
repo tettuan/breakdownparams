@@ -26,13 +26,19 @@
  */
 
 import { assertEquals, assertExists } from '@std/assert';
+import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
 import { ParamsParser } from '../src/params_parser.ts';
+
+// Initialize logger for testing
+const _logger = new BreakdownLogger();
 
 Deno.test('Error Cases', async (t) => {
   const parser = new ParamsParser();
 
   await t.step('should handle invalid demonstrative type', () => {
+    _logger.debug('Testing invalid demonstrative type handling');
     const result = parser.parse(['invalid', 'issue']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
     if (result.type === 'double') {
       assertExists(result.error);
@@ -44,7 +50,9 @@ Deno.test('Error Cases', async (t) => {
   });
 
   await t.step('should handle invalid layer type', () => {
+    _logger.debug('Testing invalid layer type handling');
     const result = parser.parse(['to', 'invalid']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
     if (result.type === 'double') {
       assertExists(result.error);
@@ -53,7 +61,9 @@ Deno.test('Error Cases', async (t) => {
   });
 
   await t.step('should handle too many parameters', () => {
+    _logger.debug('Testing too many parameters handling');
     const result = parser.parse(['to', 'issue', 'extra']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertExists(result.error);
@@ -62,7 +72,9 @@ Deno.test('Error Cases', async (t) => {
   });
 
   await t.step('should handle invalid command', () => {
+    _logger.debug('Testing invalid command handling');
     const result = parser.parse(['invalid']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertExists(result.error);

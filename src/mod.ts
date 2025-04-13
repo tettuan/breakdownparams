@@ -14,7 +14,11 @@
  * const result = parser.parse(Deno.args);
  *
  * if (result.type === "double") {
- *   console.log(`Converting ${result.layerType} using ${result.demonstrativeType}`);
+ *   // Process the parameters
+ *   const { demonstrativeType, layerType, options } = result;
+ *   // Handle the conversion
+ * } else if (result.error) {
+ *   // Handle error case
  * }
  * ```
  */

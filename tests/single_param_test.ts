@@ -24,13 +24,19 @@
  */
 
 import { assertEquals } from '@std/assert';
+import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
 import { ParamsParser } from '../src/params_parser.ts';
+
+// Initialize logger for testing
+const _logger = new BreakdownLogger();
 
 Deno.test('Single Parameter', async (t) => {
   const parser = new ParamsParser();
 
   await t.step('should handle init command', () => {
+    _logger.debug('Testing init command handling');
     const result = parser.parse(['init']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'single');
     if (result.type === 'single') {
       assertEquals(result.command, 'init');
@@ -39,7 +45,9 @@ Deno.test('Single Parameter', async (t) => {
   });
 
   await t.step('should handle init command with options', () => {
+    _logger.debug('Testing init command with options handling');
     const result = parser.parse(['init', '--from', 'input.txt']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'single');
     if (result.type === 'single') {
       assertEquals(result.command, 'init');
@@ -50,7 +58,9 @@ Deno.test('Single Parameter', async (t) => {
   });
 
   await t.step('should handle invalid command', () => {
+    _logger.debug('Testing invalid command handling');
     const result = parser.parse(['invalid']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertEquals(result.error, 'Invalid command: invalid');
@@ -60,7 +70,9 @@ Deno.test('Single Parameter', async (t) => {
   });
 
   await t.step('should handle invalid command with options', () => {
+    _logger.debug('Testing invalid command with options handling');
     const result = parser.parse(['invalid', '--from', 'input.txt']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertEquals(result.error, 'Invalid command: invalid');

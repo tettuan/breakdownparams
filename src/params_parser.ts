@@ -20,11 +20,19 @@ import {
  * const result = parser.parse(Deno.args);
  *
  * if (result.type === "no-params") {
- *   console.log(`Help: ${result.help}, Version: ${result.version}`);
+ *   // Handle no parameters case
+ *   if (result.help) {
+ *     // Show help message
+ *   }
  * } else if (result.type === "single") {
- *   console.log(`Command: ${result.command}`);
+ *   // Handle single parameter case
+ *   if (result.command === "init") {
+ *     // Handle init command
+ *   }
  * } else if (result.type === "double") {
- *   console.log(`Type: ${result.demonstrativeType}, Layer: ${result.layerType}`);
+ *   // Handle double parameters case
+ *   const { demonstrativeType, layerType, options } = result;
+ *   // Process the parameters
  * }
  * ```
  */

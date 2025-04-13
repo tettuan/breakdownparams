@@ -27,13 +27,19 @@
  */
 
 import { assertEquals } from '@std/assert';
+import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
 import { ParamsParser } from '../src/params_parser.ts';
+
+// Initialize logger for testing
+const _logger = new BreakdownLogger();
 
 Deno.test('No Parameters', async (t) => {
   const parser = new ParamsParser();
 
   await t.step('should handle no parameters', () => {
+    _logger.debug('Testing no parameters handling');
     const result = parser.parse([]);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertEquals(result.help, false);
@@ -42,7 +48,9 @@ Deno.test('No Parameters', async (t) => {
   });
 
   await t.step('should handle help flag', () => {
+    _logger.debug('Testing help flag handling');
     const result = parser.parse(['-h']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertEquals(result.help, true);
@@ -51,7 +59,9 @@ Deno.test('No Parameters', async (t) => {
   });
 
   await t.step('should handle version flag', () => {
+    _logger.debug('Testing version flag handling');
     const result = parser.parse(['-v']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertEquals(result.help, false);
@@ -60,7 +70,9 @@ Deno.test('No Parameters', async (t) => {
   });
 
   await t.step('should handle both flags', () => {
+    _logger.debug('Testing both flags handling');
     const result = parser.parse(['-h', '-v']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertEquals(result.help, true);
@@ -69,7 +81,9 @@ Deno.test('No Parameters', async (t) => {
   });
 
   await t.step('should handle flags in any order', () => {
+    _logger.debug('Testing flag order handling');
     const result = parser.parse(['-v', '-h']);
+    _logger.debug('Parse result', result);
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertEquals(result.help, true);

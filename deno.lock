@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@std/assert@~0.220.1": "0.220.1",
     "jsr:@std/fmt@~0.220.1": "0.220.1",
+    "jsr:@tettuan/breakdownlogger@*": "0.1.10",
     "jsr:@tettuan/breakdownlogger@0.1": "0.1.10"
   },
   "jsr": {
