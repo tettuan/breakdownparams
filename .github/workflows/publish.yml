@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  publish:
+  verify-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -14,6 +14,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -22,7 +24,24 @@ jobs:
 
       - name: Get tag version
         id: get_tag
-        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        run: |
+          TAG=${GITHUB_REF/refs\/tags\//}
+          echo "TAG=${TAG}" >> $GITHUB_OUTPUT
+          echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
+
+      - name: Verify version matches deno.json
+        run: |
+          DENO_VERSION=$(deno eval "const config = JSON.parse(await Deno.readTextFile('deno.json')); console.log(config.version);")
+          TAG_VERSION="${{ steps.get_tag.outputs.VERSION }}"
+          if [ "$DENO_VERSION" != "$TAG_VERSION" ]; then
+            echo "Error: Version mismatch between tag ($TAG_VERSION) and deno.json ($DENO_VERSION)"
+            exit 1
+          fi
+
+      - name: Run tests
+        run: deno test --allow-env --allow-write --allow-read
 
       - name: Publish to JSR
         run: deno publish
+        env:
+          DENO_JSON_PATH: "./deno.json"

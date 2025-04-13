@@ -10,6 +10,9 @@ on:
     paths:
       - 'deno.json'
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -33,13 +36,22 @@ jobs:
       - name: Get latest version from JSR
         id: latest
         run: |
-          LATEST_VERSION=$(curl -s https://jsr.io/@tettuan/breakdownparams/versions | grep -o '0\.[0-9]\+\.[0-9]\+' | head -n 1)
+          LATEST_VERSION=$(curl -s https://jsr.io/@tettuan/breakdownconfig/versions | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n 1)
+          if [ -z "$LATEST_VERSION" ]; then
+            echo "No version found on JSR, assuming first release"
+            echo "VERSION=0.0.0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
           echo "VERSION=${LATEST_VERSION}" >> $GITHUB_OUTPUT
 
       - name: Compare versions
         run: |
           CURRENT="${{ steps.current.outputs.VERSION }}"
           LATEST="${{ steps.latest.outputs.VERSION }}"
+          if [ "$LATEST" = "0.0.0" ]; then
+            echo "First release, skipping version comparison"
+            exit 0
+          fi
           if [ "$(printf '%s\n%s\n' "$LATEST" "$CURRENT" | sort -V | head -n1)" = "$CURRENT" ]; then
             echo "Error: New version ($CURRENT) must be greater than the latest version ($LATEST)"
             exit 1
