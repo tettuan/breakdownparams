@@ -9,19 +9,22 @@ fi
 # Get the latest commit hash
 latest_commit=$(git rev-parse HEAD)
 
-# Check GitHub Actions status
+# Check GitHub Actions status for all workflows
 echo "Checking GitHub Actions status..."
-gh run list --workflow=test.yml --limit=1 --json status,conclusion,headSha | jq -e '.[0].status == "completed" and .[0].conclusion == "success" and .[0].headSha == "'$latest_commit'"' > /dev/null
+for workflow in "ci.yml" "version-check.yml"; do
+    echo "Checking $workflow..."
+    gh run list --workflow=$workflow --limit=1 --json status,conclusion,headSha | jq -e '.[0].status == "completed" and .[0].conclusion == "success" and .[0].headSha == "'$latest_commit'"' > /dev/null
 
-if [ $? -ne 0 ]; then
-    echo "Error: Latest GitHub Actions workflow has not completed successfully."
-    echo "Please ensure all tests pass before bumping version."
-    exit 1
-fi
+    if [ $? -ne 0 ]; then
+        echo "Error: Latest GitHub Actions workflow ($workflow) has not completed successfully."
+        echo "Please ensure all tests pass before bumping version."
+        exit 1
+    fi
+done
 
 # Try to get latest version from JSR
 echo "Checking latest version from JSR..."
-latest_jsr_version=$(curl -s https://jsr.io/@tettuan/breakdownparams/versions | grep -o '0\.[0-9]\+\.[0-9]\+' | head -n 1)
+latest_jsr_version=$(curl -s https://jsr.io/@tettuan/breakdownconfig/versions | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n 1)
 
 if [ -z "$latest_jsr_version" ]; then
     echo "Warning: Could not determine latest version from JSR, using local version"
