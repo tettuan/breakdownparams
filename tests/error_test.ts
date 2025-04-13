@@ -25,7 +25,7 @@
  * - エラーが発生しても、パースは継続される
  */
 
-import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals, assertExists } from '@std/assert';
 import { ParamsParser } from '../src/params_parser.ts';
 
 Deno.test('Error Cases', async (t) => {

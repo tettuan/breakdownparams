@@ -26,7 +26,7 @@
  * - フラグの値は大文字小文字を区別しない
  */
 
-import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals } from '@std/assert';
 import { ParamsParser } from '../src/params_parser.ts';
 
 Deno.test('No Parameters', async (t) => {

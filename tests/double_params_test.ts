@@ -22,7 +22,7 @@
  * - エラーケースのテストは error_test.ts で行う
  */
 
-import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals } from '@std/assert';
 import { ParamsParser } from '../src/params_parser.ts';
 
 Deno.test('Double Parameters', async (t) => {

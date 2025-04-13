@@ -23,7 +23,7 @@
  * - エラーメッセージは具体的な内容を含む
  */
 
-import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals } from '@std/assert';
 import { ParamsParser } from '../src/params_parser.ts';
 
 Deno.test('Single Parameter', async (t) => {

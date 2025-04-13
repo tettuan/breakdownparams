@@ -1,7 +1,8 @@
 # ライブラリ概要
 
-https://deno.land/x に登録し、使われるライブラリ。
-https://deno.land/x/breakdown から用いられる。
+https://jsr.io に登録し、使われるライブラリ。
+https://jsr.io/@tettuan/breakdown が、このライブラリを使う。
+ユースケースのうち、パラメータの解析と格納が、このライブラリのスコープである。
 
 このライブラリでは、実行時パラメータを解析し、値を保持する。
 バリデートしたあと、保持した値を返すところまでがスコープである。
@@ -139,8 +140,7 @@ https://deno.land/x/breakdown から用いられる。
 
 -　`<from_layer_type>` 部分を取得する。
 
-- ex. `--input issue` のとき、 `issue`
-- from_layer_type が取りうる値は以下の値のみである。
+- ex. `--input issue` のとき、 `issue`- from_layer_type が取りうる値は以下の値のみである。
   - project, pj, prj
   - issue, story
   - task, todo, chore, style, fix, error, bug
@@ -155,3 +155,4 @@ https://deno.land/x/breakdown から用いられる。
 - パス処理は行わない（加工しない）
 - エイリアスの大文字小文字は、必ず小文字を使う（大文字は処理の対象としない。エラーにもしないで、無いものとして扱う）
 - 未定義のエイリアスが指定された場合は、指定されなかった時と同様に無いものとして扱う。
+
