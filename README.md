@@ -2,6 +2,8 @@
 
 A command line argument parser for breakdown tasks. This module provides functionality to parse command line arguments for task breakdown operations.
 
+For detailed documentation about parameter patterns and usage, please see the [detailed documentation](docs/index.md).
+
 ## Installation
 
 ```ts
@@ -58,6 +60,8 @@ The main class for parsing command line arguments.
 
 ### Result Types
 
+The following result types are available based on the command line arguments provided. For a detailed breakdown of available options for each type, see [Options Documentation](docs/options.md).
+
 - `NoParamsResult`: For commands with no parameters or help/version flags
 - `SingleParamResult`: For single commands like "init"
 - `DoubleParamsResult`: For commands with demonstrative and layer type
@@ -67,6 +71,8 @@ The main class for parsing command line arguments.
 - `--from` or `-f`: Specify source file
 - `--destination` or `-o`: Specify destination file
 - `--input` or `-i`: Specify input layer type
+
+For a comprehensive list of options available for each result type, see the [Options Documentation](docs/options.md).
 
 ## Examples
 

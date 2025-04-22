@@ -7,9 +7,11 @@ https://jsr.io/@tettuan/breakdown が、このライブラリを使う。
 このライブラリでは、実行時パラメータを解析し、値を保持する。
 バリデートしたあと、保持した値を返すところまでがスコープである。
 
+各パラメータタイプの詳細な仕様と利用可能なオプションについては、[オプション一覧](options.md)を参照してください。
+
 ## 行わないこと
 
-パラメータ値の意味解釈は行わない。(ex. 「--helpだからヘルプ表示する」といったは、行わない)
+パラメータ値の意味解釈は行わない。(ex. "--"helpだからヘルプ表示する"といったは、行わない)
 デフォルト値は持たない。
 
 # 引数のパターン
@@ -58,7 +60,7 @@ https://jsr.io/@tettuan/breakdown が、このライブラリを使う。
 - `init`
 
 引数が何であることを示す。
-例えば初期化処理のなかで「パラメータが `init` である」ということが確認できる。
+例えば初期化処理のなかで"パラメータが `init` である"ということが確認できる。
 
 ## 2つを指定
 
@@ -104,7 +106,7 @@ https://jsr.io/@tettuan/breakdown が、このライブラリを使う。
 
 ##### FromFile の値
 
--　`<file>` 部分を取得する。
+- `<file>` 部分を取得する。
 
 - ex. `--from ./.agent/breakdown/issues/issue_summary.md` のとき、 `./.agent/breakdown/issues/issue_summary.md`
 
@@ -121,7 +123,7 @@ https://jsr.io/@tettuan/breakdown が、このライブラリを使う。
 
 ##### DestinationFile の値
 
--　`<output_file>` 部分を取得する。
+- `<output_file>` 部分を取得する。
 
 - ex. `--destination ./.agent/breakdown/issues/issue_summary.md` のとき、 `./.agent/breakdown/issues/issue_summary.md`
 
@@ -138,21 +140,6 @@ https://jsr.io/@tettuan/breakdown が、このライブラリを使う。
 
 ##### from_layer_type の値
 
--　`<from_layer_type>` 部分を取得する。
+- `<from_layer_type>` 部分を取得する。
 
-- ex. `--input issue` のとき、 `issue`- from_layer_type が取りうる値は以下の値のみである。
-  - project, pj, prj
-  - issue, story
-  - task, todo, chore, style, fix, error, bug
-- from_layer_type の値に応じて、共通の値へ変換した後に、保持する。例えば pj が渡されたとき project に変換して保持する。
-  - project, pj, prj -> project
-  - issue, story -> issue
-  - task, todo, chore, style, fix, error, bug -> task
-
-# 引数の優先順位
-
-- ショートハンドとロングフォームが同時に指定された場合の挙動は、ロングフォームを優先する。ロングフォームが主で、ショートハンドは短縮系のエイリアスとする。
-- パス処理は行わない（加工しない）
-- エイリアスの大文字小文字は、必ず小文字を使う（大文字は処理の対象としない。エラーにもしないで、無いものとして扱う）
-- 未定義のエイリアスが指定された場合は、指定されなかった時と同様に無いものとして扱う。
-
+- ex. `--input issue` のとき、 `issue`
