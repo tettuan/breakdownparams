@@ -21,8 +21,19 @@ jobs:
         with:
           deno-version: '2.1.9'
 
+      - name: Cache Dependencies
+        run: |
+          rm -f deno.lock
+          deno cache --reload mod.ts
+
+      - name: Type Check
+        run: deno check mod.ts
+
+      - name: JSR Type Check
+        run: npx jsr publish --dry-run --allow-dirty
+
       - name: Format Check
-        run: deno fmt --check
+        run: deno fmt --check "**/*.ts" "**/*.js" "**/*.jsx" "**/*.tsx"
 
       - name: Lint
         run: deno lint
