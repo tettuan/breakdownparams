@@ -26,9 +26,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install JSR CLI
-        run: npm install -g @jsr/cli
-
       - name: Cache Dependencies
         run: |
           rm -f deno.lock
@@ -38,7 +35,7 @@ jobs:
         run: deno check mod.ts
 
       - name: JSR Type Check
-        run: jsr publish --dry-run --allow-dirty
+        run: npx jsr publish --dry-run --allow-dirty
 
       - name: Format Check
         run: deno fmt --check "**/*.ts" "**/*.js" "**/*.jsx" "**/*.tsx"
