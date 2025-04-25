@@ -59,6 +59,7 @@ interface OptionParams {
   fromFile?: string;
   destinationFile?: string;
   fromLayerType?: LayerType;
+  adaptation?: string;
 }
 
 // 値の定義
@@ -96,6 +97,7 @@ type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
 | --from         | -f             | 入力ファイル指定 |
 | --destination  | -o             | 出力ファイル指定 |
 | --input        | -i             | 入力レイヤー指定 |
+| --adaptation   | -a             | プロンプト適応タイプ指定 |
 
 ### 3. バリデーション規則
 
@@ -155,6 +157,14 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 //   demonstrativeType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
+// }
+
+parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
+// {
+//   type: "double",
+//   demonstrativeType: "summary",
+//   layerType: "task",
+//   options: { fromFile: "./tasks.md", adaptation: "strict" }
 // }
 ```
 

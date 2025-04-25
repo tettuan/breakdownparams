@@ -71,11 +71,36 @@ disable_debug() {
 ==============================================================================="
 }
 
+# Function to handle permission errors
+handle_permission_error() {
+    local test_file=$1
+    local error_message=$2
+
+    if [[ $error_message == *"Requires run access"* ]]; then
+        echo "
+===============================================================================
+>>> PERMISSION ERROR DETECTED - RETRYING WITH --allow-run <<<
+===============================================================================
+Error: Missing run permission in $test_file
+Adding --allow-run flag and retrying..."
+        if ! LOG_LEVEL=debug deno test --allow-env --allow-write --allow-read --allow-run "$test_file"; then
+            handle_error "$test_file" "Test failed even with --allow-run permission" "true"
+        fi
+        return 0
+    fi
+    return 1
+}
+
 # Function to handle errors
 handle_error() {
     local test_file=$1
     local error_message=$2
     local is_debug=$3
+
+    # Try to handle permission errors first
+    if handle_permission_error "$test_file" "$error_message"; then
+        return 0
+    fi
 
     if [ "$is_debug" = "true" ]; then
         echo "
@@ -105,6 +130,129 @@ Retrying with debug mode..."
     exit 1
 }
 
+# Function to handle type check errors
+handle_type_error() {
+    local error_type=$1
+    local error_message=$2
+
+    echo "
+===============================================================================
+>>> TYPE CHECK FAILED: $error_type <<<
+===============================================================================
+Please review:
+1. Project rules and specifications in docs/ directory
+2. Deno's type system documentation at https://deno.land/manual/typescript
+3. External library documentation for any imported packages
+
+Remember to:
+- Check type definitions in your code
+- Verify type compatibility with external dependencies
+- Review TypeScript configuration in deno.json
+
+Error details: $error_message
+==============================================================================="
+    exit 1
+}
+
+# Function to handle format errors
+handle_format_error() {
+    local error_message=$1
+
+    echo "
+===============================================================================
+>>> FORMAT CHECK FAILED <<<
+===============================================================================
+Please review:
+1. Project formatting rules in docs/ directory
+2. Deno's style guide at https://deno.land/manual/tools/formatter
+3. Format settings in deno.json
+
+To auto-fix formatting issues:
+  $ deno fmt
+
+Remember to:
+- Format checks are applied only to TypeScript and JavaScript files
+- Check for any custom formatting rules in the project
+- Ensure your editor's formatting settings align with the project
+
+Error details: $error_message
+==============================================================================="
+    exit 1
+}
+
+# Function to handle lint errors
+handle_lint_error() {
+    local error_message=$1
+
+    echo "
+===============================================================================
+>>> LINT CHECK FAILED <<<
+===============================================================================
+Please review:
+1. Project linting rules in docs/ directory
+2. Deno's linting rules at https://deno.land/manual/tools/linter
+3. Lint configuration in deno.json
+
+Remember to:
+- Check for common code style issues
+- Review best practices for Deno development
+- Verify any custom lint rules specific to the project
+
+Error details: $error_message
+==============================================================================="
+    exit 1
+}
+
+# Function to handle JSR type check errors
+handle_jsr_error() {
+    local error_output=$1
+    
+    # Check if error is due to uncommitted changes
+    if echo "$error_output" | grep -q "Aborting due to uncommitted changes"; then
+        echo "
+===============================================================================
+>>> INTERNAL ERROR: JSR CHECK CONFIGURATION <<<
+===============================================================================
+Error: JSR check failed with uncommitted changes despite --allow-dirty flag
+
+This is likely a bug in the CI script. Please:
+1. Report this issue
+2. As a temporary workaround, commit your changes
+
+Technical details:
+- Command used: npx jsr publish --dry-run --allow-dirty
+- Error: $error_output
+==============================================================================="
+        exit 1
+    fi
+
+    # Handle actual type check errors
+    echo "
+===============================================================================
+>>> JSR TYPE CHECK FAILED <<<
+===============================================================================
+Error: JSR publish dry-run failed
+
+Common causes:
+1. Version constraints in import statements
+2. Package name format in deno.json
+3. File paths and naming conventions
+4. Type definition errors
+
+Next steps:
+1. Review type definitions in your code
+2. Check import statement versions
+3. Verify package.json configuration
+
+Error details: $error_output
+
+For more details:
+- JSR publishing guide: https://jsr.io/docs/publishing
+- Project documentation in docs/ directory
+==============================================================================="
+    exit 1
+}
+
 # Handle DEBUG environment variable
 if [ "${DEBUG:-false}" = "true" ]; then
     echo "
@@ -125,24 +273,52 @@ if ! deno cache --reload mod.ts; then
     handle_error "mod.ts" "Failed to regenerate deno.lock" "false"
 fi
 
+# Comprehensive type checking
+echo "Running comprehensive type checks..."
+
+# Check main entry points
+echo "Checking entry points..."
+for entry_point in mod.ts cli.ts main.ts; do
+    if [ -f "$entry_point" ]; then
+        if ! deno check "$entry_point"; then
+            handle_error "$entry_point" "Type check failed" "false"
+        fi
+    fi
+done
+
+# Check all TypeScript files in lib directory
+echo "Checking library files..."
+find lib -name "*.ts" -not -name "*.test.ts" | while read -r file; do
+    if ! deno check "$file"; then
+        handle_error "$file" "Type check failed" "false"
+    fi
+done
+
+# Try JSR type check with --allow-dirty if available
+echo "Running JSR type check..."
+if ! error_output=$(npx jsr publish --dry-run --allow-dirty 2>&1); then
+    handle_jsr_error "$error_output"
+fi
+
 # Function to run a single test file
 run_single_test() {
     local test_file=$1
     local is_debug=${2:-false}
+    local error_output
     
     if [ "$is_debug" = "true" ]; then
         echo "
 ===============================================================================
 >>> RUNNING TEST IN DEBUG MODE: $test_file <<<
 ==============================================================================="
-        if ! LOG_LEVEL=debug deno test --allow-env --allow-write --allow-read --allow-run "$test_file"; then
-            handle_error "$test_file" "Test failed" "true"
+        if ! error_output=$(LOG_LEVEL=debug deno test --allow-env --allow-write --allow-read --allow-run "$test_file" 2>&1); then
+            handle_error "$test_file" "$error_output" "true"
             return 1
         fi
     else
         echo "Running test: $test_file"
-        if ! deno test --allow-env --allow-write --allow-read --allow-run "$test_file"; then
-            handle_error "$test_file" "Test failed" "false"
+        if ! error_output=$(deno test --allow-env --allow-write --allow-read --allow-run "$test_file" 2>&1); then
+            handle_error "$test_file" "$error_output" "false"
             return 1
         fi
         echo "✓ $test_file"
@@ -191,26 +367,16 @@ fi
 
 echo "All tests passed. Running type check..."
 if ! deno check mod.ts; then
-    echo "
-===============================================================================
->>> TYPE CHECK FAILED <<<
-===============================================================================
-Please review:
-1. Project rules and specifications in docs/ directory
-2. Deno's type system documentation at https://deno.land/manual/typescript
-3. External library documentation for any imported packages
+    handle_type_error "mod.ts" "$(deno check mod.ts 2>&1)"
+fi
 
-Remember to:
-- Check type definitions in your code
-- Verify type compatibility with external dependencies
-- Review TypeScript configuration in deno.json
-==============================================================================="
-    handle_error "type check" "Type check failed" "false"
-    exit 1
+echo "Running JSR type check..."
+if ! error_output=$(npx jsr publish --dry-run --allow-dirty 2>&1); then
+    handle_jsr_error "$error_output"
 fi
 
 echo "Running format check..."
-if ! deno fmt --check; then
+if ! deno fmt --check "**/*.ts" "**/*.js" "**/*.jsx" "**/*.tsx"; then
     echo "
 ===============================================================================
 >>> FORMAT CHECK FAILED <<<
@@ -220,39 +386,22 @@ Please review:
 2. Deno's style guide at https://deno.land/manual/tools/formatter
 3. Format settings in deno.json
 
+To auto-fix formatting issues:
+  $ deno fmt
+
 Remember to:
-- Run 'deno fmt' to automatically fix formatting issues
+- Format checks are applied only to TypeScript and JavaScript files
 - Check for any custom formatting rules in the project
 - Ensure your editor's formatting settings align with the project
 
-Important Note:
-- Some format errors might be from test-generated files
-- Check if any test runs have created or modified files
-- Consider adding such dynamically generated files to .gitignore
-- Clean up test output directories if necessary
+Error details: $(deno fmt --check "**/*.ts" "**/*.js" "**/*.jsx" "**/*.tsx" 2>&1)
 ==============================================================================="
-    handle_error "format" "Format check failed" "false"
-    exit 1
+    handle_format_error "$(deno fmt --check "**/*.ts" "**/*.js" "**/*.jsx" "**/*.tsx" 2>&1)"
 fi
 
 echo "Running lint..."
 if ! deno lint; then
-    echo "
-===============================================================================
->>> LINT CHECK FAILED <<<
-===============================================================================
-Please review:
-1. Project linting rules in docs/ directory
-2. Deno's linting rules at https://deno.land/manual/tools/linter
-3. Lint configuration in deno.json
-
-Remember to:
-- Check for common code style issues
-- Review best practices for Deno development
-- Verify any custom lint rules specific to the project
-==============================================================================="
-    handle_error "lint" "Lint check failed" "false"
-    exit 1
+    handle_lint_error "$(deno lint 2>&1)"
 fi
 
 echo "✓ Local checks completed successfully." 

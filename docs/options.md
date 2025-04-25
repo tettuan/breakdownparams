@@ -27,6 +27,7 @@ Options available when both DemonstrativeType and LayerType are provided (e.g., 
 | --from | -f | Source file path | string | No | `--from input.md` |
 | --destination | -o | Output file path | string | No | `--destination output.md` |
 | --input | -i | Input layer type | enum | No | `--input project` |
+| --adaptation | -a | Prompt adaptation type | string | No | `--adaptation strict` |
 
 ### Input Layer Type Values
 
@@ -68,4 +69,6 @@ breakdown init
 ```bash
 breakdown to issue --from input.md --destination output.md
 breakdown to issue -f input.md -o output.md -i project
+breakdown summary task --from unorganized_tasks.md -o task_markdown_dir -a strict
+breakdown summary task -f unorganized_tasks.md -o task_markdown_dir -a a
 ``` 
