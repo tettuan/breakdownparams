@@ -308,7 +308,10 @@ Deno.test('Too many parameters', () => {
   const result = parser.parse(['to', 'issue', 'extra']);
   assertEquals(result.type, 'no-params');
   assertExists(result.error);
-  assertEquals(result.error, 'Too many arguments. Maximum 2 arguments are allowed.');
+  assertEquals(
+    result.error,
+    'Too many arguments. Maximum 2 arguments are allowed.',
+  );
 });
 
 /**

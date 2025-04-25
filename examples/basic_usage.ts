@@ -41,7 +41,7 @@ Options:
   case 'double': {
     const { demonstrativeType, layerType, options = {} } = result;
     console.log(`Action: ${demonstrativeType} ${layerType}`);
-    
+
     if (options?.fromFile) {
       console.log(`Input file: ${options.fromFile}`);
     }
@@ -59,4 +59,4 @@ Options:
 if ('error' in result && result.error) {
   console.error(`Error: ${result.error}`);
   Deno.exit(1);
-} 
+}

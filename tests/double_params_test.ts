@@ -72,6 +72,8 @@ Deno.test('Double Parameters', async (t) => {
       'output.txt',
       '--input',
       'issue',
+      '--adaptation',
+      'strict',
     ]);
     _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
@@ -82,6 +84,7 @@ Deno.test('Double Parameters', async (t) => {
         fromFile: 'input.txt',
         destinationFile: 'output.txt',
         fromLayerType: 'issue',
+        adaptationType: 'strict',
       });
     }
   });
@@ -97,6 +100,8 @@ Deno.test('Double Parameters', async (t) => {
       'output.txt',
       '-i',
       'issue',
+      '-a',
+      'strict',
     ]);
     _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
@@ -107,7 +112,49 @@ Deno.test('Double Parameters', async (t) => {
         fromFile: 'input.txt',
         destinationFile: 'output.txt',
         fromLayerType: 'issue',
+        adaptationType: 'strict',
       });
     }
   });
+
+  await t.step('should handle adaptation option independently', () => {
+    _logger.debug('Testing adaptation option independently');
+    const result = parser.parse([
+      'summary',
+      'task',
+      '--adaptation',
+      'strict',
+    ]);
+    _logger.debug('Parse result', result);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertEquals(result.demonstrativeType, 'summary');
+      assertEquals(result.layerType, 'task');
+      assertEquals(result.options, {
+        adaptationType: 'strict',
+      });
+    }
+  });
+
+  await t.step(
+    'should handle short form adaptation option independently',
+    () => {
+      _logger.debug('Testing short form adaptation option independently');
+      const result = parser.parse([
+        'summary',
+        'task',
+        '-a',
+        'strict',
+      ]);
+      _logger.debug('Parse result', result);
+      assertEquals(result.type, 'double');
+      if (result.type === 'double') {
+        assertEquals(result.demonstrativeType, 'summary');
+        assertEquals(result.layerType, 'task');
+        assertEquals(result.options, {
+          adaptationType: 'strict',
+        });
+      }
+    },
+  );
 });

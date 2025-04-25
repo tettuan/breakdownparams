@@ -67,7 +67,10 @@ Deno.test('Error Cases', async (t) => {
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertExists(result.error);
-      assertEquals(result.error, 'Too many arguments. Maximum 2 arguments are allowed.');
+      assertEquals(
+        result.error,
+        'Too many arguments. Maximum 2 arguments are allowed.',
+      );
     }
   });
 

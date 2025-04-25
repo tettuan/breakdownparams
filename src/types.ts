@@ -40,7 +40,10 @@ export interface DoubleParamsResult {
 /**
  * Union type of all possible parameter result types
  */
-export type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
+export type ParamsResult =
+  | NoParamsResult
+  | SingleParamResult
+  | DoubleParamsResult;
 
 /**
  * Interface representing optional parameters that can be provided with commands.
@@ -53,6 +56,8 @@ export interface OptionParams {
   destinationFile?: string;
   /** The source layer type when specified with --input or -i */
   fromLayerType?: LayerType;
+  /** The prompt adaptation type when specified with --adaptation or -a */
+  adaptationType?: string;
 }
 
 /**

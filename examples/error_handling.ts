@@ -43,4 +43,4 @@ if ('error' in result && result.error) {
 
 // If we get here, the command was valid
 console.log('Command processed successfully:');
-console.log(JSON.stringify(result, null, 2)); 
+console.log(JSON.stringify(result, null, 2));

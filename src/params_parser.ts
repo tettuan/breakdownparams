@@ -37,7 +37,11 @@ import {
  * ```
  */
 export class ParamsParser {
-  private readonly demonstrativeTypes = new Set<DemonstrativeType>(['to', 'summary', 'defect']);
+  private readonly demonstrativeTypes = new Set<DemonstrativeType>([
+    'to',
+    'summary',
+    'defect',
+  ]);
   private readonly validSingleCommands = new Set<string>(['init']);
 
   /**
@@ -112,7 +116,10 @@ export class ParamsParser {
    * @param args - The command line arguments
    * @returns A result object containing the parsed command
    */
-  private parseSingleParam(command: string, args: string[]): SingleParamResult | NoParamsResult {
+  private parseSingleParam(
+    command: string,
+    args: string[],
+  ): SingleParamResult | NoParamsResult {
     if (!this.validSingleCommands.has(command)) {
       return {
         type: 'no-params',
@@ -143,7 +150,11 @@ export class ParamsParser {
     args: string[],
   ): DoubleParamsResult {
     const normalizedDemonstrativeType = demonstrativeType.toLowerCase();
-    if (!this.demonstrativeTypes.has(normalizedDemonstrativeType as DemonstrativeType)) {
+    if (
+      !this.demonstrativeTypes.has(
+        normalizedDemonstrativeType as DemonstrativeType,
+      )
+    ) {
       return {
         type: 'double',
         error:
@@ -191,7 +202,12 @@ export class ParamsParser {
 
       if (!nextArg || nextArg.startsWith('-')) continue;
 
-      if (arg === '--from' || arg === '--destination' || arg === '--input') {
+      if (
+        arg === '--from' ||
+        arg === '--destination' ||
+        arg === '--input' ||
+        arg === '--adaptation'
+      ) {
         if (arg === '--from') options.fromFile = nextArg;
         if (arg === '--destination') options.destinationFile = nextArg;
         if (arg === '--input') {
@@ -200,6 +216,7 @@ export class ParamsParser {
             options.fromLayerType = LayerTypeAliasMap[value as keyof typeof LayerTypeAliasMap];
           }
         }
+        if (arg === '--adaptation') options.adaptationType = nextArg;
         i++;
       }
     }
@@ -222,6 +239,9 @@ export class ParamsParser {
         if (value in LayerTypeAliasMap) {
           options.fromLayerType = LayerTypeAliasMap[value as keyof typeof LayerTypeAliasMap];
         }
+        i++;
+      } else if (arg === '-a' && !options.adaptationType) {
+        options.adaptationType = nextArg;
         i++;
       }
     }

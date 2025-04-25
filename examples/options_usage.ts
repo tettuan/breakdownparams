@@ -50,7 +50,7 @@ if ('error' in result && result.error) {
 // Process valid command
 if (result.type === 'double') {
   const { demonstrativeType, layerType, options = {} } = result;
-  
+
   console.log('Command processed successfully:');
   console.log('----------------------------');
   console.log(`Action: ${demonstrativeType} ${layerType}`);
@@ -68,4 +68,4 @@ if (result.type === 'double') {
   console.log('Please provide both command and layer type.');
   console.log('\nFor usage information, run: options_usage --help');
   Deno.exit(1);
-} 
+}
