@@ -18,19 +18,20 @@ Options:
   --from, -f <file>          Input file path
   --destination, -o <file>    Output file path
   --input, -i <layer>        Input layer type
+  --adaptation, -a <type>    Prompt adaptation type
 
 Examples:
   # Using long form options
-  options_usage to issue --from input.md --destination output.md --input project
+  options_usage to issue --from input.md --destination output.md --input project --adaptation strict
 
   # Using short form options
-  options_usage to issue -f input.md -o output.md -i project
+  options_usage to issue -f input.md -o output.md -i project -a strict
 
   # Mixed options
-  options_usage to issue --from input.md -o output.md --input project
+  options_usage to issue --from input.md -o output.md --input project -a strict
 
-  # Using aliases
-  options_usage summary pj -f project.md
+  # Using adaptation option only
+  options_usage summary task --adaptation strict
 `);
 }
 
@@ -63,6 +64,9 @@ if (result.type === 'double') {
   }
   if (options?.fromLayerType) {
     console.log(`Converting from layer: ${options.fromLayerType}`);
+  }
+  if (options?.adaptationType) {
+    console.log(`Prompt adaptation: ${options.adaptationType}`);
   }
 } else {
   console.log('Please provide both command and layer type.');
