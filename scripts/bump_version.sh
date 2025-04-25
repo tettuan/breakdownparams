@@ -24,7 +24,7 @@ done
 
 # Try to get latest version from JSR
 echo "Checking latest version from JSR..."
-latest_jsr_version=$(curl -s https://jsr.io/@tettuan/breakdownconfig/versions | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n 1)
+latest_jsr_version=$(curl -s https://jsr.io/@tettuan/breakdownparams/versions | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -n 1)
 
 if [ -z "$latest_jsr_version" ]; then
     echo "Warning: Could not determine latest version from JSR, using local version"
