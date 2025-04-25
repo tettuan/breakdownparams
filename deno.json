@@ -27,7 +27,8 @@
   "fmt": {
     "include": [
       "src/",
-      "tests/"
+      "tests/",
+      "examples/"
     ],
     "exclude": [
       "**/node_modules/",
@@ -36,12 +37,15 @@
     "lineWidth": 100,
     "indentWidth": 2,
     "singleQuote": true,
-    "proseWrap": "preserve"
+    "proseWrap": "preserve",
+    "semiColons": true,
+    "useTabs": false
   },
   "lint": {
     "include": [
       "src/",
-      "tests/"
+      "tests/",
+      "examples/"
     ],
     "exclude": [
       "**/node_modules/",
@@ -59,7 +63,9 @@
       "dom",
       "esnext"
     ],
-    "strict": true
+    "strict": true,
+    "allowJs": true,
+    "checkJs": true
   },
   "publish": {
     "include": [
