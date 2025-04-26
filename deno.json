@@ -63,9 +63,7 @@
       "dom",
       "esnext"
     ],
-    "strict": true,
-    "allowJs": true,
-    "checkJs": true
+    "strict": true
   },
   "publish": {
     "include": [
