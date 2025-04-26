@@ -39,6 +39,42 @@ When using the `--input` option, the following values are supported and normaliz
 | issue, story | issue |
 | task, todo, chore, style, fix, error, bug | task |
 
+### Adaptation Option Value Rules
+
+The value for `--adaptation`/`-a` must follow these rules:
+
+- Only the following characters are allowed:
+  - Alphanumeric characters (`a-z`, `A-Z`, `0-9`)
+  - Underscores (`_`)
+  - Hyphens (`-`)
+- The value must not be empty.
+- Any other character (including spaces, slashes `/`, dots `.`, symbols, or non-ASCII characters) is not allowed.
+
+#### Examples
+
+| Value         | Accepted? | Reason                        |
+| ------------- | --------- | ----------------------------- |
+| `strict`      | Yes       | Alphanumeric                  |
+| `my_adapt`    | Yes       | Underscore allowed            |
+| `my-adapt`    | Yes       | Hyphen allowed                |
+| `a08`         | Yes       | Alphanumeric                  |
+| `a08&^`       | No        | Special chars not allowed     |
+| `my/adapt`    | No        | Slash not allowed             |
+| `my.adapt`    | No        | Dot not allowed               |
+| `ストリクト`   | No        | Japanese not allowed          |
+| `adapt😀`      | No        | Emoji not allowed             |
+| (empty)       | No        | Must not be empty             |
+
+#### Pattern (Regex)
+
+```
+^[a-zA-Z0-9_-]+$
+```
+
+#### Error Handling
+
+If an invalid value is provided, the parser will return an error indicating the invalid adaptation value and the allowed pattern.
+
 ## Option Precedence Rules
 
 1. Long form vs Short form:
