@@ -19,54 +19,33 @@
     "@std/assert": "jsr:@std/assert@^0.220.1"
   },
   "tasks": {
-    "test": "deno test -A --env",
+    "test": "deno test --allow-env --allow-read --allow-write",
     "check": "deno check **/*.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "ci": "bash scripts/local_ci.sh"
   },
   "fmt": {
-    "include": [
-      "src/",
-      "tests/",
-      "examples/"
-    ],
-    "exclude": [
-      "**/node_modules/",
-      "**/.git/"
-    ],
+    "include": ["src/", "tests/", "mod.ts"],
+    "exclude": ["docs/", "drafts/"],
+    "useTabs": false,
     "lineWidth": 100,
     "indentWidth": 2,
     "singleQuote": true,
-    "proseWrap": "preserve",
-    "semiColons": true,
-    "useTabs": false
+    "proseWrap": "preserve"
   },
   "lint": {
-    "include": [
-      "src/",
-      "tests/",
-      "examples/"
-    ],
-    "exclude": [
-      "**/node_modules/",
-      "**/.git/"
-    ],
+    "files": {
+      "include": ["src/", "tests/"]
+    },
     "rules": {
-      "tags": [
-        "recommended"
-      ]
+      "tags": ["recommended"]
     }
   },
   "compilerOptions": {
-    "lib": [
-      "deno.window",
-      "dom",
-      "esnext"
-    ],
-    "strict": true,
     "allowJs": true,
-    "checkJs": true
+    "lib": ["deno.window"],
+    "strict": true
   },
   "publish": {
     "include": [
