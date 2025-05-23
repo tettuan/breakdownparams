@@ -28,7 +28,7 @@
 
 import { assertEquals } from '@std/assert';
 import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
-import { ParamsParser } from '../src/params_parser.ts';
+import { ParamsParser } from '../../mod.ts';
 
 // Initialize logger for testing
 const _logger = new BreakdownLogger();

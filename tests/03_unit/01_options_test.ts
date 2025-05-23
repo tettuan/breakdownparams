@@ -24,7 +24,11 @@
  */
 
 import { assertEquals } from '@std/assert';
-import { ParamsParser } from '../src/params_parser.ts';
+import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
+import { ParamsParser } from '../../mod.ts';
+
+// Initialize logger for testing
+const _logger = new BreakdownLogger();
 
 Deno.test('Options', async (t) => {
   const parser = new ParamsParser();

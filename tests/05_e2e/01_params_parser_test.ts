@@ -1,6 +1,6 @@
 import { assertEquals, assertExists } from '@std/assert';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
-import { ParamsParser } from '../src/params_parser.ts';
+import { ParamsParser } from '../../mod.ts';
 
 /**
  * ParamsParserのテストスイート
