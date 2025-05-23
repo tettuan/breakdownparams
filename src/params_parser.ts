@@ -141,10 +141,19 @@ export class ParamsParser {
       };
     }
 
+    const options = this.parseOptions(args);
+    if ('error' in options) {
+      return {
+        type: 'single',
+        command: 'init',
+        error: options.error,
+      };
+    }
+
     return {
       type: 'single',
       command: 'init',
-      options: this.parseOptions(args),
+      options,
     };
   }
 
@@ -283,6 +292,14 @@ export class ParamsParser {
       };
     }
     const options = this.parseOptions(args);
+    if ('error' in options) {
+      return {
+        type: 'double',
+        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
+        layerType: mappedLayerType,
+        error: options.error,
+      };
+    }
     return {
       type: 'double',
       demonstrativeType: normalizedDemonstrativeType.toLowerCase() as DemonstrativeType,
@@ -297,9 +314,9 @@ export class ParamsParser {
    * This method extracts and parses command line options from the arguments.
    *
    * @param args - The command line arguments to parse
-   * @returns An object containing the parsed options
+   * @returns An object containing the parsed options or an error
    */
-  private parseOptions(args: string[]): OptionParams {
+  private parseOptions(args: string[]): OptionParams | { error: string } {
     const options: OptionParams = {};
 
     // ロングフォームを先に処理
@@ -323,7 +340,15 @@ export class ParamsParser {
             options.fromLayerType = LayerTypeAliasMap[value as keyof typeof LayerTypeAliasMap];
           }
         }
-        if (arg === '--adaptation') options.adaptationType = nextArg;
+        if (arg === '--adaptation') {
+          if (!/^[a-zA-Z0-9_-]+$/.test(nextArg)) {
+            return {
+              error:
+                `Invalid adaptation value: '${nextArg}'. Only alphanumeric characters, underscores, and hyphens are allowed.`,
+            };
+          }
+          options.adaptationType = nextArg;
+        }
         i++;
       }
     }
@@ -348,6 +373,12 @@ export class ParamsParser {
         }
         i++;
       } else if (arg === '-a' && !options.adaptationType) {
+        if (!/^[a-zA-Z0-9_-]+$/.test(nextArg)) {
+          return {
+            error:
+              `Invalid adaptation value: '${nextArg}'. Only alphanumeric characters, underscores, and hyphens are allowed.`,
+          };
+        }
         options.adaptationType = nextArg;
         i++;
       }

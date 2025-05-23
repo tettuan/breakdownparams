@@ -43,7 +43,11 @@
     }
   },
   "compilerOptions": {
-    "lib": ["deno.window"],
+    "lib": [
+      "deno.window",
+      "dom",
+      "esnext"
+    ],
     "strict": true
   },
   "publish": {
