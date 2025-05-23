@@ -6,7 +6,9 @@
 このライブラリは実行時パラメータを解析し、その値を保存します。
 スコープは解析から検証、保存された値の返却までをカバーします。
 
-各パラメータタイプの詳細な仕様と利用可能なオプションについては、[オプション文書](options.ja.md)を参照してください。
+詳細な仕様については、以下のドキュメントを参照してください：
+- [パラメータ仕様](params.ja.md) - 位置引数の定義と制約
+- [オプション仕様](options.ja.md) - ハイフン付き引数の定義と制約
 
 ## スコープ外
 
@@ -141,13 +143,9 @@
 - `<from_layer_type>`部分を取得
 - 例：`--input issue`の場合、`issue`を保存
 - 許可される値：
-  - project, pj, prj
+  - project, pj
   - issue, story
   - task, todo, chore, style, fix, error, bug
-- 値は共通形式に正規化されます：
-  - project, pj, prj -> project
-  - issue, story -> issue
-  - task, todo, chore, style, fix, error, bug -> task
 
 # パラメータ優先順位ルール
 
