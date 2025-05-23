@@ -63,6 +63,29 @@ deno run options_usage.ts to issue -f input.md -o output.md -i project
 deno run options_usage.ts to issue --from input.md -o output.md --input project
 ```
 
+## Extended Parameters Usage (`extended_params_usage.ts`)
+
+Shows how to use custom parameter validation with extended mode:
+
+- Custom demonstrative type validation
+- Custom layer type validation
+- Pattern-based validation
+- Custom error messages
+
+```bash
+# Using custom demonstrative type
+deno run extended_params_usage.ts custom project
+
+# Using custom layer type
+deno run extended_params_usage.ts to custom
+
+# Using both custom types
+deno run extended_params_usage.ts custom custom
+
+# With custom error messages
+deno run extended_params_usage.ts invalid invalid
+```
+
 ## Required Permissions
 
 The examples require the following permissions:
