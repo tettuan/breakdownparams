@@ -22,7 +22,8 @@
     "test": "deno test -A --env",
     "check": "deno check **/*.ts",
     "fmt": "deno fmt",
-    "lint": "deno lint"
+    "lint": "deno lint",
+    "ci": "bash scripts/local_ci.sh"
   },
   "fmt": {
     "include": [
