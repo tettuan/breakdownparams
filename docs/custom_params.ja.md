@@ -63,12 +63,12 @@ const config: ParserConfig = {
   isExtendedMode: true,
   demonstrativeType: {
     pattern: '^[a-z]+$',
-    errorMessage: 'Invalid demonstrative type'
+    errorMessage: 'Invalid demonstrative type',
   },
   layerType: {
     pattern: '^[a-z]+$',
-    errorMessage: 'Invalid layer type'
-  }
+    errorMessage: 'Invalid layer type',
+  },
 };
 ```
 
@@ -104,11 +104,11 @@ import { ParamsParser } from './mod.ts';
 const config: ParserConfig = {
   isExtendedMode: true,
   demonstrativeType: {
-    pattern: '^[a-z]+$'
+    pattern: '^[a-z]+$',
   },
   layerType: {
-    pattern: '^[a-z]+$'
-  }
+    pattern: '^[a-z]+$',
+  },
 };
 
 const parser = new ParamsParser(config);
@@ -192,4 +192,4 @@ if (result.type === 'double') {
 
 2. パラメータの確認
    - 標準値の使用確認
-   - カスタム値の置き換え 
+   - カスタム値の置き換え

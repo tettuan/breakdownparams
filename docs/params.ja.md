@@ -25,21 +25,21 @@
 
 最初のパラメータとして指定可能な値：
 
-| 値 | 説明 |
-|----|------|
-| to | 対象への変換 |
-| summary | 要約の生成 |
-| defect | 欠陥の報告 |
+| 値      | 説明         |
+| ------- | ------------ |
+| to      | 対象への変換 |
+| summary | 要約の生成   |
+| defect  | 欠陥の報告   |
 
 ## LayerType
 
 2番目のパラメータとして指定可能な値：
 
-| 値 | 説明 |
-|----|------|
+| 値      | 説明         |
+| ------- | ------------ |
 | project | プロジェクト |
-| issue | 課題 |
-| task | タスク |
+| issue   | 課題         |
+| task    | タスク       |
 
 ## パラメータの制約
 
@@ -55,16 +55,19 @@
 ## 使用例
 
 ### NoParams
+
 ```bash
 breakdown
 ```
 
 ### SingleParam
+
 ```bash
 breakdown init
 ```
 
 ### DoubleParams
+
 ```bash
 breakdown to project
 breakdown summary issue
@@ -73,8 +76,8 @@ breakdown defect task
 
 ## エラーケース
 
-| エラーケース | メッセージ例 |
-|--------------|--------------|
-| 引数過多 | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正なDemonstrativeType | "Invalid value for demonstrativeType: {value}" |
-| 不正なLayerType | "Invalid value for layerType: {value}" | 
+| エラーケース            | メッセージ例                                           |
+| ----------------------- | ------------------------------------------------------ |
+| 引数過多                | "Too many arguments. Maximum 2 arguments are allowed." |
+| 不正なDemonstrativeType | "Invalid value for demonstrativeType: {value}"         |
+| 不正なLayerType         | "Invalid value for layerType: {value}"                 |

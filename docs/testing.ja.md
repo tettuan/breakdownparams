@@ -95,7 +95,6 @@ tests/
 5. 統合テスト (`05_e2e/`)
    - 01: パーサー統合
 
-
 ## テスト実行手順
 
 ### 推奨: 一括テスト・CIフローのローカル実行
@@ -126,10 +125,10 @@ BreakdownLogger をテストコードで「のみ」利用する。
 ### テストコードでの使用
 
 ```typescript
-import { BreakdownLogger } from "@tettuan/breakdownlogger";
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 const logger = new BreakdownLogger();
-logger.debug("テスト実行開始", { testName: "example" });
+logger.debug('テスト実行開始', { testName: 'example' });
 ```
 
 ### ログレベル

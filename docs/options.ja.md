@@ -4,14 +4,14 @@
 
 ## オプション一覧
 
-| オプション | エイリアス | 説明 | 値の型 | 必須 | 例 |
-|------------|------------|------|--------|------|-----|
-| --help | -h | ヘルプ情報を表示 | boolean | いいえ | `--help` |
-| --version | -v | バージョン情報を表示 | boolean | いいえ | `--version` |
-| --from | -f | ソースファイルパス | string | いいえ | `--from input.md` |
-| --destination | -o | 出力ファイルパス | string | いいえ | `--destination output.md` |
-| --input | -i | 入力レイヤータイプ | enum | いいえ | `--input project` |
-| --adaptation | -a | プロンプト適応タイプ | string | いいえ | `--adaptation strict` |
+| オプション    | エイリアス | 説明                 | 値の型  | 必須   | 例                        |
+| ------------- | ---------- | -------------------- | ------- | ------ | ------------------------- |
+| --help        | -h         | ヘルプ情報を表示     | boolean | いいえ | `--help`                  |
+| --version     | -v         | バージョン情報を表示 | boolean | いいえ | `--version`               |
+| --from        | -f         | ソースファイルパス   | string  | いいえ | `--from input.md`         |
+| --destination | -o         | 出力ファイルパス     | string  | いいえ | `--destination output.md` |
+| --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input project`         |
+| --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation strict`     |
 
 ## オプションの制約
 
@@ -31,39 +31,44 @@
 
 `--input`オプションを使用する場合、以下の値がサポートされます：
 
-| 入力値 | 説明 |
-|--------|------|
+| 入力値  | 説明         |
+| ------- | ------------ |
 | project | プロジェクト |
-| issue | 課題 |
-| task | タスク |
+| issue   | 課題         |
+| task    | タスク       |
 
 ## 使用例
 
 ### ヘルプとバージョン
+
 ```bash
 breakdown --help
 breakdown -v
 ```
 
 ### ファイル操作
+
 ```bash
 breakdown to issue --from input.md --destination output.md
 breakdown to issue -f input.md -o output.md
 ```
 
 ### レイヤータイプ指定
+
 ```bash
 breakdown summary task --input project
 breakdown summary task -i project
 ```
 
 ### プロンプト適応
+
 ```bash
 breakdown summary task --adaptation strict
 breakdown summary task -a strict
 ```
 
 ### 複合使用
+
 ```bash
 breakdown to issue --from input.md -o output.md -i project -a strict
-``` 
+```
