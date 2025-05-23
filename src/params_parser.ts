@@ -274,6 +274,14 @@ export class ParamsParser {
     // 拡張モード時は値をそのままセット（型安全性はテストで担保）
     if (this.config.isExtendedMode) {
       const options = this.parseOptions(args);
+      if ('error' in options) {
+        return {
+          type: 'double',
+          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
+          layerType: normalizedLayerType as LayerType,
+          error: options.error,
+        };
+      }
       return {
         type: 'double',
         demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
