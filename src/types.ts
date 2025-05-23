@@ -3,8 +3,9 @@
  * - 'no-params': No parameters provided, may include help or version flags
  * - 'single': Single command parameter (e.g., 'init')
  * - 'double': Two parameters (demonstrative type and layer type)
+ * - 'error': Indicates an error in the parameter parsing process
  */
-export type ParamsType = 'no-params' | 'single' | 'double';
+export type ParamsType = 'no-params' | 'single' | 'double' | 'error';
 
 /**
  * Result type for when no parameters are provided
@@ -38,12 +39,21 @@ export interface DoubleParamsResult {
 }
 
 /**
+ * Result type for when an error occurs during parameter parsing
+ */
+export interface ErrorResult {
+  type: 'error';
+  error: string;
+}
+
+/**
  * Union type of all possible parameter result types
  */
 export type ParamsResult =
   | NoParamsResult
   | SingleParamResult
-  | DoubleParamsResult;
+  | DoubleParamsResult
+  | ErrorResult;
 
 /**
  * Interface representing optional parameters that can be provided with commands.
@@ -109,3 +119,27 @@ export const LayerTypeAliasMap = {
  * that can be used to specify a layer type.
  */
 export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
+
+/**
+ * Interface representing the configuration for the ParamsParser.
+ */
+export interface ParserConfig {
+  /** Whether to enable extended mode for custom validation rules */
+  isExtendedMode: boolean;
+
+  /** Configuration for demonstrative type validation */
+  demonstrativeType?: {
+    /** Regular expression pattern for validation */
+    pattern: string;
+    /** Custom error message for validation failures */
+    errorMessage?: string;
+  };
+
+  /** Configuration for layer type validation */
+  layerType?: {
+    /** Regular expression pattern for validation */
+    pattern: string;
+    /** Custom error message for validation failures */
+    errorMessage?: string;
+  };
+}

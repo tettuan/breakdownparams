@@ -1,10 +1,12 @@
 import {
   DemonstrativeType,
   DoubleParamsResult,
+  LayerType,
   LayerTypeAliasMap,
   NoParamsResult,
   OptionParams,
   ParamsResult,
+  ParserConfig,
   SingleParamResult,
 } from './types.ts';
 
@@ -43,6 +45,16 @@ export class ParamsParser {
     'defect',
   ]);
   private readonly validSingleCommands = new Set<string>(['init']);
+  private readonly config: ParserConfig;
+
+  /**
+   * Create a new ParamsParser instance.
+   *
+   * @param config - Optional configuration for extended mode validation
+   */
+  constructor(config?: ParserConfig) {
+    this.config = config || { isExtendedMode: false };
+  }
 
   /**
    * Parse command line arguments.
@@ -142,17 +154,63 @@ export class ParamsParser {
    * @param demonstrativeType - The demonstrative type parameter
    * @param layerType - The layer type parameter
    * @param args - The command line arguments
-   * @returns A result object containing the parsed parameters
+   * @returns A result object containing the parsed parameters or an error
    */
   private parseDoubleParams(
     demonstrativeType: string,
     layerType: string,
     args: string[],
-  ): DoubleParamsResult {
-    const normalizedDemonstrativeType = demonstrativeType.toLowerCase();
-    if (
+  ): DoubleParamsResult | { type: 'error'; error: string } {
+    const normalizedDemonstrativeType = demonstrativeType;
+    const normalizedLayerType = layerType;
+
+    // セキュリティ: 許可しない文字リスト
+    const forbiddenChars = [';', '|', '&', '`', '$', '>', '<'];
+
+    // Extended mode validation for demonstrative type
+    if (this.config.isExtendedMode && this.config.demonstrativeType) {
+      const patternStr = this.config.demonstrativeType.pattern;
+      if (!patternStr) {
+        return {
+          type: 'error',
+          error: 'Invalid configuration: pattern is required in extended mode',
+        };
+      }
+      // セキュリティ: 何でも許可するパターンは禁止
+      if (patternStr.trim() === '.*') {
+        return {
+          type: 'error',
+          error: 'Security error: pattern ".*" is not allowed',
+        };
+      }
+      let pattern: RegExp;
+      try {
+        pattern = new RegExp(patternStr);
+      } catch (_error) {
+        return {
+          type: 'error',
+          error: 'Invalid demonstrative type pattern configuration',
+        };
+      }
+      if (!pattern.test(normalizedDemonstrativeType)) {
+        return {
+          type: 'error',
+          error: this.config.demonstrativeType.errorMessage ||
+            `Invalid demonstrative type: ${demonstrativeType}`,
+        };
+      }
+      // セキュリティ: 許可しない文字が含まれていればエラー
+      for (const c of forbiddenChars) {
+        if (normalizedDemonstrativeType.includes(c)) {
+          return {
+            type: 'error',
+            error: `Security error: character '${c}' is not allowed in demonstrativeType`,
+          };
+        }
+      }
+    } else if (
       !this.demonstrativeTypes.has(
-        normalizedDemonstrativeType as DemonstrativeType,
+        normalizedDemonstrativeType.toLowerCase() as DemonstrativeType,
       )
     ) {
       return {
@@ -162,23 +220,72 @@ export class ParamsParser {
       };
     }
 
-    // 大文字小文字を区別せずにエイリアスを検証
-    const normalizedLayerType = layerType.toLowerCase();
-    const mappedLayerType =
-      LayerTypeAliasMap[normalizedLayerType as keyof typeof LayerTypeAliasMap];
+    // Extended mode validation for layer type
+    if (this.config.isExtendedMode && this.config.layerType) {
+      const patternStr = this.config.layerType.pattern;
+      if (!patternStr) {
+        return {
+          type: 'error',
+          error: 'Invalid configuration: pattern is required in extended mode',
+        };
+      }
+      // セキュリティ: 何でも許可するパターンは禁止
+      if (patternStr.trim() === '.*') {
+        return {
+          type: 'error',
+          error: 'Security error: pattern ".*" is not allowed',
+        };
+      }
+      let pattern: RegExp;
+      try {
+        pattern = new RegExp(patternStr);
+      } catch (_error) {
+        return {
+          type: 'error',
+          error: 'Invalid layer type pattern configuration',
+        };
+      }
+      if (!pattern.test(normalizedLayerType)) {
+        return {
+          type: 'error',
+          error: this.config.layerType.errorMessage || `Invalid layer type: ${layerType}`,
+        };
+      }
+      // セキュリティ: 許可しない文字が含まれていればエラー
+      for (const c of forbiddenChars) {
+        if (normalizedLayerType.includes(c)) {
+          return {
+            type: 'error',
+            error: `Security error: character '${c}' is not allowed in layerType`,
+          };
+        }
+      }
+    }
 
+    // 拡張モード時は値をそのままセット（型安全性はテストで担保）
+    if (this.config.isExtendedMode) {
+      const options = this.parseOptions(args);
+      return {
+        type: 'double',
+        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
+        layerType: normalizedLayerType as LayerType,
+        options,
+      };
+    }
+
+    // 標準モード: alias map
+    const mappedLayerType =
+      LayerTypeAliasMap[normalizedLayerType.toLowerCase() as keyof typeof LayerTypeAliasMap];
     if (!mappedLayerType) {
       return {
         type: 'double',
         error: `Invalid layer type: ${layerType}`,
       };
     }
-
     const options = this.parseOptions(args);
-
     return {
       type: 'double',
-      demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
+      demonstrativeType: normalizedDemonstrativeType.toLowerCase() as DemonstrativeType,
       layerType: mappedLayerType,
       options,
     };
