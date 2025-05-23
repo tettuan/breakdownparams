@@ -44,4 +44,4 @@ jobs:
       - name: Publish to JSR
         run: deno publish
         env:
-          DENO_JSON_PATH: "./deno.json"
+          DENO_JSON_PATH: './deno.json'
