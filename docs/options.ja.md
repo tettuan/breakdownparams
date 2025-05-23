@@ -33,9 +33,9 @@
 
 | 入力値 | 説明 |
 |--------|------|
-| project, pj | プロジェクト |
-| issue, story | 課題 |
-| task, todo, chore, style, fix, error, bug | タスク |
+| project | プロジェクト |
+| issue | 課題 |
+| task | タスク |
 
 ## 使用例
 

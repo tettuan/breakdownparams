@@ -143,9 +143,9 @@
 - `<from_layer_type>`部分を取得
 - 例：`--input issue`の場合、`issue`を保存
 - 許可される値：
-  - project, pj
-  - issue, story
-  - task, todo, chore, style, fix, error, bug
+  - project
+  - issue
+  - task
 
 # パラメータ優先順位ルール
 
