@@ -13,20 +13,20 @@ import {
 
 /**
  * A class to parse and validate command line arguments for the breakdown structure system.
- * 
+ *
  * This class provides functionality to parse command line arguments with type safety and validation,
  * supporting various command patterns and options for managing breakdown structures.
- * 
+ *
  * The parser supports three main types of parameter combinations:
  * 1. No parameters (with optional help/version flags)
  * 2. Single parameter (e.g., 'init' command)
  * 3. Double parameters (demonstrative type + layer type)
- * 
+ *
  * @example
  * ```ts
  * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
- * 
+ *
  * if (result.type === "no-params") {
  *   // Handle no parameters case
  *   if (result.help) {
@@ -43,7 +43,7 @@ import {
  *   // Process the parameters
  * }
  * ```
- * 
+ *
  * @since 1.0.0
  * @module
  */
@@ -60,10 +60,10 @@ export class ParamsParser {
 
   /**
    * Create a new ParamsParser instance with optional configuration.
-   * 
+   *
    * The configuration allows for extended mode validation and custom validation rules
    * for demonstrative types and layer types.
-   * 
+   *
    * @param config - Optional configuration for extended mode validation and custom rules
    * @throws {Error} If the configuration is invalid
    * @since 1.0.0
@@ -74,10 +74,10 @@ export class ParamsParser {
 
   /**
    * Parse command line arguments and return a type-safe result.
-   * 
+   *
    * This method analyzes the provided arguments and returns a result object that
    * indicates the type of command and any associated options or errors.
-   * 
+   *
    * @param args - Array of command line arguments to parse
    * @returns A {@link ParamsResult} object containing the parsed parameters and any errors
    * @throws {Error} If the arguments cannot be parsed

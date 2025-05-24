@@ -1,7 +1,7 @@
 /**
  * Type representing the different kinds of parameter combinations that can be parsed.
  * This type is used to categorize the command line arguments into distinct patterns.
- * 
+ *
  * @since 1.0.0
  */
 export type ParamsType = 'no-params' | 'single' | 'double' | 'error';
@@ -9,7 +9,7 @@ export type ParamsType = 'no-params' | 'single' | 'double' | 'error';
 /**
  * Categories of errors that can occur during parameter parsing.
  * These categories help in organizing and handling different types of errors.
- * 
+ *
  * @since 1.0.0
  */
 export type ErrorCategory =
@@ -22,7 +22,7 @@ export type ErrorCategory =
 /**
  * Error codes for parameter parsing.
  * These codes provide specific identification for different error scenarios.
- * 
+ *
  * @since 1.0.0
  */
 export type ErrorCode =
@@ -50,7 +50,7 @@ export type ErrorCode =
 /**
  * Interface representing detailed error information.
  * This interface provides comprehensive error details for debugging and error handling.
- * 
+ *
  * @since 1.0.0
  */
 export interface ErrorInfo {
@@ -68,7 +68,7 @@ export interface ErrorInfo {
  * Result type for when no parameters are provided.
  * This type is used when the command is run without any arguments,
  * potentially including help or version flags.
- * 
+ *
  * @since 1.0.0
  */
 export interface NoParamsResult {
@@ -85,7 +85,7 @@ export interface NoParamsResult {
 /**
  * Result type for when a single parameter is provided.
  * This type is used for commands like 'init' that take a single argument.
- * 
+ *
  * @since 1.0.0
  */
 export interface SingleParamResult {
@@ -102,7 +102,7 @@ export interface SingleParamResult {
 /**
  * Result type for when two parameters are provided.
  * This type is used for commands that require both a demonstrative type and a layer type.
- * 
+ *
  * @since 1.0.0
  */
 export interface DoubleParamsResult {
@@ -121,7 +121,7 @@ export interface DoubleParamsResult {
 /**
  * Union type of all possible parameter result types.
  * This type represents all possible outcomes of parameter parsing.
- * 
+ *
  * @since 1.0.0
  */
 export type ParamsResult =
@@ -132,7 +132,7 @@ export type ParamsResult =
 /**
  * Interface representing optional parameters that can be provided with commands.
  * These options can be specified using either long form (--option) or short form (-o).
- * 
+ *
  * @since 1.0.0
  */
 export interface OptionParams {
@@ -153,7 +153,7 @@ export interface OptionParams {
 /**
  * Type representing the available demonstrative types that indicate the action to perform.
  * These types define the main operations that can be performed on breakdown structures.
- * 
+ *
  * @since 1.0.0
  */
 export type DemonstrativeType = 'to' | 'summary' | 'defect';
@@ -161,7 +161,7 @@ export type DemonstrativeType = 'to' | 'summary' | 'defect';
 /**
  * Type representing the available layer types in the breakdown structure.
  * These types define the different levels of granularity in the breakdown structure.
- * 
+ *
  * @since 1.0.0
  */
 export type LayerType = 'project' | 'issue' | 'task';
@@ -197,7 +197,7 @@ export const LayerTypeAliasMap = {
  * Type representing all possible layer type aliases.
  * This type is derived from the keys of LayerTypeAliasMap and includes all valid alias strings
  * that can be used to specify a layer type.
- * 
+ *
  * @since 1.0.0
  */
 export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
@@ -206,7 +206,7 @@ export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
  * Interface representing the configuration for the ParamsParser.
  * This interface defines the configuration options that can be used to customize
  * the behavior of the parameter parser.
- * 
+ *
  * @since 1.0.0
  */
 export interface ParserConfig {
