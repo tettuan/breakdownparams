@@ -1,6 +1,7 @@
 import { assertEquals, assertExists } from '@std/assert';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../mod.ts';
+import { ErrorCode, ErrorCategory } from '../../src/types.ts';
 
 /**
  * ParamsParserのテストスイート
@@ -128,8 +129,8 @@ Deno.test('Single parameter with invalid command', () => {
     assertExists(result.error);
     assertEquals(result.error, {
       message: 'Invalid command: invalid. Must be one of: init',
-      code: 'INVALID_COMMAND',
-      category: 'VALIDATION',
+      code: 'INVALID_COMMAND' as ErrorCode,
+      category: 'VALIDATION' as ErrorCategory,
       details: {
         provided: 'invalid',
         validCommands: ['init'],
@@ -204,8 +205,8 @@ Deno.test('Double parameters with invalid demonstrative type', () => {
     assertExists(result.error);
     assertEquals(result.error, {
       message: 'Invalid demonstrative type: invalid. Must be one of: to, summary, defect',
-      code: 'INVALID_DEMONSTRATIVE_TYPE',
-      category: 'VALIDATION',
+      code: 'INVALID_DEMONSTRATIVE_TYPE' as ErrorCode,
+      category: 'VALIDATION' as ErrorCategory,
       details: {
         provided: 'invalid',
         validTypes: ['to', 'summary', 'defect'],
@@ -233,8 +234,8 @@ Deno.test('Double parameters with invalid layer type', () => {
     assertExists(result.error);
     assertEquals(result.error, {
       message: 'Invalid layer type: invalid. Must be one of: project, issue, task',
-      code: 'INVALID_LAYER_TYPE',
-      category: 'VALIDATION',
+      code: 'INVALID_LAYER_TYPE' as ErrorCode,
+      category: 'VALIDATION' as ErrorCategory,
       details: {
         provided: 'invalid',
         validTypes: ['project', 'issue', 'task'],
@@ -331,8 +332,8 @@ Deno.test('Too many parameters', () => {
   assertExists(result.error);
   assertEquals(result.error, {
     message: 'Too many arguments. Maximum 2 arguments are allowed.',
-    code: 'TOO_MANY_ARGUMENTS',
-    category: 'SYNTAX',
+    code: 'TOO_MANY_ARGUMENTS' as ErrorCode,
+    category: 'SYNTAX' as ErrorCategory,
     details: {
       provided: 3,
       maxAllowed: 2,

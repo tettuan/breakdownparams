@@ -26,6 +26,7 @@
 import { assertEquals, assertExists } from '@std/assert';
 import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
 import { ParamsParser } from '../../mod.ts';
+import { ErrorCode, ErrorCategory } from '../../src/types.ts';
 
 // Initialize logger for testing
 const _logger = new BreakdownLogger();
@@ -79,8 +80,8 @@ Deno.test('Single Parameter Tests', async (t) => {
     assertEquals(result.type, 'single');
     if (result.type === 'single') {
       assertExists(result.error);
-      assertEquals(result.error.code, 'INVALID_COMMAND');
-      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(result.error.code, 'INVALID_COMMAND' as ErrorCode);
+      assertEquals(result.error.category, 'VALIDATION' as ErrorCategory);
       assertEquals(
         result.error.message,
         'Invalid command: invalid. Must be one of: init',
@@ -98,8 +99,8 @@ Deno.test('Single Parameter Tests', async (t) => {
     assertEquals(result.type, 'single');
     if (result.type === 'single') {
       assertExists(result.error);
-      assertEquals(result.error.code, 'INVALID_COMMAND');
-      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(result.error.code, 'INVALID_COMMAND' as ErrorCode);
+      assertEquals(result.error.category, 'VALIDATION' as ErrorCategory);
       assertEquals(
         result.error.message,
         'Invalid command: invalid. Must be one of: init',
