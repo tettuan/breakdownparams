@@ -13,23 +13,28 @@
 | --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input project`         |
 | --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation strict`     |
 | --config      | -c         | 設定ファイル名       | string  | いいえ | `--config test`           |
+| --uv-*        | なし       | カスタム変数オプション | string  | いいえ | `--uv-project=myproject`  |
 
 ## オプションの制約
 
 1. **長形式と短縮形**
    - 両方の形式が提供された場合（例：`--from`と`-f`）、長形式が優先されます
    - 長形式が主要で、短縮形はエイリアスと見なされます
+   - カスタム変数オプション（`--uv-*`）は短縮形をサポートしません
 
 2. **大文字小文字の区別**
    - すべてのオプションとエイリアスは小文字である必要があります
    - 大文字バリアントはエラーなしで無視されます
+   - カスタム変数オプション名は大文字小文字を区別し、指定された通りに使用する必要があります
 
 3. **無効なオプション**
    - 未定義のオプションはエラーなしで無視されます
    - ファイルパスに対する検証は行われません
+   - カスタム変数オプションの構文が不正な場合（`=`の欠落など）はエラーとなります
 
 4. **パラメータタイプによる制約**
    - `--config` / `-c` オプションは DoubleParams でのみ使用可能です
+   - カスタム変数オプション（`--uv-*`）も DoubleParams でのみ使用可能です
    - 他のパラメータタイプ（NoParams, SingleParam）では無視されます
 
 ## 入力レイヤータイプの値
@@ -72,10 +77,18 @@ breakdown summary task --adaptation strict
 breakdown summary task -a strict
 ```
 
+### カスタム変数オプション
+
+```bash
+breakdown to project --uv-project=myproject
+breakdown to project --uv-version=1.0.0 --uv-environment=production
+```
+
 ### 複合使用
 
 ```bash
 breakdown to issue --from input.md -o output.md -i project -a strict
 breakdown to project --config test
 breakdown summary task -c test
+breakdown to project --config test --uv-environment=prod --uv-version=1.0.0
 ```

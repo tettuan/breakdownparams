@@ -64,6 +64,14 @@
 | --adaptation  | -a         | プロンプト適応タイプ。処理の挙動を調整するために使用。カスタマイズ可能な動作を指定。 | [options.ja.md](options.ja.md) |
 | --config      | -c         | 設定ファイル名。DoubleParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
 
+### カスタム変数オプション
+
+| 用語           | 説明                                                                                                                 | 参照仕様ファイル                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| カスタム変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数。DoubleParamsモードでのみ使用可能で、任意の値を保持できる。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| カスタム変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字と最小限の特殊文字のみを許可し、大文字小文字を区別する。               | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| CustomVariables | カスタム変数オプションを保持する型。キーと値のペアで構成され、コマンドラインから受け取った値をそのまま保持する。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+
 ## 拡張機能関連
 
 | 用語         | 説明                                                                                                               | 参照仕様ファイル                           |
