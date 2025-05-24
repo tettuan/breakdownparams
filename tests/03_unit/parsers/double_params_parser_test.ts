@@ -147,4 +147,144 @@ Deno.test("DoubleParamsParser - valid params with unknown option", () => {
   assertExists(result.error);
   assertEquals(result.error?.code, ErrorCode.UNKNOWN_OPTION);
   assertEquals(result.error?.category, ErrorCategory.SYNTAX);
+});
+
+// 追加のテストケース
+Deno.test("DoubleParamsParser - demonstrative type with whitespace", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("  to  ", "project", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project");
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("DoubleParamsParser - layer type with whitespace", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "  project  ", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project");
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("DoubleParamsParser - demonstrative type with mixed case", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("To", "project", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "To");
+  assertEquals(result.layerType, "project");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_DEMONSTRATIVE_TYPE);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("DoubleParamsParser - layer type with mixed case", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "Project", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "Project");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_LAYER_TYPE);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("DoubleParamsParser - demonstrative type with unicode characters", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to値", "project", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to値");
+  assertEquals(result.layerType, "project");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_DEMONSTRATIVE_TYPE);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("DoubleParamsParser - layer type with unicode characters", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "project値", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project値");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_LAYER_TYPE);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("DoubleParamsParser - demonstrative type with special characters", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to@123", "project", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to@123");
+  assertEquals(result.layerType, "project");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_DEMONSTRATIVE_TYPE);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("DoubleParamsParser - layer type with special characters", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "project@123", []);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project@123");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_LAYER_TYPE);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("DoubleParamsParser - valid params with multiple options", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "project", [
+    "--from=src",
+    "--destination=dist",
+    "--uv-test1=value1",
+    "--uv-test2=value2"
+  ]);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project");
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("DoubleParamsParser - valid params with empty option value", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "project", ["--from="]);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project");
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("DoubleParamsParser - valid params with whitespace option value", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "project", ["--from=   "]);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project");
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("DoubleParamsParser - valid params with invalid option format", () => {
+  const parser = new DoubleParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse("to", "project", ["--from src"]);
+  
+  assertEquals(result.type, "double");
+  assertEquals(result.demonstrativeType, "to");
+  assertEquals(result.layerType, "project");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_OPTION);
+  assertEquals(result.error?.category, ErrorCategory.SYNTAX);
 }); 

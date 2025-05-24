@@ -95,4 +95,77 @@ Deno.test("NoParamsParser - empty args", () => {
   assertEquals(result.help, false);
   assertEquals(result.version, false);
   assertEquals(result.error, undefined);
+});
+
+// 追加のテストケース
+Deno.test("NoParamsParser - multiple custom variables", () => {
+  const parser = new NoParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse(["--uv-test1=value1", "--uv-test2=value2"]);
+  
+  assertEquals(result.type, "no-params");
+  assertEquals(result.help, false);
+  assertEquals(result.version, false);
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("NoParamsParser - custom variable with empty value", () => {
+  const parser = new NoParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse(["--uv-test="]);
+  
+  assertEquals(result.type, "no-params");
+  assertEquals(result.help, false);
+  assertEquals(result.version, false);
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("NoParamsParser - custom variable with whitespace value", () => {
+  const parser = new NoParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse(["--uv-test=   "]);
+  
+  assertEquals(result.type, "no-params");
+  assertEquals(result.help, false);
+  assertEquals(result.version, false);
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("NoParamsParser - custom variable with special characters", () => {
+  const parser = new NoParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse(["--uv-test=value@123"]);
+  
+  assertEquals(result.type, "no-params");
+  assertEquals(result.help, false);
+  assertEquals(result.version, false);
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("NoParamsParser - custom variable with unicode characters", () => {
+  const parser = new NoParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse(["--uv-test=値"]);
+  
+  assertEquals(result.type, "no-params");
+  assertEquals(result.help, false);
+  assertEquals(result.version, false);
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("NoParamsParser - custom variable with invalid name", () => {
+  const parser = new NoParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse(["--uv-test@name=value"]);
+  
+  assertEquals(result.type, "no-params");
+  assertEquals(result.help, false);
+  assertEquals(result.version, false);
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_CUSTOM_VARIABLE);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("NoParamsParser - custom variable with invalid format", () => {
+  const parser = new NoParamsParser(ValidatorFactory.getInstance());
+  const result = parser.parse(["--uv-test=value"]);
+  
+  assertEquals(result.type, "no-params");
+  assertEquals(result.help, false);
+  assertEquals(result.version, false);
+  assertEquals(result.error, undefined);
 }); 

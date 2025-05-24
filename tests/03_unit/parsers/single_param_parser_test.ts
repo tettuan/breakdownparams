@@ -103,4 +103,94 @@ Deno.test("SingleParamParser - valid command with options", () => {
   assertEquals(result.error, undefined);
   assertEquals(result.options.from, "src");
   assertEquals(result.options.destination, "dist");
+});
+
+// 追加のテストケース
+Deno.test("SingleParamParser - command with whitespace", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("  init  ", []);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertEquals(result.error, undefined);
+});
+
+Deno.test("SingleParamParser - command with mixed case", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("InIt", []);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_COMMAND);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("SingleParamParser - command with unicode characters", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("init値", []);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_COMMAND);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("SingleParamParser - command with special characters", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("init@123", []);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_COMMAND);
+  assertEquals(result.error?.category, ErrorCategory.VALIDATION);
+});
+
+Deno.test("SingleParamParser - command with multiple options", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("init", [
+    "--from=src",
+    "--destination=dist",
+    "--uv-test1=value1",
+    "--uv-test2=value2"
+  ]);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertEquals(result.error, undefined);
+  assertEquals(result.options.from, "src");
+  assertEquals(result.options.destination, "dist");
+});
+
+Deno.test("SingleParamParser - command with empty option value", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("init", ["--from="]);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertEquals(result.error, undefined);
+  assertEquals(result.options.from, "");
+});
+
+Deno.test("SingleParamParser - command with whitespace option value", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("init", ["--from=   "]);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertEquals(result.error, undefined);
+  assertEquals(result.options.from, "   ");
+});
+
+Deno.test("SingleParamParser - command with invalid option format", () => {
+  const parser = new SingleParamParser(ValidatorFactory.getInstance());
+  const result = parser.parse("init", ["--from src"]);
+  
+  assertEquals(result.type, "single");
+  assertEquals(result.command, "init");
+  assertExists(result.error);
+  assertEquals(result.error?.code, ErrorCode.INVALID_OPTION);
+  assertEquals(result.error?.category, ErrorCategory.SYNTAX);
 }); 

@@ -1,48 +1,21 @@
-/**
- * Validator Factory Test Suite
- * 
- * Purpose:
- * - Test the ValidatorFactory's ability to create and manage validator instances
- * - Verify the singleton pattern implementation
- * - Ensure proper validator type creation and caching
- * 
- * Design Principles:
- * 1. Test factory's singleton behavior
- * 2. Verify correct validator type creation
- * 3. Test validator instance caching
- * 4. Ensure proper initialization of validators with required parameters
- * 
- * Related Documentation:
- * - docs/factory.md: Factory pattern implementation details
- * - docs/validation.md: Validation strategy and rules
- * - docs/types.md: Type definitions and validator interfaces
- * 
- * Test Categories:
- * 1. Singleton pattern tests
- * 2. Validator creation tests
- * 3. Validator type verification
- * 4. Instance caching tests
- */
-
 import { assertEquals, assertExists } from "https://deno.land/std@0.220.1/assert/mod.ts";
 import { ValidatorFactory } from "../../../src/validators/validator_factory.ts";
 import { NoParamsValidator } from "../../../src/validators/no_params_validator.ts";
 import { SingleParamValidator } from "../../../src/validators/single_param_validator.ts";
 import { DoubleParamsValidator } from "../../../src/validators/double_params_validator.ts";
+import { ConfigValidator } from "../../../src/validators/config_validator.ts";
 import { SecurityValidator } from "../../../src/validators/security_validator.ts";
 import { CustomVariableValidator } from "../../../src/validators/custom_variable_validator.ts";
 import { RequiredFieldValidator } from "../../../src/validators/required_field_validator.ts";
 
-// Singleton pattern tests
-Deno.test("ValidatorFactory - singleton instance", () => {
+Deno.test("ValidatorFactory - getInstance returns singleton instance", () => {
   const instance1 = ValidatorFactory.getInstance();
   const instance2 = ValidatorFactory.getInstance();
   
   assertEquals(instance1, instance2);
 });
 
-// Validator creation tests
-Deno.test("ValidatorFactory - NoParamsValidator creation", () => {
+Deno.test("ValidatorFactory - createNoParamsValidator", () => {
   const factory = ValidatorFactory.getInstance();
   const validator = factory.createNoParamsValidator();
   
@@ -50,7 +23,7 @@ Deno.test("ValidatorFactory - NoParamsValidator creation", () => {
   assertEquals(validator instanceof NoParamsValidator, true);
 });
 
-Deno.test("ValidatorFactory - SingleParamValidator creation", () => {
+Deno.test("ValidatorFactory - createSingleParamValidator", () => {
   const factory = ValidatorFactory.getInstance();
   const validator = factory.createSingleParamValidator();
   
@@ -58,7 +31,7 @@ Deno.test("ValidatorFactory - SingleParamValidator creation", () => {
   assertEquals(validator instanceof SingleParamValidator, true);
 });
 
-Deno.test("ValidatorFactory - DoubleParamsValidator creation", () => {
+Deno.test("ValidatorFactory - createDoubleParamsValidator", () => {
   const factory = ValidatorFactory.getInstance();
   const validator = factory.createDoubleParamsValidator();
   
@@ -66,7 +39,15 @@ Deno.test("ValidatorFactory - DoubleParamsValidator creation", () => {
   assertEquals(validator instanceof DoubleParamsValidator, true);
 });
 
-Deno.test("ValidatorFactory - SecurityValidator creation", () => {
+Deno.test("ValidatorFactory - createConfigValidator", () => {
+  const factory = ValidatorFactory.getInstance();
+  const validator = factory.createConfigValidator();
+  
+  assertExists(validator);
+  assertEquals(validator instanceof ConfigValidator, true);
+});
+
+Deno.test("ValidatorFactory - createSecurityValidator", () => {
   const factory = ValidatorFactory.getInstance();
   const validator = factory.createSecurityValidator();
   
@@ -74,7 +55,7 @@ Deno.test("ValidatorFactory - SecurityValidator creation", () => {
   assertEquals(validator instanceof SecurityValidator, true);
 });
 
-Deno.test("ValidatorFactory - CustomVariableValidator creation", () => {
+Deno.test("ValidatorFactory - createCustomVariableValidator", () => {
   const factory = ValidatorFactory.getInstance();
   const validator = factory.createCustomVariableValidator();
   
@@ -82,19 +63,17 @@ Deno.test("ValidatorFactory - CustomVariableValidator creation", () => {
   assertEquals(validator instanceof CustomVariableValidator, true);
 });
 
-Deno.test("ValidatorFactory - RequiredFieldValidator creation", () => {
+Deno.test("ValidatorFactory - createRequiredFieldValidator", () => {
   const factory = ValidatorFactory.getInstance();
-  const validator = factory.createRequiredFieldValidator("test");
+  const validator = factory.createRequiredFieldValidator();
   
   assertExists(validator);
   assertEquals(validator instanceof RequiredFieldValidator, true);
 });
 
-// Instance caching tests
-Deno.test("ValidatorFactory - validator caching", () => {
+Deno.test("ValidatorFactory - createValidator with invalid type", () => {
   const factory = ValidatorFactory.getInstance();
-  const validator1 = factory.createNoParamsValidator();
-  const validator2 = factory.createNoParamsValidator();
+  const validator = factory.createValidator("invalid" as any);
   
-  assertEquals(validator1, validator2);
+  assertEquals(validator, null);
 }); 

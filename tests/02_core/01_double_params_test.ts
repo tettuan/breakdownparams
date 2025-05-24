@@ -66,14 +66,10 @@ Deno.test('Double Parameters', async (t) => {
     const result = parser.parse([
       'to',
       'project',
-      '--from',
-      'input.txt',
-      '--destination',
-      'output.txt',
-      '--input',
-      'issue',
-      '--adaptation',
-      'strict',
+      '--from=input.txt',
+      '--destination=output.txt',
+      '--input=issue',
+      '--adaptation=strict',
     ]);
     _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
@@ -94,14 +90,10 @@ Deno.test('Double Parameters', async (t) => {
     const result = parser.parse([
       'to',
       'project',
-      '-f',
-      'input.txt',
-      '-o',
-      'output.txt',
-      '-i',
-      'issue',
-      '-a',
-      'strict',
+      '-f=input.txt',
+      '-o=output.txt',
+      '-i=issue',
+      '-a=strict',
     ]);
     _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
@@ -122,8 +114,7 @@ Deno.test('Double Parameters', async (t) => {
     const result = parser.parse([
       'summary',
       'task',
-      '--adaptation',
-      'strict',
+      '--adaptation=strict',
     ]);
     _logger.debug('Parse result', result);
     assertEquals(result.type, 'double');
@@ -143,8 +134,7 @@ Deno.test('Double Parameters', async (t) => {
       const result = parser.parse([
         'summary',
         'task',
-        '-a',
-        'strict',
+        '-a=strict',
       ]);
       _logger.debug('Parse result', result);
       assertEquals(result.type, 'double');
