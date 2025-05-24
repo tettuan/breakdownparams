@@ -8,13 +8,53 @@
 export type ParamsType = 'no-params' | 'single' | 'double' | 'error';
 
 /**
+ * Categories of errors that can occur during parameter parsing
+ */
+export type ErrorCategory =
+  | 'VALIDATION' // Input validation errors
+  | 'SECURITY' // Security-related errors
+  | 'CONFIGURATION' // Configuration-related errors
+  | 'SYNTAX' // Syntax-related errors
+  | 'UNEXPECTED'; // Unexpected errors
+
+/**
+ * Error codes for parameter parsing
+ */
+export type ErrorCode =
+  // Validation errors
+  | 'INVALID_DEMONSTRATIVE_TYPE'
+  | 'INVALID_LAYER_TYPE'
+  | 'INVALID_COMMAND'
+  | 'INVALID_OPTION'
+  | 'INVALID_CUSTOM_VARIABLE_NAME'
+  | 'MISSING_VALUE_FOR_OPTION'
+  | 'MISSING_VALUE_FOR_CUSTOM_VARIABLE'
+  // Security errors
+  | 'SECURITY_ERROR'
+  // Configuration errors
+  | 'INVALID_CONFIG'
+  | 'INVALID_PATTERN'
+  // Syntax errors
+  | 'TOO_MANY_ARGUMENTS'
+  | 'UNKNOWN_OPTION'
+  // Unexpected errors
+  | 'UNEXPECTED_ERROR';
+
+/**
  * Result type for when no parameters are provided
  */
+export interface ErrorInfo {
+  message: string;
+  code: ErrorCode;
+  category: ErrorCategory;
+  details?: Record<string, unknown>;
+}
+
 export interface NoParamsResult {
   type: 'no-params';
-  help?: boolean;
-  version?: boolean;
-  error?: string;
+  help: boolean;
+  version: boolean;
+  error?: ErrorInfo;
 }
 
 /**
@@ -22,9 +62,9 @@ export interface NoParamsResult {
  */
 export interface SingleParamResult {
   type: 'single';
-  command?: 'init';
-  options?: OptionParams;
-  error?: string;
+  command: 'init';
+  options: OptionParams;
+  error?: ErrorInfo;
 }
 
 /**
@@ -32,18 +72,10 @@ export interface SingleParamResult {
  */
 export interface DoubleParamsResult {
   type: 'double';
-  demonstrativeType?: DemonstrativeType;
-  layerType?: LayerType;
-  options?: OptionParams;
-  error?: string;
-}
-
-/**
- * Result type for when an error occurs during parameter parsing
- */
-export interface ErrorResult {
-  type: 'error';
-  error: string;
+  demonstrativeType: DemonstrativeType;
+  layerType: LayerType;
+  options: OptionParams;
+  error?: ErrorInfo;
 }
 
 /**
@@ -52,8 +84,7 @@ export interface ErrorResult {
 export type ParamsResult =
   | NoParamsResult
   | SingleParamResult
-  | DoubleParamsResult
-  | ErrorResult;
+  | DoubleParamsResult;
 
 /**
  * Interface representing optional parameters that can be provided with commands.
@@ -70,6 +101,8 @@ export interface OptionParams {
   adaptationType?: string;
   /** The configuration file name when specified with --config or -c */
   configFile?: string;
+  /** Custom variables specified with --uv-* options */
+  customVariables?: Record<string, string>;
 }
 
 /**

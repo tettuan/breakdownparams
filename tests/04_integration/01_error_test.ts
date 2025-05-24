@@ -42,10 +42,15 @@ Deno.test('Error Cases', async (t) => {
     assertEquals(result.type, 'double');
     if (result.type === 'double') {
       assertExists(result.error);
+      assertEquals(result.error.code, 'INVALID_DEMONSTRATIVE_TYPE');
+      assertEquals(result.error.category, 'VALIDATION');
       assertEquals(
-        result.error,
+        result.error.message,
         'Invalid demonstrative type: invalid. Must be one of: to, summary, defect',
       );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, 'invalid');
+      assertEquals(result.error.details.validTypes, ['to', 'summary', 'defect']);
     }
   });
 
@@ -56,7 +61,15 @@ Deno.test('Error Cases', async (t) => {
     assertEquals(result.type, 'double');
     if (result.type === 'double') {
       assertExists(result.error);
-      assertEquals(result.error, 'Invalid layer type: invalid');
+      assertEquals(result.error.code, 'INVALID_LAYER_TYPE');
+      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(
+        result.error.message,
+        'Invalid layer type: invalid. Must be one of: project, issue, task',
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, 'invalid');
+      assertEquals(result.error.details.validTypes, ['project', 'issue', 'task']);
     }
   });
 
@@ -67,10 +80,15 @@ Deno.test('Error Cases', async (t) => {
     assertEquals(result.type, 'no-params');
     if (result.type === 'no-params') {
       assertExists(result.error);
+      assertEquals(result.error.code, 'TOO_MANY_ARGUMENTS');
+      assertEquals(result.error.category, 'SYNTAX');
       assertEquals(
-        result.error,
+        result.error.message,
         'Too many arguments. Maximum 2 arguments are allowed.',
       );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, 3);
+      assertEquals(result.error.details.maxAllowed, 2);
     }
   });
 
@@ -78,10 +96,107 @@ Deno.test('Error Cases', async (t) => {
     _logger.debug('Testing invalid command handling');
     const result = parser.parse(['invalid']);
     _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
+    assertEquals(result.type, 'single');
+    if (result.type === 'single') {
       assertExists(result.error);
-      assertEquals(result.error, 'Invalid command: invalid');
+      assertEquals(result.error.code, 'INVALID_COMMAND');
+      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(
+        result.error.message,
+        'Invalid command: invalid. Must be one of: init',
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, 'invalid');
+      assertEquals(result.error.details.validCommands, ['init']);
+    }
+  });
+
+  await t.step('should handle security error for forbidden characters', () => {
+    _logger.debug('Testing security error handling');
+    const result = parser.parse(['to;', 'project']);
+    _logger.debug('Parse result', result);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertExists(result.error);
+      assertEquals(result.error.code, 'SECURITY_ERROR');
+      assertEquals(result.error.category, 'SECURITY');
+      assertEquals(
+        result.error.message,
+        "Security error: character ';' is not allowed in parameters",
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.forbiddenChar, ';');
+      assertEquals(result.error.details.location, 'demonstrativeType');
+    }
+  });
+
+  await t.step('should handle missing value for option', () => {
+    _logger.debug('Testing missing value for option handling');
+    const result = parser.parse(['to', 'project', '--from']);
+    _logger.debug('Parse result', result);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertExists(result.error);
+      assertEquals(result.error.code, 'MISSING_VALUE_FOR_OPTION');
+      assertEquals(result.error.category, 'SYNTAX');
+      assertEquals(
+        result.error.message,
+        'Missing value for option: --from',
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.option, '--from');
+    }
+  });
+
+  await t.step('should handle unknown option', async (t) => {
+    await t.step('Testing unknown option handling', () => {
+      const parser = new ParamsParser();
+      const result = parser.parse(['to', 'project', '--unknown']);
+      assertEquals(result.type, 'double');
+      if (result.type === 'double') {
+        assertExists(result.error);
+        assertEquals(result.error.code, 'MISSING_VALUE_FOR_OPTION');
+        assertEquals(result.error.category, 'SYNTAX');
+        assertEquals(result.error.message, 'Missing value for option: --unknown');
+        assertExists(result.error.details);
+        assertEquals(result.error.details.option, '--unknown');
+      }
+    });
+  });
+
+  await t.step('should handle invalid custom variable name', () => {
+    _logger.debug('Testing invalid custom variable name handling');
+    const result = parser.parse(['to', 'project', '--uv-']);
+    _logger.debug('Parse result', result);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertExists(result.error);
+      assertEquals(result.error.code, 'INVALID_CUSTOM_VARIABLE_NAME');
+      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(
+        result.error.message,
+        'Invalid custom variable name: --uv-',
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, '--uv-');
+    }
+  });
+
+  await t.step('should handle missing value for custom variable', () => {
+    _logger.debug('Testing missing value for custom variable handling');
+    const result = parser.parse(['to', 'project', '--uv-name']);
+    _logger.debug('Parse result', result);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertExists(result.error);
+      assertEquals(result.error.code, 'MISSING_VALUE_FOR_CUSTOM_VARIABLE');
+      assertEquals(result.error.category, 'SYNTAX');
+      assertEquals(
+        result.error.message,
+        'Missing value for custom variable: --uv-name',
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.variable, '--uv-name');
     }
   });
 });

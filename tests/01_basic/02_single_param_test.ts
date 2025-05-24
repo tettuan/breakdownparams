@@ -23,18 +23,18 @@
  * - エラーメッセージは具体的な内容を含む
  */
 
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertExists } from '@std/assert';
 import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
 import { ParamsParser } from '../../mod.ts';
 
 // Initialize logger for testing
 const _logger = new BreakdownLogger();
 
-Deno.test('Single Parameter', async (t) => {
+Deno.test('Single Parameter Tests', async (t) => {
   const parser = new ParamsParser();
 
-  await t.step('should handle init command', () => {
-    _logger.debug('Testing init command handling');
+  await t.step('should parse init command', () => {
+    _logger.debug('Testing init command parsing');
     const result = parser.parse(['init']);
     _logger.debug('Parse result', result);
     assertEquals(result.type, 'single');
@@ -44,15 +44,30 @@ Deno.test('Single Parameter', async (t) => {
     }
   });
 
-  await t.step('should handle init command with options', () => {
-    _logger.debug('Testing init command with options handling');
-    const result = parser.parse(['init', '--from', 'input.txt']);
+  await t.step('should parse init command with options', () => {
+    _logger.debug('Testing init command with options');
+    const result = parser.parse(['init', '--from', 'input.txt', '--destination', 'output.txt']);
     _logger.debug('Parse result', result);
     assertEquals(result.type, 'single');
     if (result.type === 'single') {
       assertEquals(result.command, 'init');
       assertEquals(result.options, {
         fromFile: 'input.txt',
+        destinationFile: 'output.txt',
+      });
+    }
+  });
+
+  await t.step('should parse init command with short options', () => {
+    _logger.debug('Testing init command with short options');
+    const result = parser.parse(['init', '-f', 'input.txt', '-o', 'output.txt']);
+    _logger.debug('Parse result', result);
+    assertEquals(result.type, 'single');
+    if (result.type === 'single') {
+      assertEquals(result.command, 'init');
+      assertEquals(result.options, {
+        fromFile: 'input.txt',
+        destinationFile: 'output.txt',
       });
     }
   });
@@ -61,23 +76,37 @@ Deno.test('Single Parameter', async (t) => {
     _logger.debug('Testing invalid command handling');
     const result = parser.parse(['invalid']);
     _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
-      assertEquals(result.error, 'Invalid command: invalid');
-      assertEquals(result.help, false);
-      assertEquals(result.version, false);
+    assertEquals(result.type, 'single');
+    if (result.type === 'single') {
+      assertExists(result.error);
+      assertEquals(result.error.code, 'INVALID_COMMAND');
+      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(
+        result.error.message,
+        'Invalid command: invalid. Must be one of: init',
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, 'invalid');
+      assertEquals(result.error.details.validCommands, ['init']);
     }
   });
 
   await t.step('should handle invalid command with options', () => {
-    _logger.debug('Testing invalid command with options handling');
+    _logger.debug('Testing invalid command with options');
     const result = parser.parse(['invalid', '--from', 'input.txt']);
     _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
-      assertEquals(result.error, 'Invalid command: invalid');
-      assertEquals(result.help, false);
-      assertEquals(result.version, false);
+    assertEquals(result.type, 'single');
+    if (result.type === 'single') {
+      assertExists(result.error);
+      assertEquals(result.error.code, 'INVALID_COMMAND');
+      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(
+        result.error.message,
+        'Invalid command: invalid. Must be one of: init',
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, 'invalid');
+      assertEquals(result.error.details.validCommands, ['init']);
     }
   });
 });
