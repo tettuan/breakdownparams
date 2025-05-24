@@ -74,6 +74,52 @@ The following result types are available based on the command line arguments pro
 
 For a comprehensive list of options available for each result type, see the [Options Documentation](docs/options.md).
 
+## Advanced Features
+
+### Custom Variable Options
+Custom variables can be defined and used in your breakdown tasks using the `--uv-*` format. These variables can be referenced in your templates and will be replaced with their values during processing.
+
+Example:
+```bash
+breakdown to project --uv-project=myproject --uv-version=1.0.0 --uv-environment=production
+```
+
+### Extended Parameters
+The parser supports extended parameter functionality that allows for more complex task breakdown scenarios. This includes:
+- Custom validation rules for parameter values
+- Extended demonstrative types for task relationships
+- Layer type extensions for custom task hierarchies
+- Custom error messages for validation failures
+
+Example:
+```bash
+breakdown to project --extended --custom-validation --error-format=detailed
+```
+
+### Configuration File Options
+You can use a configuration file to set default options and behaviors. The configuration file supports:
+- Default parameter values for common operations
+- Custom validation rules for your specific use cases
+- Extended parameter settings for complex scenarios
+- Environment-specific configurations for different deployment stages
+
+Example configuration:
+```json
+{
+  "defaults": {
+    "demonstrativeType": "to",
+    "layerType": "project"
+  },
+  "validation": {
+    "customRules": ["rule1", "rule2"]
+  },
+  "extended": {
+    "enabled": true,
+    "customTypes": ["type1", "type2"]
+  }
+}
+```
+
 ## Examples
 
 The `examples/` directory contains three CLI examples that demonstrate different aspects of the parser:
