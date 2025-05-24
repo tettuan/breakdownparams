@@ -98,4 +98,4 @@ if (result.type === 'double') {
   console.log('Please provide both command and layer type.');
   console.log('\nFor usage information, run: custom_variable_options_usage --help');
   Deno.exit(1);
-} 
+}
