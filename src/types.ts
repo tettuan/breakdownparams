@@ -12,12 +12,13 @@ export type ParamsType = 'no-params' | 'single' | 'double' | 'error';
  *
  * @since 1.0.0
  */
-export type ErrorCategory =
-  | 'VALIDATION' // Input validation errors
-  | 'SECURITY' // Security-related errors
-  | 'CONFIGURATION' // Configuration-related errors
-  | 'SYNTAX' // Syntax-related errors
-  | 'UNEXPECTED';
+export enum ErrorCategory {
+  VALIDATION = 'VALIDATION',
+  SECURITY = 'SECURITY',
+  CONFIGURATION = 'CONFIGURATION',
+  SYNTAX = 'SYNTAX',
+  UNEXPECTED = 'UNEXPECTED',
+}
 
 /**
  * Error codes for parameter parsing.
@@ -25,27 +26,31 @@ export type ErrorCategory =
  *
  * @since 1.0.0
  */
-export type ErrorCode =
+export enum ErrorCode {
   // Validation errors
-  | 'INVALID_DEMONSTRATIVE_TYPE'
-  | 'INVALID_LAYER_TYPE'
-  | 'INVALID_COMMAND'
-  | 'INVALID_OPTION'
-  | 'INVALID_CUSTOM_VARIABLE_NAME'
-  | 'MISSING_VALUE_FOR_OPTION'
-  | 'MISSING_VALUE_FOR_CUSTOM_VARIABLE'
-  | 'VALUE_TOO_LONG'
-  | 'TOO_MANY_CUSTOM_VARIABLES'
+  INVALID_DEMONSTRATIVE_TYPE = 'INVALID_DEMONSTRATIVE_TYPE',
+  INVALID_LAYER_TYPE = 'INVALID_LAYER_TYPE',
+  INVALID_COMMAND = 'INVALID_COMMAND',
+  INVALID_OPTION = 'INVALID_OPTION',
+  INVALID_CUSTOM_VARIABLE_NAME = 'INVALID_CUSTOM_VARIABLE_NAME',
+  MISSING_VALUE_FOR_OPTION = 'MISSING_VALUE_FOR_OPTION',
+  MISSING_VALUE_FOR_CUSTOM_VARIABLE = 'MISSING_VALUE_FOR_CUSTOM_VARIABLE',
+  VALUE_TOO_LONG = 'VALUE_TOO_LONG',
+  TOO_MANY_CUSTOM_VARIABLES = 'TOO_MANY_CUSTOM_VARIABLES',
+  MISSING_REQUIRED_ARGUMENT = 'MISSING_REQUIRED_ARGUMENT',
+  INVALID_CUSTOM_VARIABLE = 'INVALID_CUSTOM_VARIABLE',
   // Security errors
-  | 'SECURITY_ERROR'
+  SECURITY_ERROR = 'SECURITY_ERROR',
   // Configuration errors
-  | 'INVALID_CONFIG'
-  | 'INVALID_PATTERN'
+  INVALID_CONFIG = 'INVALID_CONFIG',
+  INVALID_PATTERN = 'INVALID_PATTERN',
   // Syntax errors
-  | 'TOO_MANY_ARGUMENTS'
-  | 'UNKNOWN_OPTION'
+  TOO_MANY_ARGUMENTS = 'TOO_MANY_ARGUMENTS',
+  UNKNOWN_OPTION = 'UNKNOWN_OPTION',
   // Unexpected errors
-  | 'UNEXPECTED_ERROR';
+  UNEXPECTED_ERROR = 'UNEXPECTED_ERROR',
+  FORBIDDEN_CHARACTER = 'FORBIDDEN_CHARACTER',
+}
 
 /**
  * Interface representing detailed error information.
@@ -164,43 +169,10 @@ export type DemonstrativeType = 'to' | 'summary' | 'defect';
  *
  * @since 1.0.0
  */
-export type LayerType = 'project' | 'issue' | 'task';
-
-/**
- * Mapping of layer type aliases to their canonical layer types.
- * This constant maps various shorthand and alternative names to their standardized layer types.
- * For example, 'pj' and 'prj' both map to 'project'.
- */
-export const LayerTypeAliasMap = {
-  // project aliases
-  'project': 'project',
-  'pj': 'project',
-  'prj': 'project',
-  'p': 'project',
-  // issue aliases
-  'issue': 'issue',
-  'story': 'issue',
-  'i': 'issue',
-  'iss': 'issue',
-  // task aliases
-  'task': 'task',
-  'todo': 'task',
-  'chore': 'task',
-  'style': 'task',
-  'fix': 'task',
-  'error': 'task',
-  'bug': 'task',
-  't': 'task',
-} as const;
-
-/**
- * Type representing all possible layer type aliases.
- * This type is derived from the keys of LayerTypeAliasMap and includes all valid alias strings
- * that can be used to specify a layer type.
- *
- * @since 1.0.0
- */
-export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
+export type LayerType = 
+  | 'project' | 'pj' | 'prj' | 'p'
+  | 'issue' | 'story' | 'i' | 'iss'
+  | 'task' | 'todo' | 'chore' | 'style' | 'fix' | 'error' | 'bug' | 't';
 
 /**
  * Interface representing the configuration for the ParamsParser.

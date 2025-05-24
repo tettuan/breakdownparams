@@ -7,7 +7,7 @@
  * The module exports:
  * - {@link ParamsParser} class for parsing command line arguments
  * - Type definitions for parameter results and options
- * - Layer type aliases and demonstrative type definitions
+ * - Demonstrative type definitions
  *
  * @example
  * ```ts
@@ -30,12 +30,17 @@
  */
 
 export { ParamsParser } from './params_parser.ts';
+
 export type {
   DemonstrativeType,
   DoubleParamsResult,
-  LayerTypeAliasMap,
+  ErrorCategory,
+  ErrorCode,
+  ErrorInfo,
+  LayerType,
   NoParamsResult,
   OptionParams,
   ParamsResult,
+  ParserConfig,
   SingleParamResult,
 } from './types.ts';
