@@ -72,6 +72,8 @@ breakdown init
 breakdown to project
 breakdown summary issue
 breakdown defect task
+breakdown to project --config test
+breakdown summary task -c test
 ```
 
 ## エラーケース
@@ -81,3 +83,4 @@ breakdown defect task
 | 引数過多                | "Too many arguments. Maximum 2 arguments are allowed." |
 | 不正なDemonstrativeType | "Invalid value for demonstrativeType: {value}"         |
 | 不正なLayerType         | "Invalid value for layerType: {value}"                 |
+| 不正なConfig使用        | "Config option is only available with DoubleParams"    |
