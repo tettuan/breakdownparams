@@ -153,7 +153,7 @@ export class ParamsParser {
     }
 
     // configオプションを無視
-    const { configFile, ...validOptions } = options;
+    const { configFile: _configFile, ...validOptions } = options;
 
     return {
       type: 'single',
