@@ -3,13 +3,19 @@ import {
   DoubleParamsResult,
   ErrorInfo,
   LayerType,
-  LayerTypeAliasMap,
   NoParamsResult,
   OptionParams,
   ParamsResult,
   ParserConfig,
   SingleParamResult,
+  ErrorCode,
+  ErrorCategory,
 } from './types.ts';
+import { ValidatorFactory } from './validators/validator_factory.ts';
+import { NoParamsParser } from './parsers/no_params_parser.ts';
+import { SingleParamParser } from './parsers/single_param_parser.ts';
+import { DoubleParamsParser } from './parsers/double_params_parser.ts';
+import { OptionParser } from './utils/option_parser.ts';
 
 /**
  * A class to parse and validate command line arguments for the breakdown structure system.
@@ -55,8 +61,16 @@ export class ParamsParser {
   ]);
   private readonly validSingleCommands = new Set<string>(['init']);
   private readonly config: ParserConfig;
-  private readonly layerTypes = new Set<LayerType>(['project', 'issue', 'task']);
-  private readonly layerTypeAliases = new Set<string>(Object.keys(LayerTypeAliasMap));
+  private readonly layerTypes = new Set<LayerType>([
+    'project',
+    'issue',
+    'task'
+  ]);
+
+  private readonly noParamsParser: NoParamsParser;
+  private readonly singleParamParser: SingleParamParser;
+  private readonly doubleParamsParser: DoubleParamsParser;
+  private readonly optionParser: OptionParser;
 
   /**
    * Create a new ParamsParser instance with optional configuration.
@@ -70,6 +84,10 @@ export class ParamsParser {
    */
   constructor(config?: ParserConfig) {
     this.config = config || { isExtendedMode: false };
+    this.noParamsParser = new NoParamsParser();
+    this.singleParamParser = new SingleParamParser();
+    this.doubleParamsParser = new DoubleParamsParser();
+    this.optionParser = new OptionParser();
   }
 
   /**
@@ -84,12 +102,117 @@ export class ParamsParser {
    * @since 1.0.0
    */
   public parse(args: string[]): ParamsResult {
+    // 追加: 設定エラーを先に検出
+    if (this.config.isExtendedMode) {
+      // 空パターン
+      if (this.config.demonstrativeType?.pattern === '') {
+        return {
+          type: 'double',
+          demonstrativeType: (args[0] ?? '') as DemonstrativeType,
+          layerType: (args[1] ?? '') as LayerType,
+          options: {},
+          error: {
+            message: 'Invalid configuration: pattern is required in extended mode',
+            code: ErrorCode.INVALID_CONFIG,
+            category: ErrorCategory.CONFIGURATION,
+            details: { missingField: 'pattern' },
+          },
+        };
+      }
+      if (this.config.layerType?.pattern === '') {
+        return {
+          type: 'double',
+          demonstrativeType: (args[0] ?? '') as DemonstrativeType,
+          layerType: (args[1] ?? '') as LayerType,
+          options: {},
+          error: {
+            message: 'Invalid configuration: pattern is required in extended mode',
+            code: ErrorCode.INVALID_CONFIG,
+            category: ErrorCategory.CONFIGURATION,
+            details: { missingField: 'pattern' },
+          },
+        };
+      }
+      // 正規表現不正
+      try {
+        if (this.config.demonstrativeType?.pattern) {
+          new RegExp(this.config.demonstrativeType.pattern);
+        }
+        if (this.config.layerType?.pattern) {
+          new RegExp(this.config.layerType.pattern);
+        }
+      } catch (_error) {
+        return {
+          type: 'double',
+          demonstrativeType: (args[0] ?? '') as DemonstrativeType,
+          layerType: (args[1] ?? '') as LayerType,
+          options: {},
+          error: {
+            message: 'Invalid demonstrative type pattern configuration',
+            code: ErrorCode.INVALID_PATTERN,
+            category: ErrorCategory.CONFIGURATION,
+            details: { pattern: this.config.demonstrativeType?.pattern },
+          },
+        };
+      }
+      // セキュリティチェック
+      const forbiddenChars = [';', '&', '`'];
+      if (this.config.demonstrativeType?.pattern) {
+        for (const c of forbiddenChars) {
+          if (this.config.demonstrativeType.pattern.includes(c)) {
+            return {
+              type: 'double',
+              demonstrativeType: (args[0] ?? '') as DemonstrativeType,
+              layerType: (args[1] ?? '') as LayerType,
+              options: {},
+              error: {
+                message: `Security error: character '${c}' is not allowed in pattern`,
+                code: ErrorCode.SECURITY_ERROR,
+                category: ErrorCategory.SECURITY,
+                details: { pattern: this.config.demonstrativeType.pattern },
+              },
+            };
+          }
+        }
+      }
+      if (this.config.layerType?.pattern) {
+        for (const c of forbiddenChars) {
+          if (this.config.layerType.pattern.includes(c)) {
+            return {
+              type: 'double',
+              demonstrativeType: (args[0] ?? '') as DemonstrativeType,
+              layerType: (args[1] ?? '') as LayerType,
+              options: {},
+              error: {
+                message: `Security error: character '${c}' is not allowed in pattern`,
+                code: ErrorCode.SECURITY_ERROR,
+                category: ErrorCategory.SECURITY,
+                details: { pattern: this.config.layerType.pattern },
+              },
+            };
+          }
+        }
+      }
+    }
     try {
+      // Early check: if all args are help/version flags, call parseNoParams directly
+      const isAllHelpOrVersion = args.length > 0 && args.every(arg => arg === '-h' || arg === '--help' || arg === '-v' || arg === '--version');
+      if (isAllHelpOrVersion) {
+        return this.noParamsParser.parse(args);
+      }
+
+      // ここから従来通り nonOptionArgs を構築
       const nonOptionArgs: string[] = [];
       for (let i = 0; i < args.length; i++) {
         const arg = args[i];
-        if (!arg.startsWith('-') && arg !== '') {
+        if (!arg.startsWith('-')) {
           nonOptionArgs.push(arg);
+        } else if (arg.startsWith('--uv-')) {
+          // skip value after --uv-*
+          const hasEquals = arg.includes('=');
+          if (!hasEquals) {
+            i++; // always skip next value, even if empty string
+          }
         } else {
           const nextArg = args[i + 1];
           if (nextArg && !nextArg.startsWith('-')) {
@@ -99,11 +222,39 @@ export class ParamsParser {
       }
 
       if (nonOptionArgs.length === 0) {
-        return this.parseNoParams(args);
+        return this.noParamsParser.parse(args);
       } else if (nonOptionArgs.length === 1) {
-        return this.parseSingleParam(nonOptionArgs[0], args);
+        return this.singleParamParser.parse(nonOptionArgs[0], args);
       } else if (nonOptionArgs.length === 2) {
-        return this.parseDoubleParams(nonOptionArgs[0], nonOptionArgs[1], args);
+        if (nonOptionArgs[0] === '') {
+          return {
+            type: 'double',
+            demonstrativeType: nonOptionArgs[0] as DemonstrativeType,
+            layerType: nonOptionArgs[1] as LayerType,
+            options: {},
+            error: {
+              message: 'Required argument demonstrativeType is empty.',
+              code: ErrorCode.MISSING_REQUIRED_ARGUMENT,
+              category: ErrorCategory.VALIDATION,
+              details: { field: 'demonstrativeType' },
+            },
+          };
+        }
+        if (nonOptionArgs[1] === '') {
+          return {
+            type: 'double',
+            demonstrativeType: nonOptionArgs[0] as DemonstrativeType,
+            layerType: nonOptionArgs[1] as LayerType,
+            options: {},
+            error: {
+              message: 'Required argument layerType is empty.',
+              code: ErrorCode.MISSING_REQUIRED_ARGUMENT,
+              category: ErrorCategory.VALIDATION,
+              details: { field: 'layerType' },
+            },
+          };
+        }
+        return this.doubleParamsParser.parse(nonOptionArgs[0], nonOptionArgs[1], args);
       } else {
         // Too many arguments
         return {
@@ -112,8 +263,8 @@ export class ParamsParser {
           version: false,
           error: {
             message: 'Too many arguments. Maximum 2 arguments are allowed.',
-            code: 'TOO_MANY_ARGUMENTS',
-            category: 'SYNTAX',
+            code: ErrorCode.TOO_MANY_ARGUMENTS,
+            category: ErrorCategory.SYNTAX,
             details: { provided: nonOptionArgs.length, maxAllowed: 2 },
           },
         };
@@ -125,757 +276,11 @@ export class ParamsParser {
         version: false,
         error: {
           message: error instanceof Error ? error.message : 'Unknown error occurred',
-          code: 'UNEXPECTED_ERROR',
-          category: 'UNEXPECTED',
+          code: ErrorCode.UNEXPECTED_ERROR,
+          category: ErrorCategory.UNEXPECTED,
           details: error instanceof Error ? { stack: error.stack } : undefined,
         },
       };
     }
-  }
-
-  /**
-   * Parse arguments when no parameters are expected.
-   *
-   * @param args - The command line arguments
-   * @returns A result object containing help and version flags
-   */
-  private parseNoParams(args: string[]): NoParamsResult {
-    const result: NoParamsResult = {
-      type: 'no-params',
-      help: false,
-      version: false,
-    };
-    const options = this.parseOptions(args);
-    if ('error' in options) {
-      result.error = options.error;
-      return result;
-    }
-    if ('customVariables' in options) {
-      delete options.customVariables;
-    }
-    for (const arg of args) {
-      if (arg === '--help' || arg === '-h') result.help = true;
-      if (arg === '--version' || arg === '-v') result.version = true;
-    }
-    return result;
-  }
-
-  /**
-   * Parse arguments when a single parameter is expected.
-   *
-   * @param command - The command parameter
-   * @param args - The command line arguments
-   * @returns A result object containing the parsed command
-   */
-  private parseSingleParam(
-    command: string,
-    args: string[],
-  ): SingleParamResult {
-    const options = this.parseOptions(args);
-    if ('error' in options) {
-      return {
-        type: 'single',
-        command: 'init',
-        options: {},
-        error: options.error,
-      };
-    }
-    // configオプションを無視
-    const { configFile: _configFile, ...validOptions } = options;
-    if ('customVariables' in validOptions) {
-      delete validOptions.customVariables;
-    }
-    if (!this.validSingleCommands.has(command)) {
-      return {
-        type: 'single',
-        command: 'init',
-        options: {},
-        error: {
-          message: `Invalid command: ${command}. Must be one of: ${
-            Array.from(this.validSingleCommands).join(', ')
-          }`,
-          code: 'INVALID_COMMAND',
-          category: 'VALIDATION',
-          details: { provided: command, validCommands: Array.from(this.validSingleCommands) },
-        },
-      };
-    }
-    return {
-      type: 'single',
-      command: 'init',
-      options: validOptions,
-    };
-  }
-
-  /**
-   * Parse arguments when two parameters are expected.
-   *
-   * @param demonstrativeType - The demonstrative type parameter
-   * @param layerType - The layer type parameter
-   * @param args - The command line arguments
-   * @returns A result object containing the parsed parameters or an error
-   */
-  private parseDoubleParams(
-    demonstrativeType: string,
-    layerType: string,
-    args: string[],
-  ): DoubleParamsResult {
-    const normalizedDemonstrativeType = demonstrativeType.toLowerCase();
-    let normalizedLayerType = layerType.toLowerCase();
-    if (this.layerTypeAliases.has(normalizedLayerType)) {
-      // LayerTypeAliasMapから正式名称に変換
-      // LayerTypeAliasMapはtypes.tsで定義
-      // @ts-ignore: LayerTypeAliasMapの型定義は正しいが、TypeScriptが動的なプロパティアクセスを検出できない
-      normalizedLayerType = LayerTypeAliasMap[normalizedLayerType];
-    }
-    const forbiddenChars = [
-      ';',
-      '|',
-      '&',
-      '`',
-      '$',
-      '>',
-      '<',
-      '(',
-      ')',
-      '{',
-      '}',
-      '[',
-      ']',
-      '\\',
-      '/',
-      '*',
-      '?',
-      '+',
-      '^',
-      '~',
-      '!',
-      '@',
-      '#',
-      '%',
-      '=',
-      ':',
-      '"',
-      "'",
-      ',',
-    ];
-    for (const c of forbiddenChars) {
-      if (demonstrativeType.includes(c) || layerType.includes(c)) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: `Security error: character '${c}' is not allowed in parameters`,
-            code: 'SECURITY_ERROR',
-            category: 'SECURITY',
-            details: {
-              forbiddenChar: c,
-              location: demonstrativeType.includes(c) ? 'demonstrativeType' : 'layerType',
-            },
-          },
-        };
-      }
-    }
-    if (this.config.isExtendedMode && this.config.demonstrativeType) {
-      const patternStr = this.config.demonstrativeType.pattern;
-      if (!patternStr || patternStr.trim() === '') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid configuration: pattern is required in extended mode',
-            code: 'INVALID_CONFIG',
-            category: 'CONFIGURATION',
-            details: { missingField: 'pattern' },
-          },
-        };
-      }
-      if (patternStr.trim() === '.*') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Security error: pattern "*" is not allowed',
-            code: 'SECURITY_ERROR',
-            category: 'SECURITY',
-            details: { invalidPattern: patternStr },
-          },
-        };
-      }
-      let pattern: RegExp;
-      try {
-        pattern = new RegExp(patternStr);
-      } catch (_error) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid demonstrative type pattern configuration',
-            code: 'INVALID_PATTERN',
-            category: 'CONFIGURATION',
-            details: { pattern: patternStr },
-          },
-        };
-      }
-      if (!pattern.test(demonstrativeType)) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: this.config.demonstrativeType.errorMessage ||
-              `Invalid demonstrative type: ${demonstrativeType}`,
-            code: 'INVALID_DEMONSTRATIVE_TYPE',
-            category: 'VALIDATION',
-            details: { provided: demonstrativeType, pattern: patternStr },
-          },
-        };
-      }
-    } else if (!this.demonstrativeTypes.has(normalizedDemonstrativeType as DemonstrativeType)) {
-      return {
-        type: 'double',
-        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-        layerType: normalizedLayerType as LayerType,
-        options: {},
-        error: {
-          message: `Invalid demonstrative type: ${demonstrativeType}. Must be one of: ${
-            Array.from(this.demonstrativeTypes).join(', ')
-          }`,
-          code: 'INVALID_DEMONSTRATIVE_TYPE',
-          category: 'VALIDATION',
-          details: { provided: demonstrativeType, validTypes: Array.from(this.demonstrativeTypes) },
-        },
-      };
-    }
-    if (this.config.isExtendedMode && this.config.layerType) {
-      const patternStr = this.config.layerType.pattern;
-      if (!patternStr || patternStr.trim() === '') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid configuration: pattern is required in extended mode',
-            code: 'INVALID_CONFIG',
-            category: 'CONFIGURATION',
-            details: { missingField: 'pattern' },
-          },
-        };
-      }
-      if (patternStr.trim() === '.*') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Security error: pattern "*" is not allowed',
-            code: 'SECURITY_ERROR',
-            category: 'SECURITY',
-            details: { invalidPattern: patternStr },
-          },
-        };
-      }
-      let pattern: RegExp;
-      try {
-        pattern = new RegExp(patternStr);
-      } catch (_error) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid layer type pattern configuration',
-            code: 'INVALID_PATTERN',
-            category: 'CONFIGURATION',
-            details: { pattern: patternStr },
-          },
-        };
-      }
-      if (!pattern.test(layerType)) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: this.config.layerType.errorMessage || `Invalid layer type: ${layerType}`,
-            code: 'INVALID_LAYER_TYPE',
-            category: 'VALIDATION',
-            details: { provided: layerType, pattern: patternStr },
-          },
-        };
-      }
-    } else if (!this.layerTypes.has(normalizedLayerType as LayerType)) {
-      return {
-        type: 'double',
-        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-        layerType: normalizedLayerType as LayerType,
-        options: {},
-        error: {
-          message: `Invalid layer type: ${layerType}. Must be one of: ${
-            Array.from(this.layerTypes).join(', ')
-          }`,
-          code: 'INVALID_LAYER_TYPE',
-          category: 'VALIDATION',
-          details: { provided: layerType, validTypes: Array.from(this.layerTypes) },
-        },
-      };
-    }
-    const options = this.parseOptions(args);
-    if ('error' in options) {
-      return {
-        type: 'double',
-        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-        layerType: normalizedLayerType as LayerType,
-        options: {},
-        error: options.error,
-      };
-    }
-    return {
-      type: 'double',
-      demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-      layerType: normalizedLayerType as LayerType,
-      options: options as OptionParams,
-    };
-  }
-
-  /**
-   * Parse command line options.
-   *
-   * This method parses the command line options and returns an object
-   * containing the parsed options or an error message.
-   *
-   * @param args - The command line arguments
-   * @returns An object containing the parsed options or an error message
-   */
-  private parseOptions(args: string[]): OptionParams | { error: ErrorInfo } {
-    const options: OptionParams = {};
-    const customVariables: Record<string, string> = {};
-    // Track long and short form values separately
-    const longForm: Record<string, string | undefined> = {};
-    const shortForm: Record<string, string | undefined> = {};
-
-    // 最大値の制限
-    const MAX_VALUE_LENGTH = 1000;
-    const MAX_CUSTOM_VARIABLES = 100;
-
-    // 禁止文字リスト
-    const forbiddenChars = [
-      ';',
-      '|',
-      '&',
-      '`',
-      '$',
-      '>',
-      '<',
-      '(',
-      ')',
-      '{',
-      '}',
-      '[',
-      ']',
-      '\\',
-      '/',
-      '*',
-      '?',
-      '+',
-      '^',
-      '~',
-      '!',
-      '@',
-      '#',
-      '%',
-      '=',
-      ':',
-      '"',
-      "'",
-      ',',
-    ];
-
-    for (let i = 0; i < args.length; i++) {
-      const arg = args[i];
-      if (arg.startsWith('--')) {
-        if (arg === '--help' || arg === '--version') {
-          continue;
-        }
-        // Handle custom variable options (--uv-*)
-        if (arg.startsWith('--uv-')) {
-          // deno-lint-ignore no-control-regex
-          const hasControlCharInName = /[\x00-\x1F\x7F]/.test(arg);
-          if (hasControlCharInName) {
-            return {
-              error: {
-                message: 'Security error: control characters are not allowed in parameters',
-                code: 'SECURITY_ERROR',
-                category: 'SECURITY',
-                details: { location: 'customVariableName' },
-              },
-            };
-          }
-
-          // --uv-name=value 形式
-          if (arg.includes('=')) {
-            const [name, value] = arg.slice(5).split('=');
-            if (!name) {
-              return {
-                error: {
-                  message: `Invalid custom variable name: ${arg}`,
-                  code: 'INVALID_CUSTOM_VARIABLE_NAME',
-                  category: 'VALIDATION',
-                  details: { provided: arg },
-                },
-              };
-            }
-
-            // 特殊文字を含むカスタム変数名のチェック
-            const hasSpecialChar = /[^a-zA-Z0-9_]/.test(name);
-            if (hasSpecialChar) {
-              return {
-                error: {
-                  message:
-                    `Invalid custom variable name: ${name}. Only alphanumeric characters and underscores are allowed.`,
-                  code: 'INVALID_CUSTOM_VARIABLE_NAME',
-                  category: 'VALIDATION',
-                  details: { provided: name },
-                },
-              };
-            }
-
-            if (value === undefined) {
-              return {
-                error: {
-                  message: `Missing value for custom variable: ${arg}`,
-                  code: 'MISSING_VALUE_FOR_CUSTOM_VARIABLE',
-                  category: 'SYNTAX',
-                  details: { variable: arg },
-                },
-              };
-            }
-
-            // 値の長さチェック
-            if (value.length > MAX_VALUE_LENGTH) {
-              return {
-                error: {
-                  message:
-                    `Value too long for custom variable: ${name}. Maximum length is ${MAX_VALUE_LENGTH} characters.`,
-                  code: 'VALUE_TOO_LONG',
-                  category: 'VALIDATION',
-                  details: { variable: name, maxLength: MAX_VALUE_LENGTH },
-                },
-              };
-            }
-
-            // deno-lint-ignore no-control-regex
-            const hasControlCharInValue = /[\x00-\x1F\x7F]/.test(value);
-            if (hasControlCharInValue) {
-              return {
-                error: {
-                  message: 'Security error: control characters are not allowed in parameters',
-                  code: 'SECURITY_ERROR',
-                  category: 'SECURITY',
-                  details: { location: `customVariableValue:${name}` },
-                },
-              };
-            }
-
-            for (const c of forbiddenChars) {
-              if (value.includes(c)) {
-                return {
-                  error: {
-                    message: `Security error: character '${c}' is not allowed in parameters`,
-                    code: 'SECURITY_ERROR',
-                    category: 'SECURITY',
-                    details: { forbiddenChar: c, location: `customVariableValue:${name}` },
-                  },
-                };
-              }
-            }
-
-            // カスタム変数の最大数チェック
-            if (Object.keys(customVariables).length >= MAX_CUSTOM_VARIABLES) {
-              return {
-                error: {
-                  message:
-                    `Too many custom variables. Maximum ${MAX_CUSTOM_VARIABLES} variables are allowed.`,
-                  code: 'TOO_MANY_CUSTOM_VARIABLES',
-                  category: 'VALIDATION',
-                  details: { maxAllowed: MAX_CUSTOM_VARIABLES },
-                },
-              };
-            }
-
-            customVariables[name] = value;
-            continue;
-          }
-
-          // --uv-name value 形式
-          const name = arg.slice(5);
-          if (!name) {
-            return {
-              error: {
-                message: `Invalid custom variable name: ${arg}`,
-                code: 'INVALID_CUSTOM_VARIABLE_NAME',
-                category: 'VALIDATION',
-                details: { provided: arg },
-              },
-            };
-          }
-
-          // 特殊文字を含むカスタム変数名のチェック
-          const hasSpecialChar = /[^a-zA-Z0-9_]/.test(name);
-          if (hasSpecialChar) {
-            return {
-              error: {
-                message:
-                  `Invalid custom variable name: ${name}. Only alphanumeric characters and underscores are allowed.`,
-                code: 'INVALID_CUSTOM_VARIABLE_NAME',
-                category: 'VALIDATION',
-                details: { provided: name },
-              },
-            };
-          }
-
-          const nextArg = args[i + 1];
-          if (!nextArg || nextArg.startsWith('-')) {
-            return {
-              error: {
-                message: `Missing value for custom variable: ${arg}`,
-                code: 'MISSING_VALUE_FOR_CUSTOM_VARIABLE',
-                category: 'SYNTAX',
-                details: { variable: arg },
-              },
-            };
-          }
-
-          // 値の長さチェック
-          if (nextArg.length > MAX_VALUE_LENGTH) {
-            return {
-              error: {
-                message:
-                  `Value too long for custom variable: ${name}. Maximum length is ${MAX_VALUE_LENGTH} characters.`,
-                code: 'VALUE_TOO_LONG',
-                category: 'VALIDATION',
-                details: { variable: name, maxLength: MAX_VALUE_LENGTH },
-              },
-            };
-          }
-
-          // deno-lint-ignore no-control-regex
-          const hasControlCharInNextArg = /[\x00-\x1F\x7F]/.test(nextArg);
-          if (hasControlCharInNextArg) {
-            return {
-              error: {
-                message: 'Security error: control characters are not allowed in parameters',
-                code: 'SECURITY_ERROR',
-                category: 'SECURITY',
-                details: { location: `customVariableValue:${name}` },
-              },
-            };
-          }
-
-          for (const c of forbiddenChars) {
-            if (nextArg.includes(c)) {
-              return {
-                error: {
-                  message: `Security error: character '${c}' is not allowed in parameters`,
-                  code: 'SECURITY_ERROR',
-                  category: 'SECURITY',
-                  details: { forbiddenChar: c, location: `customVariableValue:${name}` },
-                },
-              };
-            }
-          }
-
-          // カスタム変数の最大数チェック
-          if (Object.keys(customVariables).length >= MAX_CUSTOM_VARIABLES) {
-            return {
-              error: {
-                message:
-                  `Too many custom variables. Maximum ${MAX_CUSTOM_VARIABLES} variables are allowed.`,
-                code: 'TOO_MANY_CUSTOM_VARIABLES',
-                category: 'VALIDATION',
-                details: { maxAllowed: MAX_CUSTOM_VARIABLES },
-              },
-            };
-          }
-
-          customVariables[name] = nextArg;
-          i++;
-          continue;
-        }
-        // Handle --option=value for standard options
-        if (arg.includes('=') && !arg.startsWith('--uv-')) {
-          const [opt, value] = arg.split('=');
-          switch (opt) {
-            case '--from':
-              longForm.fromFile = value;
-              break;
-            case '--destination':
-              longForm.destinationFile = value;
-              break;
-            case '--input':
-              if (!this.layerTypes.has(value as LayerType)) {
-                return {
-                  error: {
-                    message: `Invalid layer type: ${value}`,
-                    code: 'INVALID_LAYER_TYPE',
-                    category: 'VALIDATION',
-                    details: { provided: value, validTypes: Array.from(this.layerTypes) },
-                  },
-                };
-              }
-              longForm.fromLayerType = value;
-              break;
-            case '--adaptation':
-              longForm.adaptationType = value;
-              break;
-            case '--config':
-              longForm.configFile = value;
-              break;
-            default:
-              return {
-                error: {
-                  message: `Unknown option: ${opt}`,
-                  code: 'UNKNOWN_OPTION',
-                  category: 'SYNTAX',
-                  details: { provided: opt },
-                },
-              };
-          }
-          continue;
-        }
-        const nextArg = args[i + 1];
-        if (!nextArg || nextArg.startsWith('-')) {
-          return {
-            error: {
-              message: `Missing value for option: ${arg}`,
-              code: 'MISSING_VALUE_FOR_OPTION',
-              category: 'SYNTAX',
-              details: { option: arg },
-            },
-          };
-        }
-        switch (arg) {
-          case '--from':
-            longForm.fromFile = nextArg;
-            break;
-          case '--destination':
-            longForm.destinationFile = nextArg;
-            break;
-          case '--input':
-            if (!this.layerTypes.has(nextArg as LayerType)) {
-              return {
-                error: {
-                  message: `Invalid layer type: ${nextArg}`,
-                  code: 'INVALID_LAYER_TYPE',
-                  category: 'VALIDATION',
-                  details: { provided: nextArg, validTypes: Array.from(this.layerTypes) },
-                },
-              };
-            }
-            longForm.fromLayerType = nextArg;
-            break;
-          case '--adaptation':
-            longForm.adaptationType = nextArg;
-            break;
-          case '--config':
-            longForm.configFile = nextArg;
-            break;
-          default:
-            return {
-              error: {
-                message: `Unknown option: ${arg}`,
-                code: 'UNKNOWN_OPTION',
-                category: 'SYNTAX',
-                details: { provided: arg },
-              },
-            };
-        }
-        i++;
-      } else if (arg.startsWith('-')) {
-        if (arg === '-h' || arg === '-v') {
-          continue;
-        }
-        const nextArg = args[i + 1];
-        if (!nextArg || nextArg.startsWith('-')) {
-          return {
-            error: {
-              message: `Missing value for option: ${arg}`,
-              code: 'MISSING_VALUE_FOR_OPTION',
-              category: 'SYNTAX',
-              details: { option: arg },
-            },
-          };
-        }
-        switch (arg) {
-          case '-f':
-            shortForm.fromFile = nextArg;
-            break;
-          case '-o':
-            shortForm.destinationFile = nextArg;
-            break;
-          case '-i':
-            if (!this.layerTypes.has(nextArg as LayerType)) {
-              return {
-                error: {
-                  message: `Invalid layer type: ${nextArg}`,
-                  code: 'INVALID_LAYER_TYPE',
-                  category: 'VALIDATION',
-                  details: { provided: nextArg, validTypes: Array.from(this.layerTypes) },
-                },
-              };
-            }
-            shortForm.fromLayerType = nextArg;
-            break;
-          case '-a':
-            shortForm.adaptationType = nextArg;
-            break;
-          case '-c':
-            shortForm.configFile = nextArg;
-            break;
-          default:
-            return {
-              error: {
-                message: `Unknown option: ${arg}`,
-                code: 'UNKNOWN_OPTION',
-                category: 'SYNTAX',
-                details: { provided: arg },
-              },
-            };
-        }
-        i++;
-      }
-    }
-    // Assign options, preferring long form over short form
-    options.fromFile = longForm.fromFile ?? shortForm.fromFile;
-    options.destinationFile = longForm.destinationFile ?? shortForm.destinationFile;
-    options.fromLayerType = (longForm.fromLayerType ?? shortForm.fromLayerType) as
-      | LayerType
-      | undefined;
-    options.adaptationType = longForm.adaptationType ?? shortForm.adaptationType;
-    options.configFile = longForm.configFile ?? shortForm.configFile;
-    // Add custom variables to options if any were found
-    if (Object.keys(customVariables).length > 0) {
-      options.customVariables = customVariables;
-    }
-    // Remove undefined properties
-    Object.keys(options).forEach((key) => {
-      if (options[key as keyof OptionParams] === undefined) {
-        delete options[key as keyof OptionParams];
-      }
-    });
-    return options;
   }
 }
