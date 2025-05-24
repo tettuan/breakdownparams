@@ -1,55 +1,55 @@
-# パラメータパーサーの型定義仕様
+# Parameter Parser Type Definition Specification
 
-## 概要
+## Overview
 
-パラメータパーサー（`ParamsParser`）は、コマンドライン引数を解析し、型安全な結果を返すクラスです。
-この仕様書では、パラメータパーサーの型定義と解析フローについて定義します。
+The parameter parser (`ParamsParser`) is a class that parses command line arguments and returns type-safe results.
+This specification defines the type definitions and parsing flow of the parameter parser.
 
-## 型の階層構造
+## Type Hierarchy
 
-### 1. 基本型
+### 1. Basic Types
 
 ```typescript
 type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
 
-// エラー情報の型
+// Error information type
 type ErrorResult = {
   message: string;
   code: string;
 };
 ```
 
-### 2. 各型の定義
+### 2. Type Definitions
 
-#### 2.1 パラメータ数による型
+#### 2.1 Types by Parameter Count
 ```typescript
-// 引数なし
+// No arguments
 type NoParamsResult = {
   type: 'no-params';
   help: boolean;
   version: boolean;
-  error?: ErrorResult;  // パラメータエラーまたはオプションエラー時に設定
+  error?: ErrorResult;  // Set when parameter or option error occurs
 };
 
-// 引数1個
+// Single argument
 type SingleParamResult = {
   type: 'single';
   command: 'init';
   options: OptionParams;
-  error?: ErrorResult;  // パラメータエラーまたはオプションエラー時に設定
+  error?: ErrorResult;  // Set when parameter or option error occurs
 };
 
-// 引数2個
+// Two arguments
 type DoubleParamsResult = {
   type: 'double';
   demonstrativeType: DemonstrativeType;
   layerType: LayerType;
   options: OptionParams;
-  error?: ErrorResult;  // パラメータエラーまたはオプションエラー時に設定
+  error?: ErrorResult;  // Set when parameter or option error occurs
 };
 ```
 
-#### 2.2 オプションの型
+#### 2.2 Option Types
 ```typescript
 type OptionParams = {
   fromFile?: string;
@@ -61,16 +61,16 @@ type OptionParams = {
 };
 ```
 
-## 解析フロー
+## Parsing Flow
 
-### 1. パラメータの解析
+### 1. Parameter Parsing
 
-1. **引数の数による分岐**
+1. **Branching by Argument Count**
    ```typescript
    if (nonOptionArgs.length === 0) {
-     // NoParamsResult を返す
+     // Return NoParamsResult
    } else if (nonOptionArgs.length === 1) {
-     // パラメータのバリデーション
+     // Parameter validation
      if (!isValidCommand(nonOptionArgs[0])) {
        return {
          type: 'single',
@@ -82,9 +82,9 @@ type OptionParams = {
          }
        };
      }
-     // SingleParamResult を返す
+     // Return SingleParamResult
    } else if (nonOptionArgs.length === 2) {
-     // パラメータのバリデーション
+     // Parameter validation
      if (!isValidDemonstrativeType(nonOptionArgs[0])) {
        return {
          type: 'double',
@@ -97,22 +97,22 @@ type OptionParams = {
          }
        };
      }
-     // DoubleParamsResult を返す
+     // Return DoubleParamsResult
    }
    ```
 
-2. **各分岐での処理**
-   - パラメータのバリデーション
-   - 型の決定
-   - オプション解析の準備
+2. **Processing in Each Branch**
+   - Parameter validation
+   - Type determination
+   - Option parsing preparation
 
-### 2. オプションの解析
+### 2. Option Parsing
 
-1. **オプション解析の実行**
+1. **Execute Option Parsing**
    ```typescript
    const options = this.parseOptions(args);
    if ('error' in options) {
-     // エラー時は現在のパラメータ型を維持し、error プロパティを設定
+     // Maintain current parameter type and set error property when error occurs
      return {
        ...currentParamResult,
        error: {
@@ -123,28 +123,28 @@ type OptionParams = {
    }
    ```
 
-2. **オプションの種類**
-   - 標準オプション（--from, --destination など）
-   - カスタム変数オプション（--uv-*）
+2. **Option Types**
+   - Standard options (--from, --destination, etc.)
+   - Custom variable options (--uv-*)
 
-### 3. 返却型の決定
+### 3. Return Type Determination
 
-1. **正常系**
-   - パラメータの型を維持
-   - オプション情報を追加
+1. **Normal Case**
+   - Maintain parameter type
+   - Add option information
 
-2. **エラー系**
-   - パラメータの型を維持
-   - エラー情報を error プロパティとして追加
+2. **Error Case**
+   - Maintain parameter type
+   - Add error information as error property
 
-## オプションエラー時の返却型
+## Return Type for Option Errors
 
-### 1. 返却型の決定
+### 1. Return Type Determination
 
-パラメータまたはオプションでエラーが発生した場合、パラメータの型を維持したまま、error プロパティにエラー情報を設定します：
+When an error occurs in parameters or options, the error information is set in the error property while maintaining the parameter type:
 
 ```typescript
-// 例：パラメータエラーの場合
+// Example: Parameter error
 {
   type: 'double',
   demonstrativeType: '...',
@@ -156,7 +156,7 @@ type OptionParams = {
   }
 }
 
-// 例：オプションエラーの場合
+// Example: Option error
 {
   type: 'double',
   demonstrativeType: '...',
@@ -169,10 +169,10 @@ type OptionParams = {
 }
 ```
 
-### 2. 返却型の例
+### 2. Return Type Examples
 
 ```typescript
-// 例1: パラメータエラー（不正なコマンド）
+// Example 1: Parameter error (invalid command)
 {
   type: 'single',
   command: 'init',
@@ -183,7 +183,7 @@ type OptionParams = {
   }
 }
 
-// 例2: パラメータエラー（不正なレイヤータイプ）
+// Example 2: Parameter error (invalid layer type)
 {
   type: 'double',
   demonstrativeType: '...',
@@ -195,7 +195,7 @@ type OptionParams = {
   }
 }
 
-// 例3: オプションエラー（カスタム変数の命名規則違反）
+// Example 3: Option error (custom variable naming rule violation)
 {
   type: 'single',
   command: 'init',
@@ -207,13 +207,13 @@ type OptionParams = {
 }
 ```
 
-### 3. 型の一貫性
+### 3. Type Consistency
 
-- パラメータの型（NoParamsResult, SingleParamResult, DoubleParamsResult）を維持
-- エラー情報は各パラメータ型の error プロパティとして保持
-- 型の変換は行わない
+- Maintain parameter types (NoParamsResult, SingleParamResult, DoubleParamsResult)
+- Error information is kept as error property of each parameter type
+- No type conversion is performed
 
-## 使用例
+## Usage Examples
 
 ```typescript
 const parser = new ParamsParser();
@@ -221,41 +221,33 @@ const result = parser.parse(args);
 
 if (result.type === 'no-params') {
   if (result.error) {
-    // エラー処理
+    // Error handling
     console.error(`Error ${result.error.code}: ${result.error.message}`);
   } else {
-    // 正常処理
+    // Normal processing
   }
 } else if (result.type === 'single') {
   if (result.error) {
-    // エラー処理
+    // Error handling
     console.error(`Error ${result.error.code}: ${result.error.message}`);
   } else {
-    // 正常処理
+    // Normal processing
   }
 } else if (result.type === 'double') {
   if (result.error) {
-    // エラー処理
+    // Error handling
     console.error(`Error ${result.error.code}: ${result.error.message}`);
   } else {
-    // 正常処理
+    // Normal processing
   }
 }
 ```
 
-## 注意事項
+## Notes
 
-1. **型の一貫性**
-   - 各分岐内での型の一貫性を保つ
-   - 型の変換は最小限に抑える
-
-2. **エラーハンドリング**
-   - エラーは各パラメータ型内で処理
-   - エラー時も型の一貫性を保つ
-
-3. **型チェック**
-   - 実行時の型チェックを確実に行う
-   - 型の不一致を防ぐ
+1. **Type Consistency**
+   - Maintain type consistency within each branch
+   - Minimize type conversions 
 
 ---
 
