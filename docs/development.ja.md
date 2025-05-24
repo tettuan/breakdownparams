@@ -189,3 +189,7 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
    - 不正な形式
    - 未定義のオプション
    - 大文字小文字の混在
+
+---
+
+[日本語版](development.ja.md) | [English Version](development.md)

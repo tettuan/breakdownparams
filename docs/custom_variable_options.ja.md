@@ -164,3 +164,7 @@ interface OptionParams {
   - エンドツーエンドの機能
   - ドキュメントの正確性
   - エラーメッセージの一貫性 
+
+---
+
+[日本語版](custom_variable_options.ja.md) | [English Version](custom_variable_options.md) 

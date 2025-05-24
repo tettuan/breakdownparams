@@ -95,3 +95,7 @@
 | BreakdownLogger    | テスト用のロギングユーティリティ。デバッグ情報の収集と管理を行い、テストの追跡を容易にする。 | [testing.ja.md](testing.ja.md) |
 | デバッグログ       | 詳細なデバッグ情報を記録するログ。問題の特定と解決を支援し、開発プロセスを効率化。           | [testing.ja.md](testing.ja.md) |
 | テスト失敗の前処理 | テストの目的ではない前処理で発生する失敗。テストの意図を明確にし、適切なテスト設計を促進。   | [testing.ja.md](testing.ja.md) |
+
+---
+
+[日本語版](glossary.ja.md) | [English Version](glossary.md)

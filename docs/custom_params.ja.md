@@ -201,3 +201,7 @@ if (result.type === 'double') {
 2. パラメータの確認
    - 標準値の使用確認
    - カスタム値の置き換え
+
+---
+
+[日本語版](custom_params.ja.md) | [English Version](custom_params.md)

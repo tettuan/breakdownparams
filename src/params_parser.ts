@@ -12,10 +12,15 @@ import {
 } from './types.ts';
 
 /**
- * A class to parse and validate command line arguments.
+ * A class to parse and validate command line arguments for the breakdown structure system.
  *
- * This class provides functionality to parse command line arguments
- * with type safety and validation.
+ * This class provides functionality to parse command line arguments with type safety and validation,
+ * supporting various command patterns and options for managing breakdown structures.
+ *
+ * The parser supports three main types of parameter combinations:
+ * 1. No parameters (with optional help/version flags)
+ * 2. Single parameter (e.g., 'init' command)
+ * 3. Double parameters (demonstrative type + layer type)
  *
  * @example
  * ```ts
@@ -38,6 +43,9 @@ import {
  *   // Process the parameters
  * }
  * ```
+ *
+ * @since 1.0.0
+ * @module
  */
 export class ParamsParser {
   private readonly demonstrativeTypes = new Set<DemonstrativeType>([
@@ -51,24 +59,31 @@ export class ParamsParser {
   private readonly layerTypeAliases = new Set<string>(Object.keys(LayerTypeAliasMap));
 
   /**
-   * Create a new ParamsParser instance.
+   * Create a new ParamsParser instance with optional configuration.
    *
-   * @param config - Optional configuration for extended mode validation
+   * The configuration allows for extended mode validation and custom validation rules
+   * for demonstrative types and layer types.
+   *
+   * @param config - Optional configuration for extended mode validation and custom rules
+   * @throws {Error} If the configuration is invalid
+   * @since 1.0.0
    */
   constructor(config?: ParserConfig) {
     this.config = config || { isExtendedMode: false };
   }
 
   /**
-   * Parse command line arguments.
+   * Parse command line arguments and return a type-safe result.
    *
-   * This method parses the command line arguments and returns a result
-   * indicating whether the parsing was successful or not.
+   * This method analyzes the provided arguments and returns a result object that
+   * indicates the type of command and any associated options or errors.
    *
-   * @param args - The command line arguments to parse
-   * @returns A result object containing either the parsed data or an error message
+   * @param args - Array of command line arguments to parse
+   * @returns A {@link ParamsResult} object containing the parsed parameters and any errors
+   * @throws {Error} If the arguments cannot be parsed
+   * @since 1.0.0
    */
-  parse(args: string[]): ParamsResult {
+  public parse(args: string[]): ParamsResult {
     try {
       const nonOptionArgs: string[] = [];
       for (let i = 0; i < args.length; i++) {

@@ -94,3 +94,7 @@ type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
 ```
 
 各型の詳細な定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
+
+---
+
+[日本語版](params.ja.md) | [English Version](params.md)
