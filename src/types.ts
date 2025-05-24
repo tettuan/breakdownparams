@@ -1,24 +1,29 @@
 /**
  * Type representing the different kinds of parameter combinations that can be parsed.
- * - 'no-params': No parameters provided, may include help or version flags
- * - 'single': Single command parameter (e.g., 'init')
- * - 'double': Two parameters (demonstrative type and layer type)
- * - 'error': Indicates an error in the parameter parsing process
+ * This type is used to categorize the command line arguments into distinct patterns.
+ * 
+ * @since 1.0.0
  */
 export type ParamsType = 'no-params' | 'single' | 'double' | 'error';
 
 /**
- * Categories of errors that can occur during parameter parsing
+ * Categories of errors that can occur during parameter parsing.
+ * These categories help in organizing and handling different types of errors.
+ * 
+ * @since 1.0.0
  */
 export type ErrorCategory =
   | 'VALIDATION' // Input validation errors
   | 'SECURITY' // Security-related errors
   | 'CONFIGURATION' // Configuration-related errors
   | 'SYNTAX' // Syntax-related errors
-  | 'UNEXPECTED'; // Unexpected errors
+  | 'UNEXPECTED';
 
 /**
- * Error codes for parameter parsing
+ * Error codes for parameter parsing.
+ * These codes provide specific identification for different error scenarios.
+ * 
+ * @since 1.0.0
  */
 export type ErrorCode =
   // Validation errors
@@ -43,45 +48,81 @@ export type ErrorCode =
   | 'UNEXPECTED_ERROR';
 
 /**
- * Result type for when no parameters are provided
+ * Interface representing detailed error information.
+ * This interface provides comprehensive error details for debugging and error handling.
+ * 
+ * @since 1.0.0
  */
 export interface ErrorInfo {
+  /** Human-readable error message */
   message: string;
+  /** Specific error code for programmatic handling */
   code: ErrorCode;
+  /** Category of the error for error handling strategy */
   category: ErrorCategory;
+  /** Additional error details for debugging */
   details?: Record<string, unknown>;
 }
 
+/**
+ * Result type for when no parameters are provided.
+ * This type is used when the command is run without any arguments,
+ * potentially including help or version flags.
+ * 
+ * @since 1.0.0
+ */
 export interface NoParamsResult {
+  /** Type identifier for this result */
   type: 'no-params';
+  /** Whether the help flag was specified */
   help: boolean;
+  /** Whether the version flag was specified */
   version: boolean;
+  /** Error information if any occurred */
   error?: ErrorInfo;
 }
 
 /**
- * Result type for when a single parameter is provided
+ * Result type for when a single parameter is provided.
+ * This type is used for commands like 'init' that take a single argument.
+ * 
+ * @since 1.0.0
  */
 export interface SingleParamResult {
+  /** Type identifier for this result */
   type: 'single';
+  /** The command that was specified */
   command: 'init';
+  /** Optional parameters for the command */
   options: OptionParams;
+  /** Error information if any occurred */
   error?: ErrorInfo;
 }
 
 /**
- * Result type for when two parameters are provided
+ * Result type for when two parameters are provided.
+ * This type is used for commands that require both a demonstrative type and a layer type.
+ * 
+ * @since 1.0.0
  */
 export interface DoubleParamsResult {
+  /** Type identifier for this result */
   type: 'double';
+  /** The demonstrative type indicating the action to perform */
   demonstrativeType: DemonstrativeType;
+  /** The layer type specifying the target layer */
   layerType: LayerType;
+  /** Optional parameters for the command */
   options: OptionParams;
+  /** Error information if any occurred */
   error?: ErrorInfo;
 }
 
 /**
- * Union type of all possible parameter result types
+ * Union type of all possible parameter result types.
+ * This type represents all possible outcomes of parameter parsing.
+ * 
+ * @since 1.0.0
  */
 export type ParamsResult =
   | NoParamsResult
@@ -91,6 +132,8 @@ export type ParamsResult =
 /**
  * Interface representing optional parameters that can be provided with commands.
  * These options can be specified using either long form (--option) or short form (-o).
+ * 
+ * @since 1.0.0
  */
 export interface OptionParams {
   /** The input file path when specified with --from or -f */
@@ -109,17 +152,17 @@ export interface OptionParams {
 
 /**
  * Type representing the available demonstrative types that indicate the action to perform.
- * - 'to': Convert to a specified layer
- * - 'summary': Generate a summary for a layer
- * - 'defect': Report defects for a layer
+ * These types define the main operations that can be performed on breakdown structures.
+ * 
+ * @since 1.0.0
  */
 export type DemonstrativeType = 'to' | 'summary' | 'defect';
 
 /**
  * Type representing the available layer types in the breakdown structure.
- * - 'project': Project level items
- * - 'issue': Issue/story level items
- * - 'task': Task/todo level items
+ * These types define the different levels of granularity in the breakdown structure.
+ * 
+ * @since 1.0.0
  */
 export type LayerType = 'project' | 'issue' | 'task';
 
@@ -154,11 +197,17 @@ export const LayerTypeAliasMap = {
  * Type representing all possible layer type aliases.
  * This type is derived from the keys of LayerTypeAliasMap and includes all valid alias strings
  * that can be used to specify a layer type.
+ * 
+ * @since 1.0.0
  */
 export type FromLayerTypeAlias = keyof typeof LayerTypeAliasMap;
 
 /**
  * Interface representing the configuration for the ParamsParser.
+ * This interface defines the configuration options that can be used to customize
+ * the behavior of the parameter parser.
+ * 
+ * @since 1.0.0
  */
 export interface ParserConfig {
   /** Whether to enable extended mode for custom validation rules */
