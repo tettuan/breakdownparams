@@ -66,8 +66,6 @@ Options are specified as hyphenated arguments. Each option supports both long an
    - 3 or more: Error
 
 2. **Value Constraints**
-   - Only lowercase aliases are valid
-   - Undefined aliases are ignored
    - Long form takes precedence (when conflicting with short form)
    - Last specification takes effect for duplicate options
 
@@ -77,8 +75,6 @@ Options are specified as hyphenated arguments. Each option supports both long an
    - Last specification takes effect when same option is specified multiple times
 
 4. **Case Sensitivity**
-   - Only lowercase aliases are valid for layer types
-   - Aliases containing uppercase letters are treated as invalid
    - Custom variable option names are case sensitive and used as specified
 
 5. **Custom Variable Option Constraints**
@@ -161,12 +157,10 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 1. **Unsupported Features**
    - Parameter meaning interpretation
    - Path validation/normalization
-   - Case normalization (except for layer type aliases)
    - Custom variable option value validation (syntax check only)
 
 2. **Limitations**
    - Maximum of 2 parameters
-   - Lowercase aliases only
    - No path string processing
    - Last specification takes effect for duplicate options
    - Custom variable options only available in DoubleParams mode
@@ -182,7 +176,6 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 2. **Integration Tests**
    - Complete command-line argument parsing
    - Error case handling
-   - Alias processing
 
 3. **Edge Cases**
    - Empty arguments

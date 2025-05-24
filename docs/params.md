@@ -49,9 +49,6 @@ Values that can be specified as the second parameter:
    - 2: Combination of demonstrativeType and layerType
    - 3 or more: Error
 
-2. **Value Constraints**
-   - Aliases containing uppercase letters are treated as invalid
-
 ## Usage Examples
 
 ### NoParams

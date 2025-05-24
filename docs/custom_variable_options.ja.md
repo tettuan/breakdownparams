@@ -16,24 +16,19 @@
 | --uv-*        | カスタム変数         | string  | いいえ | `--uv-project=myproject`  |
 
 ## 構文
-```
---uv-{variable_name}={value}
+```bash
+--uv-<name>=<value>
 ```
 
-### 使用例
-```bash
---uv-about=abc
---uv-something=weneed
---uv-project=myproject
---uv-version=1.0.0
-```
+- `<name>`: 変数名（必須）
+- `<value>`: 変数の値（必須）
 
 ## ルールと制約
 
 ### 変数名の検証
 - カスタム変数名は以下を満たす必要があります：
-  - 英数字のみを含む
-  - 最小限の特殊文字（アンダースコア、ハイフンなど）を許可
+  - 英数字とアンダースコアのみを含む
+  - 先頭は英字である必要があります
   - 大文字小文字を区別する
   - 空でないこと
 

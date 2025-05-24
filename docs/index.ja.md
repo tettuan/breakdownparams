@@ -107,14 +107,14 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from <file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f <file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
 ```
 
 ##### FromFile値
 
 - `<file>`部分を取得
-- 例：`--from ./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
+- 例：`--from=./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
 
 #### --destination `<output_file>`
 
@@ -123,14 +123,14 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination <output_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o <output_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
 ```
 
 ##### DestinationFile値
 
 - `<output_file>`部分を取得
-- 例：`--destination ./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
+- 例：`--destination=./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
 
 #### --input `<from_layer_type>`
 
@@ -139,14 +139,14 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input <from_layer_type>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i <from_layer_type>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
 ```
 
 ##### from_layer_type値
 
 - `<from_layer_type>`部分を取得
-- 例：`--input issue`の場合、`issue`を保存
+- 例：`--input=issue`の場合、`issue`を保存
 - 許可される値：
   - project
   - issue
@@ -159,14 +159,14 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config <config_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c <config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
 ```
 
 ##### ConfigFile値
 
 - `<config_file>`部分を取得
-- 例：`--config test`の場合、`test`を保存
+- 例：`--config=test`の場合、`test`を保存
 
 #### カスタム変数オプション（`--uv-*`）
 

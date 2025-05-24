@@ -8,11 +8,11 @@
 | ------------- | ---------- | -------------------- | ------- | ------ | ------------------------- |
 | --help        | -h         | ヘルプ情報を表示     | boolean | いいえ | `--help`                  |
 | --version     | -v         | バージョン情報を表示 | boolean | いいえ | `--version`               |
-| --from        | -f         | ソースファイルパス   | string  | いいえ | `--from input.md`         |
-| --destination | -o         | 出力ファイルパス     | string  | いいえ | `--destination output.md` |
-| --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input project`         |
-| --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation strict`     |
-| --config      | -c         | 設定ファイル名       | string  | いいえ | `--config test`           |
+| --from        | -f         | ソースファイルパス   | string  | いいえ | `--from=input.md`         |
+| --destination | -o         | 出力ファイルパス     | string  | いいえ | `--destination=output.md` |
+| --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input=project`         |
+| --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation=strict`     |
+| --config      | -c         | 設定ファイル名       | string  | いいえ | `--config=test`           |
 | --uv-*        | なし       | カスタム変数オプション | string  | いいえ | `--uv-project=myproject`  |
 
 ## オプションの制約
@@ -59,22 +59,22 @@ breakdown -v
 ### ファイル操作
 
 ```bash
-breakdown to issue --from input.md --destination output.md
-breakdown to issue -f input.md -o output.md
+breakdown to issue --from=input.md --destination=output.md
+breakdown to issue -f=input.md -o=output.md
 ```
 
 ### レイヤータイプ指定
 
 ```bash
-breakdown summary task --input project
-breakdown summary task -i project
+breakdown summary task --input=project
+breakdown summary task -i=project
 ```
 
 ### プロンプト適応
 
 ```bash
-breakdown summary task --adaptation strict
-breakdown summary task -a strict
+breakdown summary task --adaptation=strict
+breakdown summary task -a=strict
 ```
 
 ### カスタム変数オプション
@@ -87,10 +87,10 @@ breakdown to project --uv-version=1.0.0 --uv-environment=production
 ### 複合使用
 
 ```bash
-breakdown to issue --from input.md -o output.md -i project -a strict
-breakdown to project --config test
-breakdown summary task -c test
-breakdown to project --config test --uv-environment=prod --uv-version=1.0.0
+breakdown to issue --from=input.md -o=output.md -i=project -a=strict
+breakdown to project --config=test
+breakdown summary task -c=test
+breakdown to project --config=test --uv-environment=prod --uv-version=1.0.0
 ```
 
 ## 返却型
