@@ -1,6 +1,6 @@
-import { SingleParamResult, ErrorInfo } from '../types.ts';
+import { SingleParamResult } from '../core/params/definitions/types.ts';
+import { ErrorFactory } from '../core/errors/error_factory.ts';
 import { SecurityValidator } from './security_validator.ts';
-import { ErrorFactory } from '../utils/error_factory.ts';
 
 /**
  * SingleParamValidator

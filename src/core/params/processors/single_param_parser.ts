@@ -1,7 +1,7 @@
-import { SingleParamResult, ErrorInfo, ErrorCode, ErrorCategory } from '../types.ts';
-import { ValidatorFactory } from '../validators/validator_factory.ts';
-import { OptionParser } from '../utils/option_parser.ts';
-import { SingleParamValidator } from '../validators/single_param_validator.ts';
+import { SingleParamResult } from '../definitions/types.ts';
+import { OptionParser } from '../../options/processors/option_parser.ts';
+import { ValidatorFactory } from '../../../validators/validator_factory.ts';
+import { SingleParamValidator } from '../../../validators/single_param_validator.ts';
 
 /**
  * SingleParamParser

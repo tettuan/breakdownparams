@@ -1,7 +1,7 @@
-import { NoParamsResult, ErrorInfo, OptionParams } from '../types.ts';
-import { OptionParser } from '../utils/option_parser.ts';
-import { ValidatorFactory } from '../validators/validator_factory.ts';
-import { NoParamsValidator } from '../validators/no_params_validator.ts';
+import { NoParamsResult } from '../definitions/types.ts';
+import { OptionParser } from '../../options/processors/option_parser.ts';
+import { ValidatorFactory } from '../../../validators/validator_factory.ts';
+import { NoParamsValidator } from '../../../validators/no_params_validator.ts';
 
 /**
  * NoParamsParser

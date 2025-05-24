@@ -1,8 +1,8 @@
-import { ErrorCategory, ErrorCode, ErrorInfo } from '../types.ts';
+import { ErrorCategory, ErrorCode, ErrorInfo, ErrorResult } from '../core/params/definitions/types.ts';
 import { BaseValidator } from './validator.ts';
 
 export class SecurityValidator extends BaseValidator {
-  private readonly forbiddenChars = [';', '&', '`', '/'];
+  private readonly forbiddenChars = [';', '&', '`'];
 
   constructor() {
     super(ErrorCode.SECURITY_ERROR, ErrorCategory.SECURITY);
@@ -11,10 +11,10 @@ export class SecurityValidator extends BaseValidator {
   /**
    * Validates a parameter for security issues.
    * @param value The parameter to validate
-   * @param context Optional context information
+   * @param _context Optional context information
    * @returns ErrorInfo if validation fails, undefined if validation passes
    */
-  public validate(value: unknown, context?: Record<string, unknown>): ErrorInfo | undefined {
+  public validate(value: unknown, _context?: Record<string, unknown>): ErrorInfo | undefined {
     if (typeof value !== 'string') {
       return this.createError('Value must be a string');
     }
@@ -28,5 +28,18 @@ export class SecurityValidator extends BaseValidator {
       }
     }
     return undefined;
+  }
+
+  validatePattern(pattern: string): ErrorResult | null {
+    const foundChars = this.forbiddenChars.filter(char => pattern.includes(char));
+    if (foundChars.length === 0) {
+      return null;
+    }
+
+    return {
+      message: `Security error: characters "${foundChars.join(', ')}" are not allowed in pattern`,
+      code: ErrorCode.SECURITY_ERROR,
+      category: ErrorCategory.SECURITY
+    };
   }
 } 

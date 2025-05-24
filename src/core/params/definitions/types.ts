@@ -155,24 +155,40 @@ export interface OptionParams {
   customVariables?: Record<string, string>;
 }
 
-/**
- * Type representing the available demonstrative types that indicate the action to perform.
- * These types define the main operations that can be performed on breakdown structures.
- *
- * @since 1.0.0
- */
-export type DemonstrativeType = 'to' | 'summary' | 'defect';
+export const DEMONSTRATIVE_TYPES = ['to', 'summary', 'defect'] as const;
+export type DemonstrativeType = typeof DEMONSTRATIVE_TYPES[number];
+
+export const LAYER_TYPES = ['project', 'issue', 'task'] as const;
+export type LayerType = typeof LAYER_TYPES[number];
 
 /**
- * Type representing the available layer types in the breakdown structure.
- * These types define the different levels of granularity in the breakdown structure.
+ * Type representing error information in a more concise format.
+ * This type is used for error handling in the parameter parser.
  *
  * @since 1.0.0
  */
-export type LayerType = 
-  | 'project' | 'pj' | 'prj' | 'p'
-  | 'issue' | 'story' | 'i' | 'iss'
-  | 'task' | 'todo' | 'chore' | 'style' | 'fix' | 'error' | 'bug' | 't';
+export type ErrorResult = {
+  /** Human-readable error message */
+  message: string;
+  /** Specific error code for programmatic handling */
+  code: ErrorCode;
+  /** Category of the error for error handling strategy */
+  category: ErrorCategory;
+  /** Additional error details for debugging */
+  details?: Record<string, unknown>;
+};
+
+/**
+ * Type representing the result of parameter parsing with error handling.
+ * This type extends the base parameter result type with error information.
+ *
+ * @template T - The base parameter result type to extend
+ * @since 1.0.0
+ */
+export type ParseResult<T extends ParamsResult> = T & {
+  /** Error information if any occurred during parsing */
+  error?: ErrorResult;
+};
 
 /**
  * Interface representing the configuration for the ParamsParser.

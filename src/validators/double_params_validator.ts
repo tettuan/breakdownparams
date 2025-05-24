@@ -1,6 +1,5 @@
 import {
   DoubleParamsResult,
-  ErrorInfo,
   DemonstrativeType,
   LayerType,
   ParserConfig,
