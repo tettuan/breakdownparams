@@ -118,6 +118,8 @@ export class ParamsParser {
       if (arg === '--version' || arg === '-v') result.version = true;
     }
 
+    // configオプションは無視
+
     return result;
   }
 
@@ -150,10 +152,13 @@ export class ParamsParser {
       };
     }
 
+    // configオプションを無視
+    const { configFile, ...validOptions } = options;
+
     return {
       type: 'single',
       command: 'init',
-      options,
+      options: validOptions,
     };
   }
 
@@ -338,7 +343,8 @@ export class ParamsParser {
         arg === '--from' ||
         arg === '--destination' ||
         arg === '--input' ||
-        arg === '--adaptation'
+        arg === '--adaptation' ||
+        arg === '--config'
       ) {
         if (arg === '--from') options.fromFile = nextArg;
         if (arg === '--destination') options.destinationFile = nextArg;
@@ -356,6 +362,9 @@ export class ParamsParser {
             };
           }
           options.adaptationType = nextArg;
+        }
+        if (arg === '--config') {
+          options.configFile = nextArg;
         }
         i++;
       }
@@ -388,6 +397,9 @@ export class ParamsParser {
           };
         }
         options.adaptationType = nextArg;
+        i++;
+      } else if (arg === '-c' && !options.configFile) {
+        options.configFile = nextArg;
         i++;
       }
     }
