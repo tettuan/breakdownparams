@@ -1,26 +1,30 @@
 /**
- * オプションのテストスイート
+ * Option Test Suite
  *
- * このテストファイルの目的：
- * 1. オプションの長形式と短形式が正しく処理されることを確認
- * 2. オプションの組み合わせが正しく動作することを検証
- * 3. オプションの優先順位が正しく適用されることを確認
+ * Purpose of this test file:
+ * 1. Verify that long and short form options are handled correctly
+ * 2. Validate that option combinations work as expected
+ * 3. Confirm that option precedence is applied correctly
+ * 4. Confirm that the config option is only available with DoubleParams
  *
- * 期待される動作：
- * - 長形式のオプション（--from, --destination, --input）が正しく処理される
- * - 短形式のオプション（-f, -o, -i）が正しく処理される
- * - 長形式が短形式より優先される
- * - オプションの組み合わせが正しく処理される
+ * Expected behavior:
+ * - Long form options (--from, --destination, --input, --config) are handled correctly
+ * - Short form options (-f, -o, -i, -c) are handled correctly
+ * - Long form takes precedence over short form
+ * - Option combinations are handled correctly
+ * - The config option is only valid with DoubleParams
  *
- * テストケースの構成：
- * 1. 長形式オプションのテスト
- * 2. 短形式オプションのテスト
- * 3. オプションの組み合わせテスト
- * 4. オプションの優先順位テスト
+ * Test case structure:
+ * 1. Test long form options
+ * 2. Test short form options
+ * 3. Test option combinations
+ * 4. Test option precedence
+ * 5. Test config option constraints
  *
- * 注意事項：
- * - オプションの順序は結果に影響しない
- * - 同じオプションが複数回指定された場合、最後の指定が有効
+ * Notes:
+ * - The order of options does not affect the result
+ * - If the same option is specified multiple times, the last one is valid
+ * - The config option is only available with DoubleParams
  */
 
 import { assertEquals } from '@std/assert';
@@ -127,6 +131,84 @@ Deno.test('Options', async (t) => {
         fromFile: 'long.txt',
         destinationFile: 'long.txt',
         fromLayerType: 'project',
+      });
+    }
+  });
+
+  await t.step('should handle config option in DoubleParams', () => {
+    const result = parser.parse([
+      'to',
+      'project',
+      '--config',
+      'test',
+    ]);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertEquals(result.demonstrativeType, 'to');
+      assertEquals(result.layerType, 'project');
+      assertEquals(result.options, {
+        configFile: 'test',
+      });
+    }
+  });
+
+  await t.step('should handle config option with short form', () => {
+    const result = parser.parse([
+      'to',
+      'project',
+      '-c',
+      'test',
+    ]);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertEquals(result.demonstrativeType, 'to');
+      assertEquals(result.layerType, 'project');
+      assertEquals(result.options, {
+        configFile: 'test',
+      });
+    }
+  });
+
+  await t.step('should ignore config option in NoParams', () => {
+    const result = parser.parse([
+      '--config',
+      'test',
+    ]);
+    assertEquals(result.type, 'no-params');
+    if (result.type === 'no-params') {
+      assertEquals(result.help, false);
+      assertEquals(result.version, false);
+    }
+  });
+
+  await t.step('should ignore config option in SingleParam', () => {
+    const result = parser.parse([
+      'init',
+      '--config',
+      'test',
+    ]);
+    assertEquals(result.type, 'single');
+    if (result.type === 'single') {
+      assertEquals(result.command, 'init');
+      assertEquals(result.options, {});
+    }
+  });
+
+  await t.step('should prioritize long form config over short form', () => {
+    const result = parser.parse([
+      'to',
+      'project',
+      '--config',
+      'long',
+      '-c',
+      'short',
+    ]);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertEquals(result.demonstrativeType, 'to');
+      assertEquals(result.layerType, 'project');
+      assertEquals(result.options, {
+        configFile: 'long',
       });
     }
   });

@@ -63,6 +63,31 @@ deno run options_usage.ts to issue -f input.md -o output.md -i project
 deno run options_usage.ts to issue --from input.md -o output.md --input project
 ```
 
+## Config Option Usage (`config_usage.ts`)
+
+Demonstrates the usage of the config option:
+
+- Long and short form config options
+- Config option with other options
+- Config option behavior in different modes
+
+```bash
+# Using config option with long form
+deno run config_usage.ts to project --config test
+
+# Using config option with short form
+deno run config_usage.ts to project -c test
+
+# Using config with other options
+deno run config_usage.ts to project --config test --from input.md --destination output.md
+
+# Config option is ignored in single param mode
+deno run config_usage.ts init --config test
+
+# Config option is ignored in no params mode
+deno run config_usage.ts --config test
+```
+
 ## Extended Parameters Usage (`extended_params_usage.ts`)
 
 Shows how to use custom parameter validation with extended mode:

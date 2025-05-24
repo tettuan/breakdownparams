@@ -12,6 +12,7 @@
 | --destination | -o         | 出力ファイルパス     | string  | いいえ | `--destination output.md` |
 | --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input project`         |
 | --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation strict`     |
+| --config      | -c         | 設定ファイル名       | string  | いいえ | `--config test`           |
 
 ## オプションの制約
 
@@ -26,6 +27,10 @@
 3. **無効なオプション**
    - 未定義のオプションはエラーなしで無視されます
    - ファイルパスに対する検証は行われません
+
+4. **パラメータタイプによる制約**
+   - `--config` / `-c` オプションは DoubleParams でのみ使用可能です
+   - 他のパラメータタイプ（NoParams, SingleParam）では無視されます
 
 ## 入力レイヤータイプの値
 
@@ -71,4 +76,6 @@ breakdown summary task -a strict
 
 ```bash
 breakdown to issue --from input.md -o output.md -i project -a strict
+breakdown to project --config test
+breakdown summary task -c test
 ```

@@ -68,6 +68,8 @@ export interface OptionParams {
   fromLayerType?: LayerType;
   /** The prompt adaptation type when specified with --adaptation or -a */
   adaptationType?: string;
+  /** The configuration file name when specified with --config or -c */
+  configFile?: string;
 }
 
 /**

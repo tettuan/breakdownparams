@@ -41,4 +41,4 @@ if (result.type === 'double') {
   if (result.version) {
     console.log('Version requested');
   }
-} 
+}
