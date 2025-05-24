@@ -69,7 +69,6 @@ export class ParamsParser {
    * @returns A result object containing either the parsed data or an error message
    */
   parse(args: string[]): ParamsResult {
-    console.debug('[DEBUG] Parsing arguments:', args);
     try {
       const nonOptionArgs: string[] = [];
       for (let i = 0; i < args.length; i++) {
@@ -83,7 +82,6 @@ export class ParamsParser {
           }
         }
       }
-      console.debug('[DEBUG] Non-option arguments:', nonOptionArgs);
 
       if (nonOptionArgs.length === 0) {
         return this.parseNoParams(args);
@@ -106,7 +104,6 @@ export class ParamsParser {
         };
       }
     } catch (error) {
-      console.debug('[DEBUG] Error parsing arguments:', error);
       return {
         type: 'no-params',
         help: false,
@@ -455,6 +452,43 @@ export class ParamsParser {
     const longForm: Record<string, string | undefined> = {};
     const shortForm: Record<string, string | undefined> = {};
 
+    // 最大値の制限
+    const MAX_VALUE_LENGTH = 1000;
+    const MAX_CUSTOM_VARIABLES = 100;
+
+    // 禁止文字リスト
+    const forbiddenChars = [
+      ';',
+      '|',
+      '&',
+      '`',
+      '$',
+      '>',
+      '<',
+      '(',
+      ')',
+      '{',
+      '}',
+      '[',
+      ']',
+      '\\',
+      '/',
+      '*',
+      '?',
+      '+',
+      '^',
+      '~',
+      '!',
+      '@',
+      '#',
+      '%',
+      '=',
+      ':',
+      '"',
+      "'",
+      ',',
+    ];
+
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
       if (arg.startsWith('--')) {
@@ -463,38 +497,19 @@ export class ParamsParser {
         }
         // Handle custom variable options (--uv-*)
         if (arg.startsWith('--uv-')) {
-          // 禁止文字リスト
-          const forbiddenChars = [
-            ';',
-            '|',
-            '&',
-            '`',
-            '$',
-            '>',
-            '<',
-            '(',
-            ')',
-            '{',
-            '}',
-            '[',
-            ']',
-            '\\',
-            '/',
-            '*',
-            '?',
-            '+',
-            '^',
-            '~',
-            '!',
-            '@',
-            '#',
-            '%',
-            '=',
-            ':',
-            '"',
-            "'",
-            ',',
-          ];
+          // deno-lint-ignore no-control-regex
+          const hasControlCharInName = /[\x00-\x1F\x7F]/.test(arg);
+          if (hasControlCharInName) {
+            return {
+              error: {
+                message: 'Security error: control characters are not allowed in parameters',
+                code: 'SECURITY_ERROR',
+                category: 'SECURITY',
+                details: { location: 'customVariableName' },
+              },
+            };
+          }
+
           // --uv-name=value 形式
           if (arg.includes('=')) {
             const [name, value] = arg.slice(5).split('=');
@@ -508,6 +523,21 @@ export class ParamsParser {
                 },
               };
             }
+
+            // 特殊文字を含むカスタム変数名のチェック
+            const hasSpecialChar = /[^a-zA-Z0-9_]/.test(name);
+            if (hasSpecialChar) {
+              return {
+                error: {
+                  message:
+                    `Invalid custom variable name: ${name}. Only alphanumeric characters and underscores are allowed.`,
+                  code: 'INVALID_CUSTOM_VARIABLE_NAME',
+                  category: 'VALIDATION',
+                  details: { provided: name },
+                },
+              };
+            }
+
             if (value === undefined) {
               return {
                 error: {
@@ -518,6 +548,33 @@ export class ParamsParser {
                 },
               };
             }
+
+            // 値の長さチェック
+            if (value.length > MAX_VALUE_LENGTH) {
+              return {
+                error: {
+                  message:
+                    `Value too long for custom variable: ${name}. Maximum length is ${MAX_VALUE_LENGTH} characters.`,
+                  code: 'VALUE_TOO_LONG',
+                  category: 'VALIDATION',
+                  details: { variable: name, maxLength: MAX_VALUE_LENGTH },
+                },
+              };
+            }
+
+            // deno-lint-ignore no-control-regex
+            const hasControlCharInValue = /[\x00-\x1F\x7F]/.test(value);
+            if (hasControlCharInValue) {
+              return {
+                error: {
+                  message: 'Security error: control characters are not allowed in parameters',
+                  code: 'SECURITY_ERROR',
+                  category: 'SECURITY',
+                  details: { location: `customVariableValue:${name}` },
+                },
+              };
+            }
+
             for (const c of forbiddenChars) {
               if (value.includes(c)) {
                 return {
@@ -530,9 +587,24 @@ export class ParamsParser {
                 };
               }
             }
+
+            // カスタム変数の最大数チェック
+            if (Object.keys(customVariables).length >= MAX_CUSTOM_VARIABLES) {
+              return {
+                error: {
+                  message:
+                    `Too many custom variables. Maximum ${MAX_CUSTOM_VARIABLES} variables are allowed.`,
+                  code: 'TOO_MANY_CUSTOM_VARIABLES',
+                  category: 'VALIDATION',
+                  details: { maxAllowed: MAX_CUSTOM_VARIABLES },
+                },
+              };
+            }
+
             customVariables[name] = value;
             continue;
           }
+
           // --uv-name value 形式
           const name = arg.slice(5);
           if (!name) {
@@ -545,6 +617,21 @@ export class ParamsParser {
               },
             };
           }
+
+          // 特殊文字を含むカスタム変数名のチェック
+          const hasSpecialChar = /[^a-zA-Z0-9_]/.test(name);
+          if (hasSpecialChar) {
+            return {
+              error: {
+                message:
+                  `Invalid custom variable name: ${name}. Only alphanumeric characters and underscores are allowed.`,
+                code: 'INVALID_CUSTOM_VARIABLE_NAME',
+                category: 'VALIDATION',
+                details: { provided: name },
+              },
+            };
+          }
+
           const nextArg = args[i + 1];
           if (!nextArg || nextArg.startsWith('-')) {
             return {
@@ -556,6 +643,33 @@ export class ParamsParser {
               },
             };
           }
+
+          // 値の長さチェック
+          if (nextArg.length > MAX_VALUE_LENGTH) {
+            return {
+              error: {
+                message:
+                  `Value too long for custom variable: ${name}. Maximum length is ${MAX_VALUE_LENGTH} characters.`,
+                code: 'VALUE_TOO_LONG',
+                category: 'VALIDATION',
+                details: { variable: name, maxLength: MAX_VALUE_LENGTH },
+              },
+            };
+          }
+
+          // deno-lint-ignore no-control-regex
+          const hasControlCharInNextArg = /[\x00-\x1F\x7F]/.test(nextArg);
+          if (hasControlCharInNextArg) {
+            return {
+              error: {
+                message: 'Security error: control characters are not allowed in parameters',
+                code: 'SECURITY_ERROR',
+                category: 'SECURITY',
+                details: { location: `customVariableValue:${name}` },
+              },
+            };
+          }
+
           for (const c of forbiddenChars) {
             if (nextArg.includes(c)) {
               return {
@@ -568,6 +682,20 @@ export class ParamsParser {
               };
             }
           }
+
+          // カスタム変数の最大数チェック
+          if (Object.keys(customVariables).length >= MAX_CUSTOM_VARIABLES) {
+            return {
+              error: {
+                message:
+                  `Too many custom variables. Maximum ${MAX_CUSTOM_VARIABLES} variables are allowed.`,
+                code: 'TOO_MANY_CUSTOM_VARIABLES',
+                category: 'VALIDATION',
+                details: { maxAllowed: MAX_CUSTOM_VARIABLES },
+              },
+            };
+          }
+
           customVariables[name] = nextArg;
           i++;
           continue;

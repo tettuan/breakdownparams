@@ -29,6 +29,8 @@ export type ErrorCode =
   | 'INVALID_CUSTOM_VARIABLE_NAME'
   | 'MISSING_VALUE_FOR_OPTION'
   | 'MISSING_VALUE_FOR_CUSTOM_VARIABLE'
+  | 'VALUE_TOO_LONG'
+  | 'TOO_MANY_CUSTOM_VARIABLES'
   // Security errors
   | 'SECURITY_ERROR'
   // Configuration errors
