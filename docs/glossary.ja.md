@@ -47,8 +47,9 @@
 | ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
 | DemonstrativeType | 最初の位置引数の型（`to`, `summary`, `defect`）。実行する操作の種類を指定。各値は特定の処理を表し、型安全性を確保。 | [params.ja.md](params.ja.md)           |
 | LayerType         | 2番目の位置引数の型（`project`, `issue`, `task`）。操作の対象となる層を指定。階層構造を表現し、処理の範囲を定義。   | [params.ja.md](params.ja.md)           |
-| ParamsResult      | パラメータ解析結果の基本型。解析結果を型安全に扱うためのインターフェース。エラー情報も含む。                        | [development.ja.md](development.ja.md) |
-| OptionParams      | オプションパラメータの型。オプションの値を型安全に扱うためのインターフェース。各オプションの値を保持。              | [development.ja.md](development.ja.md) |
+| ParamsResult      | パラメータ解析結果の基本型。解析結果を型安全に扱うためのインターフェース。エラー情報も含む。                        | [params_type.ja.md](params_type.ja.md) |
+| OptionParams      | オプションパラメータの型。オプションの値を型安全に扱うためのインターフェース。各オプションの値を保持。              | [params_type.ja.md](params_type.ja.md) |
+| ErrorResult       | エラー情報を保持する型。エラーメッセージとエラーコードを含む。                                                      | [params_type.ja.md](params_type.ja.md) |
 
 ## オプション関連
 

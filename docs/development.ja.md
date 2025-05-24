@@ -40,39 +40,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
    - 形式：`<demonstrativeType> <layerType>`
    - 例：`breakdown to project`
 
-各タイプに対応する型定義は以下の通りです：
-
-```typescript
-// パラメータの種類
-type ParamsType = 'no-params' | 'single' | 'double';
-
-// 基本型
-interface ParamsResult {
-  type: ParamsType;
-  error?: string;
-}
-
-// パラメータなし
-interface NoParamsResult extends ParamsResult {
-  type: 'no-params';
-  help: boolean;
-  version: boolean;
-}
-
-// 単一パラメータ
-interface SingleParamResult extends ParamsResult {
-  type: 'single';
-  command: 'init';
-}
-
-// 2パラメータ
-interface DoubleParamsResult extends ParamsResult {
-  type: 'double';
-  demonstrativeType: DemonstrativeType;
-  layerType: LayerType;
-  options: OptionParams;
-}
-```
+各タイプの詳細な型定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
 
 ### 2. オプション定義
 

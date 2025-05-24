@@ -92,3 +92,20 @@ breakdown to project --config test
 breakdown summary task -c test
 breakdown to project --config test --uv-environment=prod --uv-version=1.0.0
 ```
+
+## 返却型
+
+オプションの解析結果は、パラメータの型に含まれて返却されます：
+
+```typescript
+type OptionParams = {
+  fromFile?: string;
+  destinationFile?: string;
+  fromLayerType?: LayerType;
+  adaptationType?: string;
+  configFile?: string;
+  customVariables?: Record<string, string>;
+};
+```
+
+各型の詳細な定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
