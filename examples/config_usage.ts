@@ -86,4 +86,4 @@ if (result.type === 'double') {
   console.log('Please provide both command and layer type.');
   console.log('\nFor usage information, run: config_usage --help');
   Deno.exit(1);
-} 
+}
