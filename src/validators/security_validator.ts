@@ -1,0 +1,32 @@
+import { ErrorCategory, ErrorCode, ErrorInfo } from '../types.ts';
+import { BaseValidator } from './validator.ts';
+
+export class SecurityValidator extends BaseValidator {
+  private readonly forbiddenChars = [';', '&', '`', '/'];
+
+  constructor() {
+    super(ErrorCode.SECURITY_ERROR, ErrorCategory.SECURITY);
+  }
+
+  /**
+   * Validates a parameter for security issues.
+   * @param value The parameter to validate
+   * @param context Optional context information
+   * @returns ErrorInfo if validation fails, undefined if validation passes
+   */
+  public validate(value: unknown, context?: Record<string, unknown>): ErrorInfo | undefined {
+    if (typeof value !== 'string') {
+      return this.createError('Value must be a string');
+    }
+
+    for (const c of this.forbiddenChars) {
+      if (value.includes(c)) {
+        return this.createError(
+          `Security error: character '${c}' is not allowed in parameters`,
+          { forbiddenChar: c }
+        );
+      }
+    }
+    return undefined;
+  }
+} 
