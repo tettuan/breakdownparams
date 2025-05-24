@@ -144,15 +144,23 @@ if (result.type === 'double') {
 // バリデーションエラーの例
 {
   type: "double",
-  error: "Invalid demonstrative type: custom"
+  error: {
+    message: "Invalid demonstrative type: custom",
+    code: "INVALID_DEMONSTRATIVE_TYPE"
+  }
 }
 
 // 設定エラーの例
 {
-  type: "error",
-  error: "Invalid configuration: pattern is required in extended mode"
+  type: "double",
+  error: {
+    message: "Invalid configuration: pattern is required in extended mode",
+    code: "INVALID_CONFIGURATION"
+  }
 }
 ```
+
+各型の詳細な定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
 
 ## 7. 制約事項
 

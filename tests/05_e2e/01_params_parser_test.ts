@@ -117,16 +117,24 @@ Deno.test('Single parameter with init command', () => {
  * - ユーザーが誤ったコマンドを入力した場合、適切なエラーメッセージを返す必要がある
  * - エラーメッセージは具体的で、ユーザーが正しいコマンドを特定できる必要がある
  * 期待される成果:
- * - パラメータタイプが"no-params"であること
+ * - パラメータタイプが"single"であること
  * - エラーメッセージが適切に設定されていること
  * - エラーメッセージに無効なコマンドが含まれていること
  */
 Deno.test('Single parameter with invalid command', () => {
   const result = parser.parse(['invalid']);
-  assertEquals(result.type, 'no-params');
-  if (result.type === 'no-params') {
+  assertEquals(result.type, 'single');
+  if (result.type === 'single') {
     assertExists(result.error);
-    assertEquals(result.error, 'Invalid command: invalid');
+    assertEquals(result.error, {
+      message: 'Invalid command: invalid. Must be one of: init',
+      code: 'INVALID_COMMAND',
+      category: 'VALIDATION',
+      details: {
+        provided: 'invalid',
+        validCommands: ['init'],
+      },
+    });
   }
 });
 
@@ -194,10 +202,15 @@ Deno.test('Double parameters with invalid demonstrative type', () => {
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertExists(result.error);
-    assertEquals(
-      result.error,
-      'Invalid demonstrative type: invalid. Must be one of: to, summary, defect',
-    );
+    assertEquals(result.error, {
+      message: 'Invalid demonstrative type: invalid. Must be one of: to, summary, defect',
+      code: 'INVALID_DEMONSTRATIVE_TYPE',
+      category: 'VALIDATION',
+      details: {
+        provided: 'invalid',
+        validTypes: ['to', 'summary', 'defect'],
+      },
+    });
   }
 });
 
@@ -218,7 +231,15 @@ Deno.test('Double parameters with invalid layer type', () => {
   assertEquals(result.type, 'double');
   if (result.type === 'double') {
     assertExists(result.error);
-    assertEquals(result.error, 'Invalid layer type: invalid');
+    assertEquals(result.error, {
+      message: 'Invalid layer type: invalid. Must be one of: project, issue, task',
+      code: 'INVALID_LAYER_TYPE',
+      category: 'VALIDATION',
+      details: {
+        provided: 'invalid',
+        validTypes: ['project', 'issue', 'task'],
+      },
+    });
   }
 });
 
@@ -308,10 +329,15 @@ Deno.test('Too many parameters', () => {
   const result = parser.parse(['to', 'issue', 'extra']);
   assertEquals(result.type, 'no-params');
   assertExists(result.error);
-  assertEquals(
-    result.error,
-    'Too many arguments. Maximum 2 arguments are allowed.',
-  );
+  assertEquals(result.error, {
+    message: 'Too many arguments. Maximum 2 arguments are allowed.',
+    code: 'TOO_MANY_ARGUMENTS',
+    category: 'SYNTAX',
+    details: {
+      provided: 3,
+      maxAllowed: 2,
+    },
+  });
 });
 
 /**

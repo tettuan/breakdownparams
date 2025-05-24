@@ -84,3 +84,13 @@ breakdown summary task -c test
 | 不正なDemonstrativeType | "Invalid value for demonstrativeType: {value}"         |
 | 不正なLayerType         | "Invalid value for layerType: {value}"                 |
 | 不正なConfig使用        | "Config option is only available with DoubleParams"    |
+
+## 返却型
+
+パラメータの解析結果は、以下の型で返却されます：
+
+```typescript
+type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
+```
+
+各型の詳細な定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。

@@ -10,6 +10,8 @@
 
 - [パラメータ仕様](params.ja.md) - 位置引数の定義と制約
 - [オプション仕様](options.ja.md) - ハイフン付き引数の定義と制約
+- [カスタム変数オプション仕様](custom_variable_options.ja.md) - ユーザー定義変数の定義と制約
+- [パラメータパーサーの型定義仕様](params_type.ja.md) - 返却型の定義と使用方法
 
 ## スコープ外
 
@@ -17,6 +19,7 @@
 
 - パラメータ値の意味の解釈（例：「--helpが指定されたのでヘルプを表示する」）
 - デフォルト値の提供
+- カスタム変数オプションの値の検証（構文チェックのみ）
 
 # パラメータパターン
 
@@ -148,6 +151,39 @@
   - project
   - issue
   - task
+
+#### --config `<config_file>`
+
+オプション名：ConfigFile
+エイリアス：`-c`
+以下は同等です：
+
+```bash
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config <config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c <config_file>
+```
+
+##### ConfigFile値
+
+- `<config_file>`部分を取得
+- 例：`--config test`の場合、`test`を保存
+
+#### カスタム変数オプション（`--uv-*`）
+
+カスタム変数オプションは、ユーザー定義の変数を指定するためのオプションです。
+DoubleParamsモードでのみ使用可能で、以下の形式で指定します：
+
+```bash
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
+```
+
+例：
+```bash
+./.deno/bin/breakdown to project --uv-project=myproject
+./.deno/bin/breakdown to project --uv-version=1.0.0 --uv-environment=production
+```
+
+詳細な仕様については[カスタム変数オプション仕様](custom_variable_options.ja.md)を参照してください。
 
 # パラメータ優先順位ルール
 

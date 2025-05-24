@@ -40,39 +40,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
    - 形式：`<demonstrativeType> <layerType>`
    - 例：`breakdown to project`
 
-各タイプに対応する型定義は以下の通りです：
-
-```typescript
-// パラメータの種類
-type ParamsType = 'no-params' | 'single' | 'double';
-
-// 基本型
-interface ParamsResult {
-  type: ParamsType;
-  error?: string;
-}
-
-// パラメータなし
-interface NoParamsResult extends ParamsResult {
-  type: 'no-params';
-  help: boolean;
-  version: boolean;
-}
-
-// 単一パラメータ
-interface SingleParamResult extends ParamsResult {
-  type: 'single';
-  command: 'init';
-}
-
-// 2パラメータ
-interface DoubleParamsResult extends ParamsResult {
-  type: 'double';
-  demonstrativeType: DemonstrativeType;
-  layerType: LayerType;
-  options: OptionParams;
-}
-```
+各タイプの詳細な型定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
 
 ### 2. オプション定義
 
@@ -86,6 +54,8 @@ interface DoubleParamsResult extends ParamsResult {
 | --destination  | -o             | 出力ファイル指定         |
 | --input        | -i             | 入力レイヤー指定         |
 | --adaptation   | -a             | プロンプト適応タイプ指定 |
+| --config       | -c             | 設定ファイル名指定       |
+| --uv-*         | なし           | カスタム変数オプション指定 |
 
 ### 3. バリデーション規則
 
@@ -109,6 +79,13 @@ interface DoubleParamsResult extends ParamsResult {
 4. **大文字小文字の扱い**
    - レイヤータイプのエイリアスは小文字のみ有効
    - 大文字を含むエイリアスは無効として扱う
+   - カスタム変数オプション名は大文字小文字を区別し、指定された通りに使用
+
+5. **カスタム変数オプションの制約**
+   - DoubleParamsモードでのみ使用可能
+   - 構文は`--uv-<name>=<value>`の形式を厳守
+   - 変数名は英数字と最小限の特殊文字のみ許可
+   - 値は文字列として扱い、検証は行わない
 
 ### 4. エラー定義
 
@@ -119,6 +96,7 @@ interface DoubleParamsResult extends ParamsResult {
 | 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
 | 不正な値           | "Invalid value for demonstrativeType: {value}"         |
 | 必須パラメータ不足 | "Missing required parameter: {param}"                  |
+| カスタム変数オプション構文エラー | "Invalid custom variable option syntax: {value}"  |
 
 ## 使用例
 
@@ -160,18 +138,38 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // }
 ```
 
+### カスタム変数オプションを含む2パラメータ
+
+```typescript
+// カスタム変数オプションを含む2パラメータ
+parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
+// {
+//   type: "double",
+//   demonstrativeType: "to",
+//   layerType: "project",
+//   options: {
+//     customVariables: {
+//       "project": "myproject",
+//       "version": "1.0.0"
+//     }
+//   }
+// }
+```
+
 ## 制約事項
 
 1. **非対応機能**
    - パラメータの意味解釈
    - パスの検証・正規化
    - 大文字小文字の正規化（レイヤータイプのエイリアスを除く）
+   - カスタム変数オプションの値の検証（構文チェックのみ）
 
 2. **制限事項**
    - パラメータは最大2個まで
    - エイリアスは小文字のみ
    - パス文字列の加工なし
    - オプションの重複時は最後の指定が有効
+   - カスタム変数オプションはDoubleParamsモードでのみ使用可能
 
 ## テスト戦略
 

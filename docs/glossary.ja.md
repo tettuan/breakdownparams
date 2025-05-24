@@ -47,8 +47,9 @@
 | ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
 | DemonstrativeType | 最初の位置引数の型（`to`, `summary`, `defect`）。実行する操作の種類を指定。各値は特定の処理を表し、型安全性を確保。 | [params.ja.md](params.ja.md)           |
 | LayerType         | 2番目の位置引数の型（`project`, `issue`, `task`）。操作の対象となる層を指定。階層構造を表現し、処理の範囲を定義。   | [params.ja.md](params.ja.md)           |
-| ParamsResult      | パラメータ解析結果の基本型。解析結果を型安全に扱うためのインターフェース。エラー情報も含む。                        | [development.ja.md](development.ja.md) |
-| OptionParams      | オプションパラメータの型。オプションの値を型安全に扱うためのインターフェース。各オプションの値を保持。              | [development.ja.md](development.ja.md) |
+| ParamsResult      | パラメータ解析結果の基本型。解析結果を型安全に扱うためのインターフェース。エラー情報も含む。                        | [params_type.ja.md](params_type.ja.md) |
+| OptionParams      | オプションパラメータの型。オプションの値を型安全に扱うためのインターフェース。各オプションの値を保持。              | [params_type.ja.md](params_type.ja.md) |
+| ErrorResult       | エラー情報を保持する型。エラーメッセージとエラーコードを含む。                                                      | [params_type.ja.md](params_type.ja.md) |
 
 ## オプション関連
 
@@ -63,6 +64,14 @@
 | --input       | -i         | 入力レイヤータイプ。処理の入力元となる層を指定。LayerTypeの値のみを許可。            | [options.ja.md](options.ja.md) |
 | --adaptation  | -a         | プロンプト適応タイプ。処理の挙動を調整するために使用。カスタマイズ可能な動作を指定。 | [options.ja.md](options.ja.md) |
 | --config      | -c         | 設定ファイル名。DoubleParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
+
+### カスタム変数オプション
+
+| 用語           | 説明                                                                                                                 | 参照仕様ファイル                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| カスタム変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数。DoubleParamsモードでのみ使用可能で、任意の値を保持できる。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| カスタム変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字と最小限の特殊文字のみを許可し、大文字小文字を区別する。               | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| CustomVariables | カスタム変数オプションを保持する型。キーと値のペアで構成され、コマンドラインから受け取った値をそのまま保持する。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 
 ## 拡張機能関連
 

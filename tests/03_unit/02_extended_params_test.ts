@@ -70,8 +70,16 @@ Deno.test('Invalid DemonstrativeType values are rejected', () => {
     },
   });
   const result = parser.parse(['Custom', 'project']);
-  assertEquals(result.type, 'error');
-  assertExists(result.error);
+  assertEquals(result.type, 'double');
+  if (result.type === 'double') {
+    assertExists(result.error);
+    assertEquals(result.error.code, 'INVALID_DEMONSTRATIVE_TYPE');
+    assertEquals(result.error.category, 'VALIDATION');
+    assertEquals(result.error.message, 'Invalid demonstrative type');
+    assertExists(result.error.details);
+    assertEquals(result.error.details.provided, 'Custom');
+    assertEquals(result.error.details.pattern, '^[a-z]+$');
+  }
 });
 
 Deno.test('Invalid LayerType values are rejected', () => {
@@ -83,8 +91,16 @@ Deno.test('Invalid LayerType values are rejected', () => {
     },
   });
   const result = parser.parse(['to', 'Custom']);
-  assertEquals(result.type, 'error');
-  assertExists(result.error);
+  assertEquals(result.type, 'double');
+  if (result.type === 'double') {
+    assertExists(result.error);
+    assertEquals(result.error.code, 'INVALID_LAYER_TYPE');
+    assertEquals(result.error.category, 'VALIDATION');
+    assertEquals(result.error.message, 'Invalid layer type');
+    assertExists(result.error.details);
+    assertEquals(result.error.details.provided, 'Custom');
+    assertEquals(result.error.details.pattern, '^[a-z]+$');
+  }
 });
 
 Deno.test('Complex regex patterns are processed correctly', () => {
@@ -113,8 +129,15 @@ Deno.test('Invalid regex patterns result in configuration error', () => {
     },
   });
   const result = parser.parse(['test', 'project']);
-  assertEquals(result.type, 'error');
-  assertExists(result.error);
+  assertEquals(result.type, 'double');
+  if (result.type === 'double') {
+    assertExists(result.error);
+    assertEquals(result.error.code, 'INVALID_PATTERN');
+    assertEquals(result.error.category, 'CONFIGURATION');
+    assertEquals(result.error.message, 'Invalid demonstrative type pattern configuration');
+    assertExists(result.error.details);
+    assertEquals(result.error.details.pattern, '[invalid');
+  }
 });
 
 Deno.test('Custom error messages are displayed correctly', () => {
@@ -126,8 +149,16 @@ Deno.test('Custom error messages are displayed correctly', () => {
     },
   });
   const result = parser.parse(['Test', 'project']);
-  assertEquals(result.type, 'error');
-  assertEquals(result.error, 'Custom error message');
+  assertEquals(result.type, 'double');
+  if (result.type === 'double') {
+    assertExists(result.error);
+    assertEquals(result.error.code, 'INVALID_DEMONSTRATIVE_TYPE');
+    assertEquals(result.error.category, 'VALIDATION');
+    assertEquals(result.error.message, 'Custom error message');
+    assertExists(result.error.details);
+    assertEquals(result.error.details.provided, 'Test');
+    assertEquals(result.error.details.pattern, '^[a-z]+$');
+  }
 });
 
 Deno.test('Empty patterns are rejected', () => {
@@ -138,8 +169,18 @@ Deno.test('Empty patterns are rejected', () => {
     },
   });
   const result = parser.parse(['test', 'project']);
-  assertEquals(result.type, 'error');
-  assertExists(result.error);
+  assertEquals(result.type, 'double');
+  if (result.type === 'double') {
+    assertExists(result.error);
+    assertEquals(result.error.code, 'INVALID_CONFIG');
+    assertEquals(result.error.category, 'CONFIGURATION');
+    assertEquals(
+      result.error.message,
+      'Invalid configuration: pattern is required in extended mode',
+    );
+    assertExists(result.error.details);
+    assertEquals(result.error.details.missingField, 'pattern');
+  }
 });
 
 Deno.test('Transition from standard mode to extended mode works correctly', () => {
@@ -200,8 +241,18 @@ Deno.test('Security: Malicious patterns are rejected', () => {
     },
   });
   const result = parser.parse(['malicious; rm -rf /', 'project']);
-  assertEquals(result.type, 'error');
-  assertExists(result.error);
+  assertEquals(result.type, 'double');
+  if (result.type === 'double') {
+    assertExists(result.error);
+    assertEquals(result.error.code, 'SECURITY_ERROR');
+    assertEquals(result.error.category, 'SECURITY');
+    assertEquals(
+      result.error.message,
+      `Security error: character ';' is not allowed in parameters`,
+    );
+    assertExists(result.error.details);
+    assertEquals(result.error.details.forbiddenChar, ';');
+  }
 });
 
 Deno.test('Security: Forbidden characters in parameters are rejected', () => {
@@ -215,8 +266,18 @@ Deno.test('Security: Forbidden characters in parameters are rejected', () => {
     },
   });
   const result = parser.parse(['test;', 'project']);
-  assertEquals(result.type, 'error');
-  assertExists(result.error);
+  assertEquals(result.type, 'double');
+  if (result.type === 'double') {
+    assertExists(result.error);
+    assertEquals(result.error.code, 'SECURITY_ERROR');
+    assertEquals(result.error.category, 'SECURITY');
+    assertEquals(
+      result.error.message,
+      `Security error: character ';' is not allowed in parameters`,
+    );
+    assertExists(result.error.details);
+    assertEquals(result.error.details.forbiddenChar, ';');
+  }
 });
 
 Deno.test('Whitelist pattern for DemonstrativeType and LayerType is validated correctly', () => {
@@ -297,8 +358,23 @@ Deno.test('Standard patterns are validated correctly in extended mode', () => {
 
   for (const { demonstrativeType, layerType } of invalidCases) {
     const result = parser.parse([demonstrativeType, layerType]);
-    assertEquals(result.type, 'error');
-    assertExists(result.error);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertExists(result.error);
+      if (demonstrativeType === 'invalid') {
+        assertEquals(result.error.code, 'INVALID_DEMONSTRATIVE_TYPE');
+        assertEquals(result.error.category, 'VALIDATION');
+        assertExists(result.error.details);
+        assertEquals(result.error.details.provided, demonstrativeType);
+        assertEquals(result.error.details.pattern, '^(to|summary|defect)$');
+      } else {
+        assertEquals(result.error.code, 'INVALID_LAYER_TYPE');
+        assertEquals(result.error.category, 'VALIDATION');
+        assertExists(result.error.details);
+        assertEquals(result.error.details.provided, layerType);
+        assertEquals(result.error.details.pattern, '^(project|issue|task)$');
+      }
+    }
   }
 });
 
@@ -322,8 +398,19 @@ Deno.test('Non-standard patterns are rejected in extended mode', () => {
 
   for (const { demonstrativeType, layerType } of standardCases) {
     const result = parser.parse([demonstrativeType, layerType]);
-    assertEquals(result.type, 'error');
-    assertExists(result.error);
+    assertEquals(result.type, 'double');
+    if (result.type === 'double') {
+      assertExists(result.error);
+      assertEquals(result.error.code, 'INVALID_DEMONSTRATIVE_TYPE');
+      assertEquals(result.error.category, 'VALIDATION');
+      assertEquals(
+        result.error.message,
+        `Invalid demonstrative type: ${demonstrativeType}`,
+      );
+      assertExists(result.error.details);
+      assertEquals(result.error.details.provided, demonstrativeType);
+      assertEquals(result.error.details.pattern, '^(custom|test|example)$');
+    }
   }
 
   // Test custom patterns are accepted
