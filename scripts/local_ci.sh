@@ -111,10 +111,10 @@ Error: $error_message in $test_file
 Note: Remaining tests have been interrupted due to this failure.
 Tests are executed sequentially to maintain dependency order and consistency.
 
-Please:
-  1. Fix errors one at a time, starting with this test
-  2. Run tests for the fixed component before moving to the next error
-  3. If root cause is unclear, consider adding more test cases
+Next Action:
+  1. find and read the error specifications under docs/.
+  2. derive a solution to the error from the specification
+  3. resolve errors one by one and fix them from this test
 ==============================================================================="
     else
         echo "
