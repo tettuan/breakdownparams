@@ -268,8 +268,8 @@ export class ParamsParser {
           options: {},
           error: {
             message: `Security error: character '${c}' is not allowed in parameters`,
-            code: 'SECURITY_ERROR',
-            category: 'SECURITY',
+            code: 'VALIDATION_ERROR',
+            category: 'VALIDATION',
             details: {
               forbiddenChar: c,
               location: demonstrativeType.includes(c) ? 'demonstrativeType' : 'layerType',
@@ -302,8 +302,8 @@ export class ParamsParser {
           options: {},
           error: {
             message: 'Security error: pattern "*" is not allowed',
-            code: 'SECURITY_ERROR',
-            category: 'SECURITY',
+            code: 'VALIDATION_ERROR',
+            category: 'VALIDATION',
             details: { invalidPattern: patternStr },
           },
         };
@@ -334,7 +334,7 @@ export class ParamsParser {
           error: {
             message: this.config.demonstrativeType.errorMessage ||
               `Invalid demonstrative type: ${demonstrativeType}`,
-            code: 'INVALID_DEMONSTRATIVE_TYPE',
+            code: 'VALIDATION_ERROR',
             category: 'VALIDATION',
             details: { provided: demonstrativeType, pattern: patternStr },
           },
@@ -350,7 +350,7 @@ export class ParamsParser {
           message: `Invalid demonstrative type: ${demonstrativeType}. Must be one of: ${
             Array.from(this.demonstrativeTypes).join(', ')
           }`,
-          code: 'INVALID_DEMONSTRATIVE_TYPE',
+          code: 'VALIDATION_ERROR',
           category: 'VALIDATION',
           details: { provided: demonstrativeType, validTypes: Array.from(this.demonstrativeTypes) },
         },
@@ -380,8 +380,8 @@ export class ParamsParser {
           options: {},
           error: {
             message: 'Security error: pattern "*" is not allowed',
-            code: 'SECURITY_ERROR',
-            category: 'SECURITY',
+            code: 'VALIDATION_ERROR',
+            category: 'VALIDATION',
             details: { invalidPattern: patternStr },
           },
         };
@@ -411,7 +411,7 @@ export class ParamsParser {
           options: {},
           error: {
             message: this.config.layerType.errorMessage || `Invalid layer type: ${layerType}`,
-            code: 'INVALID_LAYER_TYPE',
+            code: 'VALIDATION_ERROR',
             category: 'VALIDATION',
             details: { provided: layerType, pattern: patternStr },
           },
@@ -427,7 +427,7 @@ export class ParamsParser {
           message: `Invalid layer type: ${layerType}. Must be one of: ${
             Array.from(this.layerTypes).join(', ')
           }`,
-          code: 'INVALID_LAYER_TYPE',
+          code: 'VALIDATION_ERROR',
           category: 'VALIDATION',
           details: { provided: layerType, validTypes: Array.from(this.layerTypes) },
         },
@@ -463,9 +463,8 @@ export class ParamsParser {
   private parseOptions(args: string[]): OptionParams | { error: ErrorInfo } {
     const options: OptionParams = {};
     const customVariables: Record<string, string> = {};
-    // Track long and short form values separately
+    // Track long form values only (short form with values not supported)
     const longForm: Record<string, string | undefined> = {};
-    const shortForm: Record<string, string | undefined> = {};
 
     // 最大値の制限
     const MAX_VALUE_LENGTH = 1000;
@@ -518,8 +517,8 @@ export class ParamsParser {
             return {
               error: {
                 message: 'Security error: control characters are not allowed in parameters',
-                code: 'SECURITY_ERROR',
-                category: 'SECURITY',
+                code: 'VALIDATION_ERROR',
+                category: 'VALIDATION',
                 details: { location: 'customVariableName' },
               },
             };
@@ -595,8 +594,8 @@ export class ParamsParser {
                 return {
                   error: {
                     message: `Security error: character '${c}' is not allowed in parameters`,
-                    code: 'SECURITY_ERROR',
-                    category: 'SECURITY',
+                    code: 'VALIDATION_ERROR',
+                    category: 'VALIDATION',
                     details: { forbiddenChar: c, location: `customVariableValue:${name}` },
                   },
                 };
@@ -678,8 +677,8 @@ export class ParamsParser {
             return {
               error: {
                 message: 'Security error: control characters are not allowed in parameters',
-                code: 'SECURITY_ERROR',
-                category: 'SECURITY',
+                code: 'VALIDATION_ERROR',
+                category: 'VALIDATION',
                 details: { location: `customVariableValue:${name}` },
               },
             };
@@ -690,8 +689,8 @@ export class ParamsParser {
               return {
                 error: {
                   message: `Security error: character '${c}' is not allowed in parameters`,
-                  code: 'SECURITY_ERROR',
-                  category: 'SECURITY',
+                  code: 'VALIDATION_ERROR',
+                  category: 'VALIDATION',
                   details: { forbiddenChar: c, location: `customVariableValue:${name}` },
                 },
               };
@@ -730,7 +729,7 @@ export class ParamsParser {
                 return {
                   error: {
                     message: `Invalid layer type: ${value}`,
-                    code: 'INVALID_LAYER_TYPE',
+                    code: 'VALIDATION_ERROR',
                     category: 'VALIDATION',
                     details: { provided: value, validTypes: Array.from(this.layerTypes) },
                   },
@@ -748,124 +747,44 @@ export class ParamsParser {
               return {
                 error: {
                   message: `Unknown option: ${opt}`,
-                  code: 'UNKNOWN_OPTION',
-                  category: 'SYNTAX',
+                  code: 'VALIDATION_ERROR',
+                  category: 'VALIDATION',
                   details: { provided: opt },
                 },
               };
           }
           continue;
         }
-        const nextArg = args[i + 1];
-        if (!nextArg || nextArg.startsWith('-')) {
-          return {
-            error: {
-              message: `Missing value for option: ${arg}`,
-              code: 'MISSING_VALUE_FOR_OPTION',
-              category: 'SYNTAX',
-              details: { option: arg },
-            },
-          };
-        }
-        switch (arg) {
-          case '--from':
-            longForm.fromFile = nextArg;
-            break;
-          case '--destination':
-            longForm.destinationFile = nextArg;
-            break;
-          case '--input':
-            if (!this.layerTypes.has(nextArg as LayerType)) {
-              return {
-                error: {
-                  message: `Invalid layer type: ${nextArg}`,
-                  code: 'INVALID_LAYER_TYPE',
-                  category: 'VALIDATION',
-                  details: { provided: nextArg, validTypes: Array.from(this.layerTypes) },
-                },
-              };
-            }
-            longForm.fromLayerType = nextArg;
-            break;
-          case '--adaptation':
-            longForm.adaptationType = nextArg;
-            break;
-          case '--config':
-            longForm.configFile = nextArg;
-            break;
-          default:
-            return {
-              error: {
-                message: `Unknown option: ${arg}`,
-                code: 'UNKNOWN_OPTION',
-                category: 'SYNTAX',
-                details: { provided: arg },
-              },
-            };
-        }
-        i++;
+        // Space-separated options are not allowed - must use = syntax
+        return {
+          error: {
+            message: `Invalid option format: ${arg}. Use ${arg}=value instead of space-separated format.`,
+            code: 'INVALID_OPTION',
+            category: 'SYNTAX',
+            details: { option: arg, suggestion: `${arg}=value` },
+          },
+        };
       } else if (arg.startsWith('-')) {
         if (arg === '-h' || arg === '-v') {
           continue;
         }
-        const nextArg = args[i + 1];
-        if (!nextArg || nextArg.startsWith('-')) {
-          return {
-            error: {
-              message: `Missing value for option: ${arg}`,
-              code: 'MISSING_VALUE_FOR_OPTION',
-              category: 'SYNTAX',
-              details: { option: arg },
-            },
-          };
-        }
-        switch (arg) {
-          case '-f':
-            shortForm.fromFile = nextArg;
-            break;
-          case '-o':
-            shortForm.destinationFile = nextArg;
-            break;
-          case '-i':
-            if (!this.layerTypes.has(nextArg as LayerType)) {
-              return {
-                error: {
-                  message: `Invalid layer type: ${nextArg}`,
-                  code: 'INVALID_LAYER_TYPE',
-                  category: 'VALIDATION',
-                  details: { provided: nextArg, validTypes: Array.from(this.layerTypes) },
-                },
-              };
-            }
-            shortForm.fromLayerType = nextArg;
-            break;
-          case '-a':
-            shortForm.adaptationType = nextArg;
-            break;
-          case '-c':
-            shortForm.configFile = nextArg;
-            break;
-          default:
-            return {
-              error: {
-                message: `Unknown option: ${arg}`,
-                code: 'UNKNOWN_OPTION',
-                category: 'SYNTAX',
-                details: { provided: arg },
-              },
-            };
-        }
-        i++;
+        // Space-separated short options are not allowed
+        return {
+          error: {
+            message: `Invalid option format: ${arg}. Short options with values are not supported in this implementation.`,
+            code: 'INVALID_OPTION',
+            category: 'SYNTAX',
+            details: { option: arg, suggestion: `Use long form with = syntax instead` },
+          },
+        };
       }
     }
-    // Assign options, preferring long form over short form
-    options.fromFile = longForm.fromFile ?? shortForm.fromFile;
-    options.destinationFile = longForm.destinationFile ?? shortForm.destinationFile;
-    options.fromLayerType = (longForm.fromLayerType ?? shortForm.fromLayerType) as
-      | LayerType
-      | undefined;
-    options.adaptationType = longForm.adaptationType ?? shortForm.adaptationType;
-    options.configFile = longForm.configFile ?? shortForm.configFile;
+    // Assign options from long form only (short form with values not supported)
+    options.fromFile = longForm.fromFile;
+    options.destinationFile = longForm.destinationFile;
+    options.fromLayerType = longForm.fromLayerType as LayerType | undefined;
+    options.adaptationType = longForm.adaptationType;
+    options.configFile = longForm.configFile;
     // Add custom variables to options if any were found
     if (Object.keys(customVariables).length > 0) {
       options.customVariables = customVariables;

@@ -26,9 +26,8 @@ export type ErrorCategory =
  * @since 1.0.0
  */
 export type ErrorCode =
-  // Validation errors
-  | 'INVALID_DEMONSTRATIVE_TYPE'
-  | 'INVALID_LAYER_TYPE'
+  // Validation errors (unified error codes)
+  | 'VALIDATION_ERROR'
   | 'INVALID_COMMAND'
   | 'INVALID_OPTION'
   | 'INVALID_CUSTOM_VARIABLE_NAME'
@@ -36,14 +35,11 @@ export type ErrorCode =
   | 'MISSING_VALUE_FOR_CUSTOM_VARIABLE'
   | 'VALUE_TOO_LONG'
   | 'TOO_MANY_CUSTOM_VARIABLES'
-  // Security errors
-  | 'SECURITY_ERROR'
   // Configuration errors
   | 'INVALID_CONFIG'
   | 'INVALID_PATTERN'
   // Syntax errors
   | 'TOO_MANY_ARGUMENTS'
-  | 'UNKNOWN_OPTION'
   // Unexpected errors
   | 'UNEXPECTED_ERROR';
 
