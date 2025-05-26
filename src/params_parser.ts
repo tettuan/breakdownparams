@@ -10,6 +10,11 @@ import {
   ParserConfig,
   SingleParamResult,
 } from './types.ts';
+import {
+  ZeroParamsValidator,
+  OneParamsValidator,
+  TwoParamsValidator,
+} from './validators.ts';
 
 /**
  * A class to parse and validate command line arguments for the breakdown structure system.
@@ -48,15 +53,10 @@ import {
  * @module
  */
 export class ParamsParser {
-  private readonly demonstrativeTypes = new Set<DemonstrativeType>([
-    'to',
-    'summary',
-    'defect',
-  ]);
-  private readonly validSingleCommands = new Set<string>(['init']);
   private readonly config: ParserConfig;
-  private readonly layerTypes = new Set<LayerType>(['project', 'issue', 'task']);
-  private readonly layerTypeAliases = new Set<string>(Object.keys(LayerTypeAliasMap));
+  private readonly zeroValidator: ZeroParamsValidator;
+  private readonly oneValidator: OneParamsValidator;
+  private readonly twoValidator: TwoParamsValidator;
 
   /**
    * Create a new ParamsParser instance with optional configuration.
@@ -70,6 +70,9 @@ export class ParamsParser {
    */
   constructor(config?: ParserConfig) {
     this.config = config || { isExtendedMode: false };
+    this.zeroValidator = new ZeroParamsValidator(this.config);
+    this.oneValidator = new OneParamsValidator(this.config);
+    this.twoValidator = new TwoParamsValidator(this.config);
   }
 
   /**
@@ -99,11 +102,11 @@ export class ParamsParser {
       }
 
       if (nonOptionArgs.length === 0) {
-        return this.parseNoParams(args);
+        return this.handleZeroParams(args);
       } else if (nonOptionArgs.length === 1) {
-        return this.parseSingleParam(nonOptionArgs[0], args);
+        return this.handleOneParam(nonOptionArgs[0], args);
       } else if (nonOptionArgs.length === 2) {
-        return this.parseDoubleParams(nonOptionArgs[0], nonOptionArgs[1], args);
+        return this.handleTwoParams(nonOptionArgs[0], nonOptionArgs[1], args);
       } else {
         // Too many arguments
         return {
@@ -134,319 +137,88 @@ export class ParamsParser {
   }
 
   /**
-   * Parse arguments when no parameters are expected.
+   * Handle zero parameters using validator pattern.
    *
    * @param args - The command line arguments
    * @returns A result object containing help and version flags
    */
-  private parseNoParams(args: string[]): NoParamsResult {
-    const result: NoParamsResult = {
-      type: 'no-params',
-      help: false,
-      version: false,
-    };
+  private handleZeroParams(args: string[]): NoParamsResult {
+    const validationResult = this.zeroValidator.validate(args);
+    
+    // Parse options to check for errors, but ignore custom variables in zero params
     const options = this.parseOptions(args);
     if ('error' in options) {
-      result.error = options.error;
-      return result;
+      return {
+        ...validationResult,
+        error: options.error,
+      };
     }
-    if ('customVariables' in options) {
-      delete options.customVariables;
-    }
-    for (const arg of args) {
-      if (arg === '--help' || arg === '-h') result.help = true;
-      if (arg === '--version' || arg === '-v') result.version = true;
-    }
-    return result;
+    
+    return validationResult;
   }
 
   /**
-   * Parse arguments when a single parameter is expected.
+   * Handle single parameter using validator pattern.
    *
    * @param command - The command parameter
    * @param args - The command line arguments
    * @returns A result object containing the parsed command
    */
-  private parseSingleParam(
+  private handleOneParam(
     command: string,
     args: string[],
   ): SingleParamResult {
+    const validationResult = this.oneValidator.validate(args, command);
+    
+    // Parse options to check for errors
     const options = this.parseOptions(args);
     if ('error' in options) {
       return {
-        type: 'single',
-        command: 'init',
-        options: {},
+        ...validationResult,
         error: options.error,
       };
     }
-    // configオプションを無視
-    const { configFile: _configFile, ...validOptions } = options;
-    if ('customVariables' in validOptions) {
-      delete validOptions.customVariables;
-    }
-    if (!this.validSingleCommands.has(command)) {
-      return {
-        type: 'single',
-        command: 'init',
-        options: {},
-        error: {
-          message: `Invalid command: ${command}. Must be one of: ${
-            Array.from(this.validSingleCommands).join(', ')
-          }`,
-          code: 'INVALID_COMMAND',
-          category: 'VALIDATION',
-          details: { provided: command, validCommands: Array.from(this.validSingleCommands) },
-        },
-      };
-    }
+    
+    // Ignore config and custom variables for single param
+    const { configFile: _configFile, customVariables: _customVariables, ...validOptions } = options;
+    
     return {
-      type: 'single',
-      command: 'init',
+      ...validationResult,
       options: validOptions,
     };
   }
 
   /**
-   * Parse arguments when two parameters are expected.
+   * Handle two parameters using validator pattern.
    *
    * @param demonstrativeType - The demonstrative type parameter
    * @param layerType - The layer type parameter
    * @param args - The command line arguments
    * @returns A result object containing the parsed parameters or an error
    */
-  private parseDoubleParams(
+  private handleTwoParams(
     demonstrativeType: string,
     layerType: string,
     args: string[],
   ): DoubleParamsResult {
-    const normalizedDemonstrativeType = demonstrativeType.toLowerCase();
-    let normalizedLayerType = layerType.toLowerCase();
-    if (this.layerTypeAliases.has(normalizedLayerType)) {
-      // LayerTypeAliasMapから正式名称に変換
-      // LayerTypeAliasMapはtypes.tsで定義
-      // @ts-ignore: LayerTypeAliasMapの型定義は正しいが、TypeScriptが動的なプロパティアクセスを検出できない
-      normalizedLayerType = LayerTypeAliasMap[normalizedLayerType];
+    const validationResult = this.twoValidator.validate(args, demonstrativeType, layerType);
+    
+    // If validation failed, return the error result
+    if (validationResult.error) {
+      return validationResult;
     }
-    const forbiddenChars = [
-      ';',
-      '|',
-      '&',
-      '`',
-      '$',
-      '>',
-      '<',
-      '(',
-      ')',
-      '{',
-      '}',
-      '[',
-      ']',
-      '\\',
-      '/',
-      '*',
-      '?',
-      '+',
-      '^',
-      '~',
-      '!',
-      '@',
-      '#',
-      '%',
-      '=',
-      ':',
-      '"',
-      "'",
-      ',',
-    ];
-    for (const c of forbiddenChars) {
-      if (demonstrativeType.includes(c) || layerType.includes(c)) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: `Security error: character '${c}' is not allowed in parameters`,
-            code: 'VALIDATION_ERROR',
-            category: 'VALIDATION',
-            details: {
-              forbiddenChar: c,
-              location: demonstrativeType.includes(c) ? 'demonstrativeType' : 'layerType',
-            },
-          },
-        };
-      }
-    }
-    if (this.config.isExtendedMode && this.config.demonstrativeType) {
-      const patternStr = this.config.demonstrativeType.pattern;
-      if (!patternStr || patternStr.trim() === '') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid configuration: pattern is required in extended mode',
-            code: 'INVALID_CONFIG',
-            category: 'CONFIGURATION',
-            details: { missingField: 'pattern' },
-          },
-        };
-      }
-      if (patternStr.trim() === '.*') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Security error: pattern "*" is not allowed',
-            code: 'VALIDATION_ERROR',
-            category: 'VALIDATION',
-            details: { invalidPattern: patternStr },
-          },
-        };
-      }
-      let pattern: RegExp;
-      try {
-        pattern = new RegExp(patternStr);
-      } catch (_error) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid demonstrative type pattern configuration',
-            code: 'INVALID_PATTERN',
-            category: 'CONFIGURATION',
-            details: { pattern: patternStr },
-          },
-        };
-      }
-      if (!pattern.test(demonstrativeType)) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: this.config.demonstrativeType.errorMessage ||
-              `Invalid demonstrative type: ${demonstrativeType}`,
-            code: 'VALIDATION_ERROR',
-            category: 'VALIDATION',
-            details: { provided: demonstrativeType, pattern: patternStr },
-          },
-        };
-      }
-    } else if (!this.demonstrativeTypes.has(normalizedDemonstrativeType as DemonstrativeType)) {
-      return {
-        type: 'double',
-        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-        layerType: normalizedLayerType as LayerType,
-        options: {},
-        error: {
-          message: `Invalid demonstrative type: ${demonstrativeType}. Must be one of: ${
-            Array.from(this.demonstrativeTypes).join(', ')
-          }`,
-          code: 'VALIDATION_ERROR',
-          category: 'VALIDATION',
-          details: { provided: demonstrativeType, validTypes: Array.from(this.demonstrativeTypes) },
-        },
-      };
-    }
-    if (this.config.isExtendedMode && this.config.layerType) {
-      const patternStr = this.config.layerType.pattern;
-      if (!patternStr || patternStr.trim() === '') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid configuration: pattern is required in extended mode',
-            code: 'INVALID_CONFIG',
-            category: 'CONFIGURATION',
-            details: { missingField: 'pattern' },
-          },
-        };
-      }
-      if (patternStr.trim() === '.*') {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Security error: pattern "*" is not allowed',
-            code: 'VALIDATION_ERROR',
-            category: 'VALIDATION',
-            details: { invalidPattern: patternStr },
-          },
-        };
-      }
-      let pattern: RegExp;
-      try {
-        pattern = new RegExp(patternStr);
-      } catch (_error) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: 'Invalid layer type pattern configuration',
-            code: 'INVALID_PATTERN',
-            category: 'CONFIGURATION',
-            details: { pattern: patternStr },
-          },
-        };
-      }
-      if (!pattern.test(layerType)) {
-        return {
-          type: 'double',
-          demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-          layerType: normalizedLayerType as LayerType,
-          options: {},
-          error: {
-            message: this.config.layerType.errorMessage || `Invalid layer type: ${layerType}`,
-            code: 'VALIDATION_ERROR',
-            category: 'VALIDATION',
-            details: { provided: layerType, pattern: patternStr },
-          },
-        };
-      }
-    } else if (!this.layerTypes.has(normalizedLayerType as LayerType)) {
-      return {
-        type: 'double',
-        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-        layerType: normalizedLayerType as LayerType,
-        options: {},
-        error: {
-          message: `Invalid layer type: ${layerType}. Must be one of: ${
-            Array.from(this.layerTypes).join(', ')
-          }`,
-          code: 'VALIDATION_ERROR',
-          category: 'VALIDATION',
-          details: { provided: layerType, validTypes: Array.from(this.layerTypes) },
-        },
-      };
-    }
+    
+    // Parse options to check for errors and add to result
     const options = this.parseOptions(args);
     if ('error' in options) {
       return {
-        type: 'double',
-        demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-        layerType: normalizedLayerType as LayerType,
-        options: {},
+        ...validationResult,
         error: options.error,
       };
     }
+    
     return {
-      type: 'double',
-      demonstrativeType: normalizedDemonstrativeType as DemonstrativeType,
-      layerType: normalizedLayerType as LayerType,
+      ...validationResult,
       options: options as OptionParams,
     };
   }
