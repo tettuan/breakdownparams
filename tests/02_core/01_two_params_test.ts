@@ -29,18 +29,48 @@ import { ParamsParser } from '../../mod.ts';
 // Initialize logger for testing
 const _logger = new BreakdownLogger();
 
-Deno.test('Double Parameters', async (t) => {
+Deno.test('Double Parameter Tests', async (t) => {
   const parser = new ParamsParser();
 
-  await t.step('should handle basic combinations', () => {
-    _logger.debug('Testing basic parameter combinations');
+  await t.step('should parse double param command', () => {
     const result = parser.parse(['to', 'project']);
-    _logger.debug('Parse result', result);
-    assertEquals(result.type, 'double');
-    if (result.type === 'double') {
-      assertEquals(result.demonstrativeType, 'to');
-      assertEquals(result.layerType, 'project');
-      assertEquals(result.options, {});
+    if (result.success && result.data && result.data.type === 'two') {
+      assertEquals(result.data.demonstrativeType, 'to');
+      assertEquals(result.data.layerType, 'project');
+      assertEquals(result.data.options, {});
+    } else if (!result.success) {
+      throw new Error(result.error?.message ?? 'Unknown error');
+    } else {
+      throw new Error('Unexpected result type');
+    }
+  });
+
+  await t.step('should parse double param command with options', () => {
+    const result = parser.parse(['to', 'project', '--from=input.txt', '--destination=output.txt']);
+    if (result.success && result.data && result.data.type === 'two') {
+      assertEquals(result.data.demonstrativeType, 'to');
+      assertEquals(result.data.layerType, 'project');
+      assertEquals(result.data.options, {
+        fromFile: 'input.txt',
+        destinationFile: 'output.txt',
+      });
+    } else if (!result.success) {
+      throw new Error(result.error?.message ?? 'Unknown error');
+    } else {
+      throw new Error('Unexpected result type');
+    }
+  });
+
+  await t.step('should parse another double param command', () => {
+    const result = parser.parse(['summary', 'task']);
+    if (result.success && result.data && result.data.type === 'two') {
+      assertEquals(result.data.demonstrativeType, 'summary');
+      assertEquals(result.data.layerType, 'task');
+      assertEquals(result.data.options, {});
+    } else if (!result.success) {
+      throw new Error(result.error?.message ?? 'Unknown error');
+    } else {
+      throw new Error('Unexpected result type');
     }
   });
 
@@ -54,9 +84,12 @@ Deno.test('Double Parameters', async (t) => {
       _logger.debug('Testing demonstrative type', { args, demonstrativeType });
       const result = parser.parse(args);
       _logger.debug('Parse result', result);
-      assertEquals(result.type, 'double');
-      if (result.type === 'double') {
-        assertEquals(result.demonstrativeType, demonstrativeType);
+      if (result.success && result.data && result.data.type === 'two') {
+        assertEquals(result.data.demonstrativeType, demonstrativeType);
+      } else if (!result.success) {
+        throw new Error(result.error?.message ?? 'Unknown error');
+      } else {
+        throw new Error('Unexpected result type');
       }
     }
   });
@@ -72,16 +105,19 @@ Deno.test('Double Parameters', async (t) => {
       '--adaptation=strict',
     ]);
     _logger.debug('Parse result', result);
-    assertEquals(result.type, 'double');
-    if (result.type === 'double') {
-      assertEquals(result.demonstrativeType, 'to');
-      assertEquals(result.layerType, 'project');
-      assertEquals(result.options, {
+    if (result.success && result.data && result.data.type === 'two') {
+      assertEquals(result.data.demonstrativeType, 'to');
+      assertEquals(result.data.layerType, 'project');
+      assertEquals(result.data.options, {
         fromFile: 'input.txt',
         destinationFile: 'output.txt',
         fromLayerType: 'issue',
         adaptationType: 'strict',
       });
+    } else if (!result.success) {
+      throw new Error(result.error?.message ?? 'Unknown error');
+    } else {
+      throw new Error('Unexpected result type');
     }
   });
 
@@ -96,16 +132,19 @@ Deno.test('Double Parameters', async (t) => {
       '-a=strict',
     ]);
     _logger.debug('Parse result', result);
-    assertEquals(result.type, 'double');
-    if (result.type === 'double') {
-      assertEquals(result.demonstrativeType, 'to');
-      assertEquals(result.layerType, 'project');
-      assertEquals(result.options, {
+    if (result.success && result.data && result.data.type === 'two') {
+      assertEquals(result.data.demonstrativeType, 'to');
+      assertEquals(result.data.layerType, 'project');
+      assertEquals(result.data.options, {
         fromFile: 'input.txt',
         destinationFile: 'output.txt',
         fromLayerType: 'issue',
         adaptationType: 'strict',
       });
+    } else if (!result.success) {
+      throw new Error(result.error?.message ?? 'Unknown error');
+    } else {
+      throw new Error('Unexpected result type');
     }
   });
 
@@ -117,13 +156,16 @@ Deno.test('Double Parameters', async (t) => {
       '--adaptation=strict',
     ]);
     _logger.debug('Parse result', result);
-    assertEquals(result.type, 'double');
-    if (result.type === 'double') {
-      assertEquals(result.demonstrativeType, 'summary');
-      assertEquals(result.layerType, 'task');
-      assertEquals(result.options, {
+    if (result.success && result.data && result.data.type === 'two') {
+      assertEquals(result.data.demonstrativeType, 'summary');
+      assertEquals(result.data.layerType, 'task');
+      assertEquals(result.data.options, {
         adaptationType: 'strict',
       });
+    } else if (!result.success) {
+      throw new Error(result.error?.message ?? 'Unknown error');
+    } else {
+      throw new Error('Unexpected result type');
     }
   });
 
@@ -137,13 +179,16 @@ Deno.test('Double Parameters', async (t) => {
         '-a=strict',
       ]);
       _logger.debug('Parse result', result);
-      assertEquals(result.type, 'double');
-      if (result.type === 'double') {
-        assertEquals(result.demonstrativeType, 'summary');
-        assertEquals(result.layerType, 'task');
-        assertEquals(result.options, {
+      if (result.success && result.data && result.data.type === 'two') {
+        assertEquals(result.data.demonstrativeType, 'summary');
+        assertEquals(result.data.layerType, 'task');
+        assertEquals(result.data.options, {
           adaptationType: 'strict',
         });
+      } else if (!result.success) {
+        throw new Error(result.error?.message ?? 'Unknown error');
+      } else {
+        throw new Error('Unexpected result type');
       }
     },
   );

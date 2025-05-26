@@ -96,6 +96,15 @@
 | デバッグログ       | 詳細なデバッグ情報を記録するログ。問題の特定と解決を支援し、開発プロセスを効率化。           | [testing.ja.md](testing.ja.md) |
 | テスト失敗の前処理 | テストの目的ではない前処理で発生する失敗。テストの意図を明確にし、適切なテスト設計を促進。   | [testing.ja.md](testing.ja.md) |
 
+## 型
+
+| 用語 | 説明 | 参照 |
+|------|------|------|
+| ParamPatternResult | パラメータパターン結果の基本型。パラメータの組み合わせパターンに基づく結果を型安全に扱うためのインターフェース。エラー情報も含む。 | [params_type.ja.md](params_type.ja.md) |
+| ZeroParamResult | パラメータなしの結果型。help/versionコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| OneParamResult | 単一パラメータの結果型。layerコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| TwoParamResult | 二重パラメータの結果型。breakコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+
 ---
 
 [日本語版](glossary.ja.md) | [English Version](glossary.md)

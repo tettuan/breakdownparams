@@ -249,6 +249,36 @@ if (result.type === 'no-params') {
    - Maintain type consistency within each branch
    - Minimize type conversions 
 
+## Error Handling and Options Persistence
+
+### 1. Error Handling Strategy
+
+The parameter parser maintains a debug-friendly approach to error handling:
+
+```typescript
+// Example of error result with preserved options
+type ParseResult<T> = {
+  success: false;
+  error: ErrorResult;
+  data?: T;  // Contains parsed options even when validation fails
+};
+```
+
+### 2. Options Persistence
+
+- Even when validation fails (`success: false`), the parser preserves the parsed options
+- This design choice enables:
+  - Easier debugging by maintaining the state at the time of error
+  - Better user experience by allowing partial corrections
+  - Flexible error handling in the application layer
+
+### 3. Security Considerations
+
+While maintaining options during errors is beneficial for debugging, be aware that:
+- Invalid or potentially malicious data may be preserved
+- Sensitive information in options should be handled with care
+- Application layer should implement appropriate security checks
+
 ---
 
 [日本語版](params_type.ja.md) | [English Version](params_type.md) 

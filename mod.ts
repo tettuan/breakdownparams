@@ -26,13 +26,13 @@
 export { ParamsParser } from './src/params_parser.ts';
 export type {
   DemonstrativeType,
-  DoubleParamsResult,
-  LayerTypeAliasMap,
-  NoParamsResult,
+  TwoParamResult,
+  LayerType,
+  ZeroParamResult,
   OptionParams,
-  ParamsResult,
-  SingleParamResult,
-} from './src/types.ts';
+  ParamPatternResult,
+  OneParamResult,
+} from './src/core/params/definitions/types.ts';
 
 /**
  * @module breakdownparams

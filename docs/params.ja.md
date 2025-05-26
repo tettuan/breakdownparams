@@ -1,3 +1,104 @@
+# パラメータの仕様
+
+## パラメータの型定義
+
+```typescript
+type ParamPatternResult = ZeroParamResult | OneParamResult | TwoParamResult;
+
+type ZeroParamResult = {
+  type: 'help' | 'version';
+  help?: boolean;
+  version?: boolean;
+  error?: ErrorInfo;
+};
+
+type OneParamResult = {
+  type: 'layer';
+  command: string;
+  options: OptionParams;
+  error?: ErrorInfo;
+};
+
+type TwoParamResult = {
+  type: 'break';
+  demonstrativeType: string;
+  layerType: string;
+  options: OptionParams;
+  error?: ErrorInfo;
+};
+```
+
+## パラメータのパターン
+
+1. パラメータなし（ZeroParamResult）
+   - helpコマンド
+   - versionコマンド
+
+2. 単一パラメータ（OneParamResult）
+   - layerコマンド
+   - コマンド名とオプション
+
+3. 二重パラメータ（TwoParamResult）
+   - breakコマンド
+   - 指示タイプとレイヤータイプ
+   - オプション
+
+## オプションパラメータ
+
+```typescript
+type OptionParams = {
+  fromFile?: string;
+  destinationFile?: string;
+  fromLayerType?: string;
+  adaptationType?: string;
+  configFile?: string;
+  customVariables?: Record<string, string>;
+};
+```
+
+## エラー処理
+
+各パラメータ型は`error`プロパティを持ち、エラー情報を含むことができます：
+
+```typescript
+type ErrorInfo = {
+  message: string;
+  code: string;
+  category: string;
+  details?: Record<string, unknown>;
+};
+```
+
+## 使用例
+
+```typescript
+// パラメータなし
+const helpResult: ZeroParamResult = {
+  type: 'help',
+  help: true
+};
+
+// 単一パラメータ
+const layerResult: OneParamResult = {
+  type: 'layer',
+  command: 'create',
+  options: {
+    fromFile: 'input.json'
+  }
+};
+
+// 二重パラメータ
+const breakResult: TwoParamResult = {
+  type: 'break',
+  demonstrativeType: 'type1',
+  layerType: 'layer1',
+  options: {
+    fromFile: 'input.json',
+    destinationFile: 'output.json'
+  }
+};
+```
+
 # パラメータ仕様
 
 このドキュメントでは、ハイフンなしのパラメータ（位置引数）の仕様を定義します。

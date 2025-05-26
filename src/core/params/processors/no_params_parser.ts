@@ -1,39 +1,57 @@
-import { NoParamsResult } from '../definitions/types.ts';
-import { OptionParser } from '../../options/processors/option_parser.ts';
-import { ValidatorFactory } from '../../../validators/validator_factory.ts';
-import { NoParamsValidator } from '../../../validators/no_params_validator.ts';
+import { ParseResult, ZeroParamResult } from '../definitions/types.ts';
+import { BaseValidator } from '../../errors/validators/base_validator.ts';
+import { ERROR_CODES, ERROR_CATEGORIES } from '../../errors/constants.ts';
 
 /**
- * NoParamsParser
- * パラメータなしの場合の解析を担当するクラス
+ * Parser for commands with zero parameters
  */
-export class NoParamsParser {
-  private readonly validator: NoParamsValidator;
-  private readonly optionParser: OptionParser;
+export class ZeroParamsParser extends BaseValidator {
+  /**
+   * Validates arguments for a command with no parameters
+   * @param args The arguments to validate
+   * @returns The validation result
+   */
+  validate(args: string[]): ParseResult<ZeroParamResult> {
+    // help/versionフラグの判定
+    const hasHelp = args.includes('--help') || args.includes('-h');
+    const hasVersion = args.includes('--version') || args.includes('-v');
+    const onlyFlags = args.every(arg => ['--help', '--version', '-h', '-v'].includes(arg));
 
-  constructor(validatorFactory: ValidatorFactory) {
-    this.validator = validatorFactory.createNoParamsValidator();
-    this.optionParser = new OptionParser();
+    if (args.length === 0 || onlyFlags) {
+      return {
+        success: true,
+        data: {
+          type: 'zero',
+          help: hasHelp,
+          version: hasVersion
+        },
+        args
+      };
+    }
+
+    // 不正なオプションやカスタム変数はUNKNOWN_OPTIONで返す
+    return {
+      success: false,
+      error: {
+        message: 'No parameters expected (except --help or --version)',
+        code: ERROR_CODES.UNKNOWN_OPTION,
+        category: ERROR_CATEGORIES.SYNTAX
+      },
+      args,
+      data: {
+        type: 'zero',
+        help: false,
+        version: false
+      }
+    };
   }
 
-  parse(args: string[]): NoParamsResult {
-    // バリデーションを実行
-    const validationResult = this.validator.validate(args);
-    if (validationResult.error) {
-      return validationResult;
-    }
-
-    // オプション解析を実行
-    const options = this.optionParser.parse(args);
-    if ('error' in options) {
-      validationResult.error = options.error;
-      return validationResult;
-    }
-
-    if ('customVariables' in options) {
-      delete options.customVariables;
-    }
-
-    return validationResult;
+  /**
+   * Determines if this parser can handle the given arguments
+   * @param args The arguments to check
+   * @returns True if this parser can handle the arguments
+   */
+  canHandle(args: string[]): boolean {
+    return args.length === 0;
   }
 } 

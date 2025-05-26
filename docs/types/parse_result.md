@@ -1,98 +1,79 @@
-# ParseResult と ParamsResult の違い
+# ParseResult と ParamPatternResult の違い
 
 ## 概要
 
-`ParseResult`と`ParamsResult`は、パラメータ解析の結果を表す型ですが、それぞれ異なる役割を持っています。
+`ParseResult`と`ParamPatternResult`は、パラメータ解析の結果を表す型ですが、それぞれ異なる役割を持っています。
 
-## ParamsResult
+## ParamPatternResult
 
-`ParamsResult`は、パラメータ解析の基本となる型で、以下の3つの型のユニオン型として定義されています：
+`ParamPatternResult`は、パラメータ解析の基本となる型で、以下の3つの型のユニオン型として定義されています：
 
 ```typescript
-type ParamsResult =
-  | NoParamsResult
-  | SingleParamResult
-  | DoubleParamsResult;
+type ParamPatternResult =
+  | ZeroParamResult
+  | OneParamResult
+  | TwoParamResult;
 ```
 
 各型の特徴：
 
-1. `NoParamsResult`
-   - パラメータなしのコマンドまたはヘルプ/バージョンフラグ用
-   - `type: 'no-params'`
-   - `help: boolean`
-   - `version: boolean`
-   - `error?: ErrorInfo`
+1. `ZeroParamResult`
+   - パラメータなしのコマンド（help/version）用
+   - シンプルな構造で、help/versionフラグを持つ
 
-2. `SingleParamResult`
-   - 単一パラメータのコマンド用（例：'init'）
-   - `type: 'single'`
-   - `command: 'init'`
-   - `options: OptionParams`
-   - `error?: ErrorInfo`
+2. `OneParamResult`
+   - 単一パラメータのコマンド（layer）用
+   - コマンド名とオプションを持つ
 
-3. `DoubleParamsResult`
-   - 指示タイプとレイヤータイプを持つコマンド用
-   - `type: 'double'`
-   - `demonstrativeType: DemonstrativeType`
-   - `layerType: LayerType`
-   - `options: OptionParams`
-   - `error?: ErrorInfo`
+3. `TwoParamResult`
+   - 二重パラメータのコマンド（break）用
+   - 2つのパラメータとオプションを持つ
 
 ## ParseResult
 
-`ParseResult`は、`ParamsResult`を拡張した型で、ジェネリック型として定義されています：
+`ParseResult`は、`ParamPatternResult`を拡張した型で、ジェネリック型として定義されています：
 
 ```typescript
-type ParseResult<T extends ParamsResult> = T & {
-  error?: ErrorResult;
+type ParseResult<T extends ParamPatternResult> = T & {
+  error?: ErrorInfo;
 };
 ```
 
 特徴：
-- `ParamsResult`の任意の型を`T`として受け取り、その型に`error`プロパティを追加
-- エラー情報を含む可能性のある解析結果を表す
-- 型安全性を保ちながら、エラー情報を追加できる
+- `ParamPatternResult`の任意の型を`T`として受け取り、その型に`error`プロパティを追加
+- パース処理の結果を表現するために使用
 
-## 主な違い
+## 使い分け
 
-1. **型の役割**
-   - `ParamsResult`: パラメータ解析の基本となる型の集合
-   - `ParseResult`: エラー情報を含む可能性のある解析結果を表す拡張型
+- `ParamPatternResult`: 基本的な解析結果の型として使用
+- `ParseResult`: パース処理の結果を表現するために使用
 
-2. **使用箇所**
-   - `ParamsResult`: 基本的な解析結果の型として使用
-   - `ParseResult`: エラー処理を含む解析結果の型として使用
+## 関係性
 
-3. **型の柔軟性**
-   - `ParamsResult`: 具体的な解析結果の型を定義
-   - `ParseResult`: ジェネリック型を使用して、任意の`ParamsResult`型を拡張可能
+- `ParamPatternResult`: 具体的な解析結果の型を定義
+- `ParseResult`: ジェネリック型を使用して、任意の`ParamPatternResult`型を拡張可能
 
 ## 使用例
 
 ```typescript
-// ParamsResultの使用例
-const noParamsResult: NoParamsResult = {
-  type: 'no-params',
-  help: true,
-  version: false
+// ParamPatternResultの使用例
+const zeroParamResult: ZeroParamResult = {
+  type: 'help',
+  help: true
 };
 
 // ParseResultの使用例
-const parseResult: ParseResult<NoParamsResult> = {
-  type: 'no-params',
+const parseResult: ParseResult<ZeroParamResult> = {
+  type: 'help',
   help: true,
-  version: false,
   error: {
-    message: 'Invalid command',
-    code: ErrorCode.INVALID_COMMAND,
-    category: ErrorCategory.VALIDATION
+    message: 'Invalid option',
+    code: 'INVALID_OPTION'
   }
 };
 ```
 
 ## まとめ
 
-- `ParamsResult`は基本的な解析結果の型を定義
-- `ParseResult`は`ParamsResult`を拡張してエラー情報を含む型を提供
-- 両方の型を使用することで、型安全なパラメータ解析とエラー処理が可能 
+- `ParamPatternResult`は基本的な解析結果の型を定義
+- `ParseResult`は`ParamPatternResult`を拡張してエラー情報を含む型を提供 

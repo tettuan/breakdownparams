@@ -1,6 +1,8 @@
-import { BaseValidator } from './validator.ts';
-import { ErrorCategory, ErrorCode, ErrorInfo } from '../types.ts';
-import { SecurityValidator } from './security_validator.ts';
+import { BaseValidator } from "../core/errors/validators/base_validator.ts";
+import { ErrorCode, ErrorCategory } from "../core/errors/types.ts";
+import { ERROR_CODES, ERROR_CATEGORIES } from "../core/errors/constants.ts";
+import { SecurityErrorValidator } from "./security_error_validator.ts";
+import { ParseResult, ParamPatternResult } from "../core/params/definitions/types.ts";
 
 /**
  * Validator for custom variables
@@ -15,61 +17,45 @@ import { SecurityValidator } from './security_validator.ts';
  */
 export class CustomVariableValidator extends BaseValidator {
   private readonly maxValueLength: number;
-  private readonly securityValidator: SecurityValidator;
+  private readonly securityValidator: SecurityErrorValidator;
 
   constructor() {
-    super(ErrorCode.INVALID_CUSTOM_VARIABLE, ErrorCategory.VALIDATION);
-    this.maxValueLength = 1000;
-    this.securityValidator = new SecurityValidator();
+    super(ERROR_CODES.VALIDATION_ERROR, ERROR_CATEGORIES.VALIDATION);
+    this.maxValueLength = 100;
+    this.securityValidator = new SecurityErrorValidator();
   }
 
-  /**
-   * Validates a custom variable name and value
-   * 
-   * @param value - The value to validate (should be an object with name and value properties)
-   * @returns undefined if validation passes, ErrorInfo if validation fails
-   */
-  validate(value: unknown): ErrorInfo | undefined {
-    if (typeof value !== 'object' || value === null) {
-      return this.createError('Invalid custom variable format');
+  canHandle(args: string[]): boolean {
+    return args.some(arg => arg.startsWith("--uv-"));
+  }
+
+  validate(args: string[]): ParseResult<ParamPatternResult> {
+    const varName = args[0]?.split("=")[0]?.replace("--uv-", "");
+    if (!varName) {
+      return this.createErrorResult("Invalid custom variable name");
     }
 
-    const { name, value: varValue } = value as { name: string; value: string };
-
-    // Validate name
-    if (!name) {
-      return this.createError('Custom variable name is required');
+    if (!/^[a-zA-Z0-9_]+$/.test(varName)) {
+      return this.createErrorResult("Custom variable name contains invalid characters");
     }
 
-    const hasSpecialChar = /[^a-zA-Z0-9_]/.test(name);
-    if (hasSpecialChar) {
-      return this.createError(
-        `Invalid custom variable name: ${name}. Only alphanumeric characters and underscores are allowed.`,
-        { name }
-      );
+    const varValue = args[0]?.split("=")[1];
+    if (varValue && varValue.length > this.maxValueLength) {
+      return this.createErrorResult(`Custom variable value exceeds maximum length of ${this.maxValueLength}`);
     }
 
-    // Validate value
-    if (varValue === undefined) {
-      return this.createError(`Missing value for custom variable: ${name}`);
+    const securityError = this.securityValidator.validate([varValue || ""]);
+    if (!securityError.success) {
+      return this.createErrorResult("Security violation detected in custom variable value", {
+        name: varName,
+        location: `customVariableValue:${varName}`
+      });
     }
 
-    if (varValue.length > this.maxValueLength) {
-      return this.createError(
-        `Value too long for custom variable: ${name}. Maximum length is ${this.maxValueLength} characters.`,
-        { name, maxLength: this.maxValueLength }
-      );
-    }
-
-    // Check for forbidden characters using SecurityValidator
-    const securityError = this.securityValidator.validate(varValue);
-    if (securityError) {
-      return {
-        ...securityError,
-        details: { ...securityError.details, name, location: `customVariableValue:${name}` },
-      };
-    }
-
-    return undefined;
+    return this.createSuccessResult({
+      type: 'zero',
+      help: false,
+      version: false
+    });
   }
 } 

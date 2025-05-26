@@ -1,91 +1,25 @@
-# File Structure Description
+# Directory Structure
 
-## Directory Structure
+The `src` directory contains the following files and directories:
 
-```
-src/
-├── core/                    # Core features
-│   ├── params/             # Parameter processing
-│   │   ├── definitions/    # Parameter definitions
-│   │   └── processors/     # Parameter processors
-│   ├── options/            # Option processing
-│   │   ├── definitions/    # Option definitions
-│   │   └── processors/     # Option processors
-│   └── errors/             # Error definitions and handling
-├── types/                  # Type definitions
-├── validators/             # Validation logic
-└── utils/                  # Utilities
-```
+- `params_parser.ts`: Main parameter parser implementation
+- `types.ts`: Type definitions for the parameter parser
+- `mod.ts`: Module entry point and exports
+- `constants/`: Directory containing constant definitions
+- `core/`: Core functionality and base implementations
+- `utils/`: Utility functions and helper classes
+- `validators/`: Validation logic for different parameter types
 
-## Directory Roles
+## Directory Details
 
-### core/
-Modules providing core features
+### Constants
+Contains error messages, configuration values, and other constant definitions. Files should be organized by domain (e.g., `error_messages.ts`, `config_values.ts`). Constants should be exported as named exports for better tree-shaking.
 
-#### params/
-Modules related to parameter processing
-- `definitions/`: Parameter definitions (types, constants, etc.)
-- `processors/`: Parameter processing logic
+### Core
+Houses the fundamental building blocks of the application. Includes base classes, interfaces, and abstract implementations. Files should follow a clear inheritance hierarchy and maintain loose coupling.
 
-#### options/
-Modules related to option processing
-- `definitions/`: Option definitions (types, constants, etc.)
-- `processors/`: Option processing logic
+### Utils
+Contains reusable utility functions and helper classes. Each file should focus on a specific domain (e.g., `string_utils.ts`, `validation_utils.ts`). Functions should be pure and well-documented.
 
-#### errors/
-Modules related to error handling
-- Error definitions
-- Error factory
-- Error handling utilities
-
-### types/
-Type definitions used throughout the application
-- Common type definitions
-- Interface definitions
-
-### validators/
-Validation logic
-- Parameter validation
-- Option validation
-- Custom validation
-
-### utils/
-Common utilities
-- String processing
-- File operations
-- Other helper functions
-
-## File Migration Plan
-
-### Current File → New Location
-
-1. Parameter-related
-   - `src/params_parser.ts` → `src/core/params/processors/params_parser.ts`
-   - `src/parsers/*` → `src/core/params/processors/`
-   - `src/types.ts` (parameter-related) → `src/core/params/definitions/types.ts`
-
-2. Option-related
-   - `src/utils/option_parser.ts` → `src/core/options/processors/option_parser.ts`
-   - `src/utils/option_processor.ts` → `src/core/options/processors/option_processor.ts`
-   - `src/types/option_config.ts` → `src/core/options/definitions/option_config.ts`
-
-3. Error-related
-   - `src/error_factory.ts` → `src/core/errors/error_factory.ts`
-   - `src/types.ts` (error-related) → `src/core/errors/definitions/types.ts`
-
-4. Validation-related
-   - `src/validators/*` → `src/validators/`
-
-5. Common type definitions
-   - `src/types.ts` (common) → `src/types/common.ts`
-
-6. Utilities
-   - `src/utils/*` (others) → `src/utils/`
-
-## Migration Steps
-
-1. Create the new directory structure
-2. Move files
-3. Update import paths
-4. Update tests
-5. Update documentation 
+### Validators
+Implements validation logic for different parameter types. Each validator should extend a base validator class and implement specific validation rules. Files should be named according to the parameter type they validate (e.g., `single_param_validator.ts`, `double_params_validator.ts`).

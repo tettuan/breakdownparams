@@ -1,141 +1,79 @@
-# パラメータパーサーの型定義仕様
+# パラメータ型の定義
 
-## 概要
-
-パラメータパーサー（`ParamsParser`）は、コマンドライン引数を解析し、型安全な結果を返すクラスです。
-この仕様書では、パラメータパーサーの型定義と解析フローについて定義します。
-
-## 型の階層構造
-
-### 1. 基本型
+## 基本型
 
 ```typescript
-type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
+type ParamPatternResult = ZeroParamResult | OneParamResult | TwoParamResult;
 
-// エラー情報の型
-type ErrorResult = {
-  message: string;
-  code: string;
-};
-```
-
-### 2. 各型の定義
-
-#### 2.1 パラメータ数による型
-```typescript
-// 引数なし
-type NoParamsResult = {
-  type: 'no-params';
-  help: boolean;
-  version: boolean;
-  error?: ErrorResult;  // パラメータエラーまたはオプションエラー時に設定
+type ZeroParamResult = {
+  type: 'help' | 'version';
+  help?: boolean;
+  version?: boolean;
+  error?: ErrorInfo;
 };
 
-// 引数1個
-type SingleParamResult = {
-  type: 'single';
-  command: 'init';
+type OneParamResult = {
+  type: 'layer';
+  command: string;
   options: OptionParams;
-  error?: ErrorResult;  // パラメータエラーまたはオプションエラー時に設定
+  error?: ErrorInfo;
 };
 
-// 引数2個
-type DoubleParamsResult = {
-  type: 'double';
-  demonstrativeType: DemonstrativeType;
-  layerType: LayerType;
+type TwoParamResult = {
+  type: 'break';
+  demonstrativeType: string;
+  layerType: string;
   options: OptionParams;
-  error?: ErrorResult;  // パラメータエラーまたはオプションエラー時に設定
+  error?: ErrorInfo;
 };
 ```
 
-#### 2.2 オプションの型
+## 使用例
+
 ```typescript
-type OptionParams = {
-  fromFile?: string;
-  destinationFile?: string;
-  fromLayerType?: LayerType;
-  adaptationType?: string;
-  configFile?: string;
-  customVariables?: Record<string, string>;
+// ZeroParamResult を返す
+const helpResult: ZeroParamResult = {
+  type: 'help',
+  help: true
+};
+
+// OneParamResult を返す
+const layerResult: OneParamResult = {
+  type: 'layer',
+  command: 'create',
+  options: {
+    fromFile: 'input.json'
+  }
+};
+
+// TwoParamResult を返す
+const breakResult: TwoParamResult = {
+  type: 'break',
+  demonstrativeType: 'type1',
+  layerType: 'layer1',
+  options: {
+    fromFile: 'input.json',
+    destinationFile: 'output.json'
+  }
 };
 ```
 
-## 解析フロー
+## 型の特徴
 
-### 1. パラメータの解析
+1. パラメータパターンに基づく型定義
+   - `ZeroParamResult`: パラメータなし（help/version）
+   - `OneParamResult`: 単一パラメータ（layer command）
+   - `TwoParamResult`: 二重パラメータ（break command）
 
-1. **引数の数による分岐**
-   ```typescript
-   if (nonOptionArgs.length === 0) {
-     // NoParamsResult を返す
-   } else if (nonOptionArgs.length === 1) {
-     // パラメータのバリデーション
-     if (!isValidCommand(nonOptionArgs[0])) {
-       return {
-         type: 'single',
-         command: 'init',
-         options: {},
-         error: {
-           message: `Invalid command: ${nonOptionArgs[0]}`,
-           code: 'INVALID_COMMAND'
-         }
-       };
-     }
-     // SingleParamResult を返す
-   } else if (nonOptionArgs.length === 2) {
-     // パラメータのバリデーション
-     if (!isValidDemonstrativeType(nonOptionArgs[0])) {
-       return {
-         type: 'double',
-         demonstrativeType: '...',
-         layerType: '...',
-         options: {},
-         error: {
-           message: `Invalid demonstrative type: ${nonOptionArgs[0]}`,
-           code: 'INVALID_DEMONSTRATIVE_TYPE'
-         }
-       };
-     }
-     // DoubleParamsResult を返す
-   }
-   ```
+2. 型安全性の確保
+   - 各パターンに応じた必須プロパティ
+   - オプショナルなプロパティの明確な定義
+   - エラー情報の統一的な扱い
 
-2. **各分岐での処理**
-   - パラメータのバリデーション
-   - 型の決定
-   - オプション解析の準備
-
-### 2. オプションの解析
-
-1. **オプション解析の実行**
-   ```typescript
-   const options = this.parseOptions(args);
-   if ('error' in options) {
-     // エラー時は現在のパラメータ型を維持し、error プロパティを設定
-     return {
-       ...currentParamResult,
-       error: {
-         message: options.error,
-         code: 'INVALID_OPTION'
-       }
-     };
-   }
-   ```
-
-2. **オプションの種類**
-   - 標準オプション（--from, --destination など）
-   - カスタム変数オプション（--uv-*）
-
-### 3. 返却型の決定
-
-1. **正常系**
-   - パラメータの型を維持
-   - オプション情報を追加
-
-2. **エラー系**
-   - パラメータの型を維持
-   - エラー情報を error プロパティとして追加
+3. 拡張性の考慮
+   - パラメータの型（ZeroParamResult, OneParamResult, TwoParamResult）を維持
+   - 新しいパターンの追加が容易
+   - 既存の型との互換性を保持
 
 ## オプションエラー時の返却型
 
@@ -212,36 +150,6 @@ type OptionParams = {
 - パラメータの型（NoParamsResult, SingleParamResult, DoubleParamsResult）を維持
 - エラー情報は各パラメータ型の error プロパティとして保持
 - 型の変換は行わない
-
-## 使用例
-
-```typescript
-const parser = new ParamsParser();
-const result = parser.parse(args);
-
-if (result.type === 'no-params') {
-  if (result.error) {
-    // エラー処理
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // 正常処理
-  }
-} else if (result.type === 'single') {
-  if (result.error) {
-    // エラー処理
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // 正常処理
-  }
-} else if (result.type === 'double') {
-  if (result.error) {
-    // エラー処理
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // 正常処理
-  }
-}
-```
 
 ## 注意事項
 

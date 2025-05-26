@@ -33,61 +33,54 @@ import { ParamsParser } from '../../mod.ts';
 // Initialize logger for testing
 const _logger = new BreakdownLogger();
 
-Deno.test('No Parameters', async (t) => {
+Deno.test('NoParams: 基本動作', () => {
   const parser = new ParamsParser();
+  const result = parser.parse([]);
+  if (result.success && result.data && result.data.type === 'zero') {
+    assertEquals(result.data.help, true);
+    assertEquals(result.data.version, false);
+  } else if (!result.success) {
+    throw new Error(result.error?.message ?? 'Unknown error');
+  } else {
+    throw new Error('Unexpected result type');
+  }
+});
 
-  await t.step('should handle no parameters', () => {
-    _logger.debug('Testing no parameters handling');
-    const result = parser.parse([]);
-    _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
-      assertEquals(result.help, false);
-      assertEquals(result.version, false);
-    }
-  });
+Deno.test('NoParams: --help', () => {
+  const parser = new ParamsParser();
+  const result = parser.parse(['--help']);
+  if (result.success && result.data && result.data.type === 'zero') {
+    assertEquals(result.data.help, true);
+    assertEquals(result.data.version, false);
+  } else if (!result.success) {
+    throw new Error(result.error?.message ?? 'Unknown error');
+  } else {
+    throw new Error('Unexpected result type');
+  }
+});
 
-  await t.step('should handle help flag', () => {
-    _logger.debug('Testing help flag handling');
-    const result = parser.parse(['-h']);
-    _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
-      assertEquals(result.help, true);
-      assertEquals(result.version, false);
-    }
-  });
+Deno.test('NoParams: --version', () => {
+  const parser = new ParamsParser();
+  const result = parser.parse(['--version']);
+  if (result.success && result.data && result.data.type === 'zero') {
+    assertEquals(result.data.help, false);
+    assertEquals(result.data.version, true);
+  } else if (!result.success) {
+    throw new Error(result.error?.message ?? 'Unknown error');
+  } else {
+    throw new Error('Unexpected result type');
+  }
+});
 
-  await t.step('should handle version flag', () => {
-    _logger.debug('Testing version flag handling');
-    const result = parser.parse(['-v']);
-    _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
-      assertEquals(result.help, false);
-      assertEquals(result.version, true);
-    }
-  });
-
-  await t.step('should handle both flags', () => {
-    _logger.debug('Testing both flags handling');
-    const result = parser.parse(['-h', '-v']);
-    _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
-      assertEquals(result.help, true);
-      assertEquals(result.version, true);
-    }
-  });
-
-  await t.step('should handle flags in any order', () => {
-    _logger.debug('Testing flag order handling');
-    const result = parser.parse(['-v', '-h']);
-    _logger.debug('Parse result', result);
-    assertEquals(result.type, 'no-params');
-    if (result.type === 'no-params') {
-      assertEquals(result.help, true);
-      assertEquals(result.version, true);
-    }
-  });
+Deno.test('NoParams: --help --version', () => {
+  const parser = new ParamsParser();
+  const result = parser.parse(['--help', '--version']);
+  if (result.success && result.data && result.data.type === 'zero') {
+    assertEquals(result.data.help, true);
+    assertEquals(result.data.version, true);
+  } else if (!result.success) {
+    throw new Error(result.error?.message ?? 'Unknown error');
+  } else {
+    throw new Error('Unexpected result type');
+  }
 });

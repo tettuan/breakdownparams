@@ -1,3 +1,6 @@
+import { Result, ErrorInfo } from '../../errors/types.ts';
+import { ErrorInfo as OldErrorInfo, ErrorResult, ErrorCode, ErrorCategory } from '../../errors/types.ts';
+
 /**
  * Type representing the different kinds of parameter combinations that can be parsed.
  * This type is used to categorize the command line arguments into distinct patterns.
@@ -7,132 +10,62 @@
 export type ParamsType = 'no-params' | 'single' | 'double' | 'error';
 
 /**
- * Categories of errors that can occur during parameter parsing.
- * These categories help in organizing and handling different types of errors.
- *
- * @since 1.0.0
+ * Result for zero parameters case
  */
-export enum ErrorCategory {
-  VALIDATION = 'VALIDATION',
-  SECURITY = 'SECURITY',
-  CONFIGURATION = 'CONFIGURATION',
-  SYNTAX = 'SYNTAX',
-  UNEXPECTED = 'UNEXPECTED',
-}
-
-/**
- * Error codes for parameter parsing.
- * These codes provide specific identification for different error scenarios.
- *
- * @since 1.0.0
- */
-export enum ErrorCode {
-  // Validation errors
-  INVALID_DEMONSTRATIVE_TYPE = 'INVALID_DEMONSTRATIVE_TYPE',
-  INVALID_LAYER_TYPE = 'INVALID_LAYER_TYPE',
-  INVALID_COMMAND = 'INVALID_COMMAND',
-  INVALID_OPTION = 'INVALID_OPTION',
-  INVALID_CUSTOM_VARIABLE_NAME = 'INVALID_CUSTOM_VARIABLE_NAME',
-  MISSING_VALUE_FOR_OPTION = 'MISSING_VALUE_FOR_OPTION',
-  MISSING_VALUE_FOR_CUSTOM_VARIABLE = 'MISSING_VALUE_FOR_CUSTOM_VARIABLE',
-  VALUE_TOO_LONG = 'VALUE_TOO_LONG',
-  TOO_MANY_CUSTOM_VARIABLES = 'TOO_MANY_CUSTOM_VARIABLES',
-  MISSING_REQUIRED_ARGUMENT = 'MISSING_REQUIRED_ARGUMENT',
-  INVALID_CUSTOM_VARIABLE = 'INVALID_CUSTOM_VARIABLE',
-  // Security errors
-  SECURITY_ERROR = 'SECURITY_ERROR',
-  // Configuration errors
-  INVALID_CONFIG = 'INVALID_CONFIG',
-  INVALID_PATTERN = 'INVALID_PATTERN',
-  // Syntax errors
-  TOO_MANY_ARGUMENTS = 'TOO_MANY_ARGUMENTS',
-  UNKNOWN_OPTION = 'UNKNOWN_OPTION',
-  // Unexpected errors
-  UNEXPECTED_ERROR = 'UNEXPECTED_ERROR',
-  FORBIDDEN_CHARACTER = 'FORBIDDEN_CHARACTER',
-}
-
-/**
- * Interface representing detailed error information.
- * This interface provides comprehensive error details for debugging and error handling.
- *
- * @since 1.0.0
- */
-export interface ErrorInfo {
-  /** Human-readable error message */
-  message: string;
-  /** Specific error code for programmatic handling */
-  code: ErrorCode;
-  /** Category of the error for error handling strategy */
-  category: ErrorCategory;
-  /** Additional error details for debugging */
-  details?: Record<string, unknown>;
-}
-
-/**
- * Result type for when no parameters are provided.
- * This type is used when the command is run without any arguments,
- * potentially including help or version flags.
- *
- * @since 1.0.0
- */
-export interface NoParamsResult {
-  /** Type identifier for this result */
-  type: 'no-params';
-  /** Whether the help flag was specified */
+export interface ZeroParamResult {
+  type: 'zero';
   help: boolean;
-  /** Whether the version flag was specified */
   version: boolean;
-  /** Error information if any occurred */
   error?: ErrorInfo;
 }
 
 /**
- * Result type for when a single parameter is provided.
- * This type is used for commands like 'init' that take a single argument.
- *
- * @since 1.0.0
+ * Result for one parameter case
  */
-export interface SingleParamResult {
-  /** Type identifier for this result */
-  type: 'single';
-  /** The command that was specified */
-  command: 'init';
-  /** Optional parameters for the command */
-  options: OptionParams;
-  /** Error information if any occurred */
+export interface OneParamResult {
+  type: 'one';
+  command: string;
+  options: Record<string, string>;
   error?: ErrorInfo;
 }
 
 /**
- * Result type for when two parameters are provided.
- * This type is used for commands that require both a demonstrative type and a layer type.
- *
- * @since 1.0.0
+ * Result for two parameters case
  */
-export interface DoubleParamsResult {
-  /** Type identifier for this result */
-  type: 'double';
-  /** The demonstrative type indicating the action to perform */
-  demonstrativeType: DemonstrativeType;
-  /** The layer type specifying the target layer */
-  layerType: LayerType;
-  /** Optional parameters for the command */
-  options: OptionParams;
-  /** Error information if any occurred */
+export interface TwoParamResult {
+  type: 'two';
+  demonstrativeType: string;
+  layerType: string;
+  options: Record<string, string | boolean>;
   error?: ErrorInfo;
 }
 
 /**
- * Union type of all possible parameter result types.
- * This type represents all possible outcomes of parameter parsing.
- *
- * @since 1.0.0
+ * Base type for all parameter pattern results
  */
-export type ParamsResult =
-  | NoParamsResult
-  | SingleParamResult
-  | DoubleParamsResult;
+export type ParamPatternResult =
+  | ZeroParamResult
+  | OneParamResult
+  | TwoParamResult;
+
+/**
+ * Result of parsing parameters
+ */
+export type ParseResult<T extends ParamPatternResult> = Result<T> & {
+  args?: string[];
+};
+
+/**
+ * Interface for parameter pattern validators
+ */
+export interface ParamPatternValidator {
+  /**
+   * Validates the parameter pattern
+   * @param args The arguments to validate
+   * @returns The validation result
+   */
+  validate(args: string[]): ParseResult<ParamPatternResult>;
+}
 
 /**
  * Interface representing optional parameters that can be provided with commands.
@@ -153,6 +86,8 @@ export interface OptionParams {
   configFile?: string;
   /** Custom variables specified with --uv-* options */
   customVariables?: Record<string, string>;
+  /** Index signature for dynamic option keys */
+  [key: string]: string | LayerType | Record<string, string> | undefined;
 }
 
 export const DEMONSTRATIVE_TYPES = ['to', 'summary', 'defect'] as const;
@@ -160,35 +95,6 @@ export type DemonstrativeType = typeof DEMONSTRATIVE_TYPES[number];
 
 export const LAYER_TYPES = ['project', 'issue', 'task'] as const;
 export type LayerType = typeof LAYER_TYPES[number];
-
-/**
- * Type representing error information in a more concise format.
- * This type is used for error handling in the parameter parser.
- *
- * @since 1.0.0
- */
-export type ErrorResult = {
-  /** Human-readable error message */
-  message: string;
-  /** Specific error code for programmatic handling */
-  code: ErrorCode;
-  /** Category of the error for error handling strategy */
-  category: ErrorCategory;
-  /** Additional error details for debugging */
-  details?: Record<string, unknown>;
-};
-
-/**
- * Type representing the result of parameter parsing with error handling.
- * This type extends the base parameter result type with error information.
- *
- * @template T - The base parameter result type to extend
- * @since 1.0.0
- */
-export type ParseResult<T extends ParamsResult> = T & {
-  /** Error information if any occurred during parsing */
-  error?: ErrorResult;
-};
 
 /**
  * Interface representing the configuration for the ParamsParser.
@@ -217,3 +123,30 @@ export interface ParserConfig {
     errorMessage?: string;
   };
 }
+
+/**
+ * Interface for parameter validators
+ * 
+ * This interface defines the contract for all parameter validators in the system.
+ * Each validator must implement the validate method that takes arguments and returns
+ * a parse result containing either the validated parameters or an error.
+ * 
+ * @since 1.0.0
+ */
+export interface ParameterValidator {
+  /**
+   * Validates the given arguments and returns a parse result.
+   * @param args - The command line arguments to validate
+   * @returns A parse result containing either the validated parameters or an error
+   */
+  validate(args: string[]): ParseResult<ParamPatternResult>;
+
+  /**
+   * Determines if this validator can handle the given arguments.
+   * @param args - The command line arguments to check
+   * @returns True if this validator can handle the arguments, false otherwise
+   */
+  canHandle(args: string[]): boolean;
+}
+
+export type { ErrorInfo, ErrorResult, ErrorCode, ErrorCategory };

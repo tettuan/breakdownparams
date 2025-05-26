@@ -1,5 +1,6 @@
-import { BaseValidator } from './validator.ts';
-import { ErrorCategory, ErrorCode, ErrorInfo } from '../types.ts';
+import { BaseValidator } from "../core/errors/validators/base_validator.ts";
+import { ERROR_CODES, ERROR_CATEGORIES } from "../core/errors/constants.ts";
+import { ParseResult, ParamPatternResult } from "../core/params/definitions/types.ts";
 
 /**
  * Validator for required fields
@@ -13,38 +14,24 @@ export class RequiredFieldValidator extends BaseValidator {
   private readonly fieldName: string;
 
   constructor(fieldName: string) {
-    super(ErrorCode.MISSING_REQUIRED_ARGUMENT, ErrorCategory.VALIDATION);
+    super(ERROR_CODES.MISSING_REQUIRED_ARGUMENT, ERROR_CATEGORIES.VALIDATION);
     this.fieldName = fieldName;
   }
 
-  /**
-   * Validates that the given value is present and not empty
-   * 
-   * @param value - The value to validate
-   * @returns undefined if validation passes, ErrorInfo if validation fails
-   */
-  validate(value: unknown): ErrorInfo | undefined {
-    if (value === undefined || value === null) {
-      return this.createError(
-        `Required argument ${this.fieldName} is missing.`,
-        { field: this.fieldName }
-      );
+  canHandle(args: string[]): boolean {
+    return args.length > 0;
+  }
+
+  validate(args: string[]): ParseResult<ParamPatternResult> {
+    const value = args[0];
+    if (!value || value.trim() === "" || value === "{}" || value === "[]") {
+      return this.createErrorResult(`${this.fieldName} is required`);
     }
 
-    if (typeof value === 'string' && value.trim() === '') {
-      return this.createError(
-        `Required argument ${this.fieldName} is empty.`,
-        { field: this.fieldName }
-      );
-    }
-
-    if (Array.isArray(value) && value.length === 0) {
-      return this.createError(
-        `Required argument ${this.fieldName} is an empty list.`,
-        { field: this.fieldName }
-      );
-    }
-
-    return undefined;
+    return this.createSuccessResult({
+      type: 'zero',
+      help: false,
+      version: false
+    });
   }
 } 
