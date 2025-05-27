@@ -1,6 +1,6 @@
 import { ParseResult, ZeroParamResult } from '../definitions/types.ts';
 import { BaseValidator } from '../../errors/validators/base_validator.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../../errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../../errors/constants.ts';
 
 /**
  * Parser for commands with zero parameters
@@ -15,7 +15,7 @@ export class ZeroParamsParser extends BaseValidator {
     // help/versionフラグの判定
     const hasHelp = args.includes('--help') || args.includes('-h');
     const hasVersion = args.includes('--version') || args.includes('-v');
-    const onlyFlags = args.every(arg => ['--help', '--version', '-h', '-v'].includes(arg));
+    const onlyFlags = args.every((arg) => ['--help', '--version', '-h', '-v'].includes(arg));
 
     if (args.length === 0 || onlyFlags) {
       return {
@@ -23,9 +23,9 @@ export class ZeroParamsParser extends BaseValidator {
         data: {
           type: 'zero',
           help: hasHelp,
-          version: hasVersion
+          version: hasVersion,
         },
-        args
+        args,
       };
     }
 
@@ -35,14 +35,14 @@ export class ZeroParamsParser extends BaseValidator {
       error: {
         message: 'No parameters expected (except --help or --version)',
         code: ERROR_CODES.UNKNOWN_OPTION,
-        category: ERROR_CATEGORIES.SYNTAX
+        category: ERROR_CATEGORIES.SYNTAX,
       },
       args,
       data: {
         type: 'zero',
         help: false,
-        version: false
-      }
+        version: false,
+      },
     };
   }
 
@@ -54,4 +54,4 @@ export class ZeroParamsParser extends BaseValidator {
   canHandle(args: string[]): boolean {
     return args.length === 0;
   }
-} 
+}

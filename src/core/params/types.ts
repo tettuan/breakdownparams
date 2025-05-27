@@ -1,4 +1,4 @@
-import { Result, ErrorInfo } from '../errors/types.ts';
+import { ErrorInfo, Result } from '../errors/types.ts';
 
 /**
  * Result of parsing parameters
@@ -51,4 +51,4 @@ export interface ParamPatternValidator {
    * @returns The validation result
    */
   validate(args: string[]): ParseResult<ParamPatternResult>;
-} 
+}

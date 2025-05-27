@@ -1,10 +1,14 @@
-import { OneParamResult, OptionParams, ParseResult, ParamPatternResult } from '../core/params/definitions/types.ts';
-import { ErrorCategory, ErrorCode, ErrorInfo } from '../core/errors/types.ts';
+import {
+  OneParamResult,
+  ParamPatternResult,
+  ParseResult,
+} from '../core/params/definitions/types.ts';
+import { ErrorInfo } from '../core/errors/types.ts';
 import { SecurityErrorValidator } from '../core/errors/validators/security_error_validator.ts';
 import { BaseValidator } from '../core/errors/validators/base_validator.ts';
 import { ErrorFactory } from '../core/errors/error_factory.ts';
 import { ValidatorFactory } from './validator_factory.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../core/errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../core/errors/constants.ts';
 
 /**
  * OneParamValidator
@@ -40,15 +44,15 @@ export class OneParamValidator extends BaseValidator {
           category: ERROR_CATEGORIES.VALIDATION,
           details: {
             provided: command,
-            validCommands: Array.from(this.validCommands)
-          }
+            validCommands: Array.from(this.validCommands),
+          },
         },
         args,
         data: {
           type: 'one',
           command: '',
-          options: {}
-        } as OneParamResult
+          options: {},
+        } as OneParamResult,
       };
     }
 
@@ -62,14 +66,14 @@ export class OneParamValidator extends BaseValidator {
         error: {
           message: securityError.error!.message,
           code: ERROR_CODES.VALIDATION_ERROR,
-          category: ERROR_CATEGORIES.VALIDATION
+          category: ERROR_CATEGORIES.VALIDATION,
         },
         args,
         data: {
           type: 'one',
           command: '',
-          options: {}
-        } as OneParamResult
+          options: {},
+        } as OneParamResult,
       };
     }
 
@@ -78,20 +82,22 @@ export class OneParamValidator extends BaseValidator {
       return {
         success: false,
         error: {
-          message: `Invalid command: ${commandLower}. Must be one of: ${Array.from(this.validCommands).join(', ')}`,
+          message: `Invalid command: ${commandLower}. Must be one of: ${
+            Array.from(this.validCommands).join(', ')
+          }`,
           code: ERROR_CODES.VALIDATION_ERROR,
           category: ERROR_CATEGORIES.VALIDATION,
           details: {
             provided: commandLower,
-            validCommands: Array.from(this.validCommands)
-          }
+            validCommands: Array.from(this.validCommands),
+          },
         },
         args,
         data: {
           type: 'one',
           command: '',
-          options: {}
-        } as OneParamResult
+          options: {},
+        } as OneParamResult,
       };
     }
 
@@ -103,14 +109,14 @@ export class OneParamValidator extends BaseValidator {
         error: {
           ...optionsResult.error,
           code: ERROR_CODES.VALIDATION_ERROR,
-          category: ERROR_CATEGORIES.VALIDATION
+          category: ERROR_CATEGORIES.VALIDATION,
         },
         args,
         data: {
           type: 'one',
           command: '',
-          options: {}
-        } as OneParamResult
+          options: {},
+        } as OneParamResult,
       };
     }
 
@@ -120,9 +126,9 @@ export class OneParamValidator extends BaseValidator {
       data: {
         type: 'one',
         command: commandLower,
-        options: optionsResult.options
+        options: optionsResult.options,
       },
-      args
+      args,
     };
   }
 
@@ -225,6 +231,6 @@ export class OneParamValidator extends BaseValidator {
    */
   private isValidOption(key: string): boolean {
     const validOptions = ['--from', '--destination', '--uv-', 'f', 'o'];
-    return validOptions.some(option => key.startsWith(option));
+    return validOptions.some((option) => key.startsWith(option));
   }
-} 
+}

@@ -1,5 +1,5 @@
-import { Result, ErrorInfo } from '../../errors/types.ts';
-import { ErrorInfo as OldErrorInfo, ErrorResult, ErrorCode, ErrorCategory } from '../../errors/types.ts';
+import { ErrorInfo, Result } from '../../errors/types.ts';
+import { ErrorCategory, ErrorCode, ErrorResult } from '../../errors/types.ts';
 
 /**
  * Type representing the different kinds of parameter combinations that can be parsed.
@@ -126,11 +126,11 @@ export interface ParserConfig {
 
 /**
  * Interface for parameter validators
- * 
+ *
  * This interface defines the contract for all parameter validators in the system.
  * Each validator must implement the validate method that takes arguments and returns
  * a parse result containing either the validated parameters or an error.
- * 
+ *
  * @since 1.0.0
  */
 export interface ParameterValidator {
@@ -149,4 +149,4 @@ export interface ParameterValidator {
   canHandle(args: string[]): boolean;
 }
 
-export type { ErrorInfo, ErrorResult, ErrorCode, ErrorCategory };
+export type { ErrorCategory, ErrorCode, ErrorInfo, ErrorResult };

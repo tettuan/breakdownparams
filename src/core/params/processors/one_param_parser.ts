@@ -1,10 +1,9 @@
-import { ParseResult, OneParamResult, ErrorInfo } from '../definitions/types.ts';
+import { ErrorInfo, OneParamResult, ParseResult } from '../definitions/types.ts';
 import { BaseValidator } from '../../errors/validators/base_validator.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../../errors/constants.ts';
-import { ErrorFactory } from '../../errors/error_factory.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../../errors/constants.ts';
 import { SecurityErrorValidator } from '../../errors/validators/security_error_validator.ts';
-import { ErrorCode, ErrorCategory } from '../../errors/types.ts';
-import { BreakdownLogger } from "@tettuan/breakdownlogger";
+import { ErrorCategory, ErrorCode } from '../../errors/types.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 const logger = new BreakdownLogger();
 
@@ -28,13 +27,15 @@ export class OneParamParser extends BaseValidator {
    * @returns The validation result
    */
   validate(args: string[]): ParseResult<OneParamResult> {
-    const nonOptionArgs = args.filter(arg => !arg.startsWith('-'));
-    const optionArgs = args.filter(arg => arg.startsWith('-'));
+    const nonOptionArgs = args.filter((arg) => !arg.startsWith('-'));
+    const optionArgs = args.filter((arg) => arg.startsWith('-'));
     if (nonOptionArgs.length === 0) {
       return this.createErrorResult('Command parameter is required') as ParseResult<OneParamResult>;
     }
     if (nonOptionArgs.length > 1) {
-      return this.createErrorResult('Only one command parameter is allowed') as ParseResult<OneParamResult>;
+      return this.createErrorResult('Only one command parameter is allowed') as ParseResult<
+        OneParamResult
+      >;
     }
 
     // Validate command
@@ -46,22 +47,31 @@ export class OneParamParser extends BaseValidator {
     // Security check for command
     const securityErrorCmd = this.securityValidator.validate(nonOptionArgs);
     if (!securityErrorCmd.success) {
-      logger.debug("Security check for command failed:", { securityErrorCmd });
-      return this.createErrorResult(securityErrorCmd.error?.message ?? 'Security error', { code: ERROR_CODES.SECURITY_ERROR, category: ERROR_CATEGORIES.SECURITY }) as ParseResult<OneParamResult>;
+      logger.debug('Security check for command failed:', { securityErrorCmd });
+      return this.createErrorResult(securityErrorCmd.error?.message ?? 'Security error', {
+        code: ERROR_CODES.SECURITY_ERROR,
+        category: ERROR_CATEGORIES.SECURITY,
+      }) as ParseResult<OneParamResult>;
     }
 
     // Security check for options
     const securityErrorOpt = this.securityValidator.validate(optionArgs);
     if (!securityErrorOpt.success) {
-      logger.debug("Security check for options failed:", { securityErrorOpt });
-      return this.createErrorResult(securityErrorOpt.error?.message ?? 'Security error', { code: ERROR_CODES.SECURITY_ERROR, category: ERROR_CATEGORIES.SECURITY }) as ParseResult<OneParamResult>;
+      logger.debug('Security check for options failed:', { securityErrorOpt });
+      return this.createErrorResult(securityErrorOpt.error?.message ?? 'Security error', {
+        code: ERROR_CODES.SECURITY_ERROR,
+        category: ERROR_CATEGORIES.SECURITY,
+      }) as ParseResult<OneParamResult>;
     }
 
     // Parse options
     const optionsResult = this.parseOptions(optionArgs);
     if (optionsResult.error) {
-      logger.debug("Parse options failed:", { optionsResult });
-      return this.createErrorResult(optionsResult.error.message, { code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION }) as ParseResult<OneParamResult>;
+      logger.debug('Parse options failed:', { optionsResult });
+      return this.createErrorResult(optionsResult.error.message, {
+        code: ERROR_CODES.VALIDATION_ERROR,
+        category: ERROR_CATEGORIES.VALIDATION,
+      }) as ParseResult<OneParamResult>;
     }
 
     return {
@@ -69,8 +79,8 @@ export class OneParamParser extends BaseValidator {
       data: {
         type: 'one',
         command: command.trim().toLowerCase(),
-        options: optionsResult.options
-      }
+        options: optionsResult.options,
+      },
     };
   }
 
@@ -80,7 +90,7 @@ export class OneParamParser extends BaseValidator {
    * @returns True if this parser can handle the arguments
    */
   canHandle(args: string[]): boolean {
-    return args.filter(arg => !arg.startsWith('-')).length === 1;
+    return args.filter((arg) => !arg.startsWith('-')).length === 1;
   }
 
   /**
@@ -89,29 +99,43 @@ export class OneParamParser extends BaseValidator {
    * @returns The parsed options or an error
    */
   private parseOptions(args: string[]): { options: Record<string, string>; error?: ErrorInfo } {
-    logger.debug("Starting parseOptions:", { args });
+    logger.debug('Starting parseOptions:', { args });
     const options: Record<string, string> = {};
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
-      logger.debug("Processing argument:", { arg, index: i });
-      
+      logger.debug('Processing argument:', { arg, index: i });
+
       // セキュリティチェック（オプション名・値）
       const secOpt = this.securityValidator.validate([arg]);
       if (!secOpt.success) {
-        logger.debug("Security check for option failed:", { arg, secOpt });
-        return { options: {}, error: { message: secOpt.error?.message ?? 'Security error', code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+        logger.debug('Security check for option failed:', { arg, secOpt });
+        return {
+          options: {},
+          error: {
+            message: secOpt.error?.message ?? 'Security error',
+            code: ERROR_CODES.VALIDATION_ERROR,
+            category: ERROR_CATEGORIES.VALIDATION,
+          },
+        };
       }
 
       if (arg.startsWith('--')) {
         if (arg === '--help' || arg === '--version') {
-          logger.debug("Skipping help/version flag:", { arg });
+          logger.debug('Skipping help/version flag:', { arg });
           continue;
         }
 
         // スペース区切りのオプションは無効な形式
         if (arg.includes(' ') && !arg.includes('=')) {
-          logger.debug("Space-separated option detected:", { arg });
-          return { options: {}, error: { message: `Invalid option format: ${arg}`, code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+          logger.debug('Space-separated option detected:', { arg });
+          return {
+            options: {},
+            error: {
+              message: `Invalid option format: ${arg}`,
+              code: ERROR_CODES.VALIDATION_ERROR,
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
+          };
         }
 
         // --from=src, --destination=dist
@@ -119,8 +143,15 @@ export class OneParamParser extends BaseValidator {
           const value = arg.substring(7);
           const secVal = this.securityValidator.validate([value]);
           if (!secVal.success) {
-            logger.debug("Security check for from value failed:", { value, secVal });
-            return { options: {}, error: { message: secVal.error?.message ?? 'Security error', code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+            logger.debug('Security check for from value failed:', { value, secVal });
+            return {
+              options: {},
+              error: {
+                message: secVal.error?.message ?? 'Security error',
+                code: ERROR_CODES.VALIDATION_ERROR,
+                category: ERROR_CATEGORIES.VALIDATION,
+              },
+            };
           }
           options['fromFile'] = value;
           continue;
@@ -128,29 +159,61 @@ export class OneParamParser extends BaseValidator {
           const value = arg.substring(14);
           const secVal = this.securityValidator.validate([value]);
           if (!secVal.success) {
-            logger.debug("Security check for destination value failed:", { value, secVal });
-            return { options: {}, error: { message: secVal.error?.message ?? 'Security error', code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+            logger.debug('Security check for destination value failed:', { value, secVal });
+            return {
+              options: {},
+              error: {
+                message: secVal.error?.message ?? 'Security error',
+                code: ERROR_CODES.VALIDATION_ERROR,
+                category: ERROR_CATEGORIES.VALIDATION,
+              },
+            };
           }
           options['destinationFile'] = value;
           continue;
         } else if (arg.startsWith('--uv-')) {
           const eqIdx = arg.indexOf('=');
           if (eqIdx === -1) {
-            logger.debug("Invalid custom variable format (missing =):", { arg });
-            return { options: {}, error: { message: `Invalid option format: ${arg}`, code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+            logger.debug('Invalid custom variable format (missing =):', { arg });
+            return {
+              options: {},
+              error: {
+                message: `Invalid option format: ${arg}`,
+                code: ERROR_CODES.VALIDATION_ERROR,
+                category: ERROR_CATEGORIES.VALIDATION,
+              },
+            };
           }
           const key = arg.slice(2, eqIdx);
           const value = arg.slice(eqIdx + 1);
           const secVal = this.securityValidator.validate([value]);
           if (!secVal.success) {
-            logger.debug("Security check for custom variable value failed:", { key, value, secVal });
-            return { options: {}, error: { message: secVal.error?.message ?? 'Security error', code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+            logger.debug('Security check for custom variable value failed:', {
+              key,
+              value,
+              secVal,
+            });
+            return {
+              options: {},
+              error: {
+                message: secVal.error?.message ?? 'Security error',
+                code: ERROR_CODES.VALIDATION_ERROR,
+                category: ERROR_CATEGORIES.VALIDATION,
+              },
+            };
           }
           options[key] = value;
           continue;
         } else if (!this.isValidOption(arg.slice(2))) {
-          logger.debug("Unknown option:", { arg });
-          return { options: {}, error: { message: `Unknown option: ${arg}`, code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+          logger.debug('Unknown option:', { arg });
+          return {
+            options: {},
+            error: {
+              message: `Unknown option: ${arg}`,
+              code: ERROR_CODES.VALIDATION_ERROR,
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
+          };
         }
       } else if (arg.startsWith('-')) {
         if (arg === '-h' || arg === '-v') {
@@ -161,8 +224,15 @@ export class OneParamParser extends BaseValidator {
           const value = arg.substring(3);
           const secVal = this.securityValidator.validate([value]);
           if (!secVal.success) {
-            logger.debug("Security check for -f value failed:", { value, secVal });
-            return { options: {}, error: { message: secVal.error?.message ?? 'Security error', code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+            logger.debug('Security check for -f value failed:', { value, secVal });
+            return {
+              options: {},
+              error: {
+                message: secVal.error?.message ?? 'Security error',
+                code: ERROR_CODES.VALIDATION_ERROR,
+                category: ERROR_CATEGORIES.VALIDATION,
+              },
+            };
           }
           options['fromFile'] = value;
           continue;
@@ -170,14 +240,28 @@ export class OneParamParser extends BaseValidator {
           const value = arg.substring(3);
           const secVal = this.securityValidator.validate([value]);
           if (!secVal.success) {
-            logger.debug("Security check for -o value failed:", { value, secVal });
-            return { options: {}, error: { message: secVal.error?.message ?? 'Security error', code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+            logger.debug('Security check for -o value failed:', { value, secVal });
+            return {
+              options: {},
+              error: {
+                message: secVal.error?.message ?? 'Security error',
+                code: ERROR_CODES.VALIDATION_ERROR,
+                category: ERROR_CATEGORIES.VALIDATION,
+              },
+            };
           }
           options['destinationFile'] = value;
           continue;
         } else if (!this.isValidOption(arg.slice(1))) {
-          logger.debug("Unknown short option:", { arg });
-          return { options: {}, error: { message: `Unknown option: ${arg}`, code: ERROR_CODES.VALIDATION_ERROR, category: ERROR_CATEGORIES.VALIDATION } };
+          logger.debug('Unknown short option:', { arg });
+          return {
+            options: {},
+            error: {
+              message: `Unknown option: ${arg}`,
+              code: ERROR_CODES.VALIDATION_ERROR,
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
+          };
         }
       }
     }
@@ -190,8 +274,8 @@ export class OneParamParser extends BaseValidator {
    * @returns True if the option is valid, false otherwise
    */
   private isValidOption(key: string): boolean {
-    const isValid = Array.from(VALID_OPTIONS).some(option => key.startsWith(option));
-    logger.debug("Option validation:", { key, isValid, validOptions: Array.from(VALID_OPTIONS) });
+    const isValid = Array.from(VALID_OPTIONS).some((option) => key.startsWith(option));
+    logger.debug('Option validation:', { key, isValid, validOptions: Array.from(VALID_OPTIONS) });
     return isValid;
   }
-} 
+}

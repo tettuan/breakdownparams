@@ -1,5 +1,4 @@
-import { ErrorResult } from '../../errors/types.ts';
-import { ParseResult, ParamPatternResult } from '../types.ts';
+import { ParamPatternResult, ParseResult } from '../types.ts';
 
 /**
  * Interface for parameter pattern validators
@@ -59,4 +58,4 @@ export interface SecurityErrorValidator extends ParamPatternValidator {
    * @returns The validation result
    */
   validate(args: string[]): ParseResult<ParamPatternResult>;
-} 
+}

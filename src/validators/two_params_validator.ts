@@ -1,10 +1,9 @@
-import { TwoParamResult, OptionParams, ParseResult, ParamPatternResult } from '../core/params/definitions/types.ts';
-import { ErrorCategory, ErrorCode, ErrorInfo } from '../core/errors/types.ts';
+import { ParamPatternResult, ParseResult } from '../core/params/definitions/types.ts';
+import { ErrorInfo } from '../core/errors/types.ts';
 import { SecurityErrorValidator } from '../core/errors/validators/security_error_validator.ts';
 import { BaseValidator } from '../core/errors/validators/base_validator.ts';
-import { ErrorFactory } from '../core/errors/error_factory.ts';
 import { ValidatorFactory } from './validator_factory.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../core/errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../core/errors/constants.ts';
 
 /**
  * TwoParamValidator
@@ -47,14 +46,14 @@ export class TwoParamValidator extends BaseValidator {
         error: {
           message: securityError.error!.message,
           code: ERROR_CODES.SECURITY_ERROR,
-          category: ERROR_CATEGORIES.SECURITY
+          category: ERROR_CATEGORIES.SECURITY,
         },
         data: {
           type: 'two',
           demonstrativeType: demonstrativeTypeLower,
           layerType: layerType || '',
-          options: {}
-        }
+          options: {},
+        },
       };
     }
 
@@ -65,14 +64,14 @@ export class TwoParamValidator extends BaseValidator {
         error: {
           message: `Invalid demonstrative type: ${demonstrativeTypeLower}`,
           code: ERROR_CODES.VALIDATION_ERROR,
-          category: ERROR_CATEGORIES.VALIDATION
+          category: ERROR_CATEGORIES.VALIDATION,
         },
         data: {
           type: 'two',
           demonstrativeType: demonstrativeTypeLower,
           layerType: layerType || '',
-          options: {}
-        }
+          options: {},
+        },
       };
     }
 
@@ -89,14 +88,14 @@ export class TwoParamValidator extends BaseValidator {
         error: {
           message: layerTypeSecurityError.error!.message,
           code: ERROR_CODES.SECURITY_ERROR,
-          category: ERROR_CATEGORIES.SECURITY
+          category: ERROR_CATEGORIES.SECURITY,
         },
         data: {
           type: 'two',
           demonstrativeType: demonstrativeTypeLower,
           layerType,
-          options: {}
-        }
+          options: {},
+        },
       };
     }
 
@@ -107,14 +106,14 @@ export class TwoParamValidator extends BaseValidator {
         error: {
           message: `Invalid layer type: ${layerType}`,
           code: ERROR_CODES.VALIDATION_ERROR,
-          category: ERROR_CATEGORIES.VALIDATION
+          category: ERROR_CATEGORIES.VALIDATION,
         },
         data: {
           type: 'two',
           demonstrativeType: demonstrativeTypeLower,
           layerType,
-          options: {}
-        }
+          options: {},
+        },
       };
     }
 
@@ -126,14 +125,14 @@ export class TwoParamValidator extends BaseValidator {
         error: {
           message: optionsResult.error.message,
           code: optionsResult.error.code,
-          category: optionsResult.error.category
+          category: optionsResult.error.category,
         },
         data: {
           type: 'two',
           demonstrativeType: demonstrativeTypeLower,
           layerType,
-          options: {}
-        }
+          options: {},
+        },
       };
     }
 
@@ -142,7 +141,7 @@ export class TwoParamValidator extends BaseValidator {
       type: 'two',
       demonstrativeType: demonstrativeTypeLower,
       layerType,
-      options: optionsResult.options
+      options: optionsResult.options,
     });
   }
 
@@ -160,7 +159,9 @@ export class TwoParamValidator extends BaseValidator {
    * @param args - The command arguments to parse
    * @returns The parsed options or an error
    */
-  private parseOptions(args: string[]): { options: Record<string, string | boolean>; error?: ErrorInfo } {
+  private parseOptions(
+    args: string[],
+  ): { options: Record<string, string | boolean>; error?: ErrorInfo } {
     const options: Record<string, string | boolean> = {};
     let i = 0;
 
@@ -179,15 +180,15 @@ export class TwoParamValidator extends BaseValidator {
         options['version'] = true;
         i++;
       } else if (arg.startsWith('--uv-')) {
-        const [name, value] = arg.split('=');
-        if (!/^[a-zA-Z0-9_-]+$/.test(name.slice(5))) {
+        const [_name, value] = arg.split('=');
+        if (!/^[a-zA-Z0-9_-]+$/.test(_name.slice(5))) {
           return {
             options: {},
             error: {
-              message: `Invalid custom variable name: ${name}`,
+              message: `Invalid custom variable name: ${_name}`,
               code: ERROR_CODES.INVALID_CUSTOM_VARIABLE,
-              category: ERROR_CATEGORIES.VALIDATION
-            }
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
           };
         }
         if (!value) {
@@ -195,69 +196,69 @@ export class TwoParamValidator extends BaseValidator {
             return {
               options: {},
               error: {
-                message: `Missing value for custom variable: ${name}`,
+                message: `Missing value for custom variable: ${_name}`,
                 code: ERROR_CODES.MISSING_OPTION_VALUE,
-                category: ERROR_CATEGORIES.VALIDATION
-              }
+                category: ERROR_CATEGORIES.VALIDATION,
+              },
             };
           }
-          options[name] = args[++i];
+          options[_name] = args[++i];
         } else {
-          options[name] = value;
+          options[_name] = value;
           i++;
         }
       } else if (arg.startsWith('--from=') || arg.startsWith('-f=')) {
-        const [key, value] = arg.split('=');
+        const [_key, value] = arg.split('=');
         if (!value) {
           return {
             options: {},
             error: {
               message: `Missing value for option: ${arg}`,
               code: ERROR_CODES.MISSING_OPTION_VALUE,
-              category: ERROR_CATEGORIES.VALIDATION
-            }
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
           };
         }
         options['fromFile'] = value;
         i++;
       } else if (arg.startsWith('--destination=') || arg.startsWith('-o=')) {
-        const [key, value] = arg.split('=');
+        const [_key, value] = arg.split('=');
         if (!value) {
           return {
             options: {},
             error: {
               message: `Missing value for option: ${arg}`,
               code: ERROR_CODES.MISSING_OPTION_VALUE,
-              category: ERROR_CATEGORIES.VALIDATION
-            }
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
           };
         }
         options['destinationFile'] = value;
         i++;
       } else if (arg.startsWith('--input=') || arg.startsWith('-i=')) {
-        const [key, value] = arg.split('=');
+        const [_key, value] = arg.split('=');
         if (!value) {
           return {
             options: {},
             error: {
               message: `Missing value for option: ${arg}`,
               code: ERROR_CODES.MISSING_OPTION_VALUE,
-              category: ERROR_CATEGORIES.VALIDATION
-            }
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
           };
         }
         options['fromLayerType'] = value;
         i++;
       } else if (arg.startsWith('--adaptation=') || arg.startsWith('-a=')) {
-        const [key, value] = arg.split('=');
+        const [_key, value] = arg.split('=');
         if (!value) {
           return {
             options: {},
             error: {
               message: `Missing value for option: ${arg}`,
               code: ERROR_CODES.MISSING_OPTION_VALUE,
-              category: ERROR_CATEGORIES.VALIDATION
-            }
+              category: ERROR_CATEGORIES.VALIDATION,
+            },
           };
         }
         options['adaptationType'] = value;
@@ -268,8 +269,8 @@ export class TwoParamValidator extends BaseValidator {
           error: {
             message: `Invalid option format: ${arg}. Use ${arg}=value instead.`,
             code: ERROR_CODES.INVALID_OPTION,
-            category: ERROR_CATEGORIES.VALIDATION
-          }
+            category: ERROR_CATEGORIES.VALIDATION,
+          },
         };
       } else if (arg === '--destination' || arg === '-o') {
         return {
@@ -277,8 +278,8 @@ export class TwoParamValidator extends BaseValidator {
           error: {
             message: `Invalid option format: ${arg}. Use ${arg}=value instead.`,
             code: ERROR_CODES.INVALID_OPTION,
-            category: ERROR_CATEGORIES.VALIDATION
-          }
+            category: ERROR_CATEGORIES.VALIDATION,
+          },
         };
       } else if (arg === '--input' || arg === '-i') {
         return {
@@ -286,8 +287,8 @@ export class TwoParamValidator extends BaseValidator {
           error: {
             message: `Invalid option format: ${arg}. Use ${arg}=value instead.`,
             code: ERROR_CODES.INVALID_OPTION,
-            category: ERROR_CATEGORIES.VALIDATION
-          }
+            category: ERROR_CATEGORIES.VALIDATION,
+          },
         };
       } else if (arg === '--adaptation' || arg === '-a') {
         return {
@@ -295,8 +296,8 @@ export class TwoParamValidator extends BaseValidator {
           error: {
             message: `Invalid option format: ${arg}. Use ${arg}=value instead.`,
             code: ERROR_CODES.INVALID_OPTION,
-            category: ERROR_CATEGORIES.VALIDATION
-          }
+            category: ERROR_CATEGORIES.VALIDATION,
+          },
         };
       } else {
         return {
@@ -304,12 +305,12 @@ export class TwoParamValidator extends BaseValidator {
           error: {
             message: `Unknown option: ${arg}`,
             code: ERROR_CODES.UNKNOWN_OPTION,
-            category: ERROR_CATEGORIES.VALIDATION
-          }
+            category: ERROR_CATEGORIES.VALIDATION,
+          },
         };
       }
     }
 
     return { options };
   }
-} 
+}

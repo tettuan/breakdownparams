@@ -1,7 +1,9 @@
 import { ErrorResult } from '../types.ts';
 
 export class ConfigValidator {
-  validate(config: { isExtendedMode?: boolean; demonstrativeType?: { pattern?: string } }): ErrorResult | null {
+  validate(
+    config: { isExtendedMode?: boolean; demonstrativeType?: { pattern?: string } },
+  ): ErrorResult | null {
     // If not in extended mode or config is empty, no validation needed
     if (!config.isExtendedMode || Object.keys(config).length === 0) {
       return null;
@@ -11,7 +13,7 @@ export class ConfigValidator {
     if (!config.demonstrativeType?.pattern) {
       return {
         code: 'INVALID_CONFIG',
-        message: 'In extended mode, pattern is required for demonstrativeType'
+        message: 'In extended mode, pattern is required for demonstrativeType',
       };
     }
 
@@ -19,20 +21,20 @@ export class ConfigValidator {
     if (!config.demonstrativeType.pattern.trim()) {
       return {
         code: 'INVALID_CONFIG',
-        message: 'In extended mode, pattern is required for demonstrativeType'
+        message: 'In extended mode, pattern is required for demonstrativeType',
       };
     }
 
     // Validate pattern is a valid regex
     try {
       new RegExp(config.demonstrativeType.pattern);
-    } catch (e) {
+    } catch (_e) {
       return {
         code: 'INVALID_CONFIG',
-        message: 'invalid pattern in demonstrativeType configuration'
+        message: 'invalid pattern in demonstrativeType configuration',
       };
     }
 
     return null;
   }
-} 
+}

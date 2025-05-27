@@ -1,4 +1,10 @@
-import { OptionParams, ErrorInfo, ErrorCode, ErrorCategory, LayerType } from '../../params/definitions/types.ts';
+import {
+  ErrorCategory,
+  ErrorCode,
+  ErrorInfo,
+  LayerType,
+  OptionParams,
+} from '../../params/definitions/types.ts';
 import { ValidatorFactory } from '../../../validators/validator_factory.ts';
 import { FLAG_OPTIONS } from '../definitions/option_config.ts';
 import { OptionProcessor } from './option_processor.ts';
@@ -24,7 +30,7 @@ export class OptionParser {
     this.validatorFactory = ValidatorFactory.getInstance();
   }
 
-  parse(args: string[]): OptionParams | { error: ErrorInfo, options: OptionParams } {
+  parse(args: string[]): OptionParams | { error: ErrorInfo; options: OptionParams } {
     const options: OptionParams = {};
     const customVariables: Record<string, string> = {};
     const _customVariableValidator = this.validatorFactory.createCustomVariableValidator();
@@ -160,4 +166,4 @@ export class OptionParser {
     }
     return options;
   }
-} 
+}

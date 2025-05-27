@@ -1,4 +1,4 @@
-import { ErrorResult, ErrorCategory, ErrorCode, ErrorInfo } from './types.ts';
+import { ErrorResult } from './types.ts';
 
 type ErrorDetails = Record<string, unknown>;
 
@@ -16,10 +16,10 @@ export class ErrorFactory {
       message: `Invalid command: ${command}. Must be one of: init`,
       code: 'INVALID_COMMAND',
       category: 'SYNTAX',
-      details: { 
+      details: {
         provided: command,
-        validCommands: ['init']
-      }
+        validCommands: ['init'],
+      },
     };
   }
 
@@ -33,7 +33,7 @@ export class ErrorFactory {
       message: `Invalid demonstrative type: ${type}`,
       code: 'INVALID_DEMONSTRATIVE_TYPE',
       category: 'SYNTAX',
-      details: { provided: type }
+      details: { provided: type },
     };
   }
 
@@ -47,7 +47,7 @@ export class ErrorFactory {
       message: `Invalid layer type: ${type}`,
       code: 'INVALID_LAYER_TYPE',
       category: 'SYNTAX',
-      details: { provided: type }
+      details: { provided: type },
     };
   }
 
@@ -61,7 +61,7 @@ export class ErrorFactory {
       message: `Invalid option: ${option}`,
       code: 'INVALID_OPTION',
       category: 'SYNTAX',
-      details: { provided: option }
+      details: { provided: option },
     };
   }
 
@@ -75,7 +75,7 @@ export class ErrorFactory {
       message: `Invalid custom variable: ${variable}`,
       code: 'INVALID_CUSTOM_VARIABLE',
       category: 'SYNTAX',
-      details: { provided: variable }
+      details: { provided: variable },
     };
   }
 
@@ -89,7 +89,7 @@ export class ErrorFactory {
       message: `Missing required argument: ${argument}`,
       code: 'MISSING_REQUIRED_ARGUMENT',
       category: 'SYNTAX',
-      details: { argument }
+      details: { argument },
     };
   }
 
@@ -103,7 +103,7 @@ export class ErrorFactory {
       message: `Unknown option: ${option}`,
       code: 'UNKNOWN_OPTION',
       category: 'SYNTAX',
-      details: { provided: option }
+      details: { provided: option },
     };
   }
 
@@ -117,7 +117,7 @@ export class ErrorFactory {
       message: `Missing value for option: ${option}`,
       code: 'MISSING_OPTION_VALUE',
       category: 'SYNTAX',
-      details: { provided: option }
+      details: { provided: option },
     };
   }
 
@@ -132,7 +132,7 @@ export class ErrorFactory {
       message,
       code: 'CONFIGURATION_ERROR',
       category: 'CONFIGURATION',
-      details
+      details,
     };
   }
 
@@ -147,7 +147,7 @@ export class ErrorFactory {
       message,
       code: 'SECURITY_ERROR',
       category: 'SECURITY',
-      details
+      details,
     };
   }
 
@@ -162,7 +162,7 @@ export class ErrorFactory {
       message,
       code: 'VALIDATION_ERROR',
       category: 'VALIDATION',
-      details
+      details,
     };
   }
-} 
+}

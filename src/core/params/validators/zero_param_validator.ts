@@ -1,7 +1,6 @@
-import { ParseResult, ParamPatternResult, ZeroParamResult } from '../types.ts';
+import { ParseResult, ZeroParamResult } from '../types.ts';
 import { ZeroParamValidator } from './types.ts';
 import { BaseValidator } from './base_validator.ts';
-import { ErrorResult } from '../../errors/types.ts';
 import { ErrorFactory } from '../../errors/error_factory.ts';
 import { ValidatorFactory } from './validator_factory.ts';
 import { SecurityErrorValidator } from './types.ts';
@@ -26,7 +25,7 @@ export class ZeroParamValidatorImpl extends BaseValidator implements ZeroParamVa
     const result: ZeroParamResult = {
       type: 'zero',
       help: args.includes('--help') || args.includes('-h'),
-      version: args.includes('--version') || args.includes('-v')
+      version: args.includes('--version') || args.includes('-v'),
     };
 
     return this.createSuccessResult(result);
@@ -46,7 +45,7 @@ export class ZeroParamValidatorImpl extends BaseValidator implements ZeroParamVa
    * @param args The arguments to check
    * @returns True if this validator can handle the arguments
    */
-  canHandle(args: string[]): boolean {
+  canHandle(_args: string[]): boolean {
     // This validator can handle any arguments
     return true;
   }
@@ -62,7 +61,7 @@ export class ZeroParamValidatorImpl extends BaseValidator implements ZeroParamVa
       return this.createSuccessResult({
         type: 'zero',
         help: true,
-        version: false
+        version: false,
       });
     }
 
@@ -71,7 +70,7 @@ export class ZeroParamValidatorImpl extends BaseValidator implements ZeroParamVa
       return this.createSuccessResult({
         type: 'zero',
         help: false,
-        version: true
+        version: true,
       });
     }
 
@@ -84,7 +83,7 @@ export class ZeroParamValidatorImpl extends BaseValidator implements ZeroParamVa
       }
 
       // Check for unknown options
-      const unknownOptions = args.filter(arg => arg.startsWith('-'));
+      const unknownOptions = args.filter((arg) => arg.startsWith('-'));
       if (unknownOptions.length > 0) {
         return this.createErrorResult(ErrorFactory.createUnknownOption(unknownOptions[0]));
       }
@@ -96,7 +95,7 @@ export class ZeroParamValidatorImpl extends BaseValidator implements ZeroParamVa
     return this.createSuccessResult({
       type: 'zero',
       help: false,
-      version: false
+      version: false,
     });
   }
-} 
+}

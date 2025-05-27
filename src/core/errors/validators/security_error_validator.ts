@@ -1,6 +1,6 @@
-import { BaseValidator } from "./base_validator.ts";
-import { ERROR_CODES, ERROR_CATEGORIES } from "../constants.ts";
-import { ParseResult, ParamPatternResult } from "../../params/definitions/types.ts";
+import { BaseValidator } from './base_validator.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../constants.ts';
+import { ParamPatternResult, ParseResult } from '../../params/definitions/types.ts';
 
 /**
  * Validator for security-related errors
@@ -20,29 +20,29 @@ export class SecurityErrorValidator extends BaseValidator {
     for (const arg of args) {
       // Check for command injection attempts
       if (/[;&|`$]/.test(arg)) {
-        return this.createErrorResult("Security violation: Command injection attempt detected");
+        return this.createErrorResult('Security violation: Command injection attempt detected');
       }
 
       // Check for path traversal attempts
       if (/\.\.\//.test(arg)) {
-        return this.createErrorResult("Security violation: Path traversal attempt detected");
+        return this.createErrorResult('Security violation: Path traversal attempt detected');
       }
 
       // Check for SQL injection attempts
       if (/['";]/.test(arg)) {
-        return this.createErrorResult("Security violation: SQL injection attempt detected");
+        return this.createErrorResult('Security violation: SQL injection attempt detected');
       }
 
       // Check for option injection attempts
       if (arg.startsWith('-') && /[;&|`$]/.test(arg)) {
-        return this.createErrorResult("Security violation: Option injection attempt detected");
+        return this.createErrorResult('Security violation: Option injection attempt detected');
       }
     }
 
     return this.createSuccessResult({
       type: 'zero',
       help: false,
-      version: false
+      version: false,
     });
   }
 
@@ -54,4 +54,4 @@ export class SecurityErrorValidator extends BaseValidator {
   canHandle(args: string[]): boolean {
     return args.length > 0;
   }
-} 
+}

@@ -1,10 +1,15 @@
-import { ParseResult, ParamPatternResult, ZeroParamResult, OneParamResult, TwoParamResult } from '../core/params/definitions/types.ts';
+import {
+  OneParamResult,
+  ParamPatternResult,
+  ParseResult,
+  TwoParamResult,
+  ZeroParamResult,
+} from '../core/params/definitions/types.ts';
 import { ZeroParamsValidator } from './zero_params_validator.ts';
 import { OneParamValidator } from './one_param_validator.ts';
 import { TwoParamValidator } from './two_params_validator.ts';
-import { ErrorFactory } from '../core/errors/error_factory.ts';
 import { ValidatorFactory } from './validator_factory.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../core/errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../core/errors/constants.ts';
 
 /**
  * InitialBranchValidator
@@ -39,8 +44,8 @@ export class InitialBranchValidator {
         args,
         data: {
           ...zeroResult.data,
-          type: 'zero'
-        } as ZeroParamResult
+          type: 'zero',
+        } as ZeroParamResult,
       };
     } else if (nonOptions.length === 1) {
       return {
@@ -49,8 +54,8 @@ export class InitialBranchValidator {
         args,
         data: {
           ...oneResult.data,
-          type: 'one'
-        } as OneParamResult
+          type: 'one',
+        } as OneParamResult,
       };
     } else if (nonOptions.length === 2) {
       return {
@@ -59,8 +64,8 @@ export class InitialBranchValidator {
         args,
         data: {
           ...twoResult.data,
-          type: 'two'
-        } as TwoParamResult
+          type: 'two',
+        } as TwoParamResult,
       };
     } else {
       // Too many arguments
@@ -72,15 +77,15 @@ export class InitialBranchValidator {
           category: ERROR_CATEGORIES.VALIDATION,
           details: {
             provided: nonOptions.length,
-            maxAllowed: 2
-          }
+            maxAllowed: 2,
+          },
         },
         args,
         data: {
           type: 'zero',
           help: false,
-          version: false
-        } as ZeroParamResult
+          version: false,
+        } as ZeroParamResult,
       };
     }
   }
@@ -104,4 +109,4 @@ export class InitialBranchValidator {
 
     return { options, nonOptions };
   }
-} 
+}

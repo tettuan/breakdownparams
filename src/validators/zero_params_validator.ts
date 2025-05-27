@@ -1,6 +1,6 @@
-import { ZeroParamResult, ParseResult, ParamPatternResult } from '../core/params/definitions/types.ts';
+import { ParseResult, ZeroParamResult } from '../core/params/definitions/types.ts';
 import { BaseValidator } from '../core/errors/validators/base_validator.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../core/errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../core/errors/constants.ts';
 import { ErrorFactory } from '../core/errors/error_factory.ts';
 import { SecurityErrorValidator } from '../core/errors/validators/security_error_validator.ts';
 import { ValidatorFactory } from './validator_factory.ts';
@@ -22,22 +22,22 @@ export class ZeroParamsValidator extends BaseValidator {
    * @param args The arguments to validate
    * @returns The validation result
    */
-  validate(args: string[]): ParseResult<ParamPatternResult> {
-    const nonOptionArgs = args.filter(arg => !arg.startsWith('-'));
+  validate(args: string[]): ParseResult<ZeroParamResult> {
+    const nonOptionArgs = args.filter((arg) => !arg.startsWith('-'));
     if (nonOptionArgs.length > 0) {
       return {
         success: false,
         error: {
           message: 'No parameters expected',
           code: ERROR_CODES.VALIDATION_ERROR,
-          category: ERROR_CATEGORIES.VALIDATION
+          category: ERROR_CATEGORIES.VALIDATION,
         },
         args,
         data: {
           type: 'zero',
           help: false,
-          version: false
-        } as ZeroParamResult
+          version: false,
+        } as ZeroParamResult,
       };
     }
 
@@ -52,9 +52,9 @@ export class ZeroParamsValidator extends BaseValidator {
         data: {
           type: 'zero',
           help: true,
-          version: false
+          version: false,
         },
-        args
+        args,
       };
     }
 
@@ -73,14 +73,14 @@ export class ZeroParamsValidator extends BaseValidator {
             error: {
               message: securityError.error!.message,
               code: ERROR_CODES.VALIDATION_ERROR,
-              category: ERROR_CATEGORIES.VALIDATION
+              category: ERROR_CATEGORIES.VALIDATION,
             },
             args,
             data: {
               type: 'zero',
               help: false,
-              version: false
-            } as ZeroParamResult
+              version: false,
+            } as ZeroParamResult,
           };
         }
 
@@ -94,14 +94,14 @@ export class ZeroParamsValidator extends BaseValidator {
               error: {
                 message: 'Invalid custom variable name',
                 code: ERROR_CODES.VALIDATION_ERROR,
-                category: ERROR_CATEGORIES.VALIDATION
+                category: ERROR_CATEGORIES.VALIDATION,
               },
               args,
               data: {
                 type: 'zero',
                 help: false,
-                version: false
-              } as ZeroParamResult
+                version: false,
+              } as ZeroParamResult,
             };
           }
           // Empty value is allowed for custom variables
@@ -114,14 +114,14 @@ export class ZeroParamsValidator extends BaseValidator {
             error: {
               message: `Unknown option: ${key}`,
               code: ERROR_CODES.VALIDATION_ERROR,
-              category: ERROR_CATEGORIES.VALIDATION
+              category: ERROR_CATEGORIES.VALIDATION,
             },
             args,
             data: {
               type: 'zero',
               help: false,
-              version: false
-            } as ZeroParamResult
+              version: false,
+            } as ZeroParamResult,
           };
         }
 
@@ -131,14 +131,14 @@ export class ZeroParamsValidator extends BaseValidator {
             error: {
               ...ErrorFactory.createMissingOptionValue(key),
               code: ERROR_CODES.VALIDATION_ERROR,
-              category: ERROR_CATEGORIES.VALIDATION
+              category: ERROR_CATEGORIES.VALIDATION,
             },
             args,
             data: {
               type: 'zero',
               help: false,
-              version: false
-            } as ZeroParamResult
+              version: false,
+            } as ZeroParamResult,
           };
         }
       } else if (arg.startsWith('-')) {
@@ -152,14 +152,14 @@ export class ZeroParamsValidator extends BaseValidator {
             error: {
               message: `Unknown option: -${key}`,
               code: ERROR_CODES.VALIDATION_ERROR,
-              category: ERROR_CATEGORIES.VALIDATION
+              category: ERROR_CATEGORIES.VALIDATION,
             },
             args,
             data: {
               type: 'zero',
               help: false,
-              version: false
-            } as ZeroParamResult
+              version: false,
+            } as ZeroParamResult,
           };
         }
         if (i + 1 >= args.length) {
@@ -168,14 +168,14 @@ export class ZeroParamsValidator extends BaseValidator {
             error: {
               ...ErrorFactory.createMissingOptionValue(key),
               code: ERROR_CODES.VALIDATION_ERROR,
-              category: ERROR_CATEGORIES.VALIDATION
+              category: ERROR_CATEGORIES.VALIDATION,
             },
             args,
             data: {
               type: 'zero',
               help: false,
-              version: false
-            } as ZeroParamResult
+              version: false,
+            } as ZeroParamResult,
           };
         }
         i++; // Skip the value
@@ -187,9 +187,9 @@ export class ZeroParamsValidator extends BaseValidator {
       data: {
         type: 'zero',
         help,
-        version
+        version,
       },
-      args
+      args,
     };
   }
 
@@ -199,7 +199,7 @@ export class ZeroParamsValidator extends BaseValidator {
    * @returns True if this validator can handle the arguments
    */
   canHandle(args: string[]): boolean {
-    return args.filter(arg => !arg.startsWith('-')).length === 0;
+    return args.filter((arg) => !arg.startsWith('-')).length === 0;
   }
 
   /**
@@ -209,6 +209,6 @@ export class ZeroParamsValidator extends BaseValidator {
    */
   private isValidOption(key: string): boolean {
     const validOptions = ['--from', '--destination', '--uv-', 'f', 'o'];
-    return validOptions.some(option => key.startsWith(option));
+    return validOptions.some((option) => key.startsWith(option));
   }
-} 
+}

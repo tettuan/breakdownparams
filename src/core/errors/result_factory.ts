@@ -1,29 +1,29 @@
 import {
-  ErrorInfo,
-  Result,
-  ParamResult,
-  ParseResult,
-  ValidationResult,
-  BusinessRuleResult,
-  ParseError,
-  ValidationError,
   BusinessRuleError,
-  ErrorCode,
+  BusinessRuleResult,
   ErrorCategory,
-} from "./types.ts";
+  ErrorCode,
+  ErrorInfo,
+  ParamResult,
+  ParseError,
+  ParseResult,
+  Result,
+  ValidationError,
+  ValidationResult,
+} from './types.ts';
 
 /**
  * Factory class for creating result and error objects
- * 
+ *
  * This class provides methods for creating various types of results and errors
  * in a consistent way throughout the application.
- * 
+ *
  * @since 1.0.0
  */
 export class ResultFactory {
   /**
    * Creates a basic result object
-   * 
+   *
    * @param success - Whether the operation was successful
    * @param data - Optional data to include in the result
    * @param error - Optional error information
@@ -32,14 +32,14 @@ export class ResultFactory {
   static createResult<T>(
     success: boolean,
     data?: T,
-    error?: ErrorInfo
+    error?: ErrorInfo,
   ): Result<T> {
     return { success, data, error };
   }
 
   /**
    * Creates a parameter result object
-   * 
+   *
    * @param success - Whether the operation was successful
    * @param args - The arguments used in the operation
    * @param data - Optional data to include in the result
@@ -50,14 +50,14 @@ export class ResultFactory {
     success: boolean,
     args: string[],
     data?: T,
-    error?: ErrorInfo
+    error?: ErrorInfo,
   ): ParamResult<T> {
     return { success, args, data, error };
   }
 
   /**
    * Creates a parse result object
-   * 
+   *
    * @param success - Whether the parsing was successful
    * @param args - The arguments that were parsed
    * @param data - Optional parsed data
@@ -68,14 +68,14 @@ export class ResultFactory {
     success: boolean,
     args: string[],
     data?: unknown,
-    error?: ParseError
+    error?: ParseError,
   ): ParseResult {
     return { success, args, data, error };
   }
 
   /**
    * Creates a validation result object
-   * 
+   *
    * @param success - Whether the validation was successful
    * @param args - The arguments that were validated
    * @param data - Optional validation data
@@ -86,14 +86,14 @@ export class ResultFactory {
     success: boolean,
     args: string[],
     data?: unknown,
-    error?: ValidationError
+    error?: ValidationError,
   ): ValidationResult {
     return { success, args, data, error };
   }
 
   /**
    * Creates a business rule result object
-   * 
+   *
    * @param success - Whether the business rule validation was successful
    * @param args - The arguments that were validated
    * @param data - Optional validation data
@@ -104,14 +104,14 @@ export class ResultFactory {
     success: boolean,
     args: string[],
     data?: unknown,
-    error?: BusinessRuleError
+    error?: BusinessRuleError,
   ): BusinessRuleResult {
     return { success, args, data, error };
   }
 
   /**
    * Creates a basic error object
-   * 
+   *
    * @param message - The error message
    * @param code - The error code
    * @param category - The error category
@@ -122,14 +122,14 @@ export class ResultFactory {
     message: string,
     code: ErrorCode,
     category: ErrorCategory,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ): ErrorInfo {
     return { message, code, category, details };
   }
 
   /**
    * Creates a parse error object
-   * 
+   *
    * @param message - The error message
    * @param code - The error code
    * @param position - Optional position where the error occurred
@@ -140,19 +140,19 @@ export class ResultFactory {
     message: string,
     code: ErrorCode,
     position?: number,
-    expected?: unknown
+    expected?: unknown,
   ): ParseError {
     return {
       message,
       code,
       category: ErrorCategory.SYNTAX,
-      details: { position, expected }
+      details: { position, expected },
     };
   }
 
   /**
    * Creates a validation error object
-   * 
+   *
    * @param message - The error message
    * @param code - The error code
    * @param provided - The provided values that caused the error
@@ -163,19 +163,19 @@ export class ResultFactory {
     message: string,
     code: ErrorCode,
     provided: string[],
-    expected?: unknown
+    expected?: unknown,
   ): ValidationError {
     return {
       message,
       code,
       category: ErrorCategory.VALIDATION,
-      details: { provided, expected }
+      details: { provided, expected },
     };
   }
 
   /**
    * Creates a business rule error object
-   * 
+   *
    * @param message - The error message
    * @param code - The error code
    * @param rule - The rule that was violated
@@ -186,14 +186,14 @@ export class ResultFactory {
     message: string,
     code: ErrorCode,
     rule: string,
-    context?: unknown
+    context?: unknown,
   ): BusinessRuleError {
     return {
       message,
       code,
       category: ErrorCategory.BUSINESS,
       details: { context },
-      rule
+      rule,
     };
   }
-} 
+}

@@ -1,8 +1,13 @@
-import { ParseResult, TwoParamResult, DEMONSTRATIVE_TYPES, LAYER_TYPES } from '../definitions/types.ts';
+import {
+  DEMONSTRATIVE_TYPES,
+  LAYER_TYPES,
+  ParseResult,
+  TwoParamResult,
+} from '../definitions/types.ts';
 import { BaseValidator } from '../../errors/validators/base_validator.ts';
-import { ERROR_CODES, ERROR_CATEGORIES, ERROR_MESSAGES } from '../../errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES, ERROR_MESSAGES } from '../../errors/constants.ts';
 import { SecurityErrorValidator } from '../validators/security_error_validator.ts';
-import { ErrorCode, ErrorCategory, ErrorInfo } from '../../errors/types.ts';
+import { ErrorCategory, ErrorCode, ErrorInfo } from '../../errors/types.ts';
 
 const OPTION_KEY_MAP: Record<string, string> = {
   from: 'fromFile',
@@ -33,7 +38,7 @@ export class TwoParamsParser extends BaseValidator {
    * @returns The validation result
    */
   validate(args: string[]): ParseResult<TwoParamResult> {
-    const nonOptionArgs = args.filter(arg => !arg.startsWith('-'));
+    const nonOptionArgs = args.filter((arg) => !arg.startsWith('-'));
     const demonstrativeType = nonOptionArgs[0]?.trim().toLowerCase() ?? '';
     const layerType = nonOptionArgs[1]?.trim().toLowerCase() ?? '';
 
@@ -45,7 +50,7 @@ export class TwoParamsParser extends BaseValidator {
     let customVariableError: ErrorInfo | undefined = undefined;
     let unknownOptionError: ErrorInfo | undefined = undefined;
     let optionValueError: ErrorInfo | undefined = undefined;
-    let invalidOptionKey: string | undefined = undefined;
+    let _invalidOptionKey: string | undefined = undefined;
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
@@ -62,7 +67,7 @@ export class TwoParamsParser extends BaseValidator {
         if (!this.validateOptionFormat(arg)) {
           optionFormatError = this.error;
           // どのオプションでエラーか記録
-          invalidOptionKey = arg.replace(/^--/, '').split('=')[0];
+          _invalidOptionKey = arg.replace(/^--/, '').split('=')[0];
         }
         const [rawKey, value] = arg.replace(/^--/, '').split('=');
         if (!rawKey || value === undefined) continue;
@@ -70,12 +75,12 @@ export class TwoParamsParser extends BaseValidator {
         if (rawKey.startsWith('uv-')) {
           if (!this.validateCustomVariable(`--${rawKey}`)) {
             customVariableError = this.error;
-            invalidOptionKey = rawKey;
+            _invalidOptionKey = rawKey;
           }
         } else {
           if (!this.validateUnknownOption(`--${rawKey}`)) {
             unknownOptionError = this.error;
-            invalidOptionKey = rawKey;
+            _invalidOptionKey = rawKey;
           }
         }
         const key = OPTION_KEY_MAP[rawKey] || rawKey;
@@ -95,7 +100,7 @@ export class TwoParamsParser extends BaseValidator {
     for (const [key, value] of Object.entries(options)) {
       if (!this.validateOptionValue(key, value)) {
         optionValueError = this.error;
-        invalidOptionKey = key;
+        _invalidOptionKey = key;
         break;
       }
     }
@@ -109,8 +114,8 @@ export class TwoParamsParser extends BaseValidator {
           type: 'two',
           demonstrativeType,
           layerType,
-          options: { ...options, help: hasHelp, version: hasVersion }
-        }
+          options: { ...options, help: hasHelp, version: hasVersion },
+        },
       };
     }
     // レイヤータイプバリデーション
@@ -122,8 +127,8 @@ export class TwoParamsParser extends BaseValidator {
           type: 'two',
           demonstrativeType,
           layerType,
-          options: { ...options, help: hasHelp, version: hasVersion }
-        }
+          options: { ...options, help: hasHelp, version: hasVersion },
+        },
       };
     }
     // セキュリティバリデーション
@@ -135,8 +140,8 @@ export class TwoParamsParser extends BaseValidator {
           type: 'two',
           demonstrativeType,
           layerType,
-          options: { ...options, help: hasHelp, version: hasVersion }
-        }
+          options: { ...options, help: hasHelp, version: hasVersion },
+        },
       };
     }
     // オプションバリデーションエラーがあれば返す
@@ -148,8 +153,8 @@ export class TwoParamsParser extends BaseValidator {
           type: 'two',
           demonstrativeType,
           layerType,
-          options: { ...options, help: hasHelp, version: hasVersion }
-        }
+          options: { ...options, help: hasHelp, version: hasVersion },
+        },
       };
     }
     if (customVariableError) {
@@ -160,8 +165,8 @@ export class TwoParamsParser extends BaseValidator {
           type: 'two',
           demonstrativeType,
           layerType,
-          options: { ...options, help: hasHelp, version: hasVersion }
-        }
+          options: { ...options, help: hasHelp, version: hasVersion },
+        },
       };
     }
     if (unknownOptionError) {
@@ -172,8 +177,8 @@ export class TwoParamsParser extends BaseValidator {
           type: 'two',
           demonstrativeType,
           layerType,
-          options: { ...options, help: hasHelp, version: hasVersion }
-        }
+          options: { ...options, help: hasHelp, version: hasVersion },
+        },
       };
     }
     if (optionValueError) {
@@ -184,8 +189,8 @@ export class TwoParamsParser extends BaseValidator {
           type: 'two',
           demonstrativeType,
           layerType,
-          options: { ...options, help: hasHelp, version: hasVersion }
-        }
+          options: { ...options, help: hasHelp, version: hasVersion },
+        },
       };
     }
 
@@ -198,9 +203,9 @@ export class TwoParamsParser extends BaseValidator {
         options: {
           ...options,
           help: hasHelp,
-          version: hasVersion
-        }
-      }
+          version: hasVersion,
+        },
+      },
     };
   }
 
@@ -210,7 +215,7 @@ export class TwoParamsParser extends BaseValidator {
    * @returns True if this parser can handle the arguments
    */
   canHandle(args: string[]): boolean {
-    return args.filter(arg => !arg.startsWith('-')).length === 2;
+    return args.filter((arg) => !arg.startsWith('-')).length === 2;
   }
 
   private validateDemonstrativeType(type: string): boolean {
@@ -224,7 +229,7 @@ export class TwoParamsParser extends BaseValidator {
       this.error = this.createError(
         ERROR_MESSAGES.VALIDATION_ERROR.INVALID_DEMONSTRATIVE_TYPE(type),
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       );
       return false;
     }
@@ -242,7 +247,7 @@ export class TwoParamsParser extends BaseValidator {
       this.error = this.createError(
         ERROR_MESSAGES.VALIDATION_ERROR.INVALID_LAYER_TYPE(type),
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       );
       return false;
     }
@@ -254,7 +259,7 @@ export class TwoParamsParser extends BaseValidator {
       this.error = this.createError(
         ERROR_MESSAGES.VALIDATION_ERROR.INVALID_OPTION_FORMAT(option),
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       );
       return false;
     }
@@ -266,7 +271,7 @@ export class TwoParamsParser extends BaseValidator {
       this.error = this.createError(
         ERROR_MESSAGES.VALIDATION_ERROR.INVALID_CUSTOM_VARIABLE(name),
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       );
       return false;
     }
@@ -278,7 +283,7 @@ export class TwoParamsParser extends BaseValidator {
       this.error = this.createError(
         ERROR_MESSAGES.VALIDATION_ERROR.EMPTY_OPTION_VALUE(option),
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       );
       return false;
     }
@@ -291,13 +296,13 @@ export class TwoParamsParser extends BaseValidator {
       ...Object.keys(OPTION_KEY_MAP),
       ...Object.values(OPTION_KEY_MAP),
       'help',
-      'version'
+      'version',
     ];
     if (!option.startsWith('--uv-') && !allowedKeys.includes(key)) {
       this.error = this.createError(
         ERROR_MESSAGES.VALIDATION_ERROR.UNKNOWN_OPTION(option),
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       );
       return false;
     }
@@ -309,10 +314,10 @@ export class TwoParamsParser extends BaseValidator {
       this.error = this.createError(
         ERROR_MESSAGES.VALIDATION_ERROR.SECURITY_ERROR(type),
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       );
       return false;
     }
     return true;
   }
-} 
+}

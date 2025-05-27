@@ -1,6 +1,6 @@
-import { BaseValidator } from "../core/errors/validators/base_validator.ts";
-import { ERROR_CODES, ERROR_CATEGORIES } from "../core/errors/constants.ts";
-import { ParseResult, ParamPatternResult } from "../core/params/definitions/types.ts";
+import { BaseValidator } from '../core/errors/validators/base_validator.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../core/errors/constants.ts';
+import { ParamPatternResult, ParseResult } from '../core/params/definitions/types.ts';
 
 export class SecurityErrorValidator extends BaseValidator {
   constructor() {
@@ -17,29 +17,29 @@ export class SecurityErrorValidator extends BaseValidator {
       return this.createSuccessResult({
         type: 'zero',
         help: false,
-        version: false
+        version: false,
       });
     }
 
     // Check for command injection attempts
     if (/[;&|`$]/.test(value)) {
-      return this.createErrorResult("Security violation: Command injection attempt detected");
+      return this.createErrorResult('Security violation: Command injection attempt detected');
     }
 
     // Check for path traversal attempts
     if (/\.\.\//.test(value)) {
-      return this.createErrorResult("Security violation: Path traversal attempt detected");
+      return this.createErrorResult('Security violation: Path traversal attempt detected');
     }
 
     // Check for SQL injection attempts
     if (/['";]/.test(value)) {
-      return this.createErrorResult("Security violation: SQL injection attempt detected");
+      return this.createErrorResult('Security violation: SQL injection attempt detected');
     }
 
     return this.createSuccessResult({
       type: 'zero',
       help: false,
-      version: false
+      version: false,
     });
   }
-} 
+}

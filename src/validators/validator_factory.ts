@@ -1,20 +1,17 @@
-import { BaseValidator } from '../core/errors/validators/base_validator.ts';
-import { SecurityErrorValidator } from '../core/errors/validators/security_error_validator.ts';
 import { RequiredFieldValidator } from './required_field_validator.ts';
 import { CustomVariableValidator } from './custom_variable_validator.ts';
 import { ZeroParamsValidator } from './zero_params_validator.ts';
 import { OneParamValidator } from './one_param_validator.ts';
 import { TwoParamValidator } from './two_params_validator.ts';
 import { InitialBranchValidator } from './initial_branch_validator.ts';
-import { ParserConfig, ErrorInfo, ErrorCode, ErrorCategory } from '../core/params/definitions/types.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../core/errors/constants.ts';
+import { SecurityErrorValidator } from '../core/errors/validators/security_error_validator.ts';
 
 /**
  * Factory for creating validators
- * 
+ *
  * This factory is responsible for creating and managing validator instances.
  * It provides methods to create different types of validators based on the validation needs.
- * 
+ *
  * @since 1.0.0
  */
 export class ValidatorFactory {
@@ -27,7 +24,7 @@ export class ValidatorFactory {
 
   /**
    * Gets the singleton instance of the ValidatorFactory
-   * 
+   *
    * @returns The ValidatorFactory instance
    */
   public static getInstance(): ValidatorFactory {
@@ -39,7 +36,7 @@ export class ValidatorFactory {
 
   /**
    * Creates a required field validator
-   * 
+   *
    * @param fieldName - The name of the field to validate
    * @returns A RequiredFieldValidator instance
    */
@@ -53,7 +50,7 @@ export class ValidatorFactory {
 
   /**
    * Creates a custom variable validator
-   * 
+   *
    * @returns A CustomVariableValidator instance
    */
   public createCustomVariableValidator(): CustomVariableValidator {
@@ -66,7 +63,7 @@ export class ValidatorFactory {
 
   /**
    * Creates a security validator
-   * 
+   *
    * @returns A SecurityValidator instance
    */
   public createSecurityValidator(): SecurityErrorValidator {
@@ -112,7 +109,7 @@ export class ValidatorFactory {
   public getValidator<T>(type: string): T {
     // Try to get existing validator
     let validator = this.validators.get(type);
-    
+
     // If not found, create it based on type
     if (!validator) {
       switch (type) {
@@ -138,7 +135,7 @@ export class ValidatorFactory {
           throw new Error(`Validator not found: ${type}`);
       }
     }
-    
+
     return validator as T;
   }
-} 
+}

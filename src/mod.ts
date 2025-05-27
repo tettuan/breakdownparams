@@ -33,14 +33,14 @@ export { ParamsParser } from './params_parser.ts';
 
 export type {
   DemonstrativeType,
-  TwoParamResult,
   ErrorCategory,
   ErrorCode,
   ErrorInfo,
   LayerType,
-  ZeroParamResult,
+  OneParamResult,
   OptionParams,
   ParamPatternResult,
   ParserConfig,
-  OneParamResult,
+  TwoParamResult,
+  ZeroParamResult,
 } from './core/params/definitions/types.ts';

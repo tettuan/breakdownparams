@@ -1,5 +1,3 @@
-import { ErrorFactory } from '../error_factory.ts';
-
 /**
  * Validates input for syntax-related issues
  * Checks for proper formatting and structure
@@ -50,4 +48,4 @@ export class SyntaxErrorValidator {
 
     return false;
   }
-} 
+}

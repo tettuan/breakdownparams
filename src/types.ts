@@ -44,4 +44,4 @@ export type ParserConfig = {
   demonstrativeType?: {
     pattern?: string;
   };
-}; 
+};

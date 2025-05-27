@@ -1,4 +1,4 @@
-import { ParseResult, ParamPatternResult } from '../types.ts';
+import { ParamPatternResult, ParseResult } from '../types.ts';
 import { ErrorInfo } from '../../errors/types.ts';
 
 /**
@@ -20,7 +20,7 @@ export abstract class BaseValidator {
   protected createSuccessResult<T extends ParamPatternResult>(data: T): ParseResult<T> {
     return {
       success: true,
-      data
+      data,
     };
   }
 
@@ -32,7 +32,7 @@ export abstract class BaseValidator {
   protected createErrorResult<T extends ParamPatternResult>(error: ErrorInfo): ParseResult<T> {
     return {
       success: false,
-      error
+      error,
     };
   }
 
@@ -57,4 +57,4 @@ export abstract class BaseValidator {
     }
     return options;
   }
-} 
+}

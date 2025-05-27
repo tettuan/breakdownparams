@@ -1,6 +1,6 @@
 import { ParseResult, ZeroParamResult } from '../definitions/types.ts';
 import { BaseValidator } from '../../errors/validators/base_validator.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../../errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../../errors/constants.ts';
 
 /**
  * Parser for commands with zero parameters
@@ -15,7 +15,7 @@ export class ZeroParamsParser extends BaseValidator {
     // help/versionフラグの判定
     const hasHelp = args.includes('--help') || args.includes('-h');
     const hasVersion = args.includes('--version') || args.includes('-v');
-    const onlyFlags = args.every(arg => ['--help', '--version', '-h', '-v'].includes(arg));
+    const onlyFlags = args.every((arg) => ['--help', '--version', '-h', '-v'].includes(arg));
 
     if (args.length === 0 || onlyFlags) {
       return {
@@ -23,8 +23,8 @@ export class ZeroParamsParser extends BaseValidator {
         data: {
           type: 'zero',
           help: args.length === 0 ? true : hasHelp,
-          version: hasVersion
-        }
+          version: hasVersion,
+        },
       };
     }
 
@@ -38,13 +38,13 @@ export class ZeroParamsParser extends BaseValidator {
             error: this.createError(
               `Invalid custom variable name: ${arg}`,
               ERROR_CODES.VALIDATION_ERROR,
-              ERROR_CATEGORIES.VALIDATION
+              ERROR_CATEGORIES.VALIDATION,
             ),
             data: {
               type: 'zero',
               help: false,
-              version: false
-            }
+              version: false,
+            },
           };
         }
         // 値が空や不正な場合
@@ -54,13 +54,13 @@ export class ZeroParamsParser extends BaseValidator {
             error: this.createError(
               `Invalid custom variable format: ${arg}`,
               ERROR_CODES.VALIDATION_ERROR,
-              ERROR_CATEGORIES.VALIDATION
+              ERROR_CATEGORIES.VALIDATION,
             ),
             data: {
               type: 'zero',
               help: false,
-              version: false
-            }
+              version: false,
+            },
           };
         }
       } else if (arg.startsWith('--') && !['--help', '--version'].includes(arg)) {
@@ -70,13 +70,13 @@ export class ZeroParamsParser extends BaseValidator {
           error: this.createError(
             `Unknown option: ${arg}`,
             ERROR_CODES.VALIDATION_ERROR,
-            ERROR_CATEGORIES.VALIDATION
+            ERROR_CATEGORIES.VALIDATION,
           ),
           data: {
             type: 'zero',
             help: false,
-            version: false
-          }
+            version: false,
+          },
         };
       }
     }
@@ -87,13 +87,13 @@ export class ZeroParamsParser extends BaseValidator {
       error: this.createError(
         'No parameters expected (except --help or --version)',
         ERROR_CODES.VALIDATION_ERROR,
-        ERROR_CATEGORIES.VALIDATION
+        ERROR_CATEGORIES.VALIDATION,
       ),
       data: {
         type: 'zero',
         help: false,
-        version: false
-      }
+        version: false,
+      },
     };
   }
 
@@ -105,4 +105,4 @@ export class ZeroParamsParser extends BaseValidator {
   canHandle(args: string[]): boolean {
     return args.length === 0;
   }
-} 
+}

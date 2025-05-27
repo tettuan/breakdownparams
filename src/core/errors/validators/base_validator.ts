@@ -1,5 +1,12 @@
-import { ParamPatternValidator, ParseResult, ParamPatternResult, ErrorResult, ErrorInfo, ErrorCode, ErrorCategory } from '../../params/definitions/types.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../constants.ts';
+import {
+  ErrorCategory,
+  ErrorCode,
+  ErrorInfo,
+  ParamPatternResult,
+  ParamPatternValidator,
+  ParseResult,
+} from '../../params/definitions/types.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../constants.ts';
 
 /**
  * Base class for parameter pattern validators
@@ -35,7 +42,7 @@ export abstract class BaseValidator implements ParamPatternValidator {
   protected createSuccessResult(data: ParamPatternResult): ParseResult<ParamPatternResult> {
     return {
       success: true,
-      data
+      data,
     };
   }
 
@@ -45,15 +52,18 @@ export abstract class BaseValidator implements ParamPatternValidator {
    * @param details Optional error details
    * @returns The error result
    */
-  protected createErrorResult(message: string, details?: Record<string, unknown>): ParseResult<ParamPatternResult> {
+  protected createErrorResult(
+    message: string,
+    details?: Record<string, unknown>,
+  ): ParseResult<ParamPatternResult> {
     return {
       success: false,
       error: {
         message,
         code: this.errorCode,
         category: this.errorCategory,
-        details
-      }
+        details,
+      },
     };
   }
 
@@ -65,12 +75,17 @@ export abstract class BaseValidator implements ParamPatternValidator {
    * @param details - Optional error details
    * @returns An error info object
    */
-  protected createError(message: string, code: ErrorCode = ERROR_CODES.INVALID_OPTION, category: ErrorCategory = ERROR_CATEGORIES.VALIDATION, details?: Record<string, unknown>): ErrorInfo {
+  protected createError(
+    message: string,
+    code: ErrorCode = ERROR_CODES.INVALID_OPTION,
+    category: ErrorCategory = ERROR_CATEGORIES.VALIDATION,
+    details?: Record<string, unknown>,
+  ): ErrorInfo {
     return {
       message,
       code,
       category,
-      details
+      details,
     };
   }
-} 
+}

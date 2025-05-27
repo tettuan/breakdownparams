@@ -1,8 +1,8 @@
-import { ParseResult, ParamPatternResult } from '../definitions/types.ts';
+import { ParamPatternResult, ParseResult } from '../definitions/types.ts';
 import { ZeroParamsParser } from './zero_params_parser.ts';
 import { OneParamParser } from './one_param_parser.ts';
 import { TwoParamsParser } from './two_params_parser.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../../errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../../errors/constants.ts';
 import { SecurityErrorValidator } from '../../errors/validators/security_error_validator.ts';
 
 /**
@@ -16,9 +16,18 @@ export class ParamsParser {
   private readonly validCommands: Set<string>;
 
   constructor() {
-    this.zeroParamsParser = new ZeroParamsParser(ERROR_CODES.VALIDATION_ERROR, ERROR_CATEGORIES.VALIDATION);
-    this.oneParamParser = new OneParamParser(ERROR_CODES.VALIDATION_ERROR, ERROR_CATEGORIES.VALIDATION);
-    this.twoParamsParser = new TwoParamsParser(ERROR_CODES.VALIDATION_ERROR, ERROR_CATEGORIES.VALIDATION);
+    this.zeroParamsParser = new ZeroParamsParser(
+      ERROR_CODES.VALIDATION_ERROR,
+      ERROR_CATEGORIES.VALIDATION,
+    );
+    this.oneParamParser = new OneParamParser(
+      ERROR_CODES.VALIDATION_ERROR,
+      ERROR_CATEGORIES.VALIDATION,
+    );
+    this.twoParamsParser = new TwoParamsParser(
+      ERROR_CODES.VALIDATION_ERROR,
+      ERROR_CATEGORIES.VALIDATION,
+    );
     this.securityValidator = new SecurityErrorValidator();
     this.validCommands = new Set(['init', 'to', 'from', 'help', 'version']);
   }
@@ -44,9 +53,9 @@ export class ParamsParser {
         error: {
           message: `Invalid command: ${nonOptionArgs[0]}`,
           code: ERROR_CODES.VALIDATION_ERROR,
-          category: ERROR_CATEGORIES.VALIDATION
+          category: ERROR_CATEGORIES.VALIDATION,
         },
-        args
+        args,
       };
     }
 
@@ -68,9 +77,9 @@ export class ParamsParser {
         error: {
           message: 'Too many arguments. Maximum 2 arguments are allowed.',
           code: ERROR_CODES.VALIDATION_ERROR,
-          category: ERROR_CATEGORIES.VALIDATION
+          category: ERROR_CATEGORIES.VALIDATION,
         },
-        args
+        args,
       };
     }
 
@@ -79,9 +88,9 @@ export class ParamsParser {
       error: {
         message: 'Invalid number of parameters',
         code: ERROR_CODES.VALIDATION_ERROR,
-        category: ERROR_CATEGORIES.VALIDATION
+        category: ERROR_CATEGORIES.VALIDATION,
       },
-      args
+      args,
     };
   }
 
@@ -91,6 +100,6 @@ export class ParamsParser {
    * @returns The non-option arguments
    */
   private parseNonOptionArgs(args: string[]): string[] {
-    return args.filter(arg => !arg.startsWith('-'));
+    return args.filter((arg) => !arg.startsWith('-'));
   }
 }

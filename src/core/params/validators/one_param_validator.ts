@@ -1,4 +1,4 @@
-import { ParseResult, ParamPatternResult, OneParamResult } from '../types.ts';
+import { OneParamResult, ParamPatternResult, ParseResult } from '../types.ts';
 import { OneParamValidator } from './types.ts';
 import { BaseValidator } from './base_validator.ts';
 import { ErrorInfo } from '../../errors/types.ts';
@@ -39,7 +39,7 @@ export class OneParamValidatorImpl extends BaseValidator implements OneParamVali
     const result: OneParamResult = {
       type: 'one',
       command,
-      options
+      options,
     };
 
     return this.createSuccessResult(result);
@@ -61,7 +61,7 @@ export class OneParamValidatorImpl extends BaseValidator implements OneParamVali
    */
   canHandle(args: string[]): boolean {
     // This validator can handle single non-option arguments
-    const nonOptionArgs = args.filter(arg => !arg.startsWith('-'));
+    const nonOptionArgs = args.filter((arg) => !arg.startsWith('-'));
     return nonOptionArgs.length === 1;
   }
 
@@ -93,4 +93,4 @@ export class OneParamValidatorImpl extends BaseValidator implements OneParamVali
 
     return options;
   }
-} 
+}

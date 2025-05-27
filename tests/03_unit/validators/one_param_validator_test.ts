@@ -49,4 +49,4 @@ Deno.test('OneParamValidator', async (t) => {
     assertEquals(result.success, false);
     assertEquals(result.error?.code, ERROR_CODES.VALIDATION_ERROR);
   });
-}); 
+});

@@ -1,6 +1,5 @@
-import { ParseResult, ParamPatternResult } from './core/params/types.ts';
+import { ParamPatternResult, ParseResult } from './core/params/types.ts';
 import { ValidatorFactory } from './validators/validator_factory.ts';
-import { ErrorCode, ErrorCategory } from './core/errors/types.ts';
 import { InitialBranchValidator } from './validators/initial_branch_validator.ts';
 
 /**
@@ -23,4 +22,4 @@ export class ParamsParser {
   parse(args: string[]): ParseResult<ParamPatternResult> {
     return this.initialBranchValidator.validate(args);
   }
-} 
+}

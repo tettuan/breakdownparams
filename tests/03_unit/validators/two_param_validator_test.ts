@@ -1,6 +1,6 @@
-import { assertEquals, assertExists } from "https://deno.land/std@0.220.1/assert/mod.ts";
+import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { TwoParamValidator } from '../../../src/validators/two_params_validator.ts';
-import { ERROR_CODES, ERROR_CATEGORIES } from '../../../src/core/errors/constants.ts';
+import { ERROR_CATEGORIES, ERROR_CODES } from '../../../src/core/errors/constants.ts';
 import { TwoParamResult } from '../../../src/core/params/definitions/types.ts';
 
 Deno.test('TwoParamValidator', async (t) => {
@@ -26,7 +26,12 @@ Deno.test('TwoParamValidator', async (t) => {
   });
 
   await t.step('should handle two parameters with multiple options', () => {
-    const result = validator.validate(['to', 'project', '--from=test.json', '--destination=output.json']);
+    const result = validator.validate([
+      'to',
+      'project',
+      '--from=test.json',
+      '--destination=output.json',
+    ]);
     assertExists(result);
     assertEquals(result.success, true);
     assertEquals((result.data as TwoParamResult).type, 'two');
@@ -62,4 +67,4 @@ Deno.test('TwoParamValidator', async (t) => {
     assertEquals(result.error?.code, ERROR_CODES.VALIDATION_ERROR);
     assertEquals(result.error?.category, ERROR_CATEGORIES.VALIDATION);
   });
-}); 
+});

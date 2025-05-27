@@ -1,8 +1,7 @@
-import { ParseResult, ParamPatternResult, TwoParamResult } from '../types.ts';
+import { ParamPatternResult, ParseResult, TwoParamResult } from '../types.ts';
 import { TwoParamValidator } from './types.ts';
 import { BaseValidator } from './base_validator.ts';
 import { ErrorInfo } from '../../errors/types.ts';
-import { ErrorFactory } from '../../errors/error_factory.ts';
 import { ValidatorFactory } from './validator_factory.ts';
 import { SecurityErrorValidator } from './types.ts';
 
@@ -23,7 +22,7 @@ export class TwoParamValidatorImpl extends BaseValidator implements TwoParamVali
     this.layerTypeAliases = new Map([
       ['p', 'project'],
       ['i', 'issue'],
-      ['t', 'task']
+      ['t', 'task'],
     ]);
     this.validCommands = new Set(['to', 'summary', 'defect']);
     this.securityValidator = ValidatorFactory.getInstance().createSecurityErrorValidator();
@@ -47,7 +46,7 @@ export class TwoParamValidatorImpl extends BaseValidator implements TwoParamVali
       type: 'two',
       demonstrativeType,
       layerType,
-      options
+      options,
     };
 
     return this.createSuccessResult(result);
@@ -69,7 +68,7 @@ export class TwoParamValidatorImpl extends BaseValidator implements TwoParamVali
    */
   canHandle(args: string[]): boolean {
     // This validator can handle double non-option arguments
-    const nonOptionArgs = args.filter(arg => !arg.startsWith('-'));
+    const nonOptionArgs = args.filter((arg) => !arg.startsWith('-'));
     return nonOptionArgs.length === 2;
   }
 
@@ -95,7 +94,7 @@ export class TwoParamValidatorImpl extends BaseValidator implements TwoParamVali
         'f': 'from',
         'o': 'destination',
         'i': 'input',
-        'a': 'adaptation'
+        'a': 'adaptation',
       };
 
       const longKey = optionMap[key] || key;
@@ -105,7 +104,7 @@ export class TwoParamValidatorImpl extends BaseValidator implements TwoParamVali
         'from': 'fromFile',
         'destination': 'destinationFile',
         'input': 'fromLayerType',
-        'adaptation': 'adaptationType'
+        'adaptation': 'adaptationType',
       };
 
       const propertyKey = propertyMap[longKey] || longKey;
@@ -114,4 +113,4 @@ export class TwoParamValidatorImpl extends BaseValidator implements TwoParamVali
 
     return options;
   }
-} 
+}

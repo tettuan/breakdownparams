@@ -26,12 +26,12 @@
 export { ParamsParser } from './src/params_parser.ts';
 export type {
   DemonstrativeType,
-  TwoParamResult,
   LayerType,
-  ZeroParamResult,
+  OneParamResult,
   OptionParams,
   ParamPatternResult,
-  OneParamResult,
+  TwoParamResult,
+  ZeroParamResult,
 } from './src/core/params/definitions/types.ts';
 
 /**

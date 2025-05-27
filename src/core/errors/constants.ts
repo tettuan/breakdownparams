@@ -1,4 +1,4 @@
-import { ErrorCode, ErrorCategory } from './types.ts';
+import { ErrorCategory, ErrorCode } from './types.ts';
 
 export const ERROR_CODES: Record<ErrorCode, ErrorCode> = {
   INVALID_COMMAND: 'INVALID_COMMAND',
@@ -17,7 +17,7 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCode> = {
   TYPE_MISMATCH: 'TYPE_MISMATCH',
   VALUE_OUT_OF_RANGE: 'VALUE_OUT_OF_RANGE',
   SECURITY_VIOLATION: 'SECURITY_VIOLATION',
-  BUSINESS_RULE_VIOLATION: 'BUSINESS_RULE_VIOLATION'
+  BUSINESS_RULE_VIOLATION: 'BUSINESS_RULE_VIOLATION',
 };
 
 export const ERROR_CATEGORIES: Record<ErrorCategory, ErrorCategory> = {
@@ -25,24 +25,24 @@ export const ERROR_CATEGORIES: Record<ErrorCategory, ErrorCategory> = {
   VALIDATION: 'VALIDATION',
   SECURITY: 'SECURITY',
   CONFIGURATION: 'CONFIGURATION',
-  BUSINESS: 'BUSINESS'
+  BUSINESS: 'BUSINESS',
 };
 
 export const ERROR_MESSAGES = {
   VALIDATION_ERROR: {
-    INVALID_DEMONSTRATIVE_TYPE: (type: string) => 
+    INVALID_DEMONSTRATIVE_TYPE: (type: string) =>
       `Invalid demonstrative type: "${type}". Valid types are: to, summary, custom`,
-    INVALID_LAYER_TYPE: (type: string) => 
+    INVALID_LAYER_TYPE: (type: string) =>
       `Invalid layer type: "${type}". Valid types are: project, task, custom`,
-    INVALID_OPTION_FORMAT: (option: string) => 
+    INVALID_OPTION_FORMAT: (option: string) =>
       `Invalid option format: "${option}". Options must be in the format --key=value`,
-    INVALID_CUSTOM_VARIABLE: (name: string) => 
+    INVALID_CUSTOM_VARIABLE: (name: string) =>
       `Invalid custom variable name: "${name}". Custom variables must start with --uv- and contain only alphanumeric characters and underscores`,
-    EMPTY_OPTION_VALUE: (option: string) => 
+    EMPTY_OPTION_VALUE: (option: string) =>
       `Empty value for option: "${option}". Option values cannot be empty`,
-    UNKNOWN_OPTION: (option: string) => 
+    UNKNOWN_OPTION: (option: string) =>
       `Unknown option: "${option}". Valid options are: --from, --destination, --input, --adaptation, --config, and custom variables (--uv-*)`,
-    SECURITY_ERROR: (details: string) => 
-      `Security validation failed: ${details}. The command contains potentially unsafe characters or patterns`
-  }
-}; 
+    SECURITY_ERROR: (details: string) =>
+      `Security validation failed: ${details}. The command contains potentially unsafe characters or patterns`,
+  },
+};

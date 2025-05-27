@@ -17,24 +17,24 @@ export const ERROR_MESSAGES = {
     TOO_MANY_CUSTOM_VARIABLES: 'Too many custom variables',
     MISSING_REQUIRED_ARGUMENT: 'Missing required argument: {field}',
     INVALID_CUSTOM_VARIABLE: 'Invalid custom variable: {name}',
-    TOO_MANY_ARGUMENTS: 'Too many arguments. Maximum 2 arguments are allowed.'
+    TOO_MANY_ARGUMENTS: 'Too many arguments. Maximum 2 arguments are allowed.',
   },
   SECURITY_ERROR: {
-    FORBIDDEN_CHARACTER: 'Security error: character \'{char}\' is not allowed in pattern',
-    INVALID_PATTERN: 'Security error: invalid pattern'
+    FORBIDDEN_CHARACTER: "Security error: character '{char}' is not allowed in pattern",
+    INVALID_PATTERN: 'Security error: invalid pattern',
   },
   CONFIGURATION_ERROR: {
     INVALID_CONFIG: 'Invalid configuration: {message}',
     INVALID_PATTERN: 'Invalid pattern: {pattern}',
-    MISSING_PATTERN: 'Pattern is required in extended mode'
+    MISSING_PATTERN: 'Pattern is required in extended mode',
   },
   SYNTAX_ERROR: {
     TOO_MANY_ARGUMENTS: 'Too many arguments',
-    UNKNOWN_OPTION: 'Unknown option: {option}'
+    UNKNOWN_OPTION: 'Unknown option: {option}',
   },
   UNEXPECTED_ERROR: {
-    UNEXPECTED: 'Unexpected error: {message}'
-  }
+    UNEXPECTED: 'Unexpected error: {message}',
+  },
 } as const;
 
 /**
@@ -56,22 +56,22 @@ export const ERROR_MESSAGES_JA = {
     TOO_MANY_CUSTOM_VARIABLES: 'カスタム変数が多すぎます',
     MISSING_REQUIRED_ARGUMENT: '必須の引数が指定されていません: {field}',
     INVALID_CUSTOM_VARIABLE: '無効なカスタム変数です: {name}',
-    TOO_MANY_ARGUMENTS: '引数が多すぎます。最大2つの引数が許可されています。'
+    TOO_MANY_ARGUMENTS: '引数が多すぎます。最大2つの引数が許可されています。',
   },
   SECURITY_ERROR: {
-    FORBIDDEN_CHARACTER: 'セキュリティエラー: 文字 \'{char}\' はパターンで使用できません',
-    INVALID_PATTERN: 'セキュリティエラー: 無効なパターンです'
+    FORBIDDEN_CHARACTER: "セキュリティエラー: 文字 '{char}' はパターンで使用できません",
+    INVALID_PATTERN: 'セキュリティエラー: 無効なパターンです',
   },
   CONFIGURATION_ERROR: {
     INVALID_CONFIG: '無効な設定です: {message}',
     INVALID_PATTERN: '無効なパターンです: {pattern}',
-    MISSING_PATTERN: '拡張モードではパターンが必要です'
+    MISSING_PATTERN: '拡張モードではパターンが必要です',
   },
   SYNTAX_ERROR: {
     TOO_MANY_ARGUMENTS: '引数が多すぎます',
-    UNKNOWN_OPTION: '不明なオプションです: {option}'
+    UNKNOWN_OPTION: '不明なオプションです: {option}',
   },
   UNEXPECTED_ERROR: {
-    UNEXPECTED: '予期しないエラーが発生しました: {message}'
-  }
-} as const; 
+    UNEXPECTED: '予期しないエラーが発生しました: {message}',
+  },
+} as const;

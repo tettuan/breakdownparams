@@ -1,9 +1,9 @@
 /**
  * Type representing error categories
- * 
+ *
  * This type defines all possible error categories that can be used in the system.
  * Each category represents a specific type of error that can occur.
- * 
+ *
  * @since 1.0.0
  */
 export type ErrorCategory =
@@ -15,10 +15,10 @@ export type ErrorCategory =
 
 /**
  * Type representing error codes
- * 
+ *
  * This type defines all possible error codes that can be used in the system.
  * Each code represents a specific type of error that can occur.
- * 
+ *
  * @since 1.0.0
  */
 export type ErrorCode =
@@ -42,10 +42,10 @@ export type ErrorCode =
 
 /**
  * Interface representing error information
- * 
+ *
  * This interface defines the structure of error information that can be returned
  * by validators and other components in the system.
- * 
+ *
  * @since 1.0.0
  */
 export interface ErrorInfo {
@@ -61,20 +61,20 @@ export interface ErrorInfo {
 
 /**
  * Type representing error result
- * 
+ *
  * This type represents the result of an error that occurred during validation
  * or other operations in the system.
- * 
+ *
  * @since 1.0.0
  */
 export type ErrorResult = ErrorInfo;
 
 /**
  * Interface representing the result of a process
- * 
+ *
  * This interface defines the structure of the result of a process that can either
  * be successful or contain an error.
- * 
+ *
  * @since 1.0.0
  */
 export interface Result<T> {
@@ -85,10 +85,10 @@ export interface Result<T> {
 
 /**
  * Interface representing the result of a parameter process
- * 
+ *
  * This interface extends the Result interface to include additional information
  * about the parameters used in the process.
- * 
+ *
  * @since 1.0.0
  */
 export interface ParamResult<T> extends Result<T> {
@@ -97,9 +97,9 @@ export interface ParamResult<T> extends Result<T> {
 
 /**
  * Interface representing the result of a parameter parsing process
- * 
+ *
  * This interface extends the ParamResult interface to include an optional parse error.
- * 
+ *
  * @since 1.0.0
  */
 export interface ParseResult extends ParamResult<unknown> {
@@ -108,10 +108,10 @@ export interface ParseResult extends ParamResult<unknown> {
 
 /**
  * Interface representing a parse error
- * 
+ *
  * This interface extends the ErrorInfo interface to include additional information
  * about the position and expected value of the error.
- * 
+ *
  * @since 1.0.0
  */
 export interface ParseError extends ErrorInfo {
@@ -121,9 +121,9 @@ export interface ParseError extends ErrorInfo {
 
 /**
  * Interface representing the result of a validation process
- * 
+ *
  * This interface extends the ParamResult interface to include an optional validation error.
- * 
+ *
  * @since 1.0.0
  */
 export interface ValidationResult extends ParamResult<unknown> {
@@ -132,10 +132,10 @@ export interface ValidationResult extends ParamResult<unknown> {
 
 /**
  * Interface representing a validation error
- * 
+ *
  * This interface extends the ErrorInfo interface to include additional information
  * about the provided and expected values of the error.
- * 
+ *
  * @since 1.0.0
  */
 export interface ValidationError extends ErrorInfo {
@@ -145,9 +145,9 @@ export interface ValidationError extends ErrorInfo {
 
 /**
  * Interface representing the result of a business rule validation process
- * 
+ *
  * This interface extends the ParamResult interface to include an optional business rule error.
- * 
+ *
  * @since 1.0.0
  */
 export interface BusinessRuleResult extends ParamResult<unknown> {
@@ -156,10 +156,10 @@ export interface BusinessRuleResult extends ParamResult<unknown> {
 
 /**
  * Interface representing a business rule error
- * 
+ *
  * This interface extends the ErrorInfo interface to include additional information
  * about the rule and context of the error.
- * 
+ *
  * @since 1.0.0
  */
 export interface BusinessRuleError extends ErrorInfo {
@@ -169,10 +169,10 @@ export interface BusinessRuleError extends ErrorInfo {
 
 /**
  * Constant representing error codes
- * 
+ *
  * This object defines all possible error codes that can be used in the system.
  * Each code is represented as a key-value pair in the object.
- * 
+ *
  * @since 1.0.0
  */
 export const ErrorCode = {
@@ -197,10 +197,10 @@ export const ErrorCode = {
 
 /**
  * Constant representing error categories
- * 
+ *
  * This object defines all possible error categories that can be used in the system.
  * Each category is represented as a key-value pair in the object.
- * 
+ *
  * @since 1.0.0
  */
 export const ErrorCategory = {
@@ -213,18 +213,18 @@ export const ErrorCategory = {
 
 /**
  * Type representing error codes
- * 
+ *
  * This type represents the error codes defined in the ErrorCode constant.
- * 
+ *
  * @since 1.0.0
  */
 export type ErrorCodeType = typeof ErrorCode[keyof typeof ErrorCode];
 
 /**
  * Type representing error categories
- * 
+ *
  * This type represents the error categories defined in the ErrorCategory constant.
- * 
+ *
  * @since 1.0.0
  */
-export type ErrorCategoryType = typeof ErrorCategory[keyof typeof ErrorCategory]; 
+export type ErrorCategoryType = typeof ErrorCategory[keyof typeof ErrorCategory];
