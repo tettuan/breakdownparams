@@ -335,8 +335,9 @@ process_test_directory() {
     
     echo "Processing directory: $dir"
     
-    # First process direct test files in sorted order
-    for test_file in $(find "$dir" -maxdepth 1 -name "*_test.ts" | sort); do
+    # First run architecture tests in current directory and subdirectories
+    echo "Running architecture tests in $dir and subdirectories..."
+    for test_file in $(find "$dir" -name "*.architecture_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -346,10 +347,27 @@ process_test_directory() {
         fi
     done
     
-    # Then process subdirectories in sorted order
-    for subdir in $(find "$dir" -mindepth 1 -maxdepth 1 -type d | sort); do
-        if ! process_test_directory "$subdir" "$is_debug"; then
-            return 1
+    # Then run structure tests in current directory and subdirectories
+    echo "Running structure tests in $dir and subdirectories..."
+    for test_file in $(find "$dir" -name "*.structure_test.ts" | sort); do
+        if [ -f "$test_file" ]; then
+            ((test_count++))
+            if ! run_single_test "$test_file" "$is_debug"; then
+                ((error_count++))
+                return 1
+            fi
+        fi
+    done
+    
+    # Finally process regular test files in current directory and subdirectories
+    echo "Running regular tests in $dir and subdirectories..."
+    for test_file in $(find "$dir" -name "*_test.ts" -not -name "*.architecture_test.ts" -not -name "*.structure_test.ts" | sort); do
+        if [ -f "$test_file" ]; then
+            ((test_count++))
+            if ! run_single_test "$test_file" "$is_debug"; then
+                ((error_count++))
+                return 1
+            fi
         fi
     done
     
