@@ -25,17 +25,17 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 
 パラメータの種類は、位置引数の数に基づいて3つのタイプに分類されます：
 
-1. **NoParams**
+1. **ZeroParams**
    - 位置引数なし
    - オプションのみ指定可能
    - 例：`breakdown --help`
 
-2. **SingleParam**
+2. **OneParam**
    - 位置引数1つ
    - 有効な値：`init`
    - 例：`breakdown init`
 
-3. **DoubleParams**
+3. **TwoParams**
    - 位置引数2つ
    - 形式：`<demonstrativeType> <layerType>`
    - 例：`breakdown to project`
@@ -82,7 +82,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
    - カスタム変数オプション名は大文字小文字を区別し、指定された通りに使用
 
 5. **カスタム変数オプションの制約**
-   - DoubleParamsモードでのみ使用可能
+   - TwoParamsモードでのみ使用可能
    - 構文は`--uv-<name>=<value>`の形式を厳守
    - 変数名は英数字と最小限の特殊文字のみ許可
    - 値は文字列として扱い、検証は行わない
@@ -117,12 +117,12 @@ parser.parse(['-h']);
 
 // 初期化
 parser.parse(['init']);
-// { type: "single", command: "init" }
+// { type: "one", command: "init" }
 
 // 2パラメータ
 parser.parse(['to', 'issue', '--from', './input.md']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
@@ -131,7 +131,7 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 // 複合オプション
 parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "summary",
 //   layerType: "task",
 //   options: { fromFile: "./tasks.md", adaptation: "strict" }
@@ -144,7 +144,7 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // カスタム変数オプションを含む2パラメータ
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "project",
 //   options: {
@@ -169,7 +169,7 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
    - エイリアスは小文字のみ
    - パス文字列の加工なし
    - オプションの重複時は最後の指定が有効
-   - カスタム変数オプションはDoubleParamsモードでのみ使用可能
+   - カスタム変数オプションはTwoParamsモードでのみ使用可能
 
 ## テスト戦略
 

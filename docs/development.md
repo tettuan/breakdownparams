@@ -25,17 +25,17 @@ It specializes in parameter parsing, validation, and value storage, aiming for a
 
 Parameter types are classified into three types based on the number of positional arguments:
 
-1. **NoParams**
+1. **ZeroParams**
    - No positional arguments
    - Only options can be specified
    - Example: `breakdown --help`
 
-2. **SingleParam**
+2. **OneParam**
    - One positional argument
    - Valid value: `init`
    - Example: `breakdown init`
 
-3. **DoubleParams**
+3. **TwoParams**
    - Two positional arguments
    - Format: `<demonstrativeType> <layerType>`
    - Example: `breakdown to project`
@@ -78,7 +78,7 @@ Options are specified as hyphenated arguments. Each option supports both long an
    - Custom variable option names are case sensitive and used as specified
 
 5. **Custom Variable Option Constraints**
-   - Only available in DoubleParams mode
+   - Only available in TwoParams mode
    - Syntax must strictly follow `--uv-<name>=<value>` format
    - Variable names only allow alphanumeric and minimal special characters
    - Values are treated as strings without validation
@@ -105,20 +105,20 @@ const parser = new ParamsParser();
 
 // No parameters
 parser.parse([]);
-// { type: "no-params", help: false, version: false }
+// { type: "zero-params", help: false, version: false }
 
 // Help display
 parser.parse(['-h']);
-// { type: "no-params", help: true, version: false }
+// { type: "zero-params", help: true, version: false }
 
 // Initialization
 parser.parse(['init']);
-// { type: "single", command: "init" }
+// { type: "one", command: "init" }
 
 // Two parameters
 parser.parse(['to', 'issue', '--from', './input.md']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
@@ -127,7 +127,7 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 // Combined options
 parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "summary",
 //   layerType: "task",
 //   options: { fromFile: "./tasks.md", adaptation: "strict" }
@@ -140,7 +140,7 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // Two parameters with custom variable options
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "project",
 //   options: {
@@ -163,7 +163,7 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
    - Maximum of 2 parameters
    - No path string processing
    - Last specification takes effect for duplicate options
-   - Custom variable options only available in DoubleParams mode
+   - Custom variable options only available in TwoParams mode
 
 ## Testing Strategy
 

@@ -32,10 +32,10 @@
 tests/
 ├── 01_basic/                    # 基礎テスト
 │   ├── 01_no_params_test.ts     # パラメータなしのテスト
-│   └── 02_single_param_test.ts  # 単一パラメータのテスト
+│   └── 02_one_param_test.ts     # 単一パラメータのテスト
 │
 ├── 02_core/                     # コア機能テスト
-│   └── 01_double_params_test.ts # 2パラメータのテスト
+│   └── 01_two_params_test.ts # 2パラメータのテスト
 │
 ├── 03_unit/                     # 単体機能テスト
 │   ├── 01_options_test.ts       # オプション処理のテスト
@@ -95,9 +95,9 @@ tests/
 │   └── 01_no_params.structure_test.ts
 │
 └── 02_core/
-    ├── 01_double_params_test.ts
-    ├── 01_double_params.architecture_test.ts
-    └── 01_double_params.structure_test.ts
+    ├── 01_two_params_test.ts
+    ├── 01_two_params.architecture_test.ts
+    └── 01_two_params.structure_test.ts
 ```
 
 ### テストの実行順序
@@ -120,10 +120,10 @@ tests/
 
 1. **基礎テスト** (`01_basic/`)
    - `01_no_params_test.ts`: パラメータなしのケース
-   - `02_single_param_test.ts`: 単一パラメータのケース
+   - `02_one_param_test.ts`: 単一パラメータのケース
 
 2. **コア機能テスト** (`02_core/`)
-   - `01_double_params_test.ts`: 2パラメータのケース
+   - `01_two_params_test.ts`: 2パラメータのケース
 
 3. **単体機能テスト** (`03_unit/`)
    - `01_options_test.ts`: オプション処理の基本機能

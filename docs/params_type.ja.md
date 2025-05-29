@@ -84,7 +84,7 @@ const breakResult: TwoParamResult = {
 ```typescript
 // 例：パラメータエラーの場合
 {
-  type: 'double',
+  type: 'two',
   demonstrativeType: '...',
   layerType: '...',
   options: {},
@@ -96,7 +96,7 @@ const breakResult: TwoParamResult = {
 
 // 例：オプションエラーの場合
 {
-  type: 'double',
+  type: 'two',
   demonstrativeType: '...',
   layerType: '...',
   options: {},
@@ -112,7 +112,7 @@ const breakResult: TwoParamResult = {
 ```typescript
 // 例1: パラメータエラー（不正なコマンド）
 {
-  type: 'single',
+  type: 'one',
   command: 'init',
   options: {},
   error: {
@@ -123,7 +123,7 @@ const breakResult: TwoParamResult = {
 
 // 例2: パラメータエラー（不正なレイヤータイプ）
 {
-  type: 'double',
+  type: 'two',
   demonstrativeType: '...',
   layerType: '...',
   options: {},
@@ -135,7 +135,7 @@ const breakResult: TwoParamResult = {
 
 // 例3: オプションエラー（カスタム変数の命名規則違反）
 {
-  type: 'single',
+  type: 'one',
   command: 'init',
   options: {},
   error: {
@@ -147,7 +147,7 @@ const breakResult: TwoParamResult = {
 
 ### 3. 型の一貫性
 
-- パラメータの型（NoParamsResult, SingleParamResult, DoubleParamsResult）を維持
+- パラメータの型（ZeroParamsResult, OneParamResult, TwoParamsResult）を維持
 - エラー情報は各パラメータ型の error プロパティとして保持
 - 型の変換は行わない
 

@@ -62,9 +62,9 @@
    - カスタム変数オプションの構文が不正な場合（`=`の欠落など）はエラーとなります
 
 4. **パラメータタイプによる制約**
-   - `--config` / `-c` オプションは DoubleParams でのみ使用可能です
-   - カスタム変数オプション（`--uv-*`）も DoubleParams でのみ使用可能です
-   - 他のパラメータタイプ（NoParams, SingleParam）では無視されます
+   - `--config` / `-c` オプションは TwoParams でのみ使用可能です
+   - カスタム変数オプション（`--uv-*`）も TwoParams でのみ使用可能です
+   - 他のパラメータタイプ（ZeroParams, OneParam, TwoParams）では無視されます
 
 ## 入力レイヤータイプの値
 

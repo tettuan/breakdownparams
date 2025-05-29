@@ -33,9 +33,9 @@ This document defines the specification for options (hyphenated arguments) in th
    - Invalid syntax for custom variable options (e.g., missing `=`) results in an error
 
 4. **Parameter Type Constraints**
-   - `--config` / `-c` option is only available in DoubleParams mode
-   - Custom variable options (`--uv-*`) are also only available in DoubleParams mode
-   - Ignored in other parameter types (NoParams, SingleParam)
+   - `--config` / `-c` option is only available in TwoParams mode
+   - Custom variable options (`--uv-*`) are also only available in TwoParams mode
+   - Ignored in other parameter types (ZeroParams, OneParam, TwoParams)
 
 ## Input Layer Type Values
 

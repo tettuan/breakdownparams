@@ -120,7 +120,7 @@ const parser = new ParamsParser(config);
 // 標準モードと同様の使用方法
 const result = parser.parse(['custom', 'layer']);
 
-if (result.type === 'double') {
+if (result.type === 'one') {
   console.log(result.demonstrativeType); // "custom"
   console.log(result.layerType); // "layer"
 }
@@ -143,7 +143,7 @@ if (result.type === 'double') {
 ```typescript
 // バリデーションエラーの例
 {
-  type: "double",
+  type: "one",
   error: {
     message: "Invalid demonstrative type: custom",
     code: "INVALID_DEMONSTRATIVE_TYPE"
@@ -152,7 +152,7 @@ if (result.type === 'double') {
 
 // 設定エラーの例
 {
-  type: "double",
+  type: "one",
   error: {
     message: "Invalid configuration: pattern is required in extended mode",
     code: "INVALID_CONFIGURATION"

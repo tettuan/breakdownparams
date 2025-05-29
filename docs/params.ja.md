@@ -30,7 +30,7 @@ type TwoParamResult = {
 
 ## パラメータのパターン
 
-1. パラメータなし（ZeroParamResult）
+1. **ZeroParams**
    - helpコマンド
    - versionコマンド
 

@@ -120,7 +120,7 @@ const parser = new ParamsParser(config);
 // Usage similar to standard mode
 const result = parser.parse(['custom', 'layer']);
 
-if (result.type === 'double') {
+if (result.type === 'one') {
   console.log(result.demonstrativeType); // "custom"
   console.log(result.layerType); // "layer"
 }
@@ -143,7 +143,7 @@ if (result.type === 'double') {
 ```typescript
 // Validation error example
 {
-  type: "double",
+  type: "one",
   error: {
     message: "Invalid demonstrative type: custom",
     code: "INVALID_DEMONSTRATIVE_TYPE"
@@ -152,7 +152,7 @@ if (result.type === 'double') {
 
 // Configuration error example
 {
-  type: "double",
+  type: "one",
   error: {
     message: "Invalid configuration: pattern is required in extended mode",
     code: "INVALID_CONFIGURATION"

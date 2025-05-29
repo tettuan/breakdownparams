@@ -37,9 +37,9 @@ This glossary is created for the following purposes:
 
 | Term          | Description                                                                                                                                    | Reference Specification    |
 |---------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| NoParams      | Parameter type with no positional arguments. Used for simple operations like help display and version check. Only options can be specified.     | [params.md](params.md)     |
-| SingleParam   | Parameter type with one positional argument. Used to execute single operations like initialization. Currently only supports `init` command.     | [params.md](params.md)     |
-| DoubleParams  | Parameter type with two positional arguments. Used to execute main functionality. Specifies operation through combination of DemonstrativeType and LayerType. | [params.md](params.md)     |
+| ZeroParams    | Parameter type with no positional arguments. Used for help and version commands.                                                                 | [params.md](params.md)     |
+| OneParam   | Parameter type with one positional argument. Used to execute one operations like initialization. Currently only supports `init` command.     | [params.md](params.md)     |
+| TwoParams     | Parameter type with two positional arguments. Used to execute main functionality. Specifies operation through combination of DemonstrativeType and LayerType. | [params.md](params.md)     |
 
 ### Main Types
 
@@ -63,13 +63,13 @@ This glossary is created for the following purposes:
 | --destination | -o    | Output file path. Specifies where to save results. Does not verify path existence.                                                             | [options.md](options.md)   |
 | --input       | -i    | Input layer type. Specifies the source layer for processing. Only allows LayerType values.                                                     | [options.md](options.md)   |
 | --adaptation  | -a    | Prompt adaptation type. Used to adjust processing behavior. Specifies customizable behavior.                                                   | [options.md](options.md)   |
-| --config      | -c    | Configuration file name. Only available in DoubleParams. Loads processing settings from external file.                                         | [options.md](options.md)   |
+| --config      | -c    | Configuration file name. Only available in TwoParams. Loads processing settings from external file.                                         | [options.md](options.md)   |
 
 ### Custom Variable Options
 
 | Term                    | Description                                                                                                                                    | Reference Specification    |
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| Custom Variable Option  | User-defined variables specified in `--uv-*` format. Only available in DoubleParams mode, can hold any value.                                  | [custom_variable_options.md](custom_variable_options.md) |
+| Custom Variable Option  | User-defined variables specified in `--uv-*` format. Only available in TwoParams mode, can hold any value.                                  | [custom_variable_options.md](custom_variable_options.md) |
 | Custom Variable Name    | Variable name following the `--uv-` prefix. Only allows alphanumeric and minimal special characters, case-sensitive.                           | [custom_variable_options.md](custom_variable_options.md) |
 | CustomVariables         | Type that holds custom variable options. Consists of key-value pairs, maintains values as received from command line.                          | [custom_variable_options.md](custom_variable_options.md) |
 

@@ -37,9 +37,9 @@
 
 | 用語         | 説明                                                                                                                    | 参照仕様ファイル             |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| NoParams     | 位置引数なしのパラメータタイプ。ヘルプ表示やバージョン確認など、単純な操作に使用。オプションのみの指定が可能。          | [params.ja.md](params.ja.md) |
-| SingleParam  | 位置引数1つのパラメータタイプ。初期化などの単一の操作を実行するために使用。現在は`init`コマンドのみをサポート。         | [params.ja.md](params.ja.md) |
-| DoubleParams | 位置引数2つのパラメータタイプ。メインの機能を実行するために使用。DemonstrativeTypeとLayerTypeの組み合わせで操作を指定。 | [params.ja.md](params.ja.md) |
+| ZeroParams   | 位置引数なしのパラメータタイプ。helpコマンドとversionコマンドに使用。 | [params.ja.md](params.ja.md) |
+| OneParam     | 位置引数1つのパラメータタイプ。初期化などの単一の操作を実行するために使用。現在は`init`コマンドのみをサポート。         | [params.ja.md](params.ja.md) |
+| TwoParams    | 位置引数2つのパラメータタイプ。メインの機能を実行するために使用。DemonstrativeTypeとLayerTypeの組み合わせで操作を指定。 | [params.ja.md](params.ja.md) |
 
 ### 主要な型
 
@@ -63,13 +63,13 @@
 | --destination | -o         | 出力ファイルパス。結果の保存先を指定。パスの存在確認は行わない。                     | [options.ja.md](options.ja.md) |
 | --input       | -i         | 入力レイヤータイプ。処理の入力元となる層を指定。LayerTypeの値のみを許可。            | [options.ja.md](options.ja.md) |
 | --adaptation  | -a         | プロンプト適応タイプ。処理の挙動を調整するために使用。カスタマイズ可能な動作を指定。 | [options.ja.md](options.ja.md) |
-| --config      | -c         | 設定ファイル名。DoubleParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
+| --config      | -c         | 設定ファイル名。TwoParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
 
 ### カスタム変数オプション
 
 | 用語           | 説明                                                                                                                 | 参照仕様ファイル                           |
 | -------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| カスタム変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数。DoubleParamsモードでのみ使用可能で、任意の値を保持できる。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| カスタム変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数。TwoParamsモードでのみ使用可能で、任意の値を保持できる。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 | カスタム変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字と最小限の特殊文字のみを許可し、大文字小文字を区別する。               | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 | CustomVariables | カスタム変数オプションを保持する型。キーと値のペアで構成され、コマンドラインから受け取った値をそのまま保持する。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 
