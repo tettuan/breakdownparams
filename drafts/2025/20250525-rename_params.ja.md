@@ -22,21 +22,21 @@
 現在の名称                    → 新しい名称
 --------------------------------------------------------
 ParamsResult                 → ParamPatternResult
-  ├─ NoParamsResult         → ZeroParamResult
+  ├─ ZeroParamResult         → ZeroParamResult
   ├─ SingleParamResult      → OneParamResult
   └─ DoubleParamsResult     → TwoParamResult
 
 関連する型の変更：
 --------------------------------------------------------
 ParamValidator              → ParamPatternValidator
-  ├─ NoParamValidator       → ZeroParamValidator
+  ├─ ZeroParamValidator       → ZeroParamValidator
   ├─ SingleParamValidator   → OneParamValidator
   └─ DoubleParamValidator   → TwoParamValidator
 
 関連するメソッドの変更：
 --------------------------------------------------------
 validateParams()            → validateParamPattern()
-  ├─ validateNoParams()     → validateZeroParams()
+  ├─ validateZeroParams()     → validateZeroParams()
   ├─ validateSingleParam()  → validateOneParam()
   └─ validateDoubleParams() → validateTwoParams()
 

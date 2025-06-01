@@ -60,7 +60,7 @@ class SecurityValidator {
 ```typescript
 // 現在: 各所で直接エラーオブジェクトを作成
 return {
-  type: 'double',
+  type: 'two',
   error: {
     message: '...',
     code: ErrorCode.INVALID_CONFIG,
@@ -121,15 +121,15 @@ type ParseResult<T extends ParamsResult> = T & {
 ```typescript
 // 現在: 直接インスタンス化
 constructor(config?: ParserConfig) {
-  this.noParamsParser = new NoParamsParser();
+  this.zeroParamsParser = new ZeroParamsParser();
   // ...
 }
 
 // 提案: 依存性の注入
 constructor(
   config?: ParserConfig,
-  private readonly noParamsParser: NoParamsParser,
-  private readonly singleParamParser: SingleParamParser,
+  private readonly zeroParamsParser: ZeroParamsParser,
+  private readonly oneParamParser: OneParamParser,
   // ...
 ) {}
 ```

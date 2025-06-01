@@ -21,9 +21,10 @@
 
 # パラメータバリデーション修正
 
-- params_parser の初期分岐に必要な精査をValidatorに任せる
-- zero,one,two のインスタンスを生成し、バリデーション結果を受け取る
-- 受け取ったバリデーションの成功したものを判定結果に使う
+- examples/config_usage.ts の現状出力は 意図しないエラー。
+- `deno run --allow-env examples/config_usage.ts to project --config test`
+  - Error: Too many arguments. Maximum 2 arguments are allowed.
+- config オプションを受け取り、返すことができるよう、実装に修正を入れる。
 
 # 実装の自動修正
 
@@ -39,14 +40,4 @@
 
 
 # 既知の修正方針
-
-- 返却型の定義を一貫させること
-- バリデータを責務分割し、カプセル化すること
-- parseOptionsでfrom/destinationではなくfromFile/destinationFileで返す
-- "--from src"のようなスペース区切りはINVALID_OPTIONエラーを返す。
-- 不明なオプションはUNKNOWN_OPTIONエラーを返す。
-- SECURITY_ERROR -> VALIDATION_ERROR へ統一
-- UNKNOWN_OPTION -> VALIDATION_ERROR へ統一
-- INVALID_DEMONSTRATIVE_TYPE および INVALID_LAYER_TYPE -> VALIDATION_ERROR へ統一
-- オプションは、`--from src`のようなスペース区切りのオプションが `--from=src` 結合に置き換わっていること
-- vitestを廃止し Deno.test する
+- zero validator 実装では --config なども許可してしまっているため、仕様に合わせて isValidOption を help/version のみ許可する
