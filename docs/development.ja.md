@@ -94,7 +94,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 | エラーケース       | メッセージ例                                           |
 | ------------------ | ------------------------------------------------------ |
 | 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正な値           | "Invalid value for demonstrativeType: {value}"         |
+| 不正な値           | "Invalid demonstrative type. Must be one of: to, summary, defect" |
 | 必須パラメータ不足 | "Missing required parameter: {param}"                  |
 | カスタム変数オプション構文エラー | "Invalid custom variable option syntax: {value}"  |
 
@@ -105,15 +105,16 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 ```typescript
 import { ParamsParser } from './mod.ts';
 
+// デフォルト設定値でパーサーを初期化
 const parser = new ParamsParser();
 
 // パラメータなし
 parser.parse([]);
-// { type: "no-params", help: false, version: false }
+// { type: "zero-params", help: false, version: false }
 
 // ヘルプ表示
 parser.parse(['-h']);
-// { type: "no-params", help: true, version: false }
+// { type: "zero-params", help: true, version: false }
 
 // 初期化
 parser.parse(['init']);
@@ -135,6 +136,33 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 //   demonstrativeType: "summary",
 //   layerType: "task",
 //   options: { fromFile: "./tasks.md", adaptation: "strict" }
+// }
+```
+
+### カスタム設定値での使用例
+
+```typescript
+// カスタム設定値でパーサーを初期化
+const customConfig = {
+  demonstrativeType: {
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
+    errorMessage: 'Invalid demonstrative type'
+  },
+  layerType: {
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
+    errorMessage: 'Invalid layer type'
+  }
+};
+
+const customParser = new ParamsParser(customConfig);
+
+// カスタム設定値での2パラメータ
+customParser.parse(['custom', 'layer', '--from', './input.md']);
+// {
+//   type: "two",
+//   demonstrativeType: "custom",
+//   layerType: "layer",
+//   options: { fromFile: "./input.md" }
 // }
 ```
 

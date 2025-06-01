@@ -170,7 +170,7 @@ The following are equivalent:
 #### Custom Variable Options (`--uv-*`)
 
 Custom variable options are used to specify user-defined variables.
-Only available in DoubleParams mode, specified in the following format:
+Only available in TwoParams mode, specified in the following format:
 
 ```bash
 ./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>

@@ -26,6 +26,37 @@ type TwoParamResult = {
   options: OptionParams;
   error?: ErrorInfo;
 };
+
+// パーサー設定の型定義
+interface ParserConfig {
+  // DemonstrativeTypeの設定
+  demonstrativeType: {
+    // 許可する値のパターン（正規表現）
+    pattern: string;
+    // カスタムエラーメッセージ
+    errorMessage?: string;
+  };
+
+  // LayerTypeの設定
+  layerType: {
+    // 許可する値のパターン（正規表現）
+    pattern: string;
+    // カスタムエラーメッセージ
+    errorMessage?: string;
+  };
+}
+
+// デフォルト設定値
+const DEFAULT_CONFIG: ParserConfig = {
+  demonstrativeType: {
+    pattern: '^(to|summary|defect)$',
+    errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect'
+  },
+  layerType: {
+    pattern: '^(project|issue|task)$',
+    errorMessage: 'Invalid layer type. Must be one of: project, issue, task'
+  }
+};
 ```
 
 ## パラメータのパターン
@@ -40,7 +71,7 @@ type TwoParamResult = {
 
 3. 二重パラメータ（TwoParamResult）
    - breakコマンド
-   - 指示タイプとレイヤータイプ
+   - DemonstrativeTypeとLayerTypeのバリデーション
    - オプション
 
 ## オプションパラメータ
@@ -49,7 +80,7 @@ type TwoParamResult = {
 type OptionParams = {
   fromFile?: string;
   destinationFile?: string;
-  fromLayerType?: string;
+  fromLayerType?: string;  // LayerTypeのパターンでバリデーション
   adaptationType?: string;
   configFile?: string;
   customVariables?: Record<string, string>;
@@ -87,16 +118,31 @@ const layerResult: OneParamResult = {
   }
 };
 
-// 二重パラメータ
+// 二重パラメータ（デフォルト設定値を使用）
 const breakResult: TwoParamResult = {
   type: 'break',
-  demonstrativeType: 'type1',
-  layerType: 'layer1',
+  demonstrativeType: 'to',      // パターン: ^(to|summary|defect)$
+  layerType: 'project',         // パターン: ^(project|issue|task)$
   options: {
     fromFile: 'input.json',
-    destinationFile: 'output.json'
+    destinationFile: 'output.json',
+    fromLayerType: 'issue'      // パターン: ^(project|issue|task)$
   }
 };
+
+// カスタム設定値での使用例
+const customConfig: ParserConfig = {
+  demonstrativeType: {
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
+    errorMessage: 'Invalid demonstrative type'
+  },
+  layerType: {
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
+    errorMessage: 'Invalid layer type'
+  }
+};
+
+const parser = new ParamsParser(customConfig);
 ```
 
 # パラメータ仕様
@@ -114,6 +160,7 @@ const breakResult: TwoParamResult = {
   - アプリケーション初期化の特別処理
 - 2パラメータ
   - メインアプリケーション実行
+  - DemonstrativeTypeとLayerTypeのバリデーション
   - ハイフン付きパラメータは追加オプションとして機能
 - 3つ以上のパラメータはエラー
 - パラメータなしは空のパラメータ結果を返す
@@ -165,17 +212,19 @@ const breakResult: TwoParamResult = {
 ./.deno/bin/breakdown to issue
 ```
 
-最初のオプション（$1）は`DemonstrativeType`と呼ばれます。
-2番目のオプション（$2）は`LayerType`と呼ばれます。
+最初のオプション（$1）は`DemonstrativeType`と呼ばれ、正規表現パターンでバリデーションされます。
+2番目のオプション（$2）は`LayerType`と呼ばれ、正規表現パターンでバリデーションされます。
 
-### 可能なDemonstrativeType値
+### デフォルトのバリデーションルール
 
+#### DemonstrativeType
+デフォルトの正規表現パターン：`^(to|summary|defect)$`
 - to
 - summary
 - defect
 
-### 可能なLayerType値
-
+#### LayerType
+デフォルトの正規表現パターン：`^(project|issue|task)$`
 - project
 - issue
 - task
@@ -229,10 +278,7 @@ const breakResult: TwoParamResult = {
 
 - `<from_layer_type>`部分を取得
 - 例：`--input=issue`の場合、`issue`を保存
-- 許可される値：
-  - project
-  - issue
-  - task
+- デフォルトの正規表現パターン：`^(project|issue|task)$`
 
 #### --config `<config_file>`
 
@@ -253,46 +299,25 @@ const breakResult: TwoParamResult = {
 #### カスタム変数オプション（`--uv-*`）
 
 カスタム変数オプションは、ユーザー定義の変数を指定するためのオプションです。
-DoubleParamsモードでのみ使用可能で、以下の形式で指定します：
+TwoParamsモードでのみ使用可能で、以下の形式で指定します：
 
 ```bash
 ./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
 ```
-
-例：
-```bash
-./.deno/bin/breakdown to project --uv-project=myproject
-./.deno/bin/breakdown to project --uv-version=1.0.0 --uv-environment=production
-```
-
-詳細な仕様については[カスタム変数オプション仕様](custom_variable_options.ja.md)を参照してください。
-
-# パラメータ優先順位ルール
-
-- 短縮形と長形式のオプションが両方指定された場合、長形式が優先されます。長形式が主要で、短縮形はエイリアスと見なされます。
-- パス処理は行われません（値はそのまま使用）
-- エイリアスは小文字である必要があります（大文字バリアントは処理されず、エラーなしで無視されます）
-- 未定義のエイリアスは指定されていないものとして扱われます（エラーなしで無視されます）
 
 ## エラーケース
 
 | エラーケース            | メッセージ例                                           |
 | ----------------------- | ------------------------------------------------------ |
 | 引数過多                | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正なDemonstrativeType | "Invalid value for demonstrativeType: {value}"         |
-| 不正なLayerType         | "Invalid value for layerType: {value}"                 |
-| 不正なConfig使用        | "Config option is only available with DoubleParams"    |
+| 不正なDemonstrativeType | "Invalid demonstrative type. Must be one of: to, summary, defect" |
+| 不正なLayerType         | "Invalid layer type. Must be one of: project, issue, task" |
+| 不正なConfig使用        | "Config option is only available with TwoParams"       |
 
 ## 返却型
 
 パラメータの解析結果は、以下の型で返却されます：
 
 ```typescript
-type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
+type ParamsResult = ZeroParamResult | OneParamResult | TwoParamResult;
 ```
-
-各型の詳細な定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
-
----
-
-[日本語版](params.ja.md) | [English Version](params.md)

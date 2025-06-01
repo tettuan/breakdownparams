@@ -86,14 +86,16 @@
 最初のオプション（$1）は`DemonstrativeType`と呼ばれます。
 2番目のオプション（$2）は`LayerType`と呼ばれます。
 
-### 可能なDemonstrativeType値
+### デフォルトのバリデーションルール
 
+#### DemonstrativeType
+デフォルトの正規表現パターン：`^(to|summary|defect)$`
 - to
 - summary
 - defect
 
-### 可能なLayerType値
-
+#### LayerType
+デフォルトの正規表現パターン：`^(project|issue|task)$`
 - project
 - issue
 - task
@@ -147,10 +149,7 @@
 
 - `<from_layer_type>`部分を取得
 - 例：`--input=issue`の場合、`issue`を保存
-- 許可される値：
-  - project
-  - issue
-  - task
+- デフォルトの正規表現パターン：`^(project|issue|task)$`
 
 #### --config `<config_file>`
 
@@ -171,7 +170,7 @@
 #### カスタム変数オプション（`--uv-*`）
 
 カスタム変数オプションは、ユーザー定義の変数を指定するためのオプションです。
-DoubleParamsモードでのみ使用可能で、以下の形式で指定します：
+TwoParamsモードでのみ使用可能で、以下の形式で指定します：
 
 ```bash
 ./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>

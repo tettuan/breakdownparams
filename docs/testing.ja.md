@@ -31,7 +31,7 @@
 ```
 tests/
 ├── 01_basic/                    # 基礎テスト
-│   ├── 01_no_params_test.ts     # パラメータなしのテスト
+│   ├── 01_zero_params_test.ts     # パラメータなしのテスト
 │   └── 02_one_param_test.ts     # 単一パラメータのテスト
 │
 ├── 02_core/                     # コア機能テスト
@@ -54,7 +54,7 @@ tests/
 
 1. **通常のテスト**
    - 命名規則: `*_test.ts`
-   - 例: `01_no_params_test.ts`
+   - 例: `01_zero_params_test.ts`
    - 用途: 機能の動作検証
 
 2. **アーキテクチャテスト**
@@ -90,9 +90,9 @@ tests/
 ```
 tests/
 ├── 01_basic/
-│   ├── 01_no_params_test.ts
-│   ├── 01_no_params.architecture_test.ts
-│   └── 01_no_params.structure_test.ts
+│   ├── 01_zero_params_test.ts
+│   ├── 01_zero_params.architecture_test.ts
+│   └── 01_zero_params.structure_test.ts
 │
 └── 02_core/
     ├── 01_two_params_test.ts
@@ -119,7 +119,7 @@ tests/
 テストは以下の階層構造に従って実装されています：
 
 1. **基礎テスト** (`01_basic/`)
-   - `01_no_params_test.ts`: パラメータなしのケース
+   - `01_zero_params_test.ts`: パラメータなしのケース
    - `02_one_param_test.ts`: 単一パラメータのケース
 
 2. **コア機能テスト** (`02_core/`)

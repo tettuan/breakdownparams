@@ -45,8 +45,8 @@
 
 | 用語              | 説明                                                                                                                | 参照仕様ファイル                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| DemonstrativeType | 最初の位置引数の型（`to`, `summary`, `defect`）。実行する操作の種類を指定。各値は特定の処理を表し、型安全性を確保。 | [params.ja.md](params.ja.md)           |
-| LayerType         | 2番目の位置引数の型（`project`, `issue`, `task`）。操作の対象となる層を指定。階層構造を表現し、処理の範囲を定義。   | [params.ja.md](params.ja.md)           |
+| DemonstrativeType | 最初の位置引数の型。デフォルトでは`to`, `summary`, `defect`を許可。正規表現パターンでバリデーション。 | [params.ja.md](params.ja.md)           |
+| LayerType         | 2番目の位置引数の型。デフォルトでは`project`, `issue`, `task`を許可。正規表現パターンでバリデーション。   | [params.ja.md](params.ja.md)           |
 | ParamsResult      | パラメータ解析結果の基本型。解析結果を型安全に扱うためのインターフェース。エラー情報も含む。                        | [params_type.ja.md](params_type.ja.md) |
 | OptionParams      | オプションパラメータの型。オプションの値を型安全に扱うためのインターフェース。各オプションの値を保持。              | [params_type.ja.md](params_type.ja.md) |
 | ErrorResult       | エラー情報を保持する型。エラーメッセージとエラーコードを含む。                                                      | [params_type.ja.md](params_type.ja.md) |
@@ -73,20 +73,20 @@
 | カスタム変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字と最小限の特殊文字のみを許可し、大文字小文字を区別する。               | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 | CustomVariables | カスタム変数オプションを保持する型。キーと値のペアで構成され、コマンドラインから受け取った値をそのまま保持する。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 
-## 拡張機能関連
+## バリデーション関連
 
 | 用語         | 説明                                                                                                               | 参照仕様ファイル                           |
 | ------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| 拡張モード   | カスタムなバリデーションルールを適用するモード。標準の制約を超えた柔軟な使用を可能にし、特定のユースケースに対応。 | [custom_params.ja.md](custom_params.ja.md) |
-| 標準モード   | デフォルトのバリデーションルールを使用するモード。基本的な使用に適し、型安全性と一貫性を保証。                     | [custom_params.ja.md](custom_params.ja.md) |
-| ParserConfig | パーサーの設定を定義するインターフェース。拡張モードでの動作を制御し、カスタムルールを指定するために使用。         | [custom_params.ja.md](custom_params.ja.md) |
+| デフォルト設定値   | 標準的な使用パターンをサポートするバリデーション設定。DemonstrativeTypeとLayerTypeの基本的な値を許可。 | [custom_params.ja.md](custom_params.ja.md) |
+| カスタム設定値   | ユーザー定義のバリデーション設定。正規表現パターンでカスタムな値を許可。                     | [custom_params.ja.md](custom_params.ja.md) |
+| ParserConfig | パーサーの設定を定義するインターフェース。バリデーションルールを指定するために使用。         | [custom_params.ja.md](custom_params.ja.md) |
 
 ## エラー関連
 
 | 用語                 | 説明                                                                                             | 参照仕様ファイル                           |
 | -------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------ |
 | バリデーションエラー | パラメータの値が制約を満たさない場合のエラー。型安全性を確保し、不正な使用を防止するために使用。 | [custom_params.ja.md](custom_params.ja.md) |
-| 設定エラー           | パーサーの設定が不正な場合のエラー。拡張モードでの設定ミスを検出し、適切な使用を促す。           | [custom_params.ja.md](custom_params.ja.md) |
+| 設定エラー           | パーサーの設定が不正な場合のエラー。設定ミスを検出し、適切な使用を促す。           | [custom_params.ja.md](custom_params.ja.md) |
 
 ## テスト関連
 

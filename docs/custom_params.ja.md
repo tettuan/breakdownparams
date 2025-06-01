@@ -1,27 +1,27 @@
-# パラメータ拡張仕様
+# パラメータバリデーション仕様
 
-このドキュメントは、breakdownparamsライブラリのパラメータ拡張機能の仕様を定義します。
+このドキュメントは、breakdownparamsライブラリのパラメータバリデーション機能の仕様を定義します。
 
 ## 1. 概要
 
-パラメータ拡張機能は、標準のDemonstrativeTypeとLayerTypeのバリデーションルールを拡張する機能です。
-拡張モードでは、標準のバリデーションルールに加えて、カスタムなバリデーションルールを適用することができます。
+パラメータバリデーション機能は、DemonstrativeTypeとLayerTypeの値を正規表現パターンで検証する機能です。
+デフォルトの設定値を使用することで、標準的な使用パターンをサポートしつつ、必要に応じてカスタムなバリデーションルールを適用することができます。
 
-## 2. 拡張機能の範囲
+## 2. バリデーションの範囲
 
-### 2.1 拡張対象
+### 2.1 バリデーション対象
 
 1. **DemonstrativeType**
-   - 標準値：`to`, `summary`, `defect`
-   - 拡張可能な値：設定値で指定
+   - デフォルトパターン：`^(to|summary|defect)$`
+   - カスタムパターン：設定値で指定
 
 2. **LayerType**
-   - 標準値：`project`, `issue`, `task`
-   - 拡張可能な値：設定値で指定
+   - デフォルトパターン：`^(project|issue|task)$`
+   - カスタムパターン：設定値で指定
 
-### 2.2 非拡張対象
+### 2.2 非バリデーション対象
 
-以下の機能は拡張の対象外です：
+以下の機能はバリデーションの対象外です：
 
 - パラメータの解析処理
 - オプションの処理
@@ -34,19 +34,16 @@
 
 ```typescript
 interface ParserConfig {
-  // 拡張モードの有効/無効
-  isExtendedMode: boolean;
-
-  // DemonstrativeTypeの拡張設定
-  demonstrativeType?: {
+  // DemonstrativeTypeの設定
+  demonstrativeType: {
     // 許可する値のパターン（正規表現）
     pattern: string;
     // カスタムエラーメッセージ
     errorMessage?: string;
   };
 
-  // LayerTypeの拡張設定
-  layerType?: {
+  // LayerTypeの設定
+  layerType: {
     // 許可する値のパターン（正規表現）
     pattern: string;
     // カスタムエラーメッセージ
@@ -55,18 +52,32 @@ interface ParserConfig {
 }
 ```
 
-### 3.2 設定値の例
+### 3.2 デフォルト設定値
 
 ```typescript
-// 拡張モードの設定例
-const config: ParserConfig = {
-  isExtendedMode: true,
+const DEFAULT_CONFIG: ParserConfig = {
   demonstrativeType: {
-    pattern: '^[a-z]+$',
+    pattern: '^(to|summary|defect)$',
+    errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect'
+  },
+  layerType: {
+    pattern: '^(project|issue|task)$',
+    errorMessage: 'Invalid layer type. Must be one of: project, issue, task'
+  }
+};
+```
+
+### 3.3 カスタム設定値の例
+
+```typescript
+// カスタム設定値の例
+const customConfig: ParserConfig = {
+  demonstrativeType: {
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
     errorMessage: 'Invalid demonstrative type',
   },
   layerType: {
-    pattern: '^[a-z]+$',
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
     errorMessage: 'Invalid layer type',
   },
 };
@@ -74,16 +85,16 @@ const config: ParserConfig = {
 
 ## 4. バリデーション処理
 
-### 4.1 標準モード
+### 4.1 デフォルト設定値でのバリデーション
 
-標準モードでは、以下の値のみを許可します：
+デフォルト設定値では、以下の値のみを許可します：
 
 - DemonstrativeType: `to`, `summary`, `defect`
 - LayerType: `project`, `issue`, `task`
 
-### 4.2 拡張モード
+### 4.2 カスタム設定値でのバリデーション
 
-拡張モードでは、設定値で指定されたパターンに一致する値を許可します：
+カスタム設定値では、設定値で指定されたパターンに一致する値を許可します：
 
 1. **DemonstrativeTypeのバリデーション**
    - 設定値のパターンに一致するかチェック
@@ -100,29 +111,30 @@ const config: ParserConfig = {
 ```typescript
 import { ParamsParser } from './mod.ts';
 
-// 拡張モードでパーサーを初期化
-const config: ParserConfig = {
-  isExtendedMode: true,
-  demonstrativeType: {
-    pattern: '^[a-z]+$',
-  },
-  layerType: {
-    pattern: '^[a-z]+$',
-  },
-};
+// デフォルト設定値でパーサーを初期化
+const parser = new ParamsParser();
 
-const parser = new ParamsParser(config);
+// カスタム設定値でパーサーを初期化
+const customParser = new ParamsParser(customConfig);
 ```
 
 ### 5.2 パラメータの解析
 
 ```typescript
-// 標準モードと同様の使用方法
-const result = parser.parse(['custom', 'layer']);
+// デフォルト設定値での使用例
+const result = parser.parse(['to', 'project']);
 
-if (result.type === 'one') {
-  console.log(result.demonstrativeType); // "custom"
-  console.log(result.layerType); // "layer"
+if (result.type === 'break') {
+  console.log(result.demonstrativeType); // "to"
+  console.log(result.layerType); // "project"
+}
+
+// カスタム設定値での使用例
+const customResult = customParser.parse(['custom', 'layer']);
+
+if (customResult.type === 'break') {
+  console.log(customResult.demonstrativeType); // "custom"
+  console.log(customResult.layerType); // "layer"
 }
 ```
 
@@ -136,31 +148,29 @@ if (result.type === 'one') {
 
 2. **設定エラー**
    - 不正な設定値
-   - 拡張モードが無効な場合の拡張設定
+   - パターンの構文エラー
 
 ### 6.2 エラーメッセージ
 
 ```typescript
 // バリデーションエラーの例
 {
-  type: "one",
+  type: "break",
   error: {
-    message: "Invalid demonstrative type: custom",
+    message: "Invalid demonstrative type. Must be one of: to, summary, defect",
     code: "INVALID_DEMONSTRATIVE_TYPE"
   }
 }
 
 // 設定エラーの例
 {
-  type: "one",
+  type: "break",
   error: {
-    message: "Invalid configuration: pattern is required in extended mode",
+    message: "Invalid configuration: pattern is required",
     code: "INVALID_CONFIGURATION"
   }
 }
 ```
-
-各型の詳細な定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
 
 ## 7. 制約事項
 
@@ -178,28 +188,27 @@ if (result.type === 'one') {
 
 ## 8. 移行ガイド
 
-### 8.1 標準モードから拡張モードへの移行
+### 8.1 デフォルト設定値からカスタム設定値への移行
 
 1. 設定値の準備
    - 必要なパターンの定義
    - エラーメッセージの準備
 
 2. パーサーの初期化
-   - 拡張モードの有効化
-   - 設定値の適用
+   - カスタム設定値の適用
 
 3. 既存コードの確認
    - エラーハンドリングの確認
    - 戻り値の型の確認
 
-### 8.2 拡張モードから標準モードへの移行
+### 8.2 カスタム設定値からデフォルト設定値への移行
 
-1. 設定値の無効化
-   - `isExtendedMode: false` の設定
-   - 拡張設定の削除
+1. デフォルト設定値の使用
+   - カスタム設定値の削除
+   - デフォルト設定値の適用
 
 2. パラメータの確認
-   - 標準値の使用確認
+   - デフォルト値の使用確認
    - カスタム値の置き換え
 
 ---

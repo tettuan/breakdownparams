@@ -31,7 +31,7 @@ Tests are designed according to the following principles:
 ```
 tests/
 ├── 01_basic/                    # Basic Tests
-│   ├── 01_no_params_test.ts     # No parameters test
+│   ├── 01_zero_params_test.ts     # No parameters test
 │   └── 02_one_param_test.ts     # One parameter test
 │
 ├── 02_core/                     # Core Function Tests
@@ -53,11 +53,18 @@ tests/
 Tests are implemented according to the following hierarchical structure:
 
 1. **Basic Tests** (`01_basic/`)
-   - `01_no_params_test.ts`: No parameters case
+   - `01_zero_params_test.ts`: No parameters case
    - `02_one_param_test.ts`: One parameter case
 
 2. **Core Function Tests** (`02_core/`)
    - `01_two_params_test.ts`: Two parameters case
 
 3. **Unit Function Tests** (`03_unit/`)
-   - `
+   - `01_options_test.ts`: Options processing test
+   - `02_extended_params_test.ts`: Extended parameters test
+
+4. **Integration Function Tests** (`04_integration/`)
+   - `01_error_test.ts`: Error handling test
+
+5. **End-to-End Tests** (`05_e2e/`)
+   - `01_params_parser_test.ts`: Parameter parser integration test
