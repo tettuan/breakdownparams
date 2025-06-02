@@ -1,0 +1,101 @@
+import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import {
+  ParamsResult,
+  ZeroParamsResult,
+  OneParamResult,
+  TwoParamResult,
+  ErrorInfo,
+  ValidationResult,
+  OptionRule,
+} from "../../src/result/types.ts";
+
+Deno.test("test_params_result_interface", () => {
+  const result: ParamsResult = {
+    type: 'zero',
+    params: [],
+    options: {},
+  };
+  assertEquals(result.type, 'zero');
+  assertEquals(Array.isArray(result.params), true);
+  assertEquals(typeof result.options, 'object');
+});
+
+Deno.test("test_zero_params_result_interface", () => {
+  const result: ZeroParamsResult = {
+    type: 'zero',
+    params: [],
+    options: {},
+  };
+  assertEquals(result.type, 'zero');
+  assertEquals(Array.isArray(result.params), true);
+  assertEquals(typeof result.options, 'object');
+});
+
+Deno.test("test_one_param_result_interface", () => {
+  const result: OneParamResult = {
+    type: 'one',
+    params: [],
+    options: {},
+    demonstrativeType: 'init',
+  };
+  assertEquals(result.type, 'one');
+  assertEquals(Array.isArray(result.params), true);
+  assertEquals(typeof result.options, 'object');
+  assertEquals(typeof result.demonstrativeType, 'string');
+});
+
+Deno.test("test_two_param_result_interface", () => {
+  const result: TwoParamResult = {
+    type: 'two',
+    params: [],
+    options: {},
+    demonstrativeType: 'to',
+    layerType: 'project',
+  };
+  assertEquals(result.type, 'two');
+  assertEquals(Array.isArray(result.params), true);
+  assertEquals(typeof result.options, 'object');
+  assertEquals(typeof result.demonstrativeType, 'string');
+  assertEquals(typeof result.layerType, 'string');
+});
+
+Deno.test("test_error_info_interface", () => {
+  const error: ErrorInfo = {
+    message: 'Error message',
+    code: 'ERROR_CODE',
+    category: 'error_category',
+  };
+  assertEquals(typeof error.message, 'string');
+  assertEquals(typeof error.code, 'string');
+  assertEquals(typeof error.category, 'string');
+});
+
+Deno.test("test_validation_result_interface", () => {
+  const result: ValidationResult = {
+    isValid: true,
+    validatedParams: [],
+  };
+  assertEquals(typeof result.isValid, 'boolean');
+  assertEquals(Array.isArray(result.validatedParams), true);
+});
+
+Deno.test("test_option_rule_interface", () => {
+  const rule: OptionRule = {
+    format: '--key=value',
+    validation: {
+      customVariables: '--uv-*',
+      emptyValue: false,
+      unknownOption: 'error',
+      duplicateOption: 'error',
+      requiredOptions: [],
+      valueTypes: ['string'],
+    },
+    specialCases: {
+      '-c=value': 'configFile',
+      '--config=value': 'configFile',
+    },
+  };
+  assertEquals(typeof rule.format, 'string');
+  assertEquals(typeof rule.validation, 'object');
+  assertEquals(typeof rule.specialCases, 'object');
+}); 
