@@ -1,4 +1,5 @@
-import { ParamsParser } from '../mod.ts';
+import { ParamsParser } from '../src/mod.ts';
+import { ParamPatternResult } from '../src/core/params/types.ts';
 
 const parser = new ParamsParser();
 const result = parser.parse(Deno.args);
@@ -12,14 +13,14 @@ Commands:
   to, summary, defect
 
 Layers:
-  project, issue, task (and their aliases)
+  project, issue, task
 
 Options:
-  --from, -f <file>          Input file path
-  --destination, -o <file>    Output file path
-  --input, -i <layer>        Input layer type
-  --adaptation, -a <type>    Prompt adaptation type
-  --uv-* <value>            Custom variable options (only available with DoubleParams)
+  --from=FILE, -f=FILE       Input file path
+  --destination=FILE, -o=FILE Output file path
+  --input=TYPE, -i=TYPE     Input layer type
+  --adaptation=TYPE, -a=TYPE Prompt adaptation type
+  --uv-NAME=VALUE          Custom variable options (only available with TwoParams)
 
 Examples:
   # Basic custom variable usage
@@ -39,34 +40,31 @@ Examples:
   custom_variable_options_usage defect task --uv-name=value --uv-type=test
 
 Notes:
-  - Custom variables are only available with DoubleParams mode
+  - Custom variables are only available with TwoParams mode
   - Custom variable names are case-sensitive
   - Custom variables must use the --uv- prefix
   - Custom variables must have a value (--uv-name=value format)
   - Multiple custom variables can be specified
-  - Custom variables are ignored in NoParams and SingleParam modes
+  - Custom variables are ignored in ZeroParams and OneParam modes
 `);
 }
 
-// Display help if requested
-if (result.type === 'no-params' && result.help) {
-  showUsage();
-  Deno.exit(0);
-}
-
-// Handle any errors
-if ('error' in result && result.error) {
-  console.error(`Error: ${result.error.message}`);
-  if (result.error.details) {
-    console.error('Details:', result.error.details);
-  }
+if (!result.success) {
+  console.error(`Error: ${result.error?.message}`);
   console.log('\nFor usage information, run: custom_variable_options_usage --help');
   Deno.exit(1);
 }
 
+const data = result.data as ParamPatternResult;
+
+if (data.type === 'zero' && data.help) {
+  showUsage();
+  Deno.exit(0);
+}
+
 // Process valid command
-if (result.type === 'double') {
-  const { demonstrativeType, layerType, options = {} } = result;
+if (data.type === 'two') {
+  const { demonstrativeType, layerType, options = {} } = data;
 
   console.log('Command processed successfully:');
   console.log('----------------------------');
@@ -87,11 +85,12 @@ if (result.type === 'double') {
   }
 
   // Display custom variables
-  if (options?.customVariables) {
+  const customVars = Object.entries(options).filter(([key]) => key.startsWith('--uv-'));
+  if (customVars.length > 0) {
     console.log('\nCustom Variables:');
     console.log('----------------');
-    for (const [name, value] of Object.entries(options.customVariables)) {
-      console.log(`${name}: ${value}`);
+    for (const [key, value] of customVars) {
+      console.log(`${key}=${value}`);
     }
   }
 } else {

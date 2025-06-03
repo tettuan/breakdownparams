@@ -13,7 +13,7 @@
  * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
  *
- * if (result.type === "double") {
+ * if (result.type === "two") {
  *   // Process the parameters
  *   const { demonstrativeType, layerType, options } = result;
  *   // Handle the conversion
@@ -25,7 +25,6 @@
 
 export { ParamsParser } from './src/params_parser.ts';
 export type {
-  DemonstrativeType,
   LayerType,
   OneParamResult,
   OptionParams,
@@ -48,7 +47,7 @@ export type {
  * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
  *
- * if (result.type === "double") {
+ * if (result.type === "two") {
  *   // Process the parameters
  *   const { demonstrativeType, layerType, options } = result;
  *   // Handle the conversion

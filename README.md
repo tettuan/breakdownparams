@@ -1,8 +1,8 @@
 # @tettuan/breakdownparams
 
-A command line argument parser for breakdown tasks. This module provides functionality to parse command line arguments for task breakdown operations.
+Command-line argument parser for task breakdown. This module provides functionality to parse command-line arguments for task breakdown operations.
 
-For detailed documentation about parameter patterns and usage, please see the [detailed documentation](docs/index.md).
+For detailed information about parameter patterns and usage, please refer to the [Detailed Documentation](docs/index.md).
 
 ## Installation
 
@@ -22,26 +22,26 @@ const result = parser.parse(Deno.args);
 
 // Handle different result types
 switch (result.type) {
-  case 'no-params':
+  case 'zero-params':
     if (result.help) {
-      console.log('Show help message');
+      console.log('Display help message');
     }
     if (result.version) {
-      console.log('Show version');
+      console.log('Display version');
     }
     break;
 
-  case 'single':
+  case 'one':
     if (result.command === 'init') {
       console.log('Initialize project');
     }
     break;
 
-  case 'double':
-    console.log(`Demonstrative: ${result.demonstrativeType}`);
+  case 'two':
+    console.log(`Demonstrative Type: ${result.demonstrativeType}`);
     console.log(`Layer: ${result.layerType}`);
     if (result.options.fromFile) {
-      console.log(`From file: ${result.options.fromFile}`);
+      console.log(`Input file: ${result.options.fromFile}`);
     }
     break;
 }
@@ -51,33 +51,33 @@ switch (result.type) {
 
 ### `ParamsParser`
 
-The main class for parsing command line arguments.
+Main class for parsing command-line arguments.
 
 #### Methods
 
 - `parse(args: string[]): ParamsResult`
-  Parses command line arguments and returns a structured result.
+  Parses command-line arguments and returns a structured result.
 
 ### Result Types
 
-The following result types are available based on the command line arguments provided. For a detailed breakdown of available options for each type, see [Options Documentation](docs/options.md).
+Based on command-line arguments, the following result types are available. For details about available options for each type, please refer to the [Options Documentation](docs/options.md).
 
-- `NoParamsResult`: For commands with no parameters or help/version flags
-- `SingleParamResult`: For single commands like "init"
-- `DoubleParamsResult`: For commands with demonstrative and layer type
+- `ZeroParamResult`: For commands without parameters or help/version flags
+- `OneParamResult`: For single commands like "init"
+- `TwoParamResult`: For commands with demonstrative type and layer type
 
 ### Options
 
 - `--from` or `-f`: Specify source file
-- `--destination` or `-o`: Specify destination file
+- `--destination` or `-o`: Specify output file
 - `--input` or `-i`: Specify input layer type
 
-For a comprehensive list of options available for each result type, see the [Options Documentation](docs/options.md).
+For a complete list of options available for each result type, please refer to the [Options Documentation](docs/options.md).
 
 ## Advanced Features
 
 ### Custom Variable Options
-Custom variables can be defined and used in your breakdown tasks using the `--uv-*` format. These variables can be referenced in your templates and will be replaced with their values during processing.
+You can define custom variables for task breakdown using the `--uv-*` format. These variables can be referenced in templates and will be replaced with values during processing.
 
 Example:
 ```bash
@@ -85,7 +85,7 @@ breakdown to project --uv-project=myproject --uv-version=1.0.0 --uv-environment=
 ```
 
 ### Extended Parameters
-The parser supports extended parameter functionality that allows for more complex task breakdown scenarios. This includes:
+The parser supports extended parameter functionality for more complex task breakdown scenarios. This includes:
 - Custom validation rules for parameter values
 - Extended demonstrative types for task relationships
 - Layer type extensions for custom task hierarchies
@@ -97,13 +97,13 @@ breakdown to project --extended --custom-validation --error-format=detailed
 ```
 
 ### Configuration File Options
-You can use a configuration file to set default options and behaviors. The configuration file supports:
+You can use configuration files to set default options and behaviors. Configuration files support:
 - Default parameter values for common operations
-- Custom validation rules for your specific use cases
+- Custom validation rules for specific use cases
 - Extended parameter settings for complex scenarios
-- Environment-specific configurations for different deployment stages
+- Environment-specific settings for different deployment stages
 
-Example configuration:
+Configuration example:
 ```json
 {
   "defaults": {
@@ -122,11 +122,11 @@ Example configuration:
 
 ## Examples
 
-The `examples/` directory contains three CLI examples that demonstrate different aspects of the parser:
+The `examples/` directory contains three CLI examples demonstrating different aspects of the parser:
 
 1. `basic_usage.ts`: Basic command parsing and help display
    ```bash
-   # Show help
+   # Display help
    deno run examples/basic_usage.ts --help
 
    # Initialize project
@@ -136,9 +136,9 @@ The `examples/` directory contains three CLI examples that demonstrate different
    deno run examples/basic_usage.ts to issue --from input.md
    ```
 
-2. `error_handling.ts`: Demonstrates error handling and validation
+2. `error_handling.ts`: Error handling and validation demo
    ```bash
-   # Show available error examples
+   # Display available error examples
    deno run examples/error_handling.ts --help
 
    # Try different error cases
@@ -146,9 +146,9 @@ The `examples/` directory contains three CLI examples that demonstrate different
    deno run examples/error_handling.ts to issue extra
    ```
 
-3. `options_usage.ts`: Shows how to work with command line options
+3. `options_usage.ts`: Command-line options usage
    ```bash
-   # Show options help
+   # Display options help
    deno run examples/options_usage.ts --help
 
    # Try different option formats
@@ -156,7 +156,7 @@ The `examples/` directory contains three CLI examples that demonstrate different
    deno run examples/options_usage.ts to issue -f input.md -o output.md
    ```
 
-Each example includes detailed help text and usage instructions. Run them with `--help` to see available options.
+Each example includes detailed help text and usage instructions. Run with `--help` to see available options.
 
 ## Development
 
@@ -164,7 +164,7 @@ Each example includes detailed help text and usage instructions. Run them with `
 
 - Deno
 - GitHub CLI (`gh`)
-- `jq` command line tool
+- `jq` command-line tool
 
 ### Testing
 
@@ -184,7 +184,6 @@ The package is published to JSR using GitHub Actions. To publish a new version:
 ```
 
 This script will:
-
 - Check for uncommitted changes
 - Verify GitHub Actions tests have passed
 - Regenerate `deno.lock`
@@ -200,17 +199,20 @@ To bump the version and create a new release:
 ```
 
 This script will:
-
 - Check for uncommitted changes
 - Verify GitHub Actions tests have passed
-- Check the latest version from JSR
-- Remove any tags newer than the latest JSR version
-- Increment the patch version
+- Check latest version from JSR
+- Remove newer tags than the latest JSR version
+- Increment patch version
 - Update `deno.json`
 - Create and push a new git tag
 
-The new version will be automatically published to JSR when the tag is pushed.
+When the tag is pushed, the new version will be automatically published to JSR.
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - See LICENSE file for details.
+
+---
+
+[English Version](README.md) | [日本語版](README.ja.md)

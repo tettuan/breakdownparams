@@ -1,46 +1,21 @@
-/**
- * A module for parsing and validating command line arguments in a type-safe manner.
- *
- * This module provides functionality for parsing command line arguments with strong type safety
- * and validation, specifically designed for managing breakdown structures in a hierarchical system.
- *
- * The module exports:
- * - {@link ParamsParser} class for parsing command line arguments
- * - Type definitions for parameter results and options
- * - Demonstrative type definitions
- *
- * @example
- * ```ts
- * import { ParamsParser } from "@tettuan/breakdownparams";
- *
- * const parser = new ParamsParser();
- * const result = parser.parse(Deno.args);
- *
- * if (result.type === "double") {
- *   // Process the parameters
- *   const { demonstrativeType, layerType, options } = result;
- *   // Handle the conversion
- * } else if (result.error) {
- *   // Handle error case
- * }
- * ```
- *
- * @module
- * @since 1.0.0
- */
+// パーサー
+export { ParamsParser } from "./parser/params_parser.ts";
 
-export { ParamsParser } from './params_parser.ts';
+// バリデーター
+export { BaseValidator } from "./validator/base_validator.ts";
+export { SecurityErrorValidator } from "./validator/security_error_validator.ts";
+export { OptionsValidator } from "./validator/options_validator.ts";
+export { ZeroParamsValidator } from "./validator/zero_params_validator.ts";
+export { OneParamValidator } from "./validator/one_param_validator.ts";
+export { TwoParamValidator } from "./validator/two_param_validator.ts";
 
+// 型定義
 export type {
-  DemonstrativeType,
-  ErrorCategory,
-  ErrorCode,
-  ErrorInfo,
-  LayerType,
+  ParamsResult,
+  ZeroParamsResult,
   OneParamResult,
-  OptionParams,
-  ParamPatternResult,
-  ParserConfig,
   TwoParamResult,
-  ZeroParamResult,
-} from './core/params/definitions/types.ts';
+  ErrorInfo,
+  ValidationResult,
+  OptionRule,
+} from "./result/types.ts"; 

@@ -60,21 +60,43 @@ DEFAULT_CONFIG:
     pattern: "^(project|issue|task)$"
     errorMessage: "Invalid layer type. Must be one of: project, issue, task"
 
-# オプション処理の統一
+# オプションフォーマット定義
 
-options:
-  format: "--key=value"  # イコール区切りのみ許可
-  short_format: "-k=value"  # ショートオプションもイコール区切り
+format:
+  # 基本フォーマット
+  long: "--key=value"     # 長形式のフォーマット
+  short: "-k=value"       # 短形式のフォーマット
+  
+  # パターン定義
+  pattern:
+    key: "[a-zA-Z0-9-]+"  # キー名の文字種制限（英数字とハイフンのみ）
+    value: ".+"           # 値の制限（空でない任意の文字列）
+  
+  # 特殊ケース
   special_cases:
     - "-c=value" -> "configFile"
     - "--config=value" -> "configFile"
-  validation:
-    - カスタム変数: "--uv-*" 形式のみ許可
-    - オプション値: 空文字列は許可しない
-    - 未知のオプション: エラーとして処理
-    - オプションの重複: エラーとして処理
-    - 必須オプションの欠落: エラーとして処理
-    - オプション値の型チェック: 文字列、数値、真偽値など
+    - "--help" -> "help"
+    - "--version" -> "version"
+  
+  # カスタム変数
+  custom_variables:
+    prefix: "--uv-"       # カスタム変数のプレフィックス
+    pattern: "--uv-[a-zA-Z0-9-]+=.+"  # カスタム変数の完全パターン
+
+# バリデーションルール
+
+validation:
+  # 値の検証
+  empty_value: "error"    # 空値の扱い（error: エラー、warn: 警告、allow: 許可）
+  unknown_option: "error" # 未知のオプションの扱い
+  duplicate: "error"      # 重複の扱い
+  
+  # 必須オプション
+  required_options: []    # 必須オプションのリスト
+  
+  # 値の型チェック
+  value_types: ["string"] # 許可される値の型
 
 # エラー定義
 
@@ -95,4 +117,4 @@ errors:
       message: "Pattern is required for {type}"
     - code: "INVALID_CONFIG"
       message: "Invalid configuration: {reason}"
-``` 
+```

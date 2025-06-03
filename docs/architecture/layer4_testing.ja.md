@@ -223,23 +223,146 @@ Deno.test('TwoParamValidator', async (t) => {
 
 ### 3.2 オプションテスト
 
+#### 3.2.1 OptionRegistry
+
+```typescript
+Deno.test('OptionRegistry', async (t) => {
+  const registry = new OptionRegistry();
+
+  await t.step('should register and retrieve options', () => {
+    const option = new ValueOption('test', ['t'], false, 'Test option', (v) => ({ isValid: true, errors: [] }));
+    registry.register(option);
+    
+    const retrieved = registry.get('test');
+    assert(retrieved === option);
+    
+    const alias = registry.get('t');
+    assert(alias === option);
+  });
+
+  await t.step('should validate custom variables', () => {
+    assert(registry.validateCustomVariable('uv-test'));
+    assert(!registry.validateCustomVariable('invalid'));
+  });
+
+  await t.step('should get all registered options', () => {
+    const options = registry.getAll();
+    assert(options.length > 0);
+  });
+});
+```
+
+#### 3.2.2 ValueOption
+
+```typescript
+Deno.test('ValueOption', async (t) => {
+  const validator = (value: string) => ({
+    isValid: value.length > 0,
+    errors: value.length === 0 ? ['Value cannot be empty'] : []
+  });
+
+  const option = new ValueOption('test', ['t'], true, 'Test option', validator);
+
+  await t.step('should validate required option', () => {
+    const result = option.validate(undefined);
+    assert(!result.isValid);
+    assert(result.errors.includes('test is required'));
+  });
+
+  await t.step('should validate value with custom validator', () => {
+    const result = option.validate('');
+    assert(!result.isValid);
+    assert(result.errors.includes('Value cannot be empty'));
+
+    const validResult = option.validate('valid');
+    assert(validResult.isValid);
+  });
+
+  await t.step('should parse value', () => {
+    const value = option.parse('test');
+    assertEquals(value, 'test');
+  });
+});
+```
+
+#### 3.2.3 FlagOption
+
+```typescript
+Deno.test('FlagOption', async (t) => {
+  const option = new FlagOption('test', ['t'], 'Test flag');
+
+  await t.step('should always validate successfully', () => {
+    const result = option.validate(undefined);
+    assert(result.isValid);
+  });
+
+  await t.step('should parse as boolean', () => {
+    const trueValue = option.parse('any');
+    assert(trueValue === true);
+
+    const falseValue = option.parse(undefined);
+    assert(falseValue === false);
+  });
+});
+```
+
+#### 3.2.4 CustomVariableOption
+
+```typescript
+Deno.test('CustomVariableOption', async (t) => {
+  const pattern = /^uv-[a-zA-Z0-9_]+$/;
+  const option = new CustomVariableOption('uv-test', 'Test variable', pattern);
+
+  await t.step('should validate name pattern', () => {
+    const result = option.validate('value');
+    assert(result.isValid);
+  });
+
+  await t.step('should reject invalid name pattern', () => {
+    const invalidOption = new CustomVariableOption('invalid', 'Invalid', pattern);
+    const result = invalidOption.validate('value');
+    assert(!result.isValid);
+    assert(result.errors.includes('Invalid custom variable name: invalid'));
+  });
+
+  await t.step('should parse value', () => {
+    const value = option.parse('test');
+    assertEquals(value, 'test');
+  });
+});
+```
+
+#### 3.2.5 OptionsValidator
+
 ```typescript
 Deno.test('OptionsValidator', async (t) => {
-  await t.step('should validate standard options', () => {
-    const validator = new OptionsValidator();
-    const result = validator.validate(['--from=input.md']);
+  const registry = new OptionRegistry();
+  const validator = new OptionsValidator();
+
+  await t.step('should validate registered options', () => {
+    const option = new ValueOption('test', ['t'], false, 'Test option', (v) => ({ isValid: true, errors: [] }));
+    registry.register(option);
+
+    const result = validator.validate(['--test=value'], registry);
     assert(result.isValid);
   });
 
-  await t.step('should validate custom variable options', () => {
-    const validator = new OptionsValidator();
-    const result = validator.validate(['--uv-name=test']);
+  await t.step('should validate custom variables', () => {
+    const result = validator.validate(['--uv-name=test'], registry);
     assert(result.isValid);
   });
 
-  await t.step('should reject invalid options', () => {
-    const validator = new OptionsValidator();
-    const result = validator.validate(['--invalid']);
+  await t.step('should reject invalid custom variables', () => {
+    const result = validator.validate(['--invalid-name=test'], registry);
+    assert(!result.isValid);
+  });
+
+  await t.step('should reject invalid option values', () => {
+    const option = new ValueOption('test', ['t'], false, 'Test option', 
+      (v) => ({ isValid: false, errors: ['Invalid value'] }));
+    registry.register(option);
+
+    const result = validator.validate(['--test=invalid'], registry);
     assert(!result.isValid);
   });
 });
@@ -248,23 +371,20 @@ Deno.test('OptionsValidator', async (t) => {
 ### 3.3 エラーテスト
 
 ```typescript
-Deno.test('ErrorFactory', async (t) => {
-  await t.step('should create validation error', () => {
-    const error = ErrorFactory.createValidationError(
-      'INVALID_TYPE',
-      'Invalid type',
-      { type: 'test' }
-    );
-    assertEquals(error.code, 'INVALID_TYPE');
-    assertEquals(error.message, 'Invalid type');
-    assertEquals(error.details?.type, 'test');
+Deno.test('OptionError', async (t) => {
+  await t.step('should create option error', () => {
+    const error = ErrorFactory.createOptionError('test', 'Invalid option');
+    assertEquals(error.code, 'INVALID_OPTION');
+    assertEquals(error.details?.option, 'test');
   });
 
-  await t.step('should create config error', () => {
-    const error = ErrorFactory.createConfigError('type', 'pattern');
-    assertEquals(error.code, 'INVALID_CONFIG');
-    assertEquals(error.details?.type, 'type');
-    assertEquals(error.details?.pattern, 'pattern');
+  await t.step('should handle option validation errors', () => {
+    const option = new ValueOption('test', ['t'], true, 'Test option', 
+      (v) => ({ isValid: false, errors: ['Invalid value'] }));
+    
+    const result = option.validate('invalid');
+    assert(!result.isValid);
+    assert(result.errors.includes('Invalid value'));
   });
 });
 ```

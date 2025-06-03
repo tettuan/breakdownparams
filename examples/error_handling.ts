@@ -1,4 +1,5 @@
-import { ParamsParser } from '../mod.ts';
+import { ParamsParser } from '../src/mod.ts';
+import { ParamPatternResult } from '../src/core/params/types.ts';
 
 const parser = new ParamsParser();
 const result = parser.parse(Deno.args);
@@ -23,24 +24,28 @@ Try these invalid commands to see error handling in action:
 4. Invalid layer type:
    error_handling to invalid
 
-5. Help and usage:
+5. Invalid option format:
+   error_handling to project --from src
+   error_handling to project --unknown-option
+
+6. Help and usage:
    error_handling --help
 `);
 }
 
-// Display help if requested
-if (result.type === 'no-params' && result.help) {
-  showUsage();
-  Deno.exit(0);
-}
-
-// Handle any errors
-if ('error' in result && result.error) {
-  console.error(`Error: ${result.error}`);
+if (!result.success) {
+  console.error(`Error: ${result.error?.message}`);
   console.log('\nFor usage information, run: error_handling --help');
   Deno.exit(1);
 }
 
+const data = result.data as ParamPatternResult;
+
+if (data.type === 'zero' && data.help) {
+  showUsage();
+  Deno.exit(0);
+}
+
 // If we get here, the command was valid
 console.log('Command processed successfully:');
-console.log(JSON.stringify(result, null, 2));
+console.log(JSON.stringify(data, null, 2));

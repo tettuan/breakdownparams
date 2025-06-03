@@ -151,10 +151,44 @@ interface ErrorInfo {
 class ParamsParser {
   private config: ParserConfig;
   private validators: ParamsValidator[];
+  private optionRegistry: OptionRegistry;
 
   constructor(config?: ParserConfig) {
     this.config = config || DEFAULT_CONFIG;
     this.validators = this.createValidators();
+    this.optionRegistry = new OptionRegistry();
+    this.registerDefaultOptions();
+  }
+
+  private registerDefaultOptions(): void {
+    // 標準オプションの登録
+    this.optionRegistry.register(new ValueOption(
+      'from',
+      ['f'],
+      false,
+      'Input file path',
+      (v) => ({ isValid: v.length > 0, errors: [] })
+    ));
+
+    this.optionRegistry.register(new ValueOption(
+      'destination',
+      ['o'],
+      false,
+      'Output file path',
+      (v) => ({ isValid: v.length > 0, errors: [] })
+    ));
+
+    this.optionRegistry.register(new FlagOption(
+      'help',
+      ['h'],
+      'Show help message'
+    ));
+
+    this.optionRegistry.register(new FlagOption(
+      'version',
+      ['v'],
+      'Show version information'
+    ));
   }
 
   public parse(args: string[]): ParamsResult {
@@ -164,9 +198,9 @@ class ParamsParser {
 
   private createValidators(): ParamsValidator[] {
     return [
-      new ZeroParamValidator(this.config),
-      new OneParamValidator(this.config),
-      new TwoParamValidator(this.config)
+      new ZeroParamValidator(this.config, this.optionRegistry),
+      new OneParamValidator(this.config, this.optionRegistry),
+      new TwoParamValidator(this.config, this.optionRegistry)
     ];
   }
 }
@@ -177,9 +211,11 @@ class ParamsParser {
 ```typescript
 abstract class BaseValidator implements ParamsValidator {
   protected config: ParserConfig;
+  protected optionRegistry: OptionRegistry;
 
-  constructor(config: ParserConfig) {
+  constructor(config: ParserConfig, optionRegistry: OptionRegistry) {
     this.config = config;
+    this.optionRegistry = optionRegistry;
   }
 
   public validate(args: string[]): ValidationResult {
@@ -191,10 +227,104 @@ abstract class BaseValidator implements ParamsValidator {
       return this.createErrorResult(error);
     }
   }
+
+  protected validateOptions(args: string[]): void {
+    const options = this.extractOptions(args);
+    for (const [name, value] of Object.entries(options)) {
+      const option = this.optionRegistry.get(name);
+      if (option) {
+        const result = option.validate(value);
+        if (!result.isValid) {
+          throw new Error(result.errors.join(", "));
+        }
+      } else if (name.startsWith("uv-")) {
+        if (!this.optionRegistry.validateCustomVariable(name)) {
+          throw new Error(`Invalid custom variable name: ${name}`);
+        }
+      }
+    }
+  }
+
+  protected extractOptions(args: string[]): Record<string, string> {
+    const options: Record<string, string> = {};
+    for (const arg of args) {
+      if (arg.startsWith("--")) {
+        const [name, value] = arg.slice(2).split("=");
+        options[name] = value || "";
+      }
+    }
+    return options;
+  }
 }
 ```
 
-### 6.3 エラー処理の実装
+### 6.3 オプションの実装
+
+```typescript
+class ValueOption implements Option {
+  constructor(
+    readonly name: string,
+    readonly aliases: string[],
+    readonly isRequired: boolean,
+    readonly description: string,
+    private validator: (value: string) => ValidationResult
+  ) {}
+
+  validate(value: string | undefined): ValidationResult {
+    if (this.isRequired && !value) {
+      return { isValid: false, errors: [`${this.name} is required`] };
+    }
+    if (value) {
+      return this.validator(value);
+    }
+    return { isValid: true, errors: [] };
+  }
+
+  parse(value: string | undefined): string | undefined {
+    return value;
+  }
+}
+
+class FlagOption implements Option {
+  constructor(
+    readonly name: string,
+    readonly aliases: string[],
+    readonly description: string
+  ) {}
+
+  validate(value: string | undefined): ValidationResult {
+    return { isValid: true, errors: [] };
+  }
+
+  parse(value: string | undefined): boolean {
+    return value !== undefined;
+  }
+}
+
+class CustomVariableOption implements Option {
+  constructor(
+    readonly name: string,
+    readonly description: string,
+    private pattern: RegExp
+  ) {}
+
+  validate(value: string | undefined): ValidationResult {
+    if (!this.pattern.test(this.name)) {
+      return { 
+        isValid: false, 
+        errors: [`Invalid custom variable name: ${this.name}`] 
+      };
+    }
+    return { isValid: true, errors: [] };
+  }
+
+  parse(value: string | undefined): string | undefined {
+    return value;
+  }
+}
+```
+
+### 6.4 エラー処理の実装
 
 ```typescript
 class ErrorFactory {
@@ -223,6 +353,19 @@ class ErrorFactory {
       }
     };
   }
+
+  static createOptionError(
+    name: string,
+    message: string
+  ): ErrorInfo {
+    return {
+      code: "INVALID_OPTION",
+      message,
+      details: {
+        option: name
+      }
+    };
+  }
 }
 ```
 
@@ -241,37 +384,50 @@ if (result.type === "break") {
 }
 ```
 
-### 7.2 カスタム設定での使用
+### 7.2 カスタムオプションの使用
 
 ```typescript
-const customConfig: ParserConfig = {
-  demonstrativeType: {
-    pattern: "^[a-z]+$",
-    errorMessage: "Invalid demonstrative type"
-  },
-  layerType: {
-    pattern: "^[a-z]+$",
-    errorMessage: "Invalid layer type"
-  }
-};
+const parser = new ParamsParser();
 
-const parser = new ParamsParser(customConfig);
-const result = parser.parse(["custom", "layer", "--from=input.md"]);
+// カスタムオプションの登録
+parser.optionRegistry.register(new ValueOption(
+  'template',
+  ['t'],
+  false,
+  'Template file path',
+  (v) => ({ isValid: v.endsWith('.md'), errors: [] })
+));
+
+// カスタム変数の使用
+const result = parser.parse([
+  "to",
+  "project",
+  "--template=template.md",
+  "--uv-name=test-project"
+]);
+
+if (result.type === "break") {
+  console.log(`Template: ${result.options.template}`);
+  console.log(`Custom Variable: ${result.options['uv-name']}`);
+}
 ```
 
-### 7.3 エラーハンドリング
+### 7.3 エラー処理の使用
 
 ```typescript
 try {
-  const result = parser.parse(args);
-  if (result.error) {
-    console.error(`Error: ${result.error.message}`);
-    if (result.error.details) {
-      console.error("Details:", result.error.details);
-    }
-  }
+  const parser = new ParamsParser();
+  const result = parser.parse([
+    "to",
+    "project",
+    "--from=",  // 空の値
+    "--invalid" // 無効なオプション
+  ]);
 } catch (error) {
-  console.error("Unexpected error:", error);
+  if (error instanceof ValidationError) {
+    console.error(`Validation Error: ${error.message}`);
+    console.error(`Details:`, error.details);
+  }
 }
 ```
 

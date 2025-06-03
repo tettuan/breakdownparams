@@ -22,7 +22,7 @@ const result = parser.parse(Deno.args);
 
 // 異なる結果タイプの処理
 switch (result.type) {
-  case 'no-params':
+  case 'zero-params':
     if (result.help) {
       console.log('ヘルプメッセージを表示');
     }
@@ -31,13 +31,13 @@ switch (result.type) {
     }
     break;
 
-  case 'single':
+  case 'one':
     if (result.command === 'init') {
       console.log('プロジェクトの初期化');
     }
     break;
 
-  case 'double':
+  case 'two':
     console.log(`指示タイプ: ${result.demonstrativeType}`);
     console.log(`レイヤー: ${result.layerType}`);
     if (result.options.fromFile) {
@@ -60,11 +60,11 @@ switch (result.type) {
 
 ### 結果タイプ
 
-コマンドライン引数に基づいて、以下の結果タイプが利用可能です。各タイプで利用可能なオプションの詳細については、[オプション ドキュメント](docs/options.md)を参照してください。
+コマンドライン引数に基づいて、以下の結果タイプが利用可能です。各タイプで利用可能なオプションの詳細については、[オプション ドキュメント](docs/options.ja.md)を参照してください。
 
-- `NoParamsResult`: パラメータなしのコマンドまたはヘルプ/バージョンフラグ用
-- `SingleParamResult`: "init"などの単一コマンド用
-- `DoubleParamsResult`: 指示タイプとレイヤータイプを持つコマンド用
+- `ZeroParamResult`: パラメータなしのコマンドまたはヘルプ/バージョンフラグ用
+- `OneParamResult`: "init"などの単一コマンド用
+- `TwoParamResult`: 指示タイプとレイヤータイプを持つコマンド用
 
 ### オプション
 
@@ -72,7 +72,7 @@ switch (result.type) {
 - `--destination` または `-o`: 出力ファイルを指定
 - `--input` または `-i`: 入力レイヤータイプを指定
 
-各結果タイプで利用可能なオプションの完全なリストについては、[オプション ドキュメント](docs/options.md)を参照してください。
+各結果タイプで利用可能なオプションの完全なリストについては、[オプション ドキュメント](docs/options.ja.md)を参照してください。
 
 ## 高度な機能
 

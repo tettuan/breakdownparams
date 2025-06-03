@@ -10,10 +10,12 @@
 class ParamsParser {
   private config: ParserConfig;
   private validators: ParamsValidator[];
+  private optionRegistry: OptionRegistry;
 
   constructor(config?: ParserConfig) {
     this.config = config || DEFAULT_CONFIG;
     this.validators = this.createValidators();
+    this.optionRegistry = new OptionRegistry();
   }
 
   public parse(args: string[]): ParamsResult {
@@ -51,9 +53,11 @@ class ParamsParser {
 ```typescript
 abstract class BaseValidator implements ParamsValidator {
   protected config: ParserConfig;
+  protected optionRegistry: OptionRegistry;
 
-  constructor(config: ParserConfig) {
+  constructor(config: ParserConfig, optionRegistry: OptionRegistry) {
     this.config = config;
+    this.optionRegistry = optionRegistry;
   }
 
   public validate(args: string[]): ValidationResult {
@@ -73,7 +77,16 @@ abstract class BaseValidator implements ParamsValidator {
   }
 
   protected validateOptions(args: string[]): void {
-    // オプション検証の実装
+    const options = this.extractOptions(args);
+    for (const [name, value] of Object.entries(options)) {
+      const option = this.optionRegistry.get(name);
+      if (option) {
+        const result = option.validate(value);
+        if (!result.isValid) {
+          throw new Error(result.errors.join(", "));
+        }
+      }
+    }
   }
 
   protected createErrorResult(error: Error): ValidationResult {
@@ -121,7 +134,124 @@ class TwoParamValidator extends BaseValidator {
   }
 
   private parseOptions(args: string[]): OptionParams {
-    // オプション解析の実装
+    const options = this.extractOptions(args);
+    const result: OptionParams = {};
+    
+    for (const [name, value] of Object.entries(options)) {
+      const option = this.optionRegistry.get(name);
+      if (option) {
+        result[name] = option.parse(value);
+      }
+    }
+    
+    return result;
+  }
+}
+```
+
+### 1.4 OptionRegistry
+
+```typescript
+class OptionRegistry {
+  private options: Map<string, Option>;
+  private customVariablePattern: RegExp;
+
+  constructor() {
+    this.options = new Map();
+    this.customVariablePattern = /^uv-[a-zA-Z0-9_]+$/;
+  }
+
+  public register(option: Option): void {
+    this.options.set(option.name, option);
+    for (const alias of option.aliases) {
+      this.options.set(alias, option);
+    }
+  }
+
+  public get(name: string): Option | undefined {
+    return this.options.get(name);
+  }
+
+  public validateCustomVariable(name: string): boolean {
+    return this.customVariablePattern.test(name);
+  }
+
+  public getAll(): Option[] {
+    return Array.from(this.options.values());
+  }
+}
+```
+
+### 1.5 ValueOption
+
+```typescript
+class ValueOption implements Option {
+  constructor(
+    readonly name: string,
+    readonly aliases: string[],
+    readonly isRequired: boolean,
+    readonly description: string,
+    private validator: (value: string) => ValidationResult
+  ) {}
+
+  validate(value: string | undefined): ValidationResult {
+    if (this.isRequired && !value) {
+      return { isValid: false, errors: [`${this.name} is required`] };
+    }
+    if (value) {
+      return this.validator(value);
+    }
+    return { isValid: true, errors: [] };
+  }
+
+  parse(value: string | undefined): string | undefined {
+    return value;
+  }
+}
+```
+
+### 1.6 FlagOption
+
+```typescript
+class FlagOption implements Option {
+  constructor(
+    readonly name: string,
+    readonly aliases: string[],
+    readonly description: string
+  ) {}
+
+  validate(value: string | undefined): ValidationResult {
+    return { isValid: true, errors: [] };
+  }
+
+  parse(value: string | undefined): boolean {
+    return value !== undefined;
+  }
+}
+```
+
+### 1.7 CustomVariableOption
+
+```typescript
+class CustomVariableOption implements Option {
+  constructor(
+    readonly name: string,
+    readonly description: string,
+    private pattern: RegExp
+  ) {}
+
+  validate(value: string | undefined): ValidationResult {
+    if (!this.pattern.test(this.name)) {
+      return { 
+        isValid: false, 
+        errors: [`Invalid custom variable name: ${this.name}`] 
+      };
+    }
+    return { isValid: true, errors: [] };
+  }
+
+  parse(value: string | undefined): string | undefined {
+    return value;
   }
 }
 ```
@@ -163,6 +293,29 @@ interface ParserConfig {
 }
 ```
 
+### 2.4 Option
+
+```typescript
+interface Option {
+  readonly name: string;
+  readonly aliases: string[];
+  readonly type: OptionType;
+  readonly isRequired: boolean;
+  readonly description: string;
+
+  validate(value: string | undefined): ValidationResult;
+  parse(value: string | undefined): OptionValue;
+}
+
+enum OptionType {
+  VALUE,
+  FLAG,
+  CUSTOM_VARIABLE
+}
+
+type OptionValue = string | boolean | undefined;
+```
+
 ## 3. エラー処理詳細
 
 ### 3.1 ErrorInfo
@@ -176,6 +329,7 @@ interface ErrorInfo {
     value?: string;
     pattern?: string;
     reason?: string;
+    option?: string;
   };
 }
 ```
@@ -206,6 +360,19 @@ class ErrorFactory {
       details: {
         type,
         pattern
+      }
+    };
+  }
+
+  static createOptionError(
+    name: string,
+    message: string
+  ): ErrorInfo {
+    return {
+      code: "INVALID_OPTION",
+      message,
+      details: {
+        option: name
       }
     };
   }
@@ -244,22 +411,26 @@ class SecurityValidator {
 
 ```typescript
 class OptionsValidator {
-  static validate(args: string[]): void {
+  static validate(args: string[], registry: OptionRegistry): void {
     const options = this.extractOptions(args);
     
-    // オプション形式の検証
-    this.validateOptionFormat(options);
-    
-    // カスタム変数オプションの検証
-    this.validateCustomVariables(options);
+    for (const [name, value] of Object.entries(options)) {
+      const option = registry.get(name);
+      if (option) {
+        const result = option.validate(value);
+        if (!result.isValid) {
+          throw new Error(result.errors.join(", "));
+        }
+      } else if (name.startsWith("uv-")) {
+        if (!registry.validateCustomVariable(name)) {
+          throw new Error(`Invalid custom variable name: ${name}`);
+        }
+      }
+    }
   }
 
-  private static validateOptionFormat(options: string[]): void {
-    // オプション形式検証の実装
-  }
-
-  private static validateCustomVariables(options: string[]): void {
-    // カスタム変数オプション検証の実装
+  private static extractOptions(args: string[]): Record<string, string> {
+    // オプション抽出の実装
   }
 }
 ```

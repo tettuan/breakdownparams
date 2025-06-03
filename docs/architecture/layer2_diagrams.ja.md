@@ -20,6 +20,12 @@ graph TD
     J --> L[CustomConfig]
     
     I --> M[CustomVariableValidator]
+
+    N[OptionRegistry] --> O[ValueOption]
+    N --> P[FlagOption]
+    N --> Q[CustomVariableOption]
+    
+    D --> N
 ```
 
 ## 2. シーケンス図
@@ -32,6 +38,7 @@ sequenceDiagram
     participant Parser as ParamsParser
     participant Validator as ParamsValidator
     participant Config as ParserConfig
+    participant Options as OptionRegistry
     
     User->>Parser: parse(args)
     Parser->>Config: getConfig()
@@ -40,7 +47,9 @@ sequenceDiagram
     par Validation
         Parser->>Validator: validate(args)
         Validator->>Validator: checkSecurity()
-        Validator->>Validator: validateOptions()
+        Validator->>Options: validateOptions()
+        Options->>Options: validateOption()
+        Options-->>Validator: optionResult
         Validator->>Validator: validateParams()
         Validator-->>Parser: result
     end
@@ -56,6 +65,7 @@ sequenceDiagram
     participant Parser as ParamsParser
     participant Validator as ParamsValidator
     participant Error as ErrorHandler
+    participant Options as OptionRegistry
     
     Parser->>Validator: validate(args)
     Validator->>Validator: validateInput()
@@ -72,10 +82,35 @@ sequenceDiagram
         Validator->>Error: createConfigError()
         Error-->>Validator: ErrorResult
         Validator-->>Parser: ErrorResult
+    else Option Error
+        Options->>Error: createOptionError()
+        Error-->>Options: ErrorResult
+        Options-->>Validator: ErrorResult
+        Validator-->>Parser: ErrorResult
     end
     
     Parser->>Parser: handleError()
     Parser-->>User: ErrorResult
+```
+
+### 2.3 オプション処理フロー
+
+```mermaid
+sequenceDiagram
+    participant Parser as ParamsParser
+    participant Registry as OptionRegistry
+    participant Option as Option
+    
+    Parser->>Registry: register(option)
+    Registry->>Option: validate()
+    Option->>Option: validateValue()
+    Option-->>Registry: ValidationResult
+    
+    Parser->>Registry: parse(args)
+    Registry->>Option: parse(value)
+    Option->>Option: convertValue()
+    Option-->>Registry: OptionValue
+    Registry-->>Parser: ParsedOptions
 ```
 
 ## 3. 状態遷移図
@@ -105,13 +140,31 @@ stateDiagram-v2
     ErrorDetection --> ValidationError
     ErrorDetection --> SecurityError
     ErrorDetection --> ConfigError
+    ErrorDetection --> OptionError
     
     ValidationError --> ErrorHandling
     SecurityError --> ErrorHandling
     ConfigError --> ErrorHandling
+    OptionError --> ErrorHandling
     
     ErrorHandling --> ErrorResult
     ErrorResult --> [*]
+```
+
+### 3.3 オプション状態
+
+```mermaid
+stateDiagram-v2
+    [*] --> OptionRegistration
+    OptionRegistration --> OptionValidation
+    OptionValidation --> OptionParsing
+    OptionParsing --> ValueConversion
+    ValueConversion --> [*]
+    
+    OptionValidation --> OptionError: Invalid Option
+    OptionParsing --> OptionError: Parse Error
+    ValueConversion --> OptionError: Conversion Error
+    OptionError --> [*]
 ```
 
 ## 4. データフロー図
@@ -126,6 +179,10 @@ graph LR
     F[ParserConfig] --> B
     G[ErrorHandler] --> C
     H[CustomVariables] --> C
+    
+    I[OptionRegistry] --> C
+    J[Options] --> I
+    K[OptionValues] --> I
 ```
 
 ## 5. クラス階層図
@@ -159,10 +216,30 @@ classDiagram
         +error: ErrorInfo
     }
     
+    class Option {
+        <<interface>>
+        +name: string
+        +aliases: string[]
+        +type: OptionType
+        +validate(value: string): ValidationResult
+        +parse(value: string): OptionValue
+    }
+    
+    class OptionRegistry {
+        +register(option: Option): void
+        +get(name: string): Option
+        +validate(name: string): ValidationResult
+    }
+    
     ParamsParser --> ParserConfig
     ParamsParser --> ParamsValidator
     ParamsValidator <|.. BaseValidator
     BaseValidator --> ErrorResult
+    BaseValidator --> OptionRegistry
+    OptionRegistry --> Option
+    Option <|.. ValueOption
+    Option <|.. FlagOption
+    Option <|.. CustomVariableOption
 ```
 
 ## 6. パッケージ図
@@ -173,11 +250,13 @@ graph TD
     A --> C[validator]
     A --> D[config]
     A --> E[error]
+    A --> F[options]
     
-    B --> F[types]
-    C --> F
-    D --> F
-    E --> F
+    B --> G[types]
+    C --> G
+    D --> G
+    E --> G
+    F --> G
 ```
 
 ---
