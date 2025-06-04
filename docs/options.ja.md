@@ -2,17 +2,46 @@
 
 このドキュメントは、breakdownparamsライブラリのオプション（ハイフン付き引数）の仕様を定義します。
 
+## 引数フォーマット
+
+オプション引数は以下のフォーマットに従う必要があります：
+
+### 正しいフォーマット
+- `--option=value` (長形式)
+- `-o=value` (短縮形)
+- `--option=` (空値指定)
+- `--option=""` (空文字列指定)
+- `--option=''` (空文字列指定)
+
+### 誤ったフォーマット
+- `--option value` (スペース区切りは非対応)
+- `-o value` (スペース区切りは非対応)
+
+### 空値の指定方法
+オプションの値を空にする場合は、以下のいずれかの方法を使用します：
+
+1. イコール記号のみ指定：
+   ```bash
+   --option=
+   ```
+
+2. 空文字列を指定：
+   ```bash
+   --option=""
+   --option=''
+   ```
+
 ## オプション一覧
 
 | オプション    | エイリアス | 説明                 | 値の型  | 必須   | 例                        |
 | ------------- | ---------- | -------------------- | ------- | ------ | ------------------------- |
 | --help        | -h         | ヘルプ情報を表示     | boolean | いいえ | `--help`                  |
 | --version     | -v         | バージョン情報を表示 | boolean | いいえ | `--version`               |
-| --from        | -f         | ソースファイルパス   | string  | いいえ | `--from input.md`         |
-| --destination | -o         | 出力ファイルパス     | string  | いいえ | `--destination output.md` |
-| --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input project`         |
-| --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation strict`     |
-| --config      | -c         | 設定ファイル名       | string  | いいえ | `--config test`           |
+| --from        | -f         | ソースファイルパス   | string  | いいえ | `--from=input.md`         |
+| --destination | -o         | 出力ファイルパス     | string  | いいえ | `--destination=output.md` |
+| --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input=project`         |
+| --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation=strict`     |
+| --config      | -c         | 設定ファイル名       | string  | いいえ | `--config=test`           |
 | --uv-*        | なし       | カスタム変数オプション | string  | いいえ | `--uv-project=myproject`  |
 
 ## オプションの制約
@@ -33,19 +62,14 @@
    - カスタム変数オプションの構文が不正な場合（`=`の欠落など）はエラーとなります
 
 4. **パラメータタイプによる制約**
-   - `--config` / `-c` オプションは DoubleParams でのみ使用可能です
-   - カスタム変数オプション（`--uv-*`）も DoubleParams でのみ使用可能です
-   - 他のパラメータタイプ（NoParams, SingleParam）では無視されます
+   - `--config` / `-c` オプションは TwoParams でのみ使用可能です
+   - カスタム変数オプション（`--uv-*`）も TwoParams でのみ使用可能です
+   - 他のパラメータタイプ（ZeroParams, OneParam, TwoParams）では無視されます
 
 ## 入力レイヤータイプの値
 
-`--input`オプションを使用する場合、以下の値がサポートされます：
+`--input`オプションを使用する場合、２番目パラメータのバリデーションルールを使います：
 
-| 入力値  | 説明         |
-| ------- | ------------ |
-| project | プロジェクト |
-| issue   | 課題         |
-| task    | タスク       |
 
 ## 使用例
 
@@ -59,38 +83,62 @@ breakdown -v
 ### ファイル操作
 
 ```bash
-breakdown to issue --from input.md --destination output.md
-breakdown to issue -f input.md -o output.md
+# 正しいフォーマット
+breakdown to issue --from=input.md --destination=output.md
+breakdown to issue -f=input.md -o=output.md
+
+# 空値指定の例
+breakdown to issue --from= --destination=""
+breakdown to issue -f='' -o=
 ```
 
 ### レイヤータイプ指定
 
 ```bash
-breakdown summary task --input project
-breakdown summary task -i project
+# 正しいフォーマット
+breakdown summary task --input=project
+breakdown summary task -i=project
+
+# 空値指定の例
+breakdown summary task --input=
+breakdown summary task -i=""
 ```
 
 ### プロンプト適応
 
 ```bash
-breakdown summary task --adaptation strict
-breakdown summary task -a strict
+# 正しいフォーマット
+breakdown summary task --adaptation=strict
+breakdown summary task -a=strict
+
+# 空値指定の例
+breakdown summary task --adaptation=
+breakdown summary task -a=''
 ```
 
 ### カスタム変数オプション
 
 ```bash
+# 正しいフォーマット
 breakdown to project --uv-project=myproject
 breakdown to project --uv-version=1.0.0 --uv-environment=production
+
+# 空値指定の例
+breakdown to project --uv-project= --uv-version=""
 ```
 
 ### 複合使用
 
 ```bash
-breakdown to issue --from input.md -o output.md -i project -a strict
-breakdown to project --config test
-breakdown summary task -c test
-breakdown to project --config test --uv-environment=prod --uv-version=1.0.0
+# 正しいフォーマット
+breakdown to issue --from=input.md -o=output.md -i=project -a=strict
+breakdown to project --config=test
+breakdown summary task -c=test
+breakdown to project --config=test --uv-environment=prod --uv-version=1.0.0
+
+# 空値指定を含む例
+breakdown to issue --from= -o="" -i=project -a=
+breakdown to project --config= --uv-environment="" --uv-version=
 ```
 
 ## 返却型

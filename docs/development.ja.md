@@ -25,17 +25,17 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 
 パラメータの種類は、位置引数の数に基づいて3つのタイプに分類されます：
 
-1. **NoParams**
+1. **ZeroParams**
    - 位置引数なし
    - オプションのみ指定可能
    - 例：`breakdown --help`
 
-2. **SingleParam**
+2. **OneParam**
    - 位置引数1つ
    - 有効な値：`init`
    - 例：`breakdown init`
 
-3. **DoubleParams**
+3. **TwoParams**
    - 位置引数2つ
    - 形式：`<demonstrativeType> <layerType>`
    - 例：`breakdown to project`
@@ -82,7 +82,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
    - カスタム変数オプション名は大文字小文字を区別し、指定された通りに使用
 
 5. **カスタム変数オプションの制約**
-   - DoubleParamsモードでのみ使用可能
+   - TwoParamsモードでのみ使用可能
    - 構文は`--uv-<name>=<value>`の形式を厳守
    - 変数名は英数字と最小限の特殊文字のみ許可
    - 値は文字列として扱い、検証は行わない
@@ -94,7 +94,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 | エラーケース       | メッセージ例                                           |
 | ------------------ | ------------------------------------------------------ |
 | 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正な値           | "Invalid value for demonstrativeType: {value}"         |
+| 不正な値           | "Invalid demonstrative type. Must be one of: to, summary, defect" |
 | 必須パラメータ不足 | "Missing required parameter: {param}"                  |
 | カスタム変数オプション構文エラー | "Invalid custom variable option syntax: {value}"  |
 
@@ -105,24 +105,25 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 ```typescript
 import { ParamsParser } from './mod.ts';
 
+// デフォルト設定値でパーサーを初期化
 const parser = new ParamsParser();
 
 // パラメータなし
 parser.parse([]);
-// { type: "no-params", help: false, version: false }
+// { type: "zero-params", help: false, version: false }
 
 // ヘルプ表示
 parser.parse(['-h']);
-// { type: "no-params", help: true, version: false }
+// { type: "zero-params", help: true, version: false }
 
 // 初期化
 parser.parse(['init']);
-// { type: "single", command: "init" }
+// { type: "one", command: "init" }
 
 // 2パラメータ
 parser.parse(['to', 'issue', '--from', './input.md']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
@@ -131,10 +132,37 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 // 複合オプション
 parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "summary",
 //   layerType: "task",
 //   options: { fromFile: "./tasks.md", adaptation: "strict" }
+// }
+```
+
+### カスタム設定値での使用例
+
+```typescript
+// カスタム設定値でパーサーを初期化
+const customConfig = {
+  demonstrativeType: {
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
+    errorMessage: 'Invalid demonstrative type'
+  },
+  layerType: {
+    pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
+    errorMessage: 'Invalid layer type'
+  }
+};
+
+const customParser = new ParamsParser(customConfig);
+
+// カスタム設定値での2パラメータ
+customParser.parse(['custom', 'layer', '--from', './input.md']);
+// {
+//   type: "two",
+//   demonstrativeType: "custom",
+//   layerType: "layer",
+//   options: { fromFile: "./input.md" }
 // }
 ```
 
@@ -144,7 +172,7 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // カスタム変数オプションを含む2パラメータ
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "project",
 //   options: {
@@ -169,7 +197,7 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
    - エイリアスは小文字のみ
    - パス文字列の加工なし
    - オプションの重複時は最後の指定が有効
-   - カスタム変数オプションはDoubleParamsモードでのみ使用可能
+   - カスタム変数オプションはTwoParamsモードでのみ使用可能
 
 ## テスト戦略
 

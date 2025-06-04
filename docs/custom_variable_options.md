@@ -45,7 +45,7 @@ This document defines the specification for implementing custom variable options
 
 ## Usage Examples
 
-### Single Variable
+### One Variable
 ```bash
 breakdown to project --uv-project=myproject
 ```
@@ -75,7 +75,7 @@ breakdown to project --uv-path=/usr/local/bin --uv-config={"key":"value"} --uv-a
 | Missing Value        | "Missing value for custom variable: {name}"       |
 | Duplicate Variable Name | "Duplicate custom variable name: {name}"         |
 | Invalid Syntax       | "Invalid custom variable syntax: {option}"        |
-| Invalid Parameter Type | "Custom variables are only available with DoubleParams" |
+| Invalid Parameter Type | "Custom variables are only available with TwoParams" |
 
 ## Type Definitions
 
@@ -119,16 +119,16 @@ interface OptionParams {
 - `CustomVariables` is an optional property in the return type
 - `CustomVariables` keys must match command-line variable names (including case)
 - Values are always strings, maintaining input as received from command line
-- This type only exists in DoubleParams mode
+- This type only exists in TwoParams mode
 - Property becomes undefined when no custom variables are provided
 
 ## Compatibility with Existing Specifications
 
 ### Parameter Type Compatibility
-- Custom variables are only available in DoubleParams mode
+- Custom variables are only available in TwoParams mode
 - Like the `--config` option, custom variables are ignored in:
-  - NoParams
-  - SingleParam
+  - ZeroParams
+  - OneParam
 - Example: `breakdown to project --uv-environment=prod`
 
 ### Case Sensitivity
@@ -156,7 +156,7 @@ interface OptionParams {
 
 ### Testing Requirements
 - Unit tests must cover:
-  - All parameter types (NoParams, SingleParam, DoubleParams)
+  - All parameter types (ZeroParams, OneParam, TwoParams)
   - Combinations with existing options
   - Error cases
   - Edge cases (empty values, special characters)

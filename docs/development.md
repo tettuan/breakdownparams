@@ -25,17 +25,17 @@ It specializes in parameter parsing, validation, and value storage, aiming for a
 
 Parameter types are classified into three types based on the number of positional arguments:
 
-1. **NoParams**
+1. **ZeroParams**
    - No positional arguments
    - Only options can be specified
    - Example: `breakdown --help`
 
-2. **SingleParam**
+2. **OneParam**
    - One positional argument
    - Valid value: `init`
    - Example: `breakdown init`
 
-3. **DoubleParams**
+3. **TwoParams**
    - Two positional arguments
    - Format: `<demonstrativeType> <layerType>`
    - Example: `breakdown to project`
@@ -66,8 +66,6 @@ Options are specified as hyphenated arguments. Each option supports both long an
    - 3 or more: Error
 
 2. **Value Constraints**
-   - Only lowercase aliases are valid
-   - Undefined aliases are ignored
    - Long form takes precedence (when conflicting with short form)
    - Last specification takes effect for duplicate options
 
@@ -77,12 +75,10 @@ Options are specified as hyphenated arguments. Each option supports both long an
    - Last specification takes effect when same option is specified multiple times
 
 4. **Case Sensitivity**
-   - Only lowercase aliases are valid for layer types
-   - Aliases containing uppercase letters are treated as invalid
    - Custom variable option names are case sensitive and used as specified
 
 5. **Custom Variable Option Constraints**
-   - Only available in DoubleParams mode
+   - Only available in TwoParams mode
    - Syntax must strictly follow `--uv-<name>=<value>` format
    - Variable names only allow alphanumeric and minimal special characters
    - Values are treated as strings without validation
@@ -109,20 +105,20 @@ const parser = new ParamsParser();
 
 // No parameters
 parser.parse([]);
-// { type: "no-params", help: false, version: false }
+// { type: "zero-params", help: false, version: false }
 
 // Help display
 parser.parse(['-h']);
-// { type: "no-params", help: true, version: false }
+// { type: "zero-params", help: true, version: false }
 
 // Initialization
 parser.parse(['init']);
-// { type: "single", command: "init" }
+// { type: "one", command: "init" }
 
 // Two parameters
 parser.parse(['to', 'issue', '--from', './input.md']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
@@ -131,7 +127,7 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 // Combined options
 parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "summary",
 //   layerType: "task",
 //   options: { fromFile: "./tasks.md", adaptation: "strict" }
@@ -144,7 +140,7 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // Two parameters with custom variable options
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
-//   type: "double",
+//   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "project",
 //   options: {
@@ -161,15 +157,13 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 1. **Unsupported Features**
    - Parameter meaning interpretation
    - Path validation/normalization
-   - Case normalization (except for layer type aliases)
    - Custom variable option value validation (syntax check only)
 
 2. **Limitations**
    - Maximum of 2 parameters
-   - Lowercase aliases only
    - No path string processing
    - Last specification takes effect for duplicate options
-   - Custom variable options only available in DoubleParams mode
+   - Custom variable options only available in TwoParams mode
 
 ## Testing Strategy
 
@@ -182,7 +176,6 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 2. **Integration Tests**
    - Complete command-line argument parsing
    - Error case handling
-   - Alias processing
 
 3. **Edge Cases**
    - Empty arguments

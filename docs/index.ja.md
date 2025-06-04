@@ -86,14 +86,16 @@
 最初のオプション（$1）は`DemonstrativeType`と呼ばれます。
 2番目のオプション（$2）は`LayerType`と呼ばれます。
 
-### 可能なDemonstrativeType値
+### デフォルトのバリデーションルール
 
+#### DemonstrativeType
+デフォルトの正規表現パターン：`^(to|summary|defect)$`
 - to
 - summary
 - defect
 
-### 可能なLayerType値
-
+#### LayerType
+デフォルトの正規表現パターン：`^(project|issue|task)$`
 - project
 - issue
 - task
@@ -107,14 +109,14 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from <file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f <file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
 ```
 
 ##### FromFile値
 
 - `<file>`部分を取得
-- 例：`--from ./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
+- 例：`--from=./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
 
 #### --destination `<output_file>`
 
@@ -123,14 +125,14 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination <output_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o <output_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
 ```
 
 ##### DestinationFile値
 
 - `<output_file>`部分を取得
-- 例：`--destination ./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
+- 例：`--destination=./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
 
 #### --input `<from_layer_type>`
 
@@ -139,18 +141,15 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input <from_layer_type>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i <from_layer_type>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
 ```
 
 ##### from_layer_type値
 
 - `<from_layer_type>`部分を取得
-- 例：`--input issue`の場合、`issue`を保存
-- 許可される値：
-  - project
-  - issue
-  - task
+- 例：`--input=issue`の場合、`issue`を保存
+- デフォルトの正規表現パターン：`^(project|issue|task)$`
 
 #### --config `<config_file>`
 
@@ -159,19 +158,19 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config <config_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c <config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
 ```
 
 ##### ConfigFile値
 
 - `<config_file>`部分を取得
-- 例：`--config test`の場合、`test`を保存
+- 例：`--config=test`の場合、`test`を保存
 
 #### カスタム変数オプション（`--uv-*`）
 
 カスタム変数オプションは、ユーザー定義の変数を指定するためのオプションです。
-DoubleParamsモードでのみ使用可能で、以下の形式で指定します：
+TwoParamsモードでのみ使用可能で、以下の形式で指定します：
 
 ```bash
 ./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>

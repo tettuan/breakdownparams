@@ -13,7 +13,7 @@
  * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
  *
- * if (result.type === "double") {
+ * if (result.type === "two") {
  *   // Process the parameters
  *   const { demonstrativeType, layerType, options } = result;
  *   // Handle the conversion
@@ -23,16 +23,16 @@
  * ```
  */
 
-export { ParamsParser } from './src/params_parser.ts';
+export { ParamsParser } from './src/parser/params_parser.ts';
 export type {
-  DemonstrativeType,
-  DoubleParamsResult,
-  LayerTypeAliasMap,
-  NoParamsResult,
-  OptionParams,
+  ErrorInfo,
+  OneParamResult,
+  OptionRule,
   ParamsResult,
-  SingleParamResult,
-} from './src/types.ts';
+  TwoParamResult,
+  ValidationResult,
+  ZeroParamsResult,
+} from './src/result/types.ts';
 
 /**
  * @module breakdownparams
@@ -48,7 +48,7 @@ export type {
  * const parser = new ParamsParser();
  * const result = parser.parse(Deno.args);
  *
- * if (result.type === "double") {
+ * if (result.type === "two") {
  *   // Process the parameters
  *   const { demonstrativeType, layerType, options } = result;
  *   // Handle the conversion

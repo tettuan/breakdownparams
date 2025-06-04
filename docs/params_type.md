@@ -10,7 +10,7 @@ This specification defines the type definitions and parsing flow of the paramete
 ### 1. Basic Types
 
 ```typescript
-type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
 
 // Error information type
 type ErrorResult = {
@@ -24,24 +24,24 @@ type ErrorResult = {
 #### 2.1 Types by Parameter Count
 ```typescript
 // No arguments
-type NoParamsResult = {
-  type: 'no-params';
+type ZeroParamsResult = {
+  type: 'zero-params';
   help: boolean;
   version: boolean;
   error?: ErrorResult;  // Set when parameter or option error occurs
 };
 
-// Single argument
-type SingleParamResult = {
-  type: 'single';
+// One argument
+type OneParamResult = {
+  type: 'one';
   command: 'init';
   options: OptionParams;
   error?: ErrorResult;  // Set when parameter or option error occurs
 };
 
 // Two arguments
-type DoubleParamsResult = {
-  type: 'double';
+type TwoParamsResult = {
+  type: 'two';
   demonstrativeType: DemonstrativeType;
   layerType: LayerType;
   options: OptionParams;
@@ -68,12 +68,12 @@ type OptionParams = {
 1. **Branching by Argument Count**
    ```typescript
    if (nonOptionArgs.length === 0) {
-     // Return NoParamsResult
+     // Return ZeroParamsResult
    } else if (nonOptionArgs.length === 1) {
      // Parameter validation
      if (!isValidCommand(nonOptionArgs[0])) {
        return {
-         type: 'single',
+         type: 'one',
          command: 'init',
          options: {},
          error: {
@@ -82,12 +82,12 @@ type OptionParams = {
          }
        };
      }
-     // Return SingleParamResult
+     // Return OneParamResult
    } else if (nonOptionArgs.length === 2) {
      // Parameter validation
      if (!isValidDemonstrativeType(nonOptionArgs[0])) {
        return {
-         type: 'double',
+         type: 'two',
          demonstrativeType: '...',
          layerType: '...',
          options: {},
@@ -97,7 +97,7 @@ type OptionParams = {
          }
        };
      }
-     // Return DoubleParamsResult
+     // Return TwoParamsResult
    }
    ```
 
@@ -146,7 +146,7 @@ When an error occurs in parameters or options, the error information is set in t
 ```typescript
 // Example: Parameter error
 {
-  type: 'double',
+  type: 'two',
   demonstrativeType: '...',
   layerType: '...',
   options: {},
@@ -158,7 +158,7 @@ When an error occurs in parameters or options, the error information is set in t
 
 // Example: Option error
 {
-  type: 'double',
+  type: 'two',
   demonstrativeType: '...',
   layerType: '...',
   options: {},
@@ -174,7 +174,7 @@ When an error occurs in parameters or options, the error information is set in t
 ```typescript
 // Example 1: Parameter error (invalid command)
 {
-  type: 'single',
+  type: 'one',
   command: 'init',
   options: {},
   error: {
@@ -185,7 +185,7 @@ When an error occurs in parameters or options, the error information is set in t
 
 // Example 2: Parameter error (invalid layer type)
 {
-  type: 'double',
+  type: 'two',
   demonstrativeType: '...',
   layerType: '...',
   options: {},
@@ -197,7 +197,7 @@ When an error occurs in parameters or options, the error information is set in t
 
 // Example 3: Option error (custom variable naming rule violation)
 {
-  type: 'single',
+  type: 'one',
   command: 'init',
   options: {},
   error: {
@@ -209,7 +209,7 @@ When an error occurs in parameters or options, the error information is set in t
 
 ### 3. Type Consistency
 
-- Maintain parameter types (NoParamsResult, SingleParamResult, DoubleParamsResult)
+- Maintain parameter types (ZeroParamsResult, OneParamResult, TwoParamsResult)
 - Error information is kept as error property of each parameter type
 - No type conversion is performed
 
@@ -219,21 +219,21 @@ When an error occurs in parameters or options, the error information is set in t
 const parser = new ParamsParser();
 const result = parser.parse(args);
 
-if (result.type === 'no-params') {
+if (result.type === 'zero-params') {
   if (result.error) {
     // Error handling
     console.error(`Error ${result.error.code}: ${result.error.message}`);
   } else {
     // Normal processing
   }
-} else if (result.type === 'single') {
+} else if (result.type === 'one') {
   if (result.error) {
     // Error handling
     console.error(`Error ${result.error.code}: ${result.error.message}`);
   } else {
     // Normal processing
   }
-} else if (result.type === 'double') {
+} else if (result.type === 'two') {
   if (result.error) {
     // Error handling
     console.error(`Error ${result.error.code}: ${result.error.message}`);
@@ -248,6 +248,36 @@ if (result.type === 'no-params') {
 1. **Type Consistency**
    - Maintain type consistency within each branch
    - Minimize type conversions 
+
+## Error Handling and Options Persistence
+
+### 1. Error Handling Strategy
+
+The parameter parser maintains a debug-friendly approach to error handling:
+
+```typescript
+// Example of error result with preserved options
+type ParseResult<T> = {
+  success: false;
+  error: ErrorResult;
+  data?: T;  // Contains parsed options even when validation fails
+};
+```
+
+### 2. Options Persistence
+
+- Even when validation fails (`success: false`), the parser preserves the parsed options
+- This design choice enables:
+  - Easier debugging by maintaining the state at the time of error
+  - Better user experience by allowing partial corrections
+  - Flexible error handling in the application layer
+
+### 3. Security Considerations
+
+While maintaining options during errors is beneficial for debugging, be aware that:
+- Invalid or potentially malicious data may be preserved
+- Sensitive information in options should be handled with care
+- Application layer should implement appropriate security checks
 
 ---
 

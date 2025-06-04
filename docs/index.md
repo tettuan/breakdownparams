@@ -51,7 +51,6 @@ Usage example:
 - -h, --help
 - -v, --version
 
-Aliases are supported.
 Indicates the presence of arguments. Multiple options can be specified simultaneously.
 
 ## Single Parameter
@@ -171,7 +170,7 @@ The following are equivalent:
 #### Custom Variable Options (`--uv-*`)
 
 Custom variable options are used to specify user-defined variables.
-Only available in DoubleParams mode, specified in the following format:
+Only available in TwoParams mode, specified in the following format:
 
 ```bash
 ./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
@@ -189,8 +188,6 @@ For detailed specifications, please refer to the [Custom Variable Options Specif
 
 - When both short and long form options are specified, the long form takes precedence. The long form is primary, and the short form is considered an alias.
 - No path processing is performed (values are used as is)
-- Aliases must be lowercase (uppercase variants are not processed and are ignored without error)
-- Undefined aliases are treated as if not specified (ignored without error)
 
 ---
 

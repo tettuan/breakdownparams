@@ -16,24 +16,19 @@
 | --uv-*        | カスタム変数         | string  | いいえ | `--uv-project=myproject`  |
 
 ## 構文
-```
---uv-{variable_name}={value}
+```bash
+--uv-<name>=<value>
 ```
 
-### 使用例
-```bash
---uv-about=abc
---uv-something=weneed
---uv-project=myproject
---uv-version=1.0.0
-```
+- `<name>`: 変数名（必須）
+- `<value>`: 変数の値（必須）
 
 ## ルールと制約
 
 ### 変数名の検証
 - カスタム変数名は以下を満たす必要があります：
-  - 英数字のみを含む
-  - 最小限の特殊文字（アンダースコア、ハイフンなど）を許可
+  - 英数字とアンダースコアのみを含む
+  - 先頭は英字である必要があります
   - 大文字小文字を区別する
   - 空でないこと
 
@@ -75,7 +70,7 @@ breakdown to project --uv-path=/usr/local/bin --uv-config={"key":"value"} --uv-a
 | 値の指定なし            | "Missing value for custom variable: {name}"            |
 | 重複する変数名          | "Duplicate custom variable name: {name}"               |
 | 不正な構文              | "Invalid custom variable syntax: {option}"             |
-| 不正なパラメータタイプ  | "Custom variables are only available with DoubleParams"|
+| 不正なパラメータタイプ  | "Custom variables are only available with TwoParams"|
 
 ## 型定義
 
@@ -119,16 +114,16 @@ interface OptionParams {
 - `CustomVariables` は戻り値の型のオプショナルプロパティです
 - `CustomVariables` のキーはコマンドラインの変数名と一致する必要があります（大文字小文字を含む）
 - 値は常に文字列で、コマンドラインからの入力をそのまま保持します
-- この型は DoubleParams モードでのみ存在します
+- この型は TwoParams モードでのみ存在します
 - カスタム変数が提供されていない場合、プロパティは undefined になります
 
 ## 既存の仕様との互換性
 
 ### パラメータタイプの互換性
-- カスタム変数は DoubleParams モードでのみ利用可能です
+- カスタム変数は TwoParams モードでのみ利用可能です
 - `--config` オプションと同様に、カスタム変数は以下では無視されます：
-  - NoParams
-  - SingleParam
+  - ZeroParams
+  - OneParam
 - 例：`breakdown to project --uv-environment=prod`
 
 ### 大文字小文字の区別
@@ -156,7 +151,7 @@ interface OptionParams {
 
 ### テスト要件
 - ユニットテストは以下をカバーする必要があります：
-  - すべてのパラメータタイプ（NoParams, SingleParam, DoubleParams）
+  - すべてのパラメータタイプ（ZeroParams, OneParam, TwoParams）
   - 既存のオプションとの組み合わせ
   - エラーケース
   - エッジケース（空の値、特殊文字）

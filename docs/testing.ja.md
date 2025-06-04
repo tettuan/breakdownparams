@@ -31,11 +31,11 @@
 ```
 tests/
 ├── 01_basic/                    # 基礎テスト
-│   ├── 01_no_params_test.ts     # パラメータなしのテスト
-│   └── 02_single_param_test.ts  # 単一パラメータのテスト
+│   ├── 01_zero_params_test.ts     # パラメータなしのテスト
+│   └── 02_one_param_test.ts     # 単一パラメータのテスト
 │
 ├── 02_core/                     # コア機能テスト
-│   └── 01_double_params_test.ts # 2パラメータのテスト
+│   └── 01_two_params_test.ts # 2パラメータのテスト
 │
 ├── 03_unit/                     # 単体機能テスト
 │   ├── 01_options_test.ts       # オプション処理のテスト
@@ -48,16 +48,82 @@ tests/
     └── 01_params_parser_test.ts # パラメータパーサーの統合テスト
 ```
 
+## テストファイル命名規則
+
+テストファイルは、その目的に応じて以下の命名規則に従います：
+
+1. **通常のテスト**
+   - 命名規則: `*_test.ts`
+   - 例: `01_zero_params_test.ts`
+   - 用途: 機能の動作検証
+
+2. **アーキテクチャテスト**
+   - 命名規則: `*.architecture_test.ts`
+   - 例: `params_parser.architecture_test.ts`
+   - 用途: アーキテクチャの制約や依存関係の検証
+   - 検証項目:
+     - 依存関係の方向性
+     - 循環参照の有無
+     - レイヤー間の境界
+     - インターフェースの一貫性
+   - 制約:
+     - スタブやモックの多用を避ける
+     - 実際の依存関係を検証する
+     - テストの複雑性を最小限に抑える
+
+3. **構造テスト**
+   - 命名規則: `*.structure_test.ts`
+   - 例: `validator.structure_test.ts`
+   - 用途: クラス構造や責務分離の検証
+   - 検証項目:
+     - 単一責任の原則の遵守
+     - 責務の重複の有無
+     - 適切な抽象化レベル
+     - クラス間の関係性
+   - 制約:
+     - スタブやモックの多用を避ける
+     - 実際のクラス構造を検証する
+     - テストの複雑性を最小限に抑える
+
+### 命名規則の使用例
+
+```
+tests/
+├── 01_basic/
+│   ├── 01_zero_params_test.ts
+│   ├── 01_zero_params.architecture_test.ts
+│   └── 01_zero_params.structure_test.ts
+│
+└── 02_core/
+    ├── 01_two_params_test.ts
+    ├── 01_two_params.architecture_test.ts
+    └── 01_two_params.structure_test.ts
+```
+
+### テストの実行順序
+
+1. アーキテクチャテスト
+   - 設計の制約が守られていることを最初に確認
+   - 依存関係の方向性を検証
+
+2. 構造テスト
+   - クラス構造の整合性を確認
+   - 責務分離の状態を検証
+
+3. 通常のテスト
+   - 機能の動作を検証
+   - ユースケースの確認
+
 ## テスト階層構造
 
 テストは以下の階層構造に従って実装されています：
 
 1. **基礎テスト** (`01_basic/`)
-   - `01_no_params_test.ts`: パラメータなしのケース
-   - `02_single_param_test.ts`: 単一パラメータのケース
+   - `01_zero_params_test.ts`: パラメータなしのケース
+   - `02_one_param_test.ts`: 単一パラメータのケース
 
 2. **コア機能テスト** (`02_core/`)
-   - `01_double_params_test.ts`: 2パラメータのケース
+   - `01_two_params_test.ts`: 2パラメータのケース
 
 3. **単体機能テスト** (`03_unit/`)
    - `01_options_test.ts`: オプション処理の基本機能

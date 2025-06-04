@@ -37,16 +37,16 @@
 
 | 用語         | 説明                                                                                                                    | 参照仕様ファイル             |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
-| NoParams     | 位置引数なしのパラメータタイプ。ヘルプ表示やバージョン確認など、単純な操作に使用。オプションのみの指定が可能。          | [params.ja.md](params.ja.md) |
-| SingleParam  | 位置引数1つのパラメータタイプ。初期化などの単一の操作を実行するために使用。現在は`init`コマンドのみをサポート。         | [params.ja.md](params.ja.md) |
-| DoubleParams | 位置引数2つのパラメータタイプ。メインの機能を実行するために使用。DemonstrativeTypeとLayerTypeの組み合わせで操作を指定。 | [params.ja.md](params.ja.md) |
+| ZeroParams   | 位置引数なしのパラメータタイプ。helpコマンドとversionコマンドに使用。 | [params.ja.md](params.ja.md) |
+| OneParam     | 位置引数1つのパラメータタイプ。初期化などの単一の操作を実行するために使用。現在は`init`コマンドのみをサポート。         | [params.ja.md](params.ja.md) |
+| TwoParams    | 位置引数2つのパラメータタイプ。メインの機能を実行するために使用。DemonstrativeTypeとLayerTypeの組み合わせで操作を指定。 | [params.ja.md](params.ja.md) |
 
 ### 主要な型
 
 | 用語              | 説明                                                                                                                | 参照仕様ファイル                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| DemonstrativeType | 最初の位置引数の型（`to`, `summary`, `defect`）。実行する操作の種類を指定。各値は特定の処理を表し、型安全性を確保。 | [params.ja.md](params.ja.md)           |
-| LayerType         | 2番目の位置引数の型（`project`, `issue`, `task`）。操作の対象となる層を指定。階層構造を表現し、処理の範囲を定義。   | [params.ja.md](params.ja.md)           |
+| DemonstrativeType | 最初の位置引数の型。デフォルトでは`to`, `summary`, `defect`を許可。正規表現パターンでバリデーション。 | [params.ja.md](params.ja.md)           |
+| LayerType         | 2番目の位置引数の型。デフォルトでは`project`, `issue`, `task`を許可。正規表現パターンでバリデーション。   | [params.ja.md](params.ja.md)           |
 | ParamsResult      | パラメータ解析結果の基本型。解析結果を型安全に扱うためのインターフェース。エラー情報も含む。                        | [params_type.ja.md](params_type.ja.md) |
 | OptionParams      | オプションパラメータの型。オプションの値を型安全に扱うためのインターフェース。各オプションの値を保持。              | [params_type.ja.md](params_type.ja.md) |
 | ErrorResult       | エラー情報を保持する型。エラーメッセージとエラーコードを含む。                                                      | [params_type.ja.md](params_type.ja.md) |
@@ -63,30 +63,30 @@
 | --destination | -o         | 出力ファイルパス。結果の保存先を指定。パスの存在確認は行わない。                     | [options.ja.md](options.ja.md) |
 | --input       | -i         | 入力レイヤータイプ。処理の入力元となる層を指定。LayerTypeの値のみを許可。            | [options.ja.md](options.ja.md) |
 | --adaptation  | -a         | プロンプト適応タイプ。処理の挙動を調整するために使用。カスタマイズ可能な動作を指定。 | [options.ja.md](options.ja.md) |
-| --config      | -c         | 設定ファイル名。DoubleParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
+| --config      | -c         | 設定ファイル名。TwoParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
 
 ### カスタム変数オプション
 
 | 用語           | 説明                                                                                                                 | 参照仕様ファイル                           |
 | -------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| カスタム変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数。DoubleParamsモードでのみ使用可能で、任意の値を保持できる。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| カスタム変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数。TwoParamsモードでのみ使用可能で、任意の値を保持できる。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 | カスタム変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字と最小限の特殊文字のみを許可し、大文字小文字を区別する。               | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 | CustomVariables | カスタム変数オプションを保持する型。キーと値のペアで構成され、コマンドラインから受け取った値をそのまま保持する。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 
-## 拡張機能関連
+## バリデーション関連
 
 | 用語         | 説明                                                                                                               | 参照仕様ファイル                           |
 | ------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| 拡張モード   | カスタムなバリデーションルールを適用するモード。標準の制約を超えた柔軟な使用を可能にし、特定のユースケースに対応。 | [custom_params.ja.md](custom_params.ja.md) |
-| 標準モード   | デフォルトのバリデーションルールを使用するモード。基本的な使用に適し、型安全性と一貫性を保証。                     | [custom_params.ja.md](custom_params.ja.md) |
-| ParserConfig | パーサーの設定を定義するインターフェース。拡張モードでの動作を制御し、カスタムルールを指定するために使用。         | [custom_params.ja.md](custom_params.ja.md) |
+| デフォルト設定値   | 標準的な使用パターンをサポートするバリデーション設定。DemonstrativeTypeとLayerTypeの基本的な値を許可。 | [custom_params.ja.md](custom_params.ja.md) |
+| カスタム設定値   | ユーザー定義のバリデーション設定。正規表現パターンでカスタムな値を許可。                     | [custom_params.ja.md](custom_params.ja.md) |
+| ParserConfig | パーサーの設定を定義するインターフェース。バリデーションルールを指定するために使用。         | [custom_params.ja.md](custom_params.ja.md) |
 
 ## エラー関連
 
 | 用語                 | 説明                                                                                             | 参照仕様ファイル                           |
 | -------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------ |
 | バリデーションエラー | パラメータの値が制約を満たさない場合のエラー。型安全性を確保し、不正な使用を防止するために使用。 | [custom_params.ja.md](custom_params.ja.md) |
-| 設定エラー           | パーサーの設定が不正な場合のエラー。拡張モードでの設定ミスを検出し、適切な使用を促す。           | [custom_params.ja.md](custom_params.ja.md) |
+| 設定エラー           | パーサーの設定が不正な場合のエラー。設定ミスを検出し、適切な使用を促す。           | [custom_params.ja.md](custom_params.ja.md) |
 
 ## テスト関連
 
@@ -95,6 +95,15 @@
 | BreakdownLogger    | テスト用のロギングユーティリティ。デバッグ情報の収集と管理を行い、テストの追跡を容易にする。 | [testing.ja.md](testing.ja.md) |
 | デバッグログ       | 詳細なデバッグ情報を記録するログ。問題の特定と解決を支援し、開発プロセスを効率化。           | [testing.ja.md](testing.ja.md) |
 | テスト失敗の前処理 | テストの目的ではない前処理で発生する失敗。テストの意図を明確にし、適切なテスト設計を促進。   | [testing.ja.md](testing.ja.md) |
+
+## 型
+
+| 用語 | 説明 | 参照 |
+|------|------|------|
+| ParamPatternResult | パラメータパターン結果の基本型。パラメータの組み合わせパターンに基づく結果を型安全に扱うためのインターフェース。エラー情報も含む。 | [params_type.ja.md](params_type.ja.md) |
+| ZeroParamResult | パラメータなしの結果型。help/versionコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| OneParamResult | 単一パラメータの結果型。layerコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| TwoParamResult | 二重パラメータの結果型。breakコマンド用。 | [params_type.ja.md](params_type.ja.md) |
 
 ---
 

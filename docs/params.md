@@ -6,17 +6,17 @@ This document defines the specification for parameters (positional arguments) in
 
 Parameters are classified into three types based on the number of positional arguments:
 
-1. **NoParams**
+1. **ZeroParams**
    - No positional arguments
    - Only options can be specified
    - Example: `breakdown --help`
 
-2. **SingleParam**
+2. **OneParam**
    - One positional argument
    - Valid value: `init`
    - Example: `breakdown init`
 
-3. **DoubleParams**
+3. **TwoParams**
    - Two positional arguments
    - Format: `<demonstrativeType> <layerType>`
    - Example: `breakdown to project`
@@ -49,24 +49,21 @@ Values that can be specified as the second parameter:
    - 2: Combination of demonstrativeType and layerType
    - 3 or more: Error
 
-2. **Value Constraints**
-   - Aliases containing uppercase letters are treated as invalid
-
 ## Usage Examples
 
-### NoParams
+### ZeroParams
 
 ```bash
 breakdown
 ```
 
-### SingleParam
+### OneParam
 
 ```bash
 breakdown init
 ```
 
-### DoubleParams
+### TwoParams
 
 ```bash
 breakdown to project
@@ -83,14 +80,14 @@ breakdown summary task -c test
 | Too many arguments   | "Too many arguments. Maximum 2 arguments are allowed." |
 | Invalid DemonstrativeType | "Invalid value for demonstrativeType: {value}"     |
 | Invalid LayerType    | "Invalid value for layerType: {value}"             |
-| Invalid Config usage | "Config option is only available with DoubleParams" |
+| Invalid Config usage | "Config option is only available with TwoParams" |
 
 ## Return Type
 
 The parameter parsing result is returned with the following type:
 
 ```typescript
-type ParamsResult = NoParamsResult | SingleParamResult | DoubleParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
 ```
 
 For detailed type definitions and usage, please refer to the [Parameter Parser Type Definition Specification](params_type.md).
