@@ -27,3 +27,11 @@ Deno.test('test_params_parser_constructor', () => {
   const parser = new ParamsParser(optionRule);
   assertEquals(parser instanceof ParamsParser, true);
 });
+
+Deno.test('test_params_parser_default_option_rule', () => {
+  const parser = new ParamsParser();
+  assertEquals(parser instanceof ParamsParser, true);
+  const result = parser.parse(['--help']);
+  assertEquals(result.type, 'zero');
+  assertEquals(result.options.help, '');
+});

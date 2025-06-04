@@ -12,12 +12,31 @@ import { OneParamValidator } from '../validator/one_param_validator.ts';
 import { TwoParamValidator } from '../validator/two_param_validator.ts';
 
 /**
+ * デフォルトのオプションルール
+ */
+const DEFAULT_OPTION_RULE: OptionRule = {
+  format: '--key=value',
+  validation: {
+    customVariables: ['uv-project', 'uv-version', 'uv-environment'],
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+    requiredOptions: [],
+    valueTypes: ['string'],
+  },
+  flagOptions: {
+    help: 'help',
+    version: 'version',
+  },
+};
+
+/**
  * パラメータパーサー
  */
 export class ParamsParser {
   private optionRule: OptionRule;
 
-  constructor(optionRule: OptionRule) {
+  constructor(optionRule: OptionRule = DEFAULT_OPTION_RULE) {
     this.optionRule = optionRule;
   }
 
