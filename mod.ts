@@ -23,15 +23,16 @@
  * ```
  */
 
-export { ParamsParser } from './src/params_parser.ts';
+export { ParamsParser } from './src/parser/params_parser.ts';
 export type {
-  LayerType,
+  ErrorInfo,
   OneParamResult,
-  OptionParams,
-  ParamPatternResult,
+  OptionRule,
+  ParamsResult,
   TwoParamResult,
-  ZeroParamResult,
-} from './src/core/params/definitions/types.ts';
+  ValidationResult,
+  ZeroParamsResult,
+} from './src/result/types.ts';
 
 /**
  * @module breakdownparams

@@ -1,15 +1,15 @@
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import {
-  ParamsResult,
-  ZeroParamsResult,
-  OneParamResult,
-  TwoParamResult,
   ErrorInfo,
-  ValidationResult,
+  OneParamResult,
   OptionRule,
-} from "../../src/result/types.ts";
+  ParamsResult,
+  TwoParamResult,
+  ValidationResult,
+  ZeroParamsResult,
+} from '../../src/result/types.ts';
 
-Deno.test("test_params_result_interface", () => {
+Deno.test('test_params_result_interface', () => {
   const result: ParamsResult = {
     type: 'zero',
     params: [],
@@ -20,7 +20,7 @@ Deno.test("test_params_result_interface", () => {
   assertEquals(typeof result.options, 'object');
 });
 
-Deno.test("test_zero_params_result_interface", () => {
+Deno.test('test_zero_params_result_interface', () => {
   const result: ZeroParamsResult = {
     type: 'zero',
     params: [],
@@ -31,7 +31,7 @@ Deno.test("test_zero_params_result_interface", () => {
   assertEquals(typeof result.options, 'object');
 });
 
-Deno.test("test_one_param_result_interface", () => {
+Deno.test('test_one_param_result_interface', () => {
   const result: OneParamResult = {
     type: 'one',
     params: [],
@@ -44,7 +44,7 @@ Deno.test("test_one_param_result_interface", () => {
   assertEquals(typeof result.demonstrativeType, 'string');
 });
 
-Deno.test("test_two_param_result_interface", () => {
+Deno.test('test_two_param_result_interface', () => {
   const result: TwoParamResult = {
     type: 'two',
     params: [],
@@ -59,7 +59,7 @@ Deno.test("test_two_param_result_interface", () => {
   assertEquals(typeof result.layerType, 'string');
 });
 
-Deno.test("test_error_info_interface", () => {
+Deno.test('test_error_info_interface', () => {
   const error: ErrorInfo = {
     message: 'Error message',
     code: 'ERROR_CODE',
@@ -70,7 +70,7 @@ Deno.test("test_error_info_interface", () => {
   assertEquals(typeof error.category, 'string');
 });
 
-Deno.test("test_validation_result_interface", () => {
+Deno.test('test_validation_result_interface', () => {
   const result: ValidationResult = {
     isValid: true,
     validatedParams: [],
@@ -79,23 +79,23 @@ Deno.test("test_validation_result_interface", () => {
   assertEquals(Array.isArray(result.validatedParams), true);
 });
 
-Deno.test("test_option_rule_interface", () => {
+Deno.test('test_option_rule_interface', () => {
   const rule: OptionRule = {
     format: '--key=value',
     validation: {
-      customVariables: '--uv-*',
-      emptyValue: false,
+      customVariables: ['uv-project', 'uv-version', 'uv-environment'],
+      emptyValue: 'error',
       unknownOption: 'error',
       duplicateOption: 'error',
       requiredOptions: [],
       valueTypes: ['string'],
     },
-    specialCases: {
-      '-c=value': 'configFile',
-      '--config=value': 'configFile',
+    flagOptions: {
+      help: 'help',
+      version: 'version',
     },
   };
   assertEquals(typeof rule.format, 'string');
   assertEquals(typeof rule.validation, 'object');
-  assertEquals(typeof rule.specialCases, 'object');
-}); 
+  assertEquals(typeof rule.flagOptions, 'object');
+});

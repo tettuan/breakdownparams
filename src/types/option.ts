@@ -1,7 +1,7 @@
 export enum OptionType {
-  VALUE = "VALUE",
-  FLAG = "FLAG",
-  CUSTOM_VARIABLE = "CUSTOM_VARIABLE"
+  VALUE = 'VALUE',
+  FLAG = 'FLAG',
+  CUSTOM_VARIABLE = 'CUSTOM_VARIABLE',
 }
 
 export type OptionValue = string | boolean | undefined;
@@ -27,4 +27,4 @@ export interface OptionRegistry {
   get(name: string): Option | undefined;
   validateCustomVariable(name: string): boolean;
   getAll(): Option[];
-} 
+}

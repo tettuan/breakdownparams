@@ -70,5 +70,5 @@ export interface OptionRule {
     requiredOptions: string[];
     valueTypes: string[];
   };
-  specialCases: Record<string, string>;
-} 
+  flagOptions: Record<string, string>;
+}

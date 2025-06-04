@@ -1,5 +1,6 @@
-import { BaseValidator } from "./base_validator.ts";
-import { ValidationResult } from "../result/types.ts";
+import { BaseValidator } from './base_validator.ts';
+import { ValidationResult } from '../result/types.ts';
+import { OptionsValidator } from './options_validator.ts';
 
 /**
  * 位置引数なしのバリデーター
@@ -11,20 +12,23 @@ export class ZeroParamsValidator extends BaseValidator {
    * @returns バリデーション結果
    */
   public override validate(args: string[]): ValidationResult {
-    // オプションのみの場合は成功
-    if (args.every(arg => arg.startsWith("--"))) {
-      return this.createSuccessResult(args);
+    // Check if there are any non-option arguments
+    const hasNonOptions = args.some((arg) => !arg.startsWith('-'));
+    if (hasNonOptions) {
+      return this.createErrorResult(
+        'Zero params validator only accepts options',
+        'VALIDATION_ERROR',
+        'invalid_params',
+      );
     }
 
-    // 位置引数がある場合はエラー
-    if (args.some(arg => !arg.startsWith("--"))) {
-      return this.createErrorResult(
-        "No parameters expected",
-        "VALIDATION_ERROR",
-        "zero_params"
-      );
+    // Validate options
+    const optionsValidator = new OptionsValidator(this.optionRule);
+    const optionsResult = optionsValidator.validate(args);
+    if (!optionsResult.isValid) {
+      return optionsResult;
     }
 
     return this.createSuccessResult(args);
   }
-} 
+}

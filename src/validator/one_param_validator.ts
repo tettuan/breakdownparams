@@ -1,5 +1,5 @@
-import { BaseValidator } from "./base_validator.ts";
-import { ValidationResult } from "../result/types.ts";
+import { BaseValidator } from './base_validator.ts';
+import { ValidationResult } from '../result/types.ts';
 
 /**
  * 位置引数1つのバリデーター
@@ -13,18 +13,18 @@ export class OneParamValidator extends BaseValidator {
   public override validate(args: string[]): ValidationResult {
     if (args.length !== 1) {
       return this.createErrorResult(
-        "Exactly one parameter expected",
-        "VALIDATION_ERROR",
-        "one_param"
+        'Exactly one parameter expected',
+        'VALIDATION_ERROR',
+        'one_param',
       );
     }
 
     const demonstrativeType = args[0];
     if (!this.isValidDemonstrativeType(demonstrativeType)) {
       return this.createErrorResult(
-        "Invalid demonstrative type",
-        "VALIDATION_ERROR",
-        "demonstrative_type"
+        'Invalid demonstrative type',
+        'VALIDATION_ERROR',
+        'demonstrative_type',
       );
     }
 
@@ -41,7 +41,7 @@ export class OneParamValidator extends BaseValidator {
    * @returns 検証結果
    */
   private checkSingleParam(args: string[]): boolean {
-    const params = args.filter(arg => !arg.startsWith('-'));
+    const params = args.filter((arg) => !arg.startsWith('-'));
     return params.length === 1;
   }
 
@@ -64,7 +64,7 @@ export class OneParamValidator extends BaseValidator {
   }
 
   private isValidDemonstrativeType(value: string): boolean {
-    const validTypes = ["to", "summary", "defect", "init"];
+    const validTypes = ['to', 'summary', 'defect', 'init'];
     return validTypes.includes(value);
   }
-} 
+}

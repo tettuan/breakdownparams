@@ -1,4 +1,4 @@
-import { Option, OptionType, OptionValue, ValidationResult } from "../types/option.ts";
+import { Option, OptionType, OptionValue, ValidationResult } from '../types/option.ts';
 
 export class ValueOption implements Option {
   readonly type = OptionType.VALUE;
@@ -8,7 +8,7 @@ export class ValueOption implements Option {
     readonly aliases: string[],
     readonly isRequired: boolean,
     readonly description: string,
-    private validator: (value: string) => ValidationResult
+    private validator: (value: string) => ValidationResult,
   ) {}
 
   validate(value: string | undefined): ValidationResult {
@@ -33,7 +33,7 @@ export class FlagOption implements Option {
   constructor(
     readonly name: string,
     readonly aliases: string[],
-    readonly description: string
+    readonly description: string,
   ) {}
 
   validate(value: string | undefined): ValidationResult {
@@ -53,14 +53,14 @@ export class CustomVariableOption implements Option {
   constructor(
     readonly name: string,
     readonly description: string,
-    private pattern: RegExp
+    private pattern: RegExp,
   ) {}
 
   validate(value: string | undefined): ValidationResult {
     if (!this.pattern.test(this.name)) {
-      return { 
-        isValid: false, 
-        errors: [`Invalid custom variable name: ${this.name}`] 
+      return {
+        isValid: false,
+        errors: [`Invalid custom variable name: ${this.name}`],
       };
     }
     return { isValid: true, errors: [] };
@@ -69,4 +69,4 @@ export class CustomVariableOption implements Option {
   parse(value: string | undefined): string | undefined {
     return value;
   }
-} 
+}

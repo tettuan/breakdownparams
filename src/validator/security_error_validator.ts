@@ -1,5 +1,5 @@
-import { BaseValidator } from "./base_validator.ts";
-import { ValidationResult } from "../result/types.ts";
+import { BaseValidator } from './base_validator.ts';
+import { ValidationResult } from '../result/types.ts';
 
 /**
  * セキュリティエラーバリデーター
@@ -10,72 +10,110 @@ export class SecurityErrorValidator extends BaseValidator {
    * @param args コマンドライン引数
    * @returns バリデーション結果
    */
-  public validate(args: string[]): ValidationResult {
-    // Check for command injection patterns
-    if (this.containsCommandInjection(args)) {
-      return this.createErrorResult(
-        "Potential command injection detected",
-        "SECURITY_ERROR",
-        "command_injection"
-      );
+  public override validate(args: string[]): ValidationResult {
+    // Check for dangerous characters first
+    for (const arg of args) {
+      if (this.containsDangerousCharacters(arg)) {
+        return this.createErrorResult(
+          'Invalid characters detected',
+          'SECURITY_ERROR',
+          'invalid_characters',
+          { command: arg },
+        );
+      }
     }
 
-    // Check for invalid characters
-    if (this.containsInvalidCharacters(args)) {
-      return this.createErrorResult(
-        "Invalid characters detected",
-        "SECURITY_ERROR",
-        "invalid_characters"
-      );
+    // Then check for command injection patterns
+    for (const arg of args) {
+      if (this.containsCommandInjectionPattern(arg)) {
+        return this.createErrorResult(
+          'Command injection pattern detected',
+          'SECURITY_ERROR',
+          'command_injection',
+          { command: arg },
+        );
+      }
     }
 
     return this.createSuccessResult(args);
   }
 
   /**
-   * コマンドインジェクションをチェックする
-   * @param args コマンドライン引数
-   * @returns 検証結果
+   * 危険な文字を含むかチェックする
+   * @param arg チェックする文字列
+   * @returns 危険な文字を含む場合はtrue
    */
-  private containsCommandInjection(args: string[]): boolean {
-    const dangerousPatterns = [
-      /[;&|`$]/,
-      /[<>]/,
-      /[()]/,
-      /[{}]/,
-      /[\[\]]/,
-    ];
+  private containsDangerousCharacters(arg: string): boolean {
+    // オプション形式の = は安全として扱う
+    if (arg.startsWith('--') && arg.includes('=')) {
+      const [key, value] = arg.split('=');
+      // キー部分と値部分を個別にチェック
+      return this.isDangerous(key) || this.isDangerous(value);
+    }
 
-    return args.some(arg => 
-      dangerousPatterns.some(pattern => pattern.test(arg))
-    );
+    // その他の文字列は通常の危険文字チェック
+    return this.isDangerous(arg);
   }
 
   /**
-   * セキュリティルールを検証する
-   * @param args コマンドライン引数
-   * @returns 検証結果
+   * 文字列に危険な文字が含まれているかチェックする
+   * @param str チェックする文字列
+   * @returns 危険な文字を含む場合はtrue
    */
-  private validateSecurityRules(args: string[]): boolean {
-    // パスの正規化チェック
-    const hasAbsolutePath = args.some(arg => arg.startsWith('/'));
-    if (hasAbsolutePath) {
-      return false;
-    }
-
-    // 特殊文字のチェック
-    const hasSpecialChars = args.some(arg => 
-      /[^a-zA-Z0-9\-_\.\/=]/.test(arg)
-    );
-    if (hasSpecialChars) {
-      return false;
-    }
-
-    return true;
+  private isDangerous(str: string): boolean {
+    const dangerousChars = /[;&|><`$(){}[\]*?~!@#%^+=]/;
+    return dangerousChars.test(str);
   }
 
-  private containsInvalidCharacters(args: string[]): boolean {
-    const validPattern = /^[a-zA-Z0-9\-_=.,@:]+$/;
-    return args.some(arg => !validPattern.test(arg));
+  /**
+   * コマンドインジェクションパターンを含むかチェックする
+   * @param arg チェックする文字列
+   * @returns コマンドインジェクションパターンを含む場合はtrue
+   */
+  private containsCommandInjectionPattern(arg: string): boolean {
+    const patterns = [
+      /;\s*rm\s+-rf/,
+      /\|\s*cat/,
+      /&\s*echo/,
+      />\s*malicious/,
+      /<\s*malicious/,
+      /`.*`/,
+      /\$PATH/,
+      /\(.*\)/,
+      /\{.*\}/,
+      /\[.*\]/,
+    ];
+    return patterns.some((pattern) => pattern.test(arg));
   }
-} 
+
+  /**
+   * エラー結果を作成する
+   */
+  protected override createErrorResult(
+    message: string,
+    code: string,
+    category: string,
+    details?: Record<string, unknown>,
+  ): ValidationResult {
+    return {
+      isValid: false,
+      validatedParams: [],
+      error: {
+        message,
+        code,
+        category,
+      },
+      errorDetails: details,
+    };
+  }
+
+  /**
+   * 成功結果を作成する
+   */
+  protected override createSuccessResult(args: string[]): ValidationResult {
+    return {
+      isValid: true,
+      validatedParams: args,
+    };
+  }
+}

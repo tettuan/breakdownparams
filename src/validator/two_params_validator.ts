@@ -1,5 +1,5 @@
-import { BaseValidator } from "./base_validator.ts";
-import { ValidationResult } from "../result/types.ts";
+import { BaseValidator } from './base_validator.ts';
+import { ValidationResult } from '../result/types.ts';
 
 /**
  * 位置引数2つのバリデーター
@@ -12,29 +12,29 @@ export class TwoParamValidator extends BaseValidator {
    */
   public override validate(args: string[]): ValidationResult {
     // オプションを除いた位置引数の数をチェック
-    const params = args.filter(arg => !arg.startsWith("--"));
+    const params = args.filter((arg) => !arg.startsWith('--'));
     if (params.length !== 2) {
       return this.createErrorResult(
-        "Exactly two parameters expected",
-        "VALIDATION_ERROR",
-        "two_params"
+        'Exactly two parameters expected',
+        'VALIDATION_ERROR',
+        'two_params',
       );
     }
 
     const [demonstrativeType, layerType] = params;
     if (!this.isValidDemonstrativeType(demonstrativeType)) {
       return this.createErrorResult(
-        "Invalid demonstrative type",
-        "VALIDATION_ERROR",
-        "demonstrative_type"
+        'Invalid demonstrative type',
+        'VALIDATION_ERROR',
+        'demonstrative_type',
       );
     }
 
     if (!this.isValidLayerType(layerType)) {
       return this.createErrorResult(
-        "Invalid layer type",
-        "VALIDATION_ERROR",
-        "layer_type"
+        'Invalid layer type',
+        'VALIDATION_ERROR',
+        'layer_type',
       );
     }
 
@@ -53,7 +53,7 @@ export class TwoParamValidator extends BaseValidator {
    * @returns 検証結果
    */
   private isValidDemonstrativeType(value: string): boolean {
-    const validTypes = ["to"];
+    const validTypes = ['to'];
     return validTypes.includes(value);
   }
 
@@ -63,7 +63,7 @@ export class TwoParamValidator extends BaseValidator {
    * @returns 検証結果
    */
   private isValidLayerType(value: string): boolean {
-    const validTypes = ["project", "feature", "story", "task"];
+    const validTypes = ['project', 'feature', 'story', 'task'];
     return validTypes.includes(value);
   }
-} 
+}

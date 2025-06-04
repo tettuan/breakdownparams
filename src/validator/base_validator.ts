@@ -1,4 +1,4 @@
-import { ValidationResult, OptionRule } from "../result/types.ts";
+import { OptionRule, ValidationResult } from '../result/types.ts';
 
 /**
  * バリデーターの基底クラス
@@ -51,6 +51,9 @@ export abstract class BaseValidator {
         code,
         category,
       },
+      errorMessage: message,
+      errorCode: code,
+      errorCategory: category,
     };
   }
 
@@ -73,4 +76,4 @@ export abstract class BaseValidator {
   protected getValidatedParams(result: ValidationResult): string[] {
     return result.validatedParams || [];
   }
-} 
+}

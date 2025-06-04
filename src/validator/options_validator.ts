@@ -1,5 +1,5 @@
-import { BaseValidator } from "./base_validator.ts";
-import { ValidationResult, OptionRule } from "../result/types.ts";
+import { BaseValidator } from './base_validator.ts';
+import { OptionRule, ValidationResult } from '../result/types.ts';
 
 /**
  * Options Validator
@@ -8,9 +8,29 @@ import { ValidationResult, OptionRule } from "../result/types.ts";
 export class OptionsValidator extends BaseValidator {
   protected override optionRule: OptionRule;
 
+  // 標準オプションのホワイトリスト
+  private readonly standardOptions = new Set([
+    'help',
+    'version',
+    'from',
+    'destination',
+    'input',
+    'adaptation',
+    'config',
+  ]);
+
   constructor(optionRule: OptionRule) {
     super(optionRule);
     this.optionRule = optionRule;
+  }
+
+  /**
+   * Normalizes an option key by removing prefixes and converting to lowercase
+   * @param key Option key
+   * @returns Normalized key
+   */
+  private normalizeKey(key: string): string {
+    return key.replace(/^--?/, '').toLowerCase();
   }
 
   /**
@@ -20,107 +40,93 @@ export class OptionsValidator extends BaseValidator {
    */
   public override validate(args: string[]): ValidationResult {
     console.debug('[DEBUG] validate: start', args);
-    const options = this.extractOptions(args);
-    console.debug('[DEBUG] extractOptions:', options);
     const errors: string[] = [];
+    const options: Record<string, string> = {};
+    const seenKeys = new Set<string>();
 
-    // Check option format
+    // Extract options and check for duplicates
     for (const arg of args) {
-      if (arg.startsWith("-")) {
-        // Skip format check for special cases
-        if (this.isSpecialCase(arg)) {
-          continue;
+      // フラグオプションの処理（プレフィックスなし）
+      if (this.isFlagOption(arg)) {
+        if (seenKeys.has(arg)) {
+          errors.push(`Duplicate option: ${arg}`);
         }
-        if (!this.validateOptionFormat(arg)) {
-          console.debug('[DEBUG] invalid option format:', arg);
-          errors.push(`Invalid option format: ${arg}`);
+        seenKeys.add(arg);
+        options[arg] = ''; // 元の形式を保持
+        continue;
+      }
+
+      // 通常のオプション処理（プレフィックス付き）
+      if (arg.startsWith('--')) {
+        const [key, value] = arg.slice(2).split('=');
+        const optionKey = this.normalizeKey(key);
+
+        if (seenKeys.has(optionKey)) {
+          errors.push(`Duplicate option: ${arg}`);
         }
+        seenKeys.add(optionKey);
+        options[arg] = value || ''; // 元の形式（プレフィックス付き）を保持
+      }
+    }
+    console.debug('[DEBUG] extractOptions:', options);
+
+    // Check option format (フラグオプションを除く)
+    for (const arg of args) {
+      if (
+        arg.startsWith('-') && !this.isValidOption(arg) &&
+        !this.isFlagOption(this.normalizeKey(arg.slice(2)))
+      ) {
+        console.debug('[DEBUG] invalid option format:', arg);
+        errors.push(`Invalid option format: ${arg}`);
       }
     }
     console.debug('[DEBUG] after format check, errors:', errors);
 
-    // Check for empty values if not allowed
-    if (this.optionRule.validation.emptyValue === "error") {
-      for (const [key, value] of Object.entries(options)) {
-        // Skip empty value check for special cases
-        if (this.isSpecialCase(key)) {
-          continue;
-        }
-        if (value === "") {
-          console.debug('[DEBUG] empty value not allowed:', key);
-          errors.push(`Empty value not allowed for option: ${key}`);
-        }
+    // Check for empty values (フラグオプションを除く)
+    for (const [key, value] of Object.entries(options)) {
+      const normalizedKey = this.normalizeKey(key.replace(/^--/, ''));
+      if (
+        this.optionRule.validation.emptyValue === 'error' && value === '' &&
+        !this.isFlagOption(normalizedKey)
+      ) {
+        console.debug('[DEBUG] empty value not allowed:', normalizedKey);
+        errors.push(`Empty value not allowed for option: ${normalizedKey}`);
       }
     }
     console.debug('[DEBUG] after empty value check, errors:', errors);
 
-    // Check for unknown options
-    if (this.optionRule.validation.unknownOption === "error") {
-      for (const key of Object.keys(options)) {
-        if (!this.isValidOption(key)) {
-          console.debug('[DEBUG] unknown option:', key);
-          errors.push(`Unknown option: ${key}`);
-        }
+    // Check for unknown options (フラグオプションを除く)
+    for (const key of Object.keys(options)) {
+      const normalizedKey = this.normalizeKey(key.replace(/^--/, ''));
+      if (
+        !this.isValidOption(key) && !this.isFlagOption(normalizedKey) &&
+        !this.isCustomVariable(normalizedKey)
+      ) {
+        console.debug('[DEBUG] unknown option:', normalizedKey);
+        errors.push(`Unknown option: ${normalizedKey}`);
       }
     }
     console.debug('[DEBUG] after unknown option check, errors:', errors);
 
-    // Check for duplicate options
-    if (this.optionRule.validation.duplicateOption === "error") {
-      const seen = new Set<string>();
-      for (const key of Object.keys(options)) {
-        if (seen.has(key)) {
-          console.debug('[DEBUG] duplicate option:', key);
-          errors.push(`Duplicate option: ${key}`);
+    const isValid = errors.length === 0;
+    const errorMessage = errors.join(', ');
+    const errorCategory = errorMessage.includes('Invalid option format')
+      ? 'invalid_format'
+      : errorMessage.includes('Duplicate option')
+      ? 'duplicate_option'
+      : 'validation';
+
+    return {
+      isValid,
+      validatedParams: isValid ? args : [],
+      error: errors.length > 0
+        ? {
+          message: errorMessage,
+          code: 'VALIDATION_ERROR',
+          category: errorCategory,
         }
-        seen.add(key);
-      }
-    }
-    console.debug('[DEBUG] after duplicate option check, errors:', errors);
-
-    // Check required options
-    for (const required of this.optionRule.validation.requiredOptions) {
-      if (!(required in options)) {
-        console.debug('[DEBUG] required option missing:', required);
-        errors.push(`Required option missing: ${required}`);
-      }
-    }
-    console.debug('[DEBUG] after required option check, errors:', errors);
-
-    if (errors.length > 0) {
-      console.debug('[DEBUG] returning error result:', errors);
-      return this.createErrorResult(
-        errors.join(", "),
-        "VALIDATION_ERROR",
-        "options"
-      );
-    }
-
-    console.debug('[DEBUG] returning success result:', args);
-    return this.createSuccessResult(args);
-  }
-
-  /**
-   * Extracts options from command-line arguments
-   * @param args Command-line arguments
-   * @returns Record of option keys and values
-   */
-  private extractOptions(args: string[]): Record<string, string> {
-    const options: Record<string, string> = {};
-    const optionPattern = new RegExp(this.optionRule.format.replace("key", "(.+?)").replace("value", "(.+?)"));
-
-    for (const arg of args) {
-      const match = arg.match(optionPattern);
-      if (match) {
-        const [, key, value] = match;
-        options[key] = value;
-      } else if (this.isSpecialCase(arg)) {
-        // Handle special cases without values
-        options[arg] = "";
-      }
-    }
-
-    return options;
+        : undefined,
+    };
   }
 
   /**
@@ -129,40 +135,46 @@ export class OptionsValidator extends BaseValidator {
    * @returns Whether the option is valid
    */
   private isValidOption(key: string): boolean {
-    // Check special cases
-    if (key in this.optionRule.specialCases) {
+    const normalizedKey = this.normalizeKey(key);
+
+    // Check flag options
+    if (this.isFlagOption(normalizedKey)) {
       return true;
     }
 
-    // Check custom variables
-    if (this.isCustomVariable(key)) {
+    // Check standard options
+    if (this.standardOptions.has(normalizedKey)) {
       return true;
     }
 
+    // Check custom variables (--uv-*)
+    if (normalizedKey.startsWith('uv-')) {
+      const customVarName = normalizedKey.split('=')[0];
+      if (this.isCustomVariable(customVarName)) {
+        return true;
+      }
+    }
+
+    // Check format
+    const optionPattern = new RegExp(
+      this.optionRule.format.replace('key', '(.+?)').replace('value', '(.+?)'),
+    );
+    if (!optionPattern.test(key)) {
+      return false;
+    }
+
+    // If we get here, the option is not in any of our whitelists
     return false;
   }
 
   /**
-   * Validates the format of an option
+   * Checks if an option is a flag option (--help, --version)
    * @param option Option string
-   * @returns Whether the option format is valid
+   * @returns Whether the option is a flag option
    */
-  private validateOptionFormat(option: string): boolean {
-    const { format } = this.optionRule;
-    if (format === '--key=value') {
-      return /^--[a-zA-Z0-9-]+=.+$/.test(option);
-    } else {
-      return /^-[a-zA-Z]=.+$/.test(option);
-    }
-  }
-
-  /**
-   * Checks if an option is a special case
-   * @param option Option string
-   * @returns Whether the option is a special case
-   */
-  private isSpecialCase(option: string): boolean {
-    return option in this.optionRule.specialCases;
+  private isFlagOption(option: string): boolean {
+    const normalizedOption = this.normalizeKey(option);
+    return Object.keys(this.optionRule.flagOptions).includes(normalizedOption);
   }
 
   /**
@@ -171,8 +183,7 @@ export class OptionsValidator extends BaseValidator {
    * @returns Whether the option is a custom variable
    */
   private isCustomVariable(key: string): boolean {
-    return this.optionRule.validation.customVariables.some(pattern => 
-      key.startsWith(pattern.replace("*", ""))
-    );
+    const normalizedKey = this.normalizeKey(key);
+    return this.optionRule.validation.customVariables.includes(normalizedKey);
   }
-} 
+}

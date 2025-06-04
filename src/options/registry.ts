@@ -1,4 +1,4 @@
-import { Option, OptionRegistry } from "../types/option.ts";
+import { Option, OptionRegistry } from '../types/option.ts';
 
 export class DefaultOptionRegistry implements OptionRegistry {
   private options: Map<string, Option>;
@@ -11,16 +11,26 @@ export class DefaultOptionRegistry implements OptionRegistry {
     this.uniqueOptions = new Set();
   }
 
+  private normalizeKey(key: string): string {
+    // Remove leading -- or - and normalize to lowercase
+    return key.replace(/^--?/, '').toLowerCase();
+  }
+
   public register(option: Option): void {
-    this.options.set(option.name, option);
+    const normalizedName = this.normalizeKey(option.name);
+    this.options.set(normalizedName, option);
     this.uniqueOptions.add(option);
+
+    // Register aliases with normalized keys
     for (const alias of option.aliases) {
-      this.options.set(alias, option);
+      const normalizedAlias = this.normalizeKey(alias);
+      this.options.set(normalizedAlias, option);
     }
   }
 
   public get(name: string): Option | undefined {
-    return this.options.get(name);
+    const normalizedName = this.normalizeKey(name);
+    return this.options.get(normalizedName);
   }
 
   public validateCustomVariable(name: string): boolean {
@@ -30,4 +40,4 @@ export class DefaultOptionRegistry implements OptionRegistry {
   public getAll(): Option[] {
     return Array.from(this.uniqueOptions);
   }
-} 
+}
