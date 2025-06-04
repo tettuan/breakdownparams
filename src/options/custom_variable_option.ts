@@ -12,7 +12,7 @@ export class CustomVariableOption implements Option {
     private pattern: RegExp,
   ) {}
 
-  validate(value: string | undefined): ValidationResult {
+  validate(_value: string | undefined): ValidationResult {
     if (!this.pattern.test(this.name)) {
       return {
         isValid: false,

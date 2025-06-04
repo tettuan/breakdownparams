@@ -1,11 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import {
-  ErrorInfo,
-  OneParamResult,
-  ParamsResult,
-  TwoParamResult,
-  ZeroParamsResult,
-} from '../../src/result/types.ts';
+import { OneParamResult, ParamsResult, TwoParamResult } from '../../src/result/types.ts';
 
 Deno.test('test_params_result_structure', () => {
   // 基本構造のテスト
@@ -38,7 +32,7 @@ Deno.test('test_params_result_structure', () => {
 });
 
 Deno.test('test_zero_params_result_structure', () => {
-  const result: ZeroParamsResult = {
+  const result: ParamsResult = {
     type: 'zero',
     params: [],
     options: {},

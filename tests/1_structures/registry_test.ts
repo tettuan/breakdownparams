@@ -11,7 +11,7 @@ Deno.test('OptionRegistry', async (t) => {
       ['t'],
       false,
       'Test option',
-      (v) => ({ isValid: true, errors: [] }),
+      (_v) => ({ isValid: true, errors: [] }),
     );
     registry.register(option);
 
@@ -34,7 +34,7 @@ Deno.test('OptionRegistry', async (t) => {
       ['t1'],
       false,
       'Test option 1',
-      (v) => ({ isValid: true, errors: [] }),
+      (_v) => ({ isValid: true, errors: [] }),
     );
     const option2 = new FlagOption('test2', ['t2'], 'Test flag');
     const option3 = new CustomVariableOption('uv-test3', 'Test variable', /^uv-[a-zA-Z0-9_]+$/);

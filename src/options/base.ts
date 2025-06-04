@@ -1,4 +1,4 @@
-import { Option, OptionType, OptionValue, ValidationResult } from '../types/option.ts';
+import { Option, OptionType, ValidationResult } from '../types/option.ts';
 
 export class ValueOption implements Option {
   readonly type = OptionType.VALUE;
@@ -11,12 +11,12 @@ export class ValueOption implements Option {
     private validator: (value: string) => ValidationResult,
   ) {}
 
-  validate(value: string | undefined): ValidationResult {
-    if (this.isRequired && value === undefined) {
+  validate(_value: string | undefined): ValidationResult {
+    if (this.isRequired && _value === undefined) {
       return { isValid: false, errors: [`${this.name} is required`] };
     }
-    if (value !== undefined) {
-      return this.validator(value);
+    if (_value !== undefined) {
+      return this.validator(_value);
     }
     return { isValid: true, errors: [] };
   }
@@ -36,7 +36,7 @@ export class FlagOption implements Option {
     readonly description: string,
   ) {}
 
-  validate(value: string | undefined): ValidationResult {
+  validate(_value: string | undefined): ValidationResult {
     return { isValid: true, errors: [] };
   }
 
@@ -56,7 +56,7 @@ export class CustomVariableOption implements Option {
     private pattern: RegExp,
   ) {}
 
-  validate(value: string | undefined): ValidationResult {
+  validate(_value: string | undefined): ValidationResult {
     if (!this.pattern.test(this.name)) {
       return {
         isValid: false,

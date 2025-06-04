@@ -11,7 +11,7 @@ export class FlagOption implements Option {
     readonly description: string,
   ) {}
 
-  validate(value: string | undefined): ValidationResult {
+  validate(_value: string | undefined): ValidationResult {
     return {
       isValid: true,
       validatedParams: [],

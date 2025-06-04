@@ -1,4 +1,4 @@
-import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
+import { assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { OptionType } from '../../src/types/option.ts';
 
 Deno.test('OptionType', async (t) => {
