@@ -1,5 +1,5 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import { ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult } from '../src/result/types.ts';
 
 const parser = new ParamsParser();
 const result = parser.parse(Deno.args);
@@ -49,43 +49,44 @@ Notes:
 `);
 }
 
-if (!result.success) {
-  console.error(`Error: ${result.error?.message}`);
+if (result.error) {
+  console.error(`Error ${result.error.code}: ${result.error.message}`);
   console.log('\nFor usage information, run: custom_variable_options_usage --help');
   Deno.exit(1);
 }
 
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
-  showUsage();
-  Deno.exit(0);
+if (result.type === 'zero') {
+  const zeroResult = result as ZeroParamsResult;
+  if (zeroResult.options['help'] === 'true') {
+    showUsage();
+    Deno.exit(0);
+  }
 }
 
 // Process valid command
-if (data.type === 'two') {
-  const { demonstrativeType, layerType, options = {} } = data;
+if (result.type === 'two') {
+  const twoResult = result as TwoParamResult;
 
   console.log('Command processed successfully:');
   console.log('----------------------------');
-  console.log(`Action: ${demonstrativeType} ${layerType}`);
+  console.log(`Action: ${twoResult.demonstrativeType} ${twoResult.layerType}`);
 
   // Display standard options
-  if (options?.fromFile) {
-    console.log(`Input file: ${options.fromFile}`);
+  if (twoResult.options['from']) {
+    console.log(`Input file: ${twoResult.options['from']}`);
   }
-  if (options?.destinationFile) {
-    console.log(`Output file: ${options.destinationFile}`);
+  if (twoResult.options['destination']) {
+    console.log(`Output file: ${twoResult.options['destination']}`);
   }
-  if (options?.fromLayerType) {
-    console.log(`Converting from layer: ${options.fromLayerType}`);
+  if (twoResult.options['input']) {
+    console.log(`Converting from layer: ${twoResult.options['input']}`);
   }
-  if (options?.adaptationType) {
-    console.log(`Prompt adaptation: ${options.adaptationType}`);
+  if (twoResult.options['adaptation']) {
+    console.log(`Prompt adaptation: ${twoResult.options['adaptation']}`);
   }
 
   // Display custom variables
-  const customVars = Object.entries(options).filter(([key]) => key.startsWith('--uv-'));
+  const customVars = Object.entries(twoResult.options).filter(([key]) => key.startsWith('--uv-'));
   if (customVars.length > 0) {
     console.log('\nCustom Variables:');
     console.log('----------------');

@@ -1,5 +1,5 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import { ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult } from '../src/result/types.ts';
 
 // Create parser instance
 const parser = new ParamsParser();
@@ -42,38 +42,41 @@ Examples:
 }
 
 // Handle different result types
-if (!result.success) {
-  console.error('Error:', result.error?.message);
+if (result.error) {
+  console.error(`Error ${result.error.code}: ${result.error.message}`);
   console.log('\nFor usage information, run: extended_params_usage --help');
   Deno.exit(1);
 }
 
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
-  showUsage();
-  Deno.exit(0);
+if (result.type === 'zero') {
+  const zeroResult = result as ZeroParamsResult;
+  if (zeroResult.options['help'] === 'true') {
+    showUsage();
+    Deno.exit(0);
+  }
 }
 
-if (data.type === 'two') {
+if (result.type === 'two') {
+  const twoResult = result as TwoParamResult;
   console.log('Command processed successfully:');
   console.log('----------------------------');
-  console.log('Demonstrative Type:', data.demonstrativeType);
-  console.log('Layer Type:', data.layerType);
-  if (data.options) {
-    console.log('Options:', data.options);
+  console.log('Demonstrative Type:', twoResult.demonstrativeType);
+  console.log('Layer Type:', twoResult.layerType);
+  if (Object.keys(twoResult.options).length > 0) {
+    console.log('Options:', twoResult.options);
   }
-} else if (data.type === 'one') {
-  console.log('Command:', data.command);
-  if (data.options) {
-    console.log('Options:', data.options);
+} else if (result.type === 'one') {
+  const oneResult = result as OneParamResult;
+  console.log('Command:', oneResult.demonstrativeType);
+  if (Object.keys(oneResult.options).length > 0) {
+    console.log('Options:', oneResult.options);
   }
-} else if (data.type === 'zero') {
+} else if (result.type === 'zero') {
   console.log('No parameters provided');
-  if (data.help) {
+  if (result.options['help'] === 'true') {
     console.log('Help requested');
   }
-  if (data.version) {
+  if (result.options['version'] === 'true') {
     console.log('Version requested');
   }
 }

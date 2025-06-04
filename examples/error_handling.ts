@@ -1,5 +1,5 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import { ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult } from '../src/result/types.ts';
 
 const parser = new ParamsParser();
 const result = parser.parse(Deno.args);
@@ -25,7 +25,7 @@ Try these invalid commands to see error handling in action:
    error_handling to invalid
 
 5. Invalid option format:
-   error_handling to project --from src
+   error_handling to project --from=src
    error_handling to project --unknown-option
 
 6. Help and usage:
@@ -33,19 +33,20 @@ Try these invalid commands to see error handling in action:
 `);
 }
 
-if (!result.success) {
-  console.error(`Error: ${result.error?.message}`);
+if (result.error) {
+  console.error(`Error ${result.error.code}: ${result.error.message}`);
   console.log('\nFor usage information, run: error_handling --help');
   Deno.exit(1);
 }
 
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
-  showUsage();
-  Deno.exit(0);
+if (result.type === 'zero') {
+  const zeroResult = result as ZeroParamsResult;
+  if (zeroResult.options['help'] === 'true') {
+    showUsage();
+    Deno.exit(0);
+  }
 }
 
 // If we get here, the command was valid
 console.log('Command processed successfully:');
-console.log(JSON.stringify(data, null, 2));
+console.log(JSON.stringify(result, null, 2));
