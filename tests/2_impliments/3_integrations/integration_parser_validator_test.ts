@@ -95,7 +95,7 @@ Deno.test('test_parser_validator_integration', () => {
   const zeroParamsParseResult = parser.parse(['--help']);
   assertEquals(zeroParamsParseResult.type, 'zero', 'Should parse as zero params');
   assertEquals(zeroParamsParseResult.params, [], 'Should have empty params');
-  assertEquals(zeroParamsParseResult.options.help, '', 'Should have help option');
+  assertEquals(zeroParamsParseResult.options.help, 'true', 'Should have help option');
 
   // 2. 1パラメータケース
   const oneParamParseResult = parser.parse(['init']);
@@ -117,6 +117,45 @@ Deno.test('test_parser_validator_integration', () => {
   const complexParseResult = parser.parse(['to', 'project', '--help', '--version']);
   assertEquals(complexParseResult.type, 'two', 'Should parse as two params with options');
   assertEquals(complexParseResult.params.length, 2, 'Should include only parameters');
-  assertEquals(complexParseResult.options.help, '', 'Should have help option');
-  assertEquals(complexParseResult.options.version, '', 'Should have version option');
+  assertEquals(complexParseResult.options.help, 'true', 'Should have help option');
+  assertEquals(complexParseResult.options.version, 'true', 'Should have version option');
+});
+
+Deno.test('test_flag_option_integration', async (t) => {
+  const parser = new ParamsParser(optionRule);
+
+  await t.step('should handle single flag option', () => {
+    const result = parser.parse(['--help']);
+    assertEquals(result.type, 'zero');
+    assertEquals(result.options.help, 'true');
+    assertEquals(result.options.version, undefined);
+  });
+
+  await t.step('should handle multiple flag options', () => {
+    const result = parser.parse(['--help', '--version']);
+    assertEquals(result.type, 'zero');
+    assertEquals(result.options.help, 'true');
+    assertEquals(result.options.version, 'true');
+  });
+
+  await t.step('should handle flag options with parameters', () => {
+    const result = parser.parse(['init', '--help', '--version']);
+    assertEquals(result.type, 'one');
+    assertEquals(result.params, ['init']);
+    assertEquals(result.options.help, 'true');
+    assertEquals(result.options.version, 'true');
+  });
+
+  await t.step('should handle flag options with custom variables', () => {
+    const result = parser.parse(['--uv-test=value', '--help']);
+    assertEquals(result.type, 'zero');
+    assertEquals(result.options['uv-test'], 'value');
+    assertEquals(result.options.help, 'true');
+  });
+
+  await t.step('should handle flag options with invalid values', () => {
+    const result = parser.parse(['--help=false']);
+    assertEquals(result.type, 'zero');
+    assertEquals(result.options.help, 'false');
+  });
 });
