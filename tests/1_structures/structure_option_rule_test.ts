@@ -51,3 +51,27 @@ Deno.test('test_option_rule_structure', () => {
     'flag option value should be a string',
   );
 });
+
+Deno.test('test_option_rule_structure', async (t) => {
+  await t.step('should have correct flag options structure', () => {
+    const rule: OptionRule = {
+      format: '--key=value',
+      validation: {
+        customVariables: ['uv-project', 'uv-version', 'uv-environment'],
+        emptyValue: 'error',
+        unknownOption: 'error',
+        duplicateOption: 'error',
+        requiredOptions: [],
+        valueTypes: ['string'],
+      },
+      flagOptions: {
+        help: 'help',
+        version: 'version',
+      },
+    };
+
+    assertEquals(typeof rule.flagOptions, 'object');
+    assertEquals(rule.flagOptions.help, 'help');
+    assertEquals(rule.flagOptions.version, 'version');
+  });
+});

@@ -79,7 +79,7 @@ Deno.test('test_validation_result_interface', () => {
   assertEquals(Array.isArray(result.validatedParams), true);
 });
 
-Deno.test('test_option_rule_interface', () => {
+Deno.test('test_option_rule_interface', async (t) => {
   const rule: OptionRule = {
     format: '--key=value',
     validation: {
@@ -95,7 +95,12 @@ Deno.test('test_option_rule_interface', () => {
       version: 'version',
     },
   };
-  assertEquals(typeof rule.format, 'string');
-  assertEquals(typeof rule.validation, 'object');
-  assertEquals(typeof rule.flagOptions, 'object');
+
+  await t.step('should have correct flag options structure', () => {
+    assertEquals(typeof rule.format, 'string');
+    assertEquals(typeof rule.validation, 'object');
+    assertEquals(typeof rule.flagOptions, 'object');
+    assertEquals(typeof rule.flagOptions.help, 'string');
+    assertEquals(typeof rule.flagOptions.version, 'string');
+  });
 });

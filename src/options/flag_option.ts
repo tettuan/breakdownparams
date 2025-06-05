@@ -19,6 +19,9 @@ export class FlagOption implements Option {
   }
 
   parse(value: string | undefined): boolean {
-    return value !== undefined;
+    if (value === undefined || value === 'false') {
+      return false;
+    }
+    return value === 'true';
   }
 }
