@@ -105,12 +105,12 @@ Deno.test('test_flag_option', async (t) => {
     assert(result.isValid);
   });
 
-  await t.step('should parse as boolean', () => {
-    const trueValue = option.parse('any');
-    assert(trueValue === true);
+  await t.step('should parse as undefined', () => {
+    const value = option.parse('true');
+    assert(value === undefined, 'Flag option should return undefined');
 
-    const falseValue = option.parse(undefined);
-    assert(falseValue === false);
+    const undefinedValue = option.parse(undefined);
+    assert(undefinedValue === undefined, 'Flag option should return undefined');
   });
 });
 

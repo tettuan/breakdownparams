@@ -1,6 +1,7 @@
 import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { DefaultOptionRegistry } from '../../src/options/registry.ts';
 import { CustomVariableOption, FlagOption, ValueOption } from '../../src/options/base.ts';
+import { OptionType } from '../../src/types/option.ts';
 
 Deno.test('OptionRegistry', async (t) => {
   const registry = new DefaultOptionRegistry();
@@ -48,5 +49,24 @@ Deno.test('OptionRegistry', async (t) => {
     assert(options.includes(option1));
     assert(options.includes(option2));
     assert(options.includes(option3));
+  });
+
+  await t.step('should register flag option with correct structure', () => {
+    const option = new FlagOption('help', ['h'], 'Show help');
+    registry.register(option);
+
+    const retrieved = registry.get('help');
+    assertEquals(retrieved?.type, OptionType.FLAG);
+    assertEquals(retrieved?.name, 'help');
+    assertEquals(retrieved?.aliases, ['h']);
+  });
+
+  await t.step('should handle flag option aliases correctly', () => {
+    const option = new FlagOption('help', ['h'], 'Show help');
+    registry.register(option);
+
+    const byName = registry.get('help');
+    const byAlias = registry.get('h');
+    assertEquals(byName, byAlias);
   });
 });

@@ -36,23 +36,26 @@ Deno.test('ValueOption', async (t) => {
 });
 
 Deno.test('FlagOption', async (t) => {
-  const option = new FlagOption('test', ['t'], 'Test flag');
+  const option = new FlagOption('help', ['h'], 'Show help');
 
-  await t.step('should have correct type', () => {
+  await t.step('should have correct structure', () => {
     assertEquals(option.type, OptionType.FLAG);
+    assertEquals(option.isRequired, false);
+    assertEquals(option.name, 'help');
+    assertEquals(option.aliases, ['h']);
+    assertEquals(option.description, 'Show help');
   });
 
-  await t.step('should always validate successfully', () => {
+  await t.step('should validate flag option structure', () => {
     const result = option.validate(undefined);
-    assert(result.isValid);
+    assertEquals(result.isValid, true);
+    assertEquals(result.errors, []);
   });
 
-  await t.step('should parse as boolean', () => {
-    const trueValue = option.parse('any');
-    assert(trueValue === true);
-
-    const falseValue = option.parse(undefined);
-    assert(falseValue === false);
+  await t.step('should parse flag option value', () => {
+    assertEquals(option.parse('true'), true);
+    assertEquals(option.parse(undefined), false);
+    assertEquals(option.parse('false'), false);
   });
 });
 

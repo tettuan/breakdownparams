@@ -11,14 +11,21 @@ export class FlagOption implements Option {
     readonly description: string,
   ) {}
 
-  validate(_value: string | undefined): ValidationResult {
+  validate(value: string | undefined): ValidationResult {
+    if (value !== undefined) {
+      return {
+        isValid: false,
+        validatedParams: [],
+        errorMessage: 'Invalid option format: Flag options should not have values',
+      };
+    }
     return {
       isValid: true,
       validatedParams: [],
     };
   }
 
-  parse(value: string | undefined): boolean {
-    return value !== undefined;
+  parse(_value: string | undefined): undefined {
+    return undefined;
   }
 }

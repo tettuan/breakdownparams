@@ -52,7 +52,8 @@ export class OptionsValidator extends BaseValidator {
           errors.push(`Duplicate option: ${arg}`);
         }
         seenKeys.add(arg);
-        options[arg] = ''; // 元の形式を保持
+        const normalizedKey = this.normalizeKey(arg);
+        options[normalizedKey] = 'true'; // 存在を表す値を設定
         continue;
       }
 
