@@ -34,5 +34,5 @@ Deno.test('test_params_parser_default_structure', () => {
   assertEquals(result.type, 'zero');
   assertEquals(Array.isArray(result.params), true);
   assertEquals(typeof result.options, 'object');
-  assertEquals(result.options.help, '');
+  assertEquals(result.options.help, undefined, 'Flag option should be undefined');
 });

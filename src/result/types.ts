@@ -4,7 +4,7 @@
 export interface ParamsResult {
   type: 'zero' | 'one' | 'two' | 'error';
   params: string[];
-  options: Record<string, string>;
+  options: Record<string, string | undefined>;
   error?: ErrorInfo;
 }
 

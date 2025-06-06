@@ -33,5 +33,5 @@ Deno.test('test_params_parser_default_option_rule', () => {
   assertEquals(parser instanceof ParamsParser, true);
   const result = parser.parse(['--help']);
   assertEquals(result.type, 'zero');
-  assertEquals(result.options.help, '');
+  assertEquals(result.options.help, undefined, 'Flag option should be undefined');
 });

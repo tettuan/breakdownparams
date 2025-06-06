@@ -25,13 +25,13 @@ Deno.test('test_params_parser_e2e', () => {
   const helpResult = parser.parse(['--help']);
   assertEquals(helpResult.type, 'zero', 'Help command should return zero params result');
   assertEquals(helpResult.params, [], 'Help command should be empty params');
-  assertEquals(helpResult.options.help, '', 'Help option should be present');
+  assertEquals(helpResult.options.help, undefined, 'Help option should be present');
 
   // バージョンコマンドのテスト
   const versionResult = parser.parse(['--version']);
   assertEquals(versionResult.type, 'zero', 'Version command should return zero params result');
   assertEquals(versionResult.params, [], 'Version command should be empty params');
-  assertEquals(versionResult.options.version, '', 'Version option should be present');
+  assertEquals(versionResult.options.version, undefined, 'Version option should be present');
 
   // initコマンドのテスト
   const initResult = parser.parse(['init']) as OneParamResult;
