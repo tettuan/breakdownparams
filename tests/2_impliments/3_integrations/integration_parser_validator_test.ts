@@ -95,7 +95,7 @@ Deno.test('test_parser_validator_integration', () => {
   const zeroParamsParseResult = parser.parse(['--help']);
   assertEquals(zeroParamsParseResult.type, 'zero', 'Should parse as zero params');
   assertEquals(zeroParamsParseResult.params, [], 'Should have empty params');
-  assertEquals(zeroParamsParseResult.options.help, '', 'Should have help option');
+  assertEquals(zeroParamsParseResult.options.help, undefined, 'Should have help option without value');
 
   // 2. 1パラメータケース
   const oneParamParseResult = parser.parse(['init']);
@@ -117,6 +117,22 @@ Deno.test('test_parser_validator_integration', () => {
   const complexParseResult = parser.parse(['to', 'project', '--help', '--version']);
   assertEquals(complexParseResult.type, 'two', 'Should parse as two params with options');
   assertEquals(complexParseResult.params.length, 2, 'Should include only parameters');
-  assertEquals(complexParseResult.options.help, '', 'Should have help option');
-  assertEquals(complexParseResult.options.version, '', 'Should have version option');
+  assertEquals(complexParseResult.options.help, undefined, 'Should have help option without value');
+  assertEquals(complexParseResult.options.version, undefined, 'Should have version option without value');
+});
+
+Deno.test('flag option with value should return error (--help=true)', () => {
+  const parser = new ParamsParser(optionRule);
+  const result = parser.parse(['--help=true']);
+  assertEquals(result.type, 'error');
+  assertEquals(result.error?.message, 'Invalid option format: --help=true, Unknown option: help=true');
+  assertEquals(result.error?.category, 'invalid_format');
+});
+
+Deno.test('flag option with value should return error (--version=true)', () => {
+  const parser = new ParamsParser(optionRule);
+  const result = parser.parse(['--version=true']);
+  assertEquals(result.type, 'error');
+  assertEquals(result.error?.message, 'Invalid option format: --version=true, Unknown option: version=true');
+  assertEquals(result.error?.category, 'invalid_format');
 });

@@ -83,7 +83,10 @@ export class ParamsParser {
         const [key, value] = arg.split('=');
         const normalizedKey = key.replace(/^--/, '');
         console.log('[DEBUG] processing option:', { arg, key, normalizedKey, value });
-        options[normalizedKey] = value || '';
+        // Only set value for non-flag options
+        if (!this.optionRule.flagOptions[normalizedKey]) {
+          options[normalizedKey] = value || '';
+        }
       } else {
         console.log('[DEBUG] processing param:', arg);
         params.push(arg);
