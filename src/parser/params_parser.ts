@@ -75,47 +75,19 @@ export class ParamsParser {
     }
 
     // Extract options from validated params
-    const options: Record<string, string> = {};
+    const options: Record<string, string | undefined> = {};
     const params: string[] = [];
     console.log('[DEBUG] validatedParams:', optionsResult.validatedParams);
     for (const arg of optionsResult.validatedParams) {
       if (arg.startsWith('-')) {
-        const normalizedKey = arg.replace(/^--/, '');
-        console.log('[DEBUG] processing option:', { arg, normalizedKey });
-
-        // Check if it's a flag option
+        const [key, value] = arg.split('=');
+        const normalizedKey = key.replace(/^--/, '');
+        console.log('[DEBUG] processing option:', { arg, key, normalizedKey, value });
+        // Set flag options in options object with undefined value
         if (this.optionRule.flagOptions[normalizedKey]) {
-          if (arg.includes('=')) {
-            const [key, value] = arg.split('=');
-            const flagKey = key.replace(/^--/, '');
-            options[flagKey] = value;
-          } else {
-            options[normalizedKey] = 'true';
-          }
+          options[normalizedKey] = undefined;
         } else {
-          // Handle custom variables
-          const customVariables = this.optionRule.validation.customVariables;
-          const isCustomVariable = customVariables.some(pattern => {
-            const regex = new RegExp(pattern.replace('*', '.*'));
-            return regex.test(normalizedKey);
-          });
-
-          if (isCustomVariable) {
-            const [key, value] = arg.split('=');
-            const customKey = key.replace(/^--/, '');
-            options[customKey] = value || '';
-          } else {
-            return {
-              type: 'error',
-              params: [],
-              options: {},
-              error: {
-                message: `Unknown option: ${normalizedKey}`,
-                code: 'VALIDATION_ERROR',
-                category: 'unknown_option',
-              },
-            } as ParamsResult;
-          }
+          options[normalizedKey] = value || '';
         }
       } else {
         console.log('[DEBUG] processing param:', arg);

@@ -316,6 +316,122 @@ enum OptionType {
 type OptionValue = string | boolean | undefined;
 ```
 
+### 2.5 オプション結果の評価
+
+オプションのバリデーション結果は、`ValidationResult` インターフェースを通じて評価されます。この評価は、オプションの種類によって異なる動作を示します：
+
+#### 2.5.1 評価の基本原則
+
+```typescript
+interface ValidationResult {
+  isValid: boolean;  // バリデーションの成功/失敗を示す
+  errors: string[];  // エラーメッセージの配列
+}
+```
+
+- `isValid: true` の場合：
+  - オプションが正しく指定されている
+  - 値の検証が成功している（必要な場合）
+  - エラーが存在しない
+
+- `isValid: false` の場合：
+  - オプションの指定に問題がある
+  - 値の検証に失敗している
+  - エラーメッセージが `errors` 配列に格納される
+
+#### 2.5.2 オプションタイプ別の評価
+
+1. **FlagOption（フラグオプション）**
+```typescript
+// フラグオプションの評価結果
+const flagResult: ValidationResult = {
+  isValid: true,  // フラグが指定されていれば有効
+  errors: []      // エラーなし
+};
+```
+- 値の検証は不要
+- オプションが指定されていれば有効
+- `isValid: true` は「フラグが有効」を意味する
+- フラグオプションに値が指定された場合は `"Invalid option format"` エラーを返す
+- フラグオプションの存在は `options` オブジェクトに値（`true` や `''`）を設定せず、`undefined` として扱う
+
+##### フラグオプションの評価結果一覧
+
+| 入力例 | 評価結果 | 説明 |
+|--------|----------|------|
+| `--help` | OK | フラグオプションが正しく指定されている |
+| `--help=true` | NG | フラグオプションに値が指定されている（エラー） |
+| `--version` | OK | フラグオプションが正しく指定されている |
+| `--version=false` | NG | フラグオプションに値が指定されている（エラー） |
+| `--help --version` | OK | 複数のフラグオプションが正しく指定されている |
+| `--help=true --version` | NG | 一部のフラグオプションに値が指定されている（エラー） |
+
+2. **ValueOption（値を持つオプション）**
+```typescript
+// 値を持つオプションの評価結果
+const valueResult: ValidationResult = {
+  isValid: true,  // 値が正しく指定されている
+  errors: []      // エラーなし
+};
+```
+- 値の存在チェック（必須の場合）
+- 値の形式チェック
+- カスタムバリデーションの実行
+
+3. **CustomVariableOption（カスタム変数オプション）**
+```typescript
+// カスタム変数オプションの評価結果
+const customResult: ValidationResult = {
+  isValid: true,  // 変数名が正しい形式
+  errors: []      // エラーなし
+};
+```
+- 変数名の形式チェック
+- 値の検証は行わない
+- パターンマッチングの結果に基づく評価
+
+#### 2.5.3 評価の使用例
+
+```typescript
+// オプションの評価結果の使用
+const option = new ValueOption('from', ['f'], true, 'Input file', (v) => ({
+  isValid: v.length > 0,
+  errors: v.length === 0 ? ['Value cannot be empty'] : []
+}));
+
+const result = option.validate('input.md');
+if (result.isValid) {
+  // オプションが有効な場合の処理
+  console.log('Option is valid');
+} else {
+  // エラー処理
+  console.error(result.errors.join(', '));
+}
+```
+
+#### 2.5.4 評価結果の解釈
+
+1. **成功ケース**
+   - `isValid: true` は、オプションが正しく指定され、必要な検証を通過したことを示す
+   - エラーメッセージは空配列
+   - オプションの値は使用可能
+   - フラグオプションの場合は、値の有無に関わらず存在のみで有効
+
+2. **失敗ケース**
+   - `isValid: false` は、オプションの指定に問題があることを示す
+   - エラーメッセージに具体的な問題が記載される
+   - オプションの値は使用不可
+   - フラグオプションに値が指定された場合は `"Invalid option format"` エラー
+
+3. **必須オプション**
+   - 必須オプションが指定されていない場合、`isValid: false`
+   - エラーメッセージに「必須」である旨が記載される
+
+4. **オプションの組み合わせ**
+   - 複数のオプションが指定された場合、それぞれ独立して評価
+   - すべてのオプションが `isValid: true` の場合のみ、全体として有効
+   - フラグオプションは値を持たず、存在のみで評価
+
 ## 3. エラー処理詳細
 
 ### 3.1 ErrorInfo
