@@ -64,18 +64,41 @@ Deno.test('test_flag_option_unit', async (t) => {
 
   await t.step('should validate flag option correctly', () => {
     const result = flagOption.validate(undefined);
-    assertEquals(result.isValid, true);
+    assertEquals(result.isValid, true, 'Flag option should be valid when no value is provided');
     assertEquals(result.validatedParams, []);
 
     const resultWithValue = flagOption.validate('true');
-    assertEquals(resultWithValue.isValid, true);
-    assertEquals(resultWithValue.validatedParams, []);
+    assertEquals(
+      resultWithValue.isValid,
+      false,
+      'Flag option should be invalid when a value is provided',
+    );
+    assertEquals(
+      resultWithValue.errorMessage,
+      'Invalid option format: Flag options should not have values',
+    );
   });
 
   await t.step('should parse flag option values correctly', () => {
-    assertEquals(flagOption.parse('true'), true);
-    assertEquals(flagOption.parse(undefined), false);
-    assertEquals(flagOption.parse('false'), false);
-    assertEquals(flagOption.parse(''), false);
+    assertEquals(
+      flagOption.parse('true'),
+      undefined,
+      'Flag option should return undefined for any value',
+    );
+    assertEquals(
+      flagOption.parse(undefined),
+      undefined,
+      'Flag option should return undefined when no value is provided',
+    );
+    assertEquals(
+      flagOption.parse('false'),
+      undefined,
+      'Flag option should return undefined for false value',
+    );
+    assertEquals(
+      flagOption.parse(''),
+      undefined,
+      'Flag option should return undefined for empty value',
+    );
   });
 });
