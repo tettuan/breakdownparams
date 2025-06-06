@@ -39,7 +39,6 @@ export class OptionsValidator extends BaseValidator {
    * @returns Validation result
    */
   public override validate(args: string[]): ValidationResult {
-    console.debug('[DEBUG] validate: start', args);
     const errors: string[] = [];
     const options: Record<string, string> = {};
     const seenKeys = new Set<string>();
@@ -69,7 +68,6 @@ export class OptionsValidator extends BaseValidator {
         options[arg] = value || ''; // 元の形式（プレフィックス付き）を保持
       }
     }
-    console.debug('[DEBUG] extractOptions:', options);
 
     // Check option format (フラグオプションを除く)
     for (const arg of args) {
@@ -77,11 +75,9 @@ export class OptionsValidator extends BaseValidator {
         arg.startsWith('-') && !this.isValidOption(arg) &&
         !this.isFlagOption(this.normalizeKey(arg.slice(2)))
       ) {
-        console.debug('[DEBUG] invalid option format:', arg);
         errors.push(`Invalid option format: ${arg}`);
       }
     }
-    console.debug('[DEBUG] after format check, errors:', errors);
 
     // Check for empty values (フラグオプションを除く)
     for (const [key, value] of Object.entries(options)) {
@@ -90,11 +86,9 @@ export class OptionsValidator extends BaseValidator {
         this.optionRule.validation.emptyValue === 'error' && value === '' &&
         !this.isFlagOption(normalizedKey)
       ) {
-        console.debug('[DEBUG] empty value not allowed:', normalizedKey);
         errors.push(`Empty value not allowed for option: ${normalizedKey}`);
       }
     }
-    console.debug('[DEBUG] after empty value check, errors:', errors);
 
     // Check for unknown options (フラグオプションを除く)
     for (const key of Object.keys(options)) {
@@ -103,11 +97,9 @@ export class OptionsValidator extends BaseValidator {
         !this.isValidOption(key) && !this.isFlagOption(normalizedKey) &&
         !this.isCustomVariable(normalizedKey)
       ) {
-        console.debug('[DEBUG] unknown option:', normalizedKey);
         errors.push(`Unknown option: ${normalizedKey}`);
       }
     }
-    console.debug('[DEBUG] after unknown option check, errors:', errors);
 
     const isValid = errors.length === 0;
     const errorMessage = errors.join(', ');

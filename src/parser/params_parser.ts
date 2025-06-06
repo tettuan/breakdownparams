@@ -46,12 +46,9 @@ export class ParamsParser {
    * @returns 解析結果
    */
   public parse(args: string[]): ParamsResult {
-    console.log('[DEBUG] parse: start', args);
-
     // First, check for security issues
     const securityValidator = new SecurityErrorValidator(this.optionRule);
     const securityResult = securityValidator.validate(args);
-    console.log('[DEBUG] securityResult:', securityResult);
     if (!securityResult.isValid) {
       return {
         type: 'error',
@@ -64,7 +61,6 @@ export class ParamsParser {
     // Then validate options
     const optionsValidator = new OptionsValidator(this.optionRule);
     const optionsResult = optionsValidator.validate(args);
-    console.log('[DEBUG] optionsResult:', optionsResult);
     if (!optionsResult.isValid) {
       return {
         type: 'error',
@@ -77,12 +73,10 @@ export class ParamsParser {
     // Extract options from validated params
     const options: Record<string, string | undefined> = {};
     const params: string[] = [];
-    console.log('[DEBUG] validatedParams:', optionsResult.validatedParams);
     for (const arg of optionsResult.validatedParams) {
       if (arg.startsWith('-')) {
         const [key, value] = arg.split('=');
         const normalizedKey = key.replace(/^--/, '');
-        console.log('[DEBUG] processing option:', { arg, key, normalizedKey, value });
         // Set flag options in options object with undefined value
         if (this.optionRule.flagOptions[normalizedKey]) {
           options[normalizedKey] = undefined;
@@ -90,11 +84,9 @@ export class ParamsParser {
           options[normalizedKey] = value || '';
         }
       } else {
-        console.log('[DEBUG] processing param:', arg);
         params.push(arg);
       }
     }
-    console.log('[DEBUG] extracted:', { options, params });
 
     // Try each parameter validator
     const zeroValidator = new ZeroParamsValidator(this.optionRule);
@@ -103,7 +95,6 @@ export class ParamsParser {
 
     // Zero params validator accepts options only
     const zeroResult = zeroValidator.validate(optionsResult.validatedParams);
-    console.log('[DEBUG] zeroResult:', zeroResult);
     if (zeroResult.isValid) {
       return {
         type: 'zero',
@@ -114,7 +105,6 @@ export class ParamsParser {
 
     // One and two params validators only accept params
     const oneResult = oneValidator.validate(params);
-    console.log('[DEBUG] oneResult:', oneResult);
     if (oneResult.isValid) {
       return {
         type: 'one',
@@ -125,7 +115,6 @@ export class ParamsParser {
     }
 
     const twoResult = twoValidator.validate(params);
-    console.log('[DEBUG] twoResult:', twoResult);
     if (twoResult.isValid) {
       return {
         type: 'two',
