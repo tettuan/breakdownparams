@@ -2,17 +2,46 @@
 
 This document defines the specification for options (hyphenated arguments) in the breakdownparams library.
 
+## Argument Format
+
+Option arguments must follow the format below:
+
+### Correct Format
+- `--option=value` (long form)
+- `-o=value` (short form)
+- `--option=` (empty value)
+- `--option=""` (empty string)
+- `--option=''` (empty string)
+
+### Incorrect Format
+- `--option value` (space-separated not supported)
+- `-o value` (space-separated not supported)
+
+### Empty Value Specification
+To specify an empty value for an option, use one of the following methods:
+
+1. Specify only the equals sign:
+   ```bash
+   --option=
+   ```
+
+2. Specify an empty string:
+   ```bash
+   --option=""
+   --option=''
+   ```
+
 ## Option List
 
 | Option        | Alias | Description          | Value Type | Required | Example                    |
 | ------------- | ----- | -------------------- | ---------- | -------- | -------------------------- |
 | --help        | -h    | Display help info    | boolean    | No       | `--help`                   |
 | --version     | -v    | Display version info | boolean    | No       | `--version`                |
-| --from        | -f    | Source file path     | string     | No       | `--from input.md`          |
-| --destination | -o    | Output file path     | string     | No       | `--destination output.md`  |
-| --input       | -i    | Input layer type     | enum       | No       | `--input project`          |
-| --adaptation  | -a    | Prompt adaptation type | string  | No       | `--adaptation strict`      |
-| --config      | -c    | Configuration file   | string     | No       | `--config test`            |
+| --from        | -f    | Source file path     | string     | No       | `--from=input.md`          |
+| --destination | -o    | Output file path     | string     | No       | `--destination=output.md`  |
+| --input       | -i    | Input layer type     | enum       | No       | `--input=project`          |
+| --adaptation  | -a    | Prompt adaptation type | string  | No       | `--adaptation=strict`      |
+| --config      | -c    | Configuration file   | string     | No       | `--config=test`            |
 | --uv-*        | None  | Custom variable option | string   | No       | `--uv-project=myproject`   |
 
 ## Option Constraints
@@ -39,13 +68,7 @@ This document defines the specification for options (hyphenated arguments) in th
 
 ## Input Layer Type Values
 
-When using the `--input` option, the following values are supported:
-
-| Input Value | Description |
-| ----------- | ----------- |
-| project     | Project     |
-| issue       | Issue       |
-| task        | Task        |
+When using the `--input` option, the validation rules for the second parameter are used:
 
 ## Usage Examples
 
@@ -59,38 +82,62 @@ breakdown -v
 ### File Operations
 
 ```bash
-breakdown to issue --from input.md --destination output.md
-breakdown to issue -f input.md -o output.md
+# Correct format
+breakdown to issue --from=input.md --destination=output.md
+breakdown to issue -f=input.md -o=output.md
+
+# Empty value examples
+breakdown to issue --from= --destination=""
+breakdown to issue -f='' -o=
 ```
 
 ### Layer Type Specification
 
 ```bash
-breakdown summary task --input project
-breakdown summary task -i project
+# Correct format
+breakdown summary task --input=project
+breakdown summary task -i=project
+
+# Empty value examples
+breakdown summary task --input=
+breakdown summary task -i=""
 ```
 
 ### Prompt Adaptation
 
 ```bash
-breakdown summary task --adaptation strict
-breakdown summary task -a strict
+# Correct format
+breakdown summary task --adaptation=strict
+breakdown summary task -a=strict
+
+# Empty value examples
+breakdown summary task --adaptation=
+breakdown summary task -a=''
 ```
 
 ### Custom Variable Options
 
 ```bash
+# Correct format
 breakdown to project --uv-project=myproject
 breakdown to project --uv-version=1.0.0 --uv-environment=production
+
+# Empty value examples
+breakdown to project --uv-project= --uv-version=""
 ```
 
 ### Combined Usage
 
 ```bash
-breakdown to issue --from input.md -o output.md -i project -a strict
-breakdown to project --config test
-breakdown summary task -c test
-breakdown to project --config test --uv-environment=prod --uv-version=1.0.0
+# Correct format
+breakdown to issue --from=input.md -o=output.md -i=project -a=strict
+breakdown to project --config=test
+breakdown summary task -c=test
+breakdown to project --config=test --uv-environment=prod --uv-version=1.0.0
+
+# Examples with empty values
+breakdown to issue --from= -o="" -i=project -a=
+breakdown to project --config= --uv-environment="" --uv-version=
 ```
 
 ## Return Type

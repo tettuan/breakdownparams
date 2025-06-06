@@ -1,8 +1,8 @@
 設計の方針を docs/architecture/ 配下へまとめてある。
-今回、Option処理について追記した。この変更差分を調べ、実装に反映したい。
+今回、FlagOption処理について別の補足ファイルを作成した。この修正内容を把握し、実装に反映したい。
 
-差分:
-docs/architecture/ を diff して、差分を把握して。
+修正内容:
+tmp/flag_options.ja.md の修正が該当する。
 オプションの詳細は、 docs/options.ja.md や用語集を見て欲しい。
 
 
