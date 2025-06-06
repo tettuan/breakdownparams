@@ -75,7 +75,7 @@ export class ParamsParser {
     }
 
     // Extract options from validated params
-    const options: Record<string, string> = {};
+    const options: Record<string, string | undefined> = {};
     const params: string[] = [];
     console.log('[DEBUG] validatedParams:', optionsResult.validatedParams);
     for (const arg of optionsResult.validatedParams) {
@@ -83,7 +83,12 @@ export class ParamsParser {
         const [key, value] = arg.split('=');
         const normalizedKey = key.replace(/^--/, '');
         console.log('[DEBUG] processing option:', { arg, key, normalizedKey, value });
-        options[normalizedKey] = value || '';
+        // Set flag options in options object with undefined value
+        if (this.optionRule.flagOptions[normalizedKey]) {
+          options[normalizedKey] = undefined;
+        } else {
+          options[normalizedKey] = value || '';
+        }
       } else {
         console.log('[DEBUG] processing param:', arg);
         params.push(arg);

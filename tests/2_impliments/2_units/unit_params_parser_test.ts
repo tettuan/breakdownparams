@@ -26,7 +26,11 @@ Deno.test('test_params_parser_unit', () => {
   console.log('[DEBUG] optionsOnlyResult:', optionsOnlyResult);
   assertEquals(optionsOnlyResult.type, 'zero', 'Options only should be zero type');
   assertEquals(optionsOnlyResult.params, [], 'Params should be empty for options only');
-  assertEquals(optionsOnlyResult.options, { help: '', version: '' }, 'Options should match');
+  assertEquals(
+    optionsOnlyResult.options,
+    { help: undefined, version: undefined },
+    'Options should match',
+  );
 
   // 1つの引数のテスト
   const oneParamResult = parser.parse(['init']) as OneParamResult;
@@ -61,7 +65,7 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(twoParamWithOptionsResult.params, ['to', 'project'], 'Params should match input');
   assertEquals(
     twoParamWithOptionsResult.options,
-    { help: '', version: '' },
+    { help: undefined, version: undefined },
     'Options should match',
   );
   assertEquals(
