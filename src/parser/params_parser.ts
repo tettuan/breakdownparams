@@ -125,8 +125,7 @@ export class ParamsParser {
       }
 
       // パラメータが0個の場合は、0個の場合のオプションの組み合わせをチェックする
-      const zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
-      const zeroOptionCombinationResult = zeroOptionCombinationValidator.validate(options);
+      const zeroOptionCombinationResult = this.zeroOptionCombinationValidator.validate(options);
 
       if (!zeroOptionCombinationResult.isValid) {
         return {
@@ -170,8 +169,7 @@ export class ParamsParser {
       }
 
       // パラメータが1個の場合は、1個の場合のオプションの組み合わせをチェックする
-      const oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);
-      const oneOptionCombinationResult = oneOptionCombinationValidator.validate(options);
+      const oneOptionCombinationResult = this.oneOptionCombinationValidator.validate(options);
 
       if (!oneOptionCombinationResult.isValid) {
         return {
@@ -216,8 +214,7 @@ export class ParamsParser {
       }
 
       // パラメータが2個の場合は、2個の場合のオプションの組み合わせをチェックする
-      const twoOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.two);
-      const twoOptionCombinationResult = twoOptionCombinationValidator.validate(options);
+      const twoOptionCombinationResult = this.twoOptionCombinationValidator.validate(options);
 
       if (!twoOptionCombinationResult.isValid) {
         return {
