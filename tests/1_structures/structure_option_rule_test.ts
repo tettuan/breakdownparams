@@ -1,5 +1,5 @@
 import { assertEquals } from 'https://deno.land/std/testing/asserts.ts';
-import { ParamsParser, DEFAULT_OPTION_RULE } from '../../src/parser/params_parser.ts';
+import { DEFAULT_OPTION_RULE, ParamsParser } from '../../src/parser/params_parser.ts';
 
 Deno.test('test_params_parser_structure', () => {
   const parser = new ParamsParser(DEFAULT_OPTION_RULE);
