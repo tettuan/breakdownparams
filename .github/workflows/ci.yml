@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}-${{ github.sha }}
+          key: ${{ runner.os }}-deno-${{ github.sha }}-${{ github.run_id }}
 
       - name: Clear Cache
         run: |
