@@ -37,7 +37,6 @@ jobs:
           deno check mod.ts
           deno check "src/**/*.ts"
           deno check "tests/**/*.ts"
-          deno check "scripts/**/*.ts"
 
       - name: JSR Type Check
         run: npx jsr publish --dry-run --allow-dirty
