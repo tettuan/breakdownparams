@@ -1,151 +1,256 @@
-import {
-  OneParamResult,
-  OptionRule,
-  ParamsResult,
-  TwoParamResult,
-  ZeroParamsResult,
-} from '../result/types.ts';
-import { SecurityErrorValidator } from '../validator/security_error_validator.ts';
-import { OptionsValidator } from '../validator/options_validator.ts';
+import { OptionRule, ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult } from '../result/types.ts';
+import { SecurityErrorValidator } from '../validator/security_validator.ts';
+import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
+import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
+import { ParserConfig } from "../types/parser_config.ts";
 import { ZeroParamsValidator } from '../validator/zero_params_validator.ts';
 import { OneParamValidator } from '../validator/one_param_validator.ts';
-import { TwoParamValidator } from '../validator/two_param_validator.ts';
-
-/**
- * デフォルトのオプションルール
- */
-const DEFAULT_OPTION_RULE: OptionRule = {
-  format: '--key=value',
-  validation: {
-    customVariables: ['uv-project', 'uv-version', 'uv-environment'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
-    requiredOptions: [],
-    valueTypes: ['string'],
-  },
-  flagOptions: {
-    help: 'help',
-    version: 'version',
-  },
-};
+import { TwoParamsValidator } from '../validator/two_params_validator.ts';
+import { ZeroOptionValidator, OneOptionValidator, TwoOptionValidator } from '../validator/options/option_validator.ts';
 
 /**
  * パラメータパーサー
  */
-export class ParamsParser {
-  private optionRule: OptionRule;
+export interface ParamsParser {
+  /**
+   * パラメータを解析する
+   * @param args - Command line arguments
+   * @returns ParamsResult containing the parsed parameters and options
+   */
+  parse(args: string[]): ParamsResult;
+}
 
-  constructor(optionRule: OptionRule = DEFAULT_OPTION_RULE) {
-    this.optionRule = optionRule;
+export class ParamsParser {
+  private readonly optionRule: OptionRule;
+  /**
+   * セキュリティバリデーター
+   * パラメータにシステムを壊す不正な文字列がないかをチェックする
+   * それ以上のチェックは不要
+   */
+  private readonly securityValidator: SecurityErrorValidator;
+  protected readonly zeroOptionCombinationValidator: OptionCombinationValidator;
+  protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
+  protected readonly twoOptionCombinationValidator: OptionCombinationValidator;
+
+  constructor(optionRule?: OptionRule) {
+    this.optionRule = optionRule || {
+      format: '--key=value',
+      validation: {
+        customVariables: [],
+        emptyValue: 'error',
+        unknownOption: 'error',
+        duplicateOption: 'error',
+        requiredOptions: [],
+        valueTypes: ['string'],
+      },
+      flagOptions: {
+        help: 'help',
+        version: 'version',
+      },
+    };
+
+    this.securityValidator = new SecurityErrorValidator(this.optionRule);
+    this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
+    this.oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);
+    this.twoOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.two);
   }
 
   /**
    * パラメータを解析する
-   * @param args コマンドライン引数
-   * @returns 解析結果
    */
   public parse(args: string[]): ParamsResult {
-    console.log('[DEBUG] parse: start', args);
-
-    // First, check for security issues
-    const securityValidator = new SecurityErrorValidator(this.optionRule);
-    const securityResult = securityValidator.validate(args);
-    console.log('[DEBUG] securityResult:', securityResult);
+    // セキュリティチェック
+    // パラメータにシステムを壊す不正な文字列がないかをチェックする
+    // それ以上のチェックは不要
+    const securityResult = this.securityValidator.validate(args);
     if (!securityResult.isValid) {
       return {
         type: 'error',
         params: [],
         options: {},
-        error: securityResult.error,
-      } as ParamsResult;
+        error: {
+          message: securityResult.errorMessage || 'Security error',
+          code: securityResult.errorCode || 'SECURITY_ERROR',
+          category: securityResult.errorCategory || 'security',
+        },
+      };
     }
 
-    // Then validate options
-    const optionsValidator = new OptionsValidator(this.optionRule);
-    const optionsResult = optionsValidator.validate(args);
-    console.log('[DEBUG] optionsResult:', optionsResult);
-    if (!optionsResult.isValid) {
-      return {
-        type: 'error',
-        params: [],
-        options: {},
-        error: optionsResult.error,
-      } as ParamsResult;
-    }
+    // パラメータとオプションを分離する
+    // パラメータは、オプションではないもの
+    // オプションは、-- から始まるもの
+    const params = args.filter(arg => !arg.startsWith('--'));
+    const options = args.filter(arg => arg.startsWith('--')).reduce((acc, opt) => {
+      const [key, value] = opt.slice(2).split('=');
+      const cleanKey = key.startsWith('--') ? key.slice(2) : key;
+      acc[cleanKey] = value;
+      return acc;
+    }, {} as Record<string, unknown>);
 
-    // Extract options from validated params
-    const options: Record<string, string | undefined> = {};
-    const params: string[] = [];
-    console.log('[DEBUG] validatedParams:', optionsResult.validatedParams);
-    for (const arg of optionsResult.validatedParams) {
-      if (arg.startsWith('-')) {
-        const [key, value] = arg.split('=');
-        const normalizedKey = key.replace(/^--/, '');
-        console.log('[DEBUG] processing option:', { arg, key, normalizedKey, value });
-        // Set flag options in options object with undefined value
-        if (this.optionRule.flagOptions[normalizedKey]) {
-          options[normalizedKey] = undefined;
-        } else {
-          options[normalizedKey] = value || '';
-        }
-      } else {
-        console.log('[DEBUG] processing param:', arg);
-        params.push(arg);
+    /* 
+     * // パラメータのバリデーション
+     * // パラメータのバリデーションは、パラメータの数に応じて、バリデーションを行う
+     * // パラメータの数に応じて、バリデーションを行う
+     * 3つ同時にバリデーションを行い、それぞれの結果を判定する
+    */
+    const zeroValidator = new ZeroParamsValidator();
+    const oneValidator = new OneParamValidator();
+    const twoValidator = new TwoParamsValidator();
+
+    const zeroResult = zeroValidator.validate(params);
+    const oneResult = oneValidator.validate(params);
+    const twoResult = twoValidator.validate(params);
+
+    /*
+     * 0個の場合
+    */
+    if (zeroResult.isValid && !oneResult.isValid && !twoResult.isValid) {
+      // オプションのバリデーション
+      const optionValidator = new ZeroOptionValidator();
+      const optionResult = optionValidator.validate(args, 'zero', this.optionRule);
+
+      if (!optionResult.isValid) {
+        return {
+          type: 'error',
+          params: [],
+          options: {},
+          error: {
+            message: optionResult.errorMessage || 'Invalid options',
+            code: optionResult.errorCode || 'INVALID_OPTIONS',
+            category: optionResult.errorCategory || 'validation',
+          },
+        };
       }
-    }
-    console.log('[DEBUG] extracted:', { options, params });
 
-    // Try each parameter validator
-    const zeroValidator = new ZeroParamsValidator(this.optionRule);
-    const oneValidator = new OneParamValidator(this.optionRule);
-    const twoValidator = new TwoParamValidator(this.optionRule);
+      // パラメータが0個の場合は、0個の場合のオプションの組み合わせをチェックする
+      const zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
+      const zeroOptionCombinationResult = zeroOptionCombinationValidator.validate(options);
 
-    // Zero params validator accepts options only
-    const zeroResult = zeroValidator.validate(optionsResult.validatedParams);
-    console.log('[DEBUG] zeroResult:', zeroResult);
-    if (zeroResult.isValid) {
+      if (!zeroOptionCombinationResult.isValid) {
+        return {
+          type: 'error',
+          params: [],
+          options: {},
+          error: {
+            message: zeroOptionCombinationResult.errorMessage || 'Invalid option combination',
+            code: zeroOptionCombinationResult.errorCode || 'INVALID_OPTION_COMBINATION',
+            category: zeroOptionCombinationResult.errorCategory || 'validation',
+          },
+        };
+      }
+
       return {
         type: 'zero',
-        params: params,
-        options: options,
+        params: [],
+        options,
       } as ZeroParamsResult;
     }
 
-    // One and two params validators only accept params
-    const oneResult = oneValidator.validate(params);
-    console.log('[DEBUG] oneResult:', oneResult);
-    if (oneResult.isValid) {
+    /*
+     * 1個の場合
+    */
+    if (!zeroResult.isValid && oneResult.isValid && !twoResult.isValid) {
+      // オプションのバリデーション
+      const optionValidator = new OneOptionValidator();
+      const optionResult = optionValidator.validate(args, 'one', this.optionRule);
+
+      if (!optionResult.isValid) {
+        return {
+          type: 'error',
+          params: [],
+          options: {},
+          error: {
+            message: optionResult.errorMessage || 'Invalid options',
+            code: optionResult.errorCode || 'INVALID_OPTIONS',
+            category: optionResult.errorCategory || 'validation',
+          },
+        };
+      }
+
+      // パラメータが1個の場合は、1個の場合のオプションの組み合わせをチェックする
+      const oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);
+      const oneOptionCombinationResult = oneOptionCombinationValidator.validate(options);
+
+      if (!oneOptionCombinationResult.isValid) {
+        return {
+          type: 'error',
+          params: [],
+          options: {},
+          error: {
+            message: oneOptionCombinationResult.errorMessage || 'Invalid option combination',
+            code: oneOptionCombinationResult.errorCode || 'INVALID_OPTION_COMBINATION',
+            category: oneOptionCombinationResult.errorCategory || 'validation',
+          },
+        };
+      }
+
       return {
         type: 'one',
-        params: params,
-        options: options,
-        demonstrativeType: oneResult.demonstrativeType!,
+        params: oneResult.validatedParams,
+        options,
+        demonstrativeType: oneResult.validatedParams[0],
       } as OneParamResult;
     }
 
-    const twoResult = twoValidator.validate(params);
-    console.log('[DEBUG] twoResult:', twoResult);
-    if (twoResult.isValid) {
+    /*
+     * 2個の場合
+    */
+    if (!zeroResult.isValid && !oneResult.isValid && twoResult.isValid) {
+      // オプションのバリデーション
+      const optionValidator = new TwoOptionValidator();
+      const optionResult = optionValidator.validate(args, 'two', this.optionRule);
+
+      if (!optionResult.isValid) {
+        return {
+          type: 'error',
+          params: [],
+          options: {},
+          error: {
+            message: optionResult.errorMessage || 'Invalid options',
+            code: optionResult.errorCode || 'INVALID_OPTIONS',
+            category: optionResult.errorCategory || 'validation',
+          },
+        };
+      }
+
+      // パラメータが2個の場合は、2個の場合のオプションの組み合わせをチェックする
+      const twoOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.two);
+      const twoOptionCombinationResult = twoOptionCombinationValidator.validate(options);
+
+      if (!twoOptionCombinationResult.isValid) {
+        return {
+          type: 'error',
+          params: [],
+          options: {},
+          error: {
+            message: twoOptionCombinationResult.errorMessage || 'Invalid option combination',
+            code: twoOptionCombinationResult.errorCode || 'INVALID_OPTION_COMBINATION',
+            category: twoOptionCombinationResult.errorCategory || 'validation',
+          },
+        };
+      }
+
       return {
         type: 'two',
-        params: params,
-        options: options,
-        demonstrativeType: twoResult.demonstrativeType!,
-        layerType: twoResult.layerType!,
+        params: twoResult.validatedParams,
+        options,
+        demonstrativeType: twoResult.validatedParams[0],
+        layerType: twoResult.validatedParams[1],
       } as TwoParamResult;
     }
 
-    // If no validator passes, return error
+    /* 
+     * パラメータのバリデーションが失敗した場合は、エラーを返却する
+    */
     return {
       type: 'error',
       params: [],
       options: {},
       error: {
-        message: 'Invalid parameters',
-        code: 'VALIDATION_ERROR',
-        category: 'invalid_params',
+        message: zeroResult.errorMessage || oneResult.errorMessage || twoResult.errorMessage || 'Invalid parameter combination',
+        code: zeroResult.errorCode || oneResult.errorCode || twoResult.errorCode || 'INVALID_PARAMS',
+        category: zeroResult.errorCategory || oneResult.errorCategory || twoResult.errorCategory || 'validation',
       },
-    } as ParamsResult;
+    };
   }
 }
