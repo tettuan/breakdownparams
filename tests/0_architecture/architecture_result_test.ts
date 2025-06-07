@@ -6,7 +6,6 @@ import {
   ParamsResult,
   TwoParamResult,
   ValidationResult,
-  ZeroParamsResult,
 } from '../../src/result/types.ts';
 import { ParamsParser } from '../../src/parser/params_parser.ts';
 import { DEFAULT_OPTION_RULE } from '../../src/parser/params_parser.ts';

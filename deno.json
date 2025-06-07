@@ -35,9 +35,7 @@
     "proseWrap": "preserve"
   },
   "lint": {
-    "files": {
-      "include": ["src/", "tests/"]
-    },
+    "include": ["src/", "tests/"],
     "rules": {
       "tags": ["recommended"]
     }
