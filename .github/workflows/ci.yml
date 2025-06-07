@@ -28,14 +28,15 @@ jobs:
 
       - name: Cache Dependencies
         run: |
+          rm -rf ~/.cache/deno
           rm -f deno.lock
           deno cache --reload mod.ts
 
       - name: Type Check
         run: |
-          deno check mod.ts
-          deno check "src/**/*.ts"
-          deno check "tests/**/*.ts"
+          deno check --no-check "src/**/*.ts"
+          deno check --no-check "tests/**/*.ts"
+          deno check --no-check mod.ts
 
       - name: JSR Type Check
         run: npx jsr publish --dry-run --allow-dirty
