@@ -36,7 +36,10 @@ jobs:
           deno cache --reload mod.ts
 
       - name: Type Check
-        run: deno check mod.ts
+        run: |
+          deno check mod.ts
+          deno check "src/**/*.ts"
+          deno check "tests/**/*.ts"
 
       - name: JSR Type Check
         run: npx jsr publish --dry-run --allow-dirty
