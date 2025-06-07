@@ -15,6 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -29,10 +32,14 @@ jobs:
       - name: Cache Dependencies
         run: |
           rm -f deno.lock
+          git clean -fdx
           deno cache --reload mod.ts
 
       - name: Type Check
-        run: deno check mod.ts
+        run: |
+          deno check mod.ts
+          deno check "src/**/*.ts"
+          deno check "tests/**/*.ts"
 
       - name: JSR Type Check
         run: npx jsr publish --dry-run --allow-dirty
