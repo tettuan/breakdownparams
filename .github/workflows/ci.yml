@@ -27,6 +27,12 @@ jobs:
           node-version: '20'
 
       - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno.lock') }}-${{ github.sha }}
+
+      - name: Clear Cache
         run: |
           rm -rf ~/.cache/deno
           rm -f deno.lock
