@@ -1,69 +1,52 @@
 import { BaseValidator } from './base_validator.ts';
 import { ValidationResult } from '../result/types.ts';
+import { ParserConfig, DEFAULT_CONFIG } from '../types/parser_config.ts';
 
 /**
- * 位置引数2つのバリデーター
+ * 2パラメータバリデータ
+ * パラメータの数が2個であることを検証する
  */
-export class TwoParamValidator extends BaseValidator {
+export class TwoParamsValidator extends BaseValidator {
   /**
-   * バリデーションを実行する
-   * @param args コマンドライン引数
-   * @returns バリデーション結果
+   * パラメータを検証する
+   * @param params - 検証するパラメータ
+   * @param config - バリデーション設定
    */
-  public override validate(args: string[]): ValidationResult {
-    // オプションを除いた位置引数の数をチェック
-    const params = args.filter((arg) => !arg.startsWith('--'));
+  override validate(params: string[], config?: ParserConfig): ValidationResult {
     if (params.length !== 2) {
-      return this.createErrorResult(
-        'Exactly two parameters expected',
-        'VALIDATION_ERROR',
-        'two_params',
-      );
+      return {
+        isValid: false,
+        validatedParams: params,
+        errorMessage: 'Expected exactly two parameters',
+        errorCode: 'INVALID_PARAMS',
+        errorCategory: 'validation'
+      };
     }
 
-    const [demonstrativeType, layerType] = params;
-    if (!this.isValidDemonstrativeType(demonstrativeType)) {
-      return this.createErrorResult(
-        'Invalid demonstrative type',
-        'VALIDATION_ERROR',
-        'demonstrative_type',
-      );
+    const demonstrativePattern = config?.demonstrativeType?.pattern || DEFAULT_CONFIG.demonstrativeType?.pattern || "^(to|summary|defect)$";
+    const layerPattern = config?.layerType?.pattern || DEFAULT_CONFIG.layerType?.pattern || "^(project|issue|task)$";
+    const demonstrativeValid = new RegExp(demonstrativePattern).test(params[0]);
+    const layerValid = new RegExp(layerPattern).test(params[1]);
+
+    if (!demonstrativeValid || !layerValid) {
+      return {
+        isValid: false,
+        validatedParams: params,
+        demonstrativeType: params[0],
+        layerType: params[1],
+        errorMessage: !demonstrativeValid 
+          ? (config?.demonstrativeType?.errorMessage || DEFAULT_CONFIG.demonstrativeType?.errorMessage || 'Invalid demonstrative type')
+          : (config?.layerType?.errorMessage || DEFAULT_CONFIG.layerType?.errorMessage || 'Invalid layer type'),
+        errorCode: !demonstrativeValid ? 'INVALID_DEMONSTRATIVE_TYPE' : 'INVALID_LAYER_TYPE',
+        errorCategory: 'validation'
+      };
     }
 
-    if (!this.isValidLayerType(layerType)) {
-      return this.createErrorResult(
-        'Invalid layer type',
-        'VALIDATION_ERROR',
-        'layer_type',
-      );
-    }
-
-    // validatedParams には元の args を返す
     return {
       isValid: true,
-      validatedParams: args,
-      demonstrativeType,
-      layerType,
+      validatedParams: params,
+      demonstrativeType: params[0],
+      layerType: params[1]
     };
-  }
-
-  /**
-   * 指示型の形式を検証する
-   * @param value 検証する値
-   * @returns 検証結果
-   */
-  private isValidDemonstrativeType(value: string): boolean {
-    const validTypes = ['to'];
-    return validTypes.includes(value);
-  }
-
-  /**
-   * レイヤー型の形式を検証する
-   * @param value 検証する値
-   * @returns 検証結果
-   */
-  private isValidLayerType(value: string): boolean {
-    const validTypes = ['project', 'feature', 'story', 'task'];
-    return validTypes.includes(value);
   }
 }

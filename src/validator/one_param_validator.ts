@@ -1,70 +1,38 @@
 import { BaseValidator } from './base_validator.ts';
 import { ValidationResult } from '../result/types.ts';
+import { ParserConfig, DEFAULT_CONFIG } from '../types/parser_config.ts';
 
 /**
- * 位置引数1つのバリデーター
+ * 1パラメータバリデータ
+ * パラメータの数が1個であることを検証する
  */
 export class OneParamValidator extends BaseValidator {
   /**
-   * バリデーションを実行する
-   * @param args コマンドライン引数
-   * @returns バリデーション結果
+   * パラメータを検証する
+   * @param params - 検証するパラメータ
+   * @param config - バリデーション設定
    */
-  public override validate(args: string[]): ValidationResult {
-    if (args.length !== 1) {
-      return this.createErrorResult(
-        'Exactly one parameter expected',
-        'VALIDATION_ERROR',
-        'one_param',
-      );
+  override validate(params: string[], config?: ParserConfig): ValidationResult {
+    if (params.length !== 1) {
+      return {
+        isValid: false,
+        validatedParams: params,
+        errorMessage: 'Expected exactly one parameter',
+        errorCode: 'INVALID_PARAMS',
+        errorCategory: 'validation'
+      };
     }
 
-    const demonstrativeType = args[0];
-    if (!this.isValidDemonstrativeType(demonstrativeType)) {
-      return this.createErrorResult(
-        'Invalid demonstrative type',
-        'VALIDATION_ERROR',
-        'demonstrative_type',
-      );
-    }
+    const demonstrativePattern = config?.demonstrativeType?.pattern || DEFAULT_CONFIG.demonstrativeType?.pattern || "^(to|summary|defect)$";
+    const isValid = new RegExp(demonstrativePattern).test(params[0]);
 
     return {
-      isValid: true,
-      validatedParams: args,
-      demonstrativeType,
+      isValid,
+      validatedParams: params,
+      demonstrativeType: params[0],
+      errorMessage: isValid ? undefined : (config?.demonstrativeType?.errorMessage || DEFAULT_CONFIG.demonstrativeType?.errorMessage || 'Invalid demonstrative type'),
+      errorCode: isValid ? undefined : 'INVALID_DEMONSTRATIVE_TYPE',
+      errorCategory: isValid ? undefined : 'validation'
     };
-  }
-
-  /**
-   * 単一パラメータをチェックする
-   * @param args コマンドライン引数
-   * @returns 検証結果
-   */
-  private checkSingleParam(args: string[]): boolean {
-    const params = args.filter((arg) => !arg.startsWith('-'));
-    return params.length === 1;
-  }
-
-  /**
-   * パラメータの形式を検証する
-   * @param param パラメータ
-   * @returns 検証結果
-   */
-  private validateParamFormat(param: string): boolean {
-    return /^[a-z]+$/.test(param);
-  }
-
-  /**
-   * initコマンドを検証する
-   * @param param パラメータ
-   * @returns 検証結果
-   */
-  private validateInitCommand(param: string): boolean {
-    return param === 'init';
-  }
-
-  private isValidDemonstrativeType(value: string): boolean {
-    const validTypes = ['to', 'summary', 'defect', 'init'];
-    return validTypes.includes(value);
   }
 }
