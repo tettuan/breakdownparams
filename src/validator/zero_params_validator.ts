@@ -1,6 +1,5 @@
 import { BaseValidator } from './base_validator.ts';
 import { ValidationResult } from '../result/types.ts';
-import { ParserConfig } from '../types/parser_config.ts';
 
 /**
  * ゼロパラメータバリデータ
@@ -10,9 +9,8 @@ export class ZeroParamsValidator extends BaseValidator {
   /**
    * パラメータを検証する
    * @param params - 検証するパラメータ
-   * @param _config - バリデーション設定（未使用）
    */
-  override validate(params: string[], _config?: ParserConfig): ValidationResult {
+  override validate(params: string[]): ValidationResult {
     // パラメータが0個の場合は有効
     if (params.length === 0) {
       return {
