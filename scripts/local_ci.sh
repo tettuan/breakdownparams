@@ -275,29 +275,19 @@ fi
 
 # Comprehensive type checking
 echo "Running comprehensive type checks..."
-
-# Check main entry points
 echo "Checking entry points..."
-for entry_point in mod.ts cli.ts main.ts; do
-    if [ -f "$entry_point" ]; then
-        if ! deno check "$entry_point"; then
-            handle_error "$entry_point" "Type check failed" "false"
-        fi
-    fi
-done
+if ! deno check mod.ts; then
+    handle_type_error "Entry Point" "Failed to check mod.ts"
+fi
 
-# Check all TypeScript files in lib directory
 echo "Checking library files..."
-find lib -name "*.ts" -not -name "*.test.ts" | while read -r file; do
-    if ! deno check "$file"; then
-        handle_error "$file" "Type check failed" "false"
-    fi
-done
+if ! deno check "src/**/*.ts"; then
+    handle_type_error "Library" "Failed to check library files"
+fi
 
-# Try JSR type check with --allow-dirty if available
 echo "Running JSR type check..."
-if ! error_output=$(npx jsr publish --dry-run --allow-dirty 2>&1); then
-    handle_jsr_error "$error_output"
+if ! deno run --allow-read --allow-write --allow-env --allow-net https://jsr.io/@tettuan/breakdownparams/publish --dry-run --allow-dirty; then
+    handle_type_error "JSR" "Failed to check JSR compatibility"
 fi
 
 # Function to run a single test file
