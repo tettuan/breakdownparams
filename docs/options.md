@@ -1,10 +1,10 @@
 # Options Specification
 
-This document defines the specification for options (hyphenated arguments) in the breakdownparams library.
+This document defines the specifications for options (hyphenated arguments) in the breakdownparams library.
 
 ## Argument Format
 
-Option arguments must follow the format below:
+Option arguments must follow the following format:
 
 ### Correct Format
 - `--option=value` (long form)
@@ -17,7 +17,7 @@ Option arguments must follow the format below:
 - `--option value` (space-separated not supported)
 - `-o value` (space-separated not supported)
 
-### Empty Value Specification
+### Specifying Empty Values
 To specify an empty value for an option, use one of the following methods:
 
 1. Specify only the equals sign:
@@ -31,39 +31,39 @@ To specify an empty value for an option, use one of the following methods:
    --option=''
    ```
 
-## Option List
+## Options List
 
-| Option        | Alias | Description          | Value Type | Required | Example                    |
-| ------------- | ----- | -------------------- | ---------- | -------- | -------------------------- |
-| --help        | -h    | Display help info    | boolean    | No       | `--help`                   |
-| --version     | -v    | Display version info | boolean    | No       | `--version`                |
-| --from        | -f    | Source file path     | string     | No       | `--from=input.md`          |
-| --destination | -o    | Output file path     | string     | No       | `--destination=output.md`  |
-| --input       | -i    | Input layer type     | enum       | No       | `--input=project`          |
-| --adaptation  | -a    | Prompt adaptation type | string  | No       | `--adaptation=strict`      |
-| --config      | -c    | Configuration file   | string     | No       | `--config=test`            |
-| --uv-*        | None  | Custom variable option | string   | No       | `--uv-project=myproject`   |
+| Option        | Alias | Description           | Type    | Required | Example                    |
+| ------------- | ----- | --------------------- | ------- | -------- | -------------------------- |
+| --help        | -h    | Show help information | boolean | No       | `--help`                   |
+| --version     | -v    | Show version info     | boolean | No       | `--version`                |
+| --from        | -f    | Source file path      | string  | No       | `--from=input.md`          |
+| --destination | -o    | Output file path      | string  | No       | `--destination=output.md`  |
+| --input       | -i    | Input layer type      | enum    | No       | `--input=project`          |
+| --adaptation  | -a    | Prompt adaptation type| string  | No       | `--adaptation=strict`      |
+| --config      | -c    | Configuration file    | string  | No       | `--config=test`            |
+| --uv-*        | None  | Custom variable option| string  | No       | `--uv-project=myproject`   |
 
 ## Option Constraints
 
-1. **Long and Short Forms**
-   - When both forms are provided (e.g., `--from` and `-f`), the long form takes precedence
-   - Long form is primary, and short form is considered an alias
-   - Custom variable options (`--uv-*`) do not support short forms
+1. **Long Form and Short Form**
+   - When both forms are provided (e.g., `--from` and `-f`), long form takes precedence
+   - Long form is primary, short form is considered an alias
+   - Custom variable options (`--uv-*`) do not support short form
 
 2. **Case Sensitivity**
    - All options and aliases must be lowercase
    - Uppercase variants are ignored without error
-   - Custom variable option names are case sensitive and must be used as specified
+   - Custom variable option names are case-sensitive and must be used as specified
 
 3. **Invalid Options**
    - Undefined options are ignored without error
    - No validation is performed on file paths
-   - Invalid syntax for custom variable options (e.g., missing `=`) results in an error
+   - Invalid custom variable option syntax (e.g., missing `=`) results in error
 
 4. **Parameter Type Constraints**
-   - `--config` / `-c` option is only available in TwoParams mode
-   - Custom variable options (`--uv-*`) are also only available in TwoParams mode
+   - `--config` / `-c` option is only available in TwoParams
+   - Custom variable options (`--uv-*`) are only available in TwoParams
    - Ignored in other parameter types (ZeroParams, OneParam, TwoParams)
 
 ## Input Layer Type Values

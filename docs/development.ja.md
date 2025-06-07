@@ -121,7 +121,7 @@ parser.parse(['init']);
 // { type: "one", command: "init" }
 
 // 2パラメータ
-parser.parse(['to', 'issue', '--from', './input.md']);
+parser.parse(['to', 'issue', '--from=./input.md']);
 // {
 //   type: "two",
 //   demonstrativeType: "to",
@@ -130,7 +130,7 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 // }
 
 // 複合オプション
-parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
+parser.parse(['summary', 'task', '--from=./tasks.md', '-a', 'strict']);
 // {
 //   type: "two",
 //   demonstrativeType: "summary",
@@ -157,7 +157,7 @@ const customConfig = {
 const customParser = new ParamsParser(customConfig);
 
 // カスタム設定値での2パラメータ
-customParser.parse(['custom', 'layer', '--from', './input.md']);
+customParser.parse(['custom', 'layer', '--from=./input.md']);
 // {
 //   type: "two",
 //   demonstrativeType: "custom",

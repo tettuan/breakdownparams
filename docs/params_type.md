@@ -1,143 +1,81 @@
-# Parameter Parser Type Definition Specification
+# Parameter Type Definitions
 
-## Overview
-
-The parameter parser (`ParamsParser`) is a class that parses command line arguments and returns type-safe results.
-This specification defines the type definitions and parsing flow of the parameter parser.
-
-## Type Hierarchy
-
-### 1. Basic Types
+## Basic Types
 
 ```typescript
-type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
+type ParamPatternResult = ZeroParamResult | OneParamResult | TwoParamResult;
 
-// Error information type
-type ErrorResult = {
-  message: string;
-  code: string;
-};
-```
-
-### 2. Type Definitions
-
-#### 2.1 Types by Parameter Count
-```typescript
-// No arguments
-type ZeroParamsResult = {
-  type: 'zero-params';
-  help: boolean;
-  version: boolean;
-  error?: ErrorResult;  // Set when parameter or option error occurs
+type ZeroParamResult = {
+  type: 'help' | 'version';
+  help?: boolean;
+  version?: boolean;
+  error?: ErrorInfo;
 };
 
-// One argument
 type OneParamResult = {
-  type: 'one';
-  command: 'init';
+  type: 'layer';
+  command: string;
   options: OptionParams;
-  error?: ErrorResult;  // Set when parameter or option error occurs
+  error?: ErrorInfo;
 };
 
-// Two arguments
-type TwoParamsResult = {
-  type: 'two';
-  demonstrativeType: DemonstrativeType;
-  layerType: LayerType;
+type TwoParamResult = {
+  type: 'break';
+  demonstrativeType: string;
+  layerType: string;
   options: OptionParams;
-  error?: ErrorResult;  // Set when parameter or option error occurs
+  error?: ErrorInfo;
 };
 ```
 
-#### 2.2 Option Types
+## Usage Examples
+
 ```typescript
-type OptionParams = {
-  fromFile?: string;
-  destinationFile?: string;
-  fromLayerType?: LayerType;
-  adaptationType?: string;
-  configFile?: string;
-  customVariables?: Record<string, string>;
+// Returns ZeroParamResult
+const helpResult: ZeroParamResult = {
+  type: 'help',
+  help: true
+};
+
+// Returns OneParamResult
+const layerResult: OneParamResult = {
+  type: 'layer',
+  command: 'create',
+  options: {
+    fromFile: 'input.json'
+  }
+};
+
+// Returns TwoParamResult
+const breakResult: TwoParamResult = {
+  type: 'break',
+  demonstrativeType: 'type1',
+  layerType: 'layer1',
+  options: {
+    fromFile: 'input.json',
+    destinationFile: 'output.json'
+  }
 };
 ```
 
-## Parsing Flow
+## Type Characteristics
 
-### 1. Parameter Parsing
+1. Type definitions based on parameter patterns
+   - `ZeroParamResult`: No parameters (help/version)
+   - `OneParamResult`: Single parameter (layer command)
+   - `TwoParamResult`: Double parameters (break command)
 
-1. **Branching by Argument Count**
-   ```typescript
-   if (nonOptionArgs.length === 0) {
-     // Return ZeroParamsResult
-   } else if (nonOptionArgs.length === 1) {
-     // Parameter validation
-     if (!isValidCommand(nonOptionArgs[0])) {
-       return {
-         type: 'one',
-         command: 'init',
-         options: {},
-         error: {
-           message: `Invalid command: ${nonOptionArgs[0]}`,
-           code: 'INVALID_COMMAND'
-         }
-       };
-     }
-     // Return OneParamResult
-   } else if (nonOptionArgs.length === 2) {
-     // Parameter validation
-     if (!isValidDemonstrativeType(nonOptionArgs[0])) {
-       return {
-         type: 'two',
-         demonstrativeType: '...',
-         layerType: '...',
-         options: {},
-         error: {
-           message: `Invalid demonstrative type: ${nonOptionArgs[0]}`,
-           code: 'INVALID_DEMONSTRATIVE_TYPE'
-         }
-       };
-     }
-     // Return TwoParamsResult
-   }
-   ```
+2. Type safety assurance
+   - Required properties for each pattern
+   - Clear definition of optional properties
+   - Unified error information handling
 
-2. **Processing in Each Branch**
-   - Parameter validation
-   - Type determination
-   - Option parsing preparation
+3. Extensibility considerations
+   - Maintain parameter types (ZeroParamResult, OneParamResult, TwoParamResult)
+   - Easy addition of new patterns
+   - Maintain compatibility with existing types
 
-### 2. Option Parsing
-
-1. **Execute Option Parsing**
-   ```typescript
-   const options = this.parseOptions(args);
-   if ('error' in options) {
-     // Maintain current parameter type and set error property when error occurs
-     return {
-       ...currentParamResult,
-       error: {
-         message: options.error,
-         code: 'INVALID_OPTION'
-       }
-     };
-   }
-   ```
-
-2. **Option Types**
-   - Standard options (--from, --destination, etc.)
-   - Custom variable options (--uv-*)
-
-### 3. Return Type Determination
-
-1. **Normal Case**
-   - Maintain parameter type
-   - Add option information
-
-2. **Error Case**
-   - Maintain parameter type
-   - Add error information as error property
-
-## Return Type for Option Errors
+## Return Types for Option Errors
 
 ### 1. Return Type Determination
 
@@ -210,74 +148,22 @@ When an error occurs in parameters or options, the error information is set in t
 ### 3. Type Consistency
 
 - Maintain parameter types (ZeroParamsResult, OneParamResult, TwoParamsResult)
-- Error information is kept as error property of each parameter type
+- Error information is kept as the error property of each parameter type
 - No type conversion is performed
-
-## Usage Examples
-
-```typescript
-const parser = new ParamsParser();
-const result = parser.parse(args);
-
-if (result.type === 'zero-params') {
-  if (result.error) {
-    // Error handling
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // Normal processing
-  }
-} else if (result.type === 'one') {
-  if (result.error) {
-    // Error handling
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // Normal processing
-  }
-} else if (result.type === 'two') {
-  if (result.error) {
-    // Error handling
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // Normal processing
-  }
-}
-```
 
 ## Notes
 
 1. **Type Consistency**
    - Maintain type consistency within each branch
-   - Minimize type conversions 
+   - Minimize type conversions
 
-## Error Handling and Options Persistence
+2. **Error Handling**
+   - Handle errors within each parameter type
+   - Maintain type consistency even during errors
 
-### 1. Error Handling Strategy
-
-The parameter parser maintains a debug-friendly approach to error handling:
-
-```typescript
-// Example of error result with preserved options
-type ParseResult<T> = {
-  success: false;
-  error: ErrorResult;
-  data?: T;  // Contains parsed options even when validation fails
-};
-```
-
-### 2. Options Persistence
-
-- Even when validation fails (`success: false`), the parser preserves the parsed options
-- This design choice enables:
-  - Easier debugging by maintaining the state at the time of error
-  - Better user experience by allowing partial corrections
-  - Flexible error handling in the application layer
-
-### 3. Security Considerations
-
-While maintaining options during errors is beneficial for debugging, be aware that:
-- Invalid or potentially malicious data may be preserved
-- Sensitive information in options should be handled with care
-- Application layer should implement appropriate security checks
+3. **Type Checking**
+   - Ensure runtime type checking
+   - Prevent type mismatches
 
 ---
 

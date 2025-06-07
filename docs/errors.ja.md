@@ -107,7 +107,7 @@ interface ErrorResult {
     code: "INVALID_OPTION_FORMAT",
     message: "Invalid option format. Must be in the form: --key=value",
     details: {
-      value: "--from input.md"
+      value: "--from=input.md"
     }
   }
 }

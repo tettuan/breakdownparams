@@ -1,5 +1,13 @@
 {
   "version": "4",
+  "specifiers": {
+    "jsr:@tettuan/breakdownlogger@0.1": "0.1.10"
+  },
+  "jsr": {
+    "@tettuan/breakdownlogger@0.1.10": {
+      "integrity": "3094af14f9271234b01280c4cf379d36f7b429531a434f169d3dce569d60e146"
+    }
+  },
   "redirects": {
     "https://deno.land/std/testing/asserts.ts": "https://deno.land/std@0.224.0/testing/asserts.ts"
   },

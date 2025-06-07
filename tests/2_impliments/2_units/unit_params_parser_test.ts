@@ -18,12 +18,22 @@ const optionRule: OptionRule = {
   },
 };
 
+// デバッグログの出力を制御
+const LOG_LEVEL = Deno.env.get('LOG_LEVEL') || 'info';
+const isDebug = LOG_LEVEL === 'debug';
+
+function debugLog(...args: unknown[]) {
+  if (isDebug) {
+    console.log('[DEBUG]', ...args);
+  }
+}
+
 Deno.test('test_params_parser_unit', () => {
   const parser = new ParamsParser(optionRule);
 
   // オプションのみのテスト
   const optionsOnlyResult = parser.parse(['--help', '--version']);
-  console.log('[DEBUG] optionsOnlyResult:', optionsOnlyResult);
+  debugLog('optionsOnlyResult:', optionsOnlyResult);
   assertEquals(optionsOnlyResult.type, 'zero', 'Options only should be zero type');
   assertEquals(optionsOnlyResult.params, [], 'Params should be empty for options only');
   assertEquals(
@@ -34,7 +44,7 @@ Deno.test('test_params_parser_unit', () => {
 
   // 1つの引数のテスト
   const oneParamResult = parser.parse(['init']) as OneParamResult;
-  console.log('[DEBUG] oneParamResult:', oneParamResult);
+  debugLog('oneParamResult:', oneParamResult);
   assertEquals(oneParamResult.type, 'one', 'One parameter should be one type');
   assertEquals(oneParamResult.params, ['init'], 'Params should match input');
   assertEquals(oneParamResult.options, {}, 'Options should be empty');
@@ -42,7 +52,7 @@ Deno.test('test_params_parser_unit', () => {
 
   // 2つの引数のテスト
   const twoParamResult = parser.parse(['to', 'project']) as TwoParamResult;
-  console.log('[DEBUG] twoParamResult:', twoParamResult);
+  debugLog('twoParamResult:', twoParamResult);
   assertEquals(twoParamResult.type, 'two', 'Two parameters should be two type');
   assertEquals(twoParamResult.params, ['to', 'project'], 'Params should match input');
   assertEquals(twoParamResult.options, {}, 'Options should be empty');
@@ -56,7 +66,7 @@ Deno.test('test_params_parser_unit', () => {
     '--help',
     '--version',
   ]) as TwoParamResult;
-  console.log('[DEBUG] twoParamWithOptionsResult:', twoParamWithOptionsResult);
+  debugLog('twoParamWithOptionsResult:', twoParamWithOptionsResult);
   assertEquals(
     twoParamWithOptionsResult.type,
     'two',
@@ -77,7 +87,7 @@ Deno.test('test_params_parser_unit', () => {
 
   // 無効な引数のテスト
   const invalidResult = parser.parse(['invalid']);
-  console.log('[DEBUG] invalidResult:', invalidResult);
+  debugLog('invalidResult:', invalidResult);
   assertEquals(invalidResult.type, 'error', 'Invalid arguments should be error type');
   assertEquals(invalidResult.params, [], 'Params should be empty for invalid input');
   assertEquals(invalidResult.options, {}, 'Options should be empty for invalid input');
