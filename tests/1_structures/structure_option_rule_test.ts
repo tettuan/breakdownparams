@@ -1,67 +1,17 @@
-import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OptionRule } from '../../src/result/types.ts';
+import { assertEquals } from 'https://deno.land/std/testing/asserts.ts';
+import { ParamsParser } from '../../src/parser/params_parser.ts';
 
-Deno.test('test_option_rule_structure', () => {
-  const rule: OptionRule = {
-    format: '--key=value',
-    validation: {
-      customVariables: ['uv-project', 'uv-version', 'uv-environment'],
-      emptyValue: 'error',
-      unknownOption: 'error',
-      duplicateOption: 'error',
-      requiredOptions: [],
-      valueTypes: ['string'],
-    },
-    flagOptions: {
-      help: 'help',
-      version: 'version',
-    },
-    paramSpecificOptions: {
-      zero: {
-        allowedOptions: ['help', 'version'],
-        requiredOptions: [],
-      },
-      one: {
-        allowedOptions: ['help', 'version'],
-        requiredOptions: [],
-      },
-      two: {
-        allowedOptions: ['help', 'version'],
-        requiredOptions: [],
-      },
-    },
-  };
+Deno.test('test_params_parser_structure', () => {
+  const parser = new ParamsParser();
+  assertEquals(typeof parser.parse, 'function');
+  assertEquals(parser instanceof ParamsParser, true);
+});
 
-  // 基本構造のテスト
-  assertEquals(typeof rule.format, 'string', 'format should be a string');
-  assertEquals(typeof rule.validation, 'object', 'validation should be an object');
-  assertEquals(typeof rule.flagOptions, 'object', 'flagOptions should be an object');
-
-  // バリデーション設定のテスト
-  assertEquals(
-    Array.isArray(rule.validation.customVariables),
-    true,
-    'customVariables should be an array',
-  );
-  assertEquals(typeof rule.validation.emptyValue, 'string', 'emptyValue should be a string');
-  assertEquals(typeof rule.validation.unknownOption, 'string', 'unknownOption should be a string');
-  assertEquals(
-    typeof rule.validation.duplicateOption,
-    'string',
-    'duplicateOption should be a string',
-  );
-  assertEquals(
-    Array.isArray(rule.validation.requiredOptions),
-    true,
-    'requiredOptions should be an array',
-  );
-  assertEquals(Array.isArray(rule.validation.valueTypes), true, 'valueTypes should be an array');
-
-  // フラグオプションのテスト
-  assertEquals(typeof rule.flagOptions['help'], 'string', 'flag option value should be a string');
-  assertEquals(
-    typeof rule.flagOptions['version'],
-    'string',
-    'flag option value should be a string',
-  );
+Deno.test('test_params_parser_default_behavior', () => {
+  const parser = new ParamsParser();
+  const result = parser.parse(['--help']);
+  assertEquals(result.type, 'zero');
+  assertEquals(Array.isArray(result.params), true);
+  assertEquals(typeof result.options, 'object');
+  assertEquals(result.options.help, undefined, 'Flag option should be undefined');
 });
