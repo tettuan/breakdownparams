@@ -273,22 +273,28 @@ if ! deno cache --reload mod.ts; then
     handle_error "mod.ts" "Failed to regenerate deno.lock" "false"
 fi
 
-# Comprehensive type checking
+# Run type checks
 echo "Running comprehensive type checks..."
+
+# Check entry points
 echo "Checking entry points..."
 if ! deno check mod.ts; then
     handle_type_error "Entry Point" "Failed to check mod.ts"
 fi
 
+# Check library files
 echo "Checking library files..."
-if ! deno check "src/**/*.ts"; then
-    handle_type_error "Library" "Failed to check library files"
+if ! deno check src/**/*.ts; then
+    handle_type_error "Library Files" "Failed to check library files"
 fi
 
+# Run JSR type check
 echo "Running JSR type check..."
 if ! npx jsr publish --dry-run --allow-dirty; then
-    handle_type_error "JSR" "Failed to check JSR compatibility"
+    handle_type_error "JSR" "Failed JSR type check"
 fi
+
+echo "Starting test execution..."
 
 # Function to run a single test file
 run_single_test() {
@@ -363,9 +369,6 @@ process_test_directory() {
     
     return 0
 }
-
-# Main execution flow
-echo "Starting test execution..."
 
 # Process all tests hierarchically
 if ! process_test_directory "tests" "${DEBUG:-false}"; then
