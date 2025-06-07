@@ -8,6 +8,8 @@ import {
   ValidationResult,
   ZeroParamsResult,
 } from '../../src/result/types.ts';
+import { ParamsParser } from '../../src/parser/params_parser.ts';
+import { DEFAULT_OPTION_RULE } from '../../src/parser/params_parser.ts';
 
 Deno.test('test_params_result_interface', () => {
   const result: ParamsResult = {
@@ -21,23 +23,16 @@ Deno.test('test_params_result_interface', () => {
 });
 
 Deno.test('test_zero_params_result_interface', () => {
-  const result: ZeroParamsResult = {
-    type: 'zero',
-    params: [],
-    options: {},
-  };
+  const parser = new ParamsParser(DEFAULT_OPTION_RULE);
+  const result = parser.parse([]);
   assertEquals(result.type, 'zero');
   assertEquals(Array.isArray(result.params), true);
   assertEquals(typeof result.options, 'object');
 });
 
 Deno.test('test_one_param_result_interface', () => {
-  const result: OneParamResult = {
-    type: 'one',
-    params: [],
-    options: {},
-    demonstrativeType: 'init',
-  };
+  const parser = new ParamsParser(DEFAULT_OPTION_RULE);
+  const result = parser.parse(['init']) as OneParamResult;
   assertEquals(result.type, 'one');
   assertEquals(Array.isArray(result.params), true);
   assertEquals(typeof result.options, 'object');
@@ -45,13 +40,8 @@ Deno.test('test_one_param_result_interface', () => {
 });
 
 Deno.test('test_two_param_result_interface', () => {
-  const result: TwoParamResult = {
-    type: 'two',
-    params: [],
-    options: {},
-    demonstrativeType: 'to',
-    layerType: 'project',
-  };
+  const parser = new ParamsParser(DEFAULT_OPTION_RULE);
+  const result = parser.parse(['to', 'project']) as TwoParamResult;
   assertEquals(result.type, 'two');
   assertEquals(Array.isArray(result.params), true);
   assertEquals(typeof result.options, 'object');

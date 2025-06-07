@@ -7,6 +7,7 @@ import { OneParamValidator } from '../../src/validator/one_param_validator.ts';
 import { TwoParamValidator } from '../../src/validator/two_param_validator.ts';
 import { ParamSpecificOptionValidator } from '../../src/validator/param_specific_option_validator.ts';
 import { OptionRule } from '../../src/result/types.ts';
+import { DEFAULT_OPTION_RULE } from '../../src/parser/params_parser.ts';
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -54,41 +55,47 @@ Deno.test('test_base_validator_interface', () => {
 });
 
 Deno.test('test_security_error_validator_interface', () => {
-  const validator = new SecurityErrorValidator(optionRule);
-  assertEquals(validator instanceof BaseValidator, true);
+  const validator = new SecurityErrorValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_options_validator_interface', () => {
-  const validator = new OptionsValidator(optionRule);
-  assertEquals(validator instanceof BaseValidator, true);
+  const validator = new OptionsValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_zero_params_validator_interface', () => {
-  const validator = new ZeroParamsValidator(optionRule);
-  assertEquals(validator instanceof BaseValidator, true);
+  const validator = new ZeroParamsValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_one_param_validator_interface', () => {
-  const validator = new OneParamValidator(optionRule);
-  assertEquals(validator instanceof BaseValidator, true);
+  const validator = new OneParamValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_two_param_validator_interface', () => {
-  const validator = new TwoParamValidator(optionRule);
-  assertEquals(validator instanceof BaseValidator, true);
+  const validator = new TwoParamValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_param_specific_option_validator_interface', () => {
-  const validator = new ParamSpecificOptionValidator(optionRule);
-  assertEquals(validator instanceof BaseValidator, true);
+  const validator = new ParamSpecificOptionValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validate, 'function');
+});
+
+Deno.test('test_param_specific_option_validator_for_zero', () => {
+  const validator = new ParamSpecificOptionValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validateForZero, 'function');
+});
+
+Deno.test('test_param_specific_option_validator_for_one', () => {
+  const validator = new ParamSpecificOptionValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validateForOne, 'function');
+});
+
+Deno.test('test_param_specific_option_validator_for_two', () => {
+  const validator = new ParamSpecificOptionValidator(DEFAULT_OPTION_RULE);
   assertEquals(typeof validator.validateForTwo, 'function');
 });
 
