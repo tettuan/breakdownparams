@@ -1,5 +1,61 @@
 # アーキテクチャ詳細
 
+## 設計概要
+
+### パラメータとオプションの検証設計
+
+#### 目的
+パラメータとオプションの検証を明確に分離し、各パラメータ数（zero, one, two）に応じた適切なオプション検証を実現する。
+
+#### 主要コンポーネント
+- パラメータバリデーター
+  - ZeroParamsValidator
+  - OneParamValidator
+  - TwoParamValidator
+- オプションバリデーター
+  - OptionsValidator（共通検証）
+  - ParamSpecificOptionValidator（パラメータ数別検証）
+
+#### 設計図
+```mermaid
+graph TD
+    A[ParamsParser] --> B[SecurityErrorValidator]
+    A --> C[OptionsValidator]
+    A --> D[ParamSpecificOptionValidator]
+    A --> E[ZeroParamsValidator]
+    A --> F[OneParamValidator]
+    A --> G[TwoParamValidator]
+    
+    D --> H[ZeroOptionRules]
+    F --> I[OneOptionRules]
+    G --> J[TwoOptionRules]
+```
+
+```mermaid
+sequenceDiagram
+    participant P as ParamsParser
+    participant S as SecurityValidator
+    participant O as OptionsValidator
+    participant PS as ParamSpecificValidator
+    participant PV as ParamValidator
+
+    P->>S: validate(args)
+    S-->>P: securityResult
+    P->>O: validate(args)
+    O-->>P: optionsResult
+    P->>PS: validateForParamType(options)
+    PS-->>P: paramSpecificResult
+    P->>PV: validate(params)
+    PV-->>P: paramResult
+```
+
+#### 実装原則・ガイドライン
+- **単一責任の原則**: 各バリデーターは特定の検証のみを担当し、ロジックの再利用性を高める
+- **オープン・クローズドの原則**: 新しいパラメータパターンの追加が容易で、既存コードを変更せず拡張可能
+- **依存性逆転の原則**: インターフェースを通じた疎結合でテスト容易性を確保
+
+---
+
 このドキュメントは、breakdownparamsライブラリのアーキテクチャの詳細を説明します。
 
 ## 1. クラス詳細

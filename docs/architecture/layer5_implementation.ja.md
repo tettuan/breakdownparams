@@ -431,6 +431,228 @@ try {
 }
 ```
 
+## 8. バリデーション実装の詳細
+
+### 8.1 コアインターフェース
+
+#### 8.1.1 オプションルールインターフェース
+```typescript
+interface OptionRule {
+  format: string;
+  validation: {
+    customVariables: string[];
+    emptyValue: string;
+    unknownOption: string;
+    duplicateOption: string;
+    requiredOptions: string[];
+    valueTypes: string[];
+  };
+  flagOptions: Record<string, string>;
+  paramSpecificOptions: {
+    zero: ParamOptionRules;
+    one: ParamOptionRules;
+    two: ParamOptionRules;
+  };
+}
+
+interface ParamOptionRules {
+  allowedOptions: string[];
+  requiredOptions: string[];
+}
+```
+
+#### 8.1.2 バリデーション結果インターフェース
+```typescript
+interface ValidationResult {
+  isValid: boolean;
+  error?: {
+    message: string;
+    code: string;
+  };
+}
+```
+
+### 8.2 クラス実装
+
+#### 8.2.1 パラメータ固有オプションバリデータ
+```typescript
+class ParamSpecificOptionValidator {
+  constructor(private optionRule: OptionRule) {}
+
+  validateForZero(options: Record<string, string | undefined>): ValidationResult {
+    const rules = this.optionRule.paramSpecificOptions.zero;
+    return this.validateOptions(options, rules);
+  }
+
+  validateForOne(options: Record<string, string | undefined>): ValidationResult {
+    const rules = this.optionRule.paramSpecificOptions.one;
+    return this.validateOptions(options, rules);
+  }
+
+  validateForTwo(options: Record<string, string | undefined>): ValidationResult {
+    const rules = this.optionRule.paramSpecificOptions.two;
+    return this.validateOptions(options, rules);
+  }
+
+  private validateOptions(
+    options: Record<string, string | undefined>,
+    rules: ParamOptionRules
+  ): ValidationResult {
+    // 許可されたオプションの検証
+    for (const option of Object.keys(options)) {
+      if (!rules.allowedOptions.includes(option)) {
+        return {
+          isValid: false,
+          error: {
+            message: `オプション '${option}' は許可されていません`,
+            code: 'INVALID_OPTION'
+          }
+        };
+      }
+    }
+
+    // 必須オプションの検証
+    for (const required of rules.requiredOptions) {
+      if (!(required in options)) {
+        return {
+          isValid: false,
+          error: {
+            message: `必須オプション '${required}' が指定されていません`,
+            code: 'MISSING_OPTION'
+          }
+        };
+      }
+    }
+
+    return { isValid: true };
+  }
+}
+```
+
+#### 8.2.2 パラメータパーサー
+```typescript
+class ParamsParser {
+  constructor(
+    private optionRule: OptionRule,
+    private securityValidator: SecurityErrorValidator,
+    private optionsValidator: OptionsValidator,
+    private paramSpecificValidator: ParamSpecificOptionValidator
+  ) {}
+
+  parse(args: string[]): ParamsResult {
+    // 1. セキュリティ検証
+    const securityResult = this.securityValidator.validate(args);
+    if (!securityResult.isValid) {
+      return securityResult;
+    }
+
+    // 2. オプション検証
+    const optionsResult = this.optionsValidator.validate(args);
+    if (!optionsResult.isValid) {
+      return optionsResult;
+    }
+
+    // 3. パラメータとオプションの分離
+    const { params, options } = this.separateParamsAndOptions(args);
+
+    // 4. パラメータ固有のオプション検証
+    const paramSpecificResult = this.validateParamSpecificOptions(params, options);
+    if (!paramSpecificResult.isValid) {
+      return paramSpecificResult;
+    }
+
+    // 5. パラメータ検証
+    return this.validateParams(params);
+  }
+
+  private separateParamsAndOptions(args: string[]): {
+    params: string[];
+    options: Record<string, string>;
+  } {
+    // 実装の詳細...
+  }
+
+  private validateParamSpecificOptions(
+    params: string[],
+    options: Record<string, string>
+  ): ValidationResult {
+    switch (params.length) {
+      case 0:
+        return this.paramSpecificValidator.validateForZero(options);
+      case 1:
+        return this.paramSpecificValidator.validateForOne(options);
+      case 2:
+        return this.paramSpecificValidator.validateForTwo(options);
+      default:
+        return {
+          isValid: false,
+          error: {
+            message: 'パラメータの数が不正です',
+            code: 'INVALID_PARAM_COUNT'
+          }
+        };
+    }
+  }
+
+  private validateParams(params: string[]): ValidationResult {
+    // 実装の詳細...
+  }
+}
+```
+
+## 9. 実装ガイドライン
+
+### 9.1 実装の原則
+
+1. **単一責任の原則**
+   - 各バリデータは特定の検証のみを担当
+   - コードの再利用性と保守性を促進
+   - 関心の分離を明確に
+
+2. **オープン・クローズドの原則**
+   - 新しいパラメータパターンの追加が容易
+   - 既存のコードを変更せずに拡張可能
+   - 柔軟なバリデーションルール
+
+3. **依存性逆転の原則**
+   - インターフェースを通じた疎結合
+   - テストとモックが容易
+   - 明確な依存関係
+
+### 9.2 実装手順
+
+1. **インターフェースの定義**
+   - コアインターフェースの定義
+   - バリデーションルールの指定
+   - 期待される動作の文書化
+
+2. **バリデータの実装**
+   - バリデーションロジックの実装
+   - エッジケースの処理
+   - 明確なエラーメッセージの提供
+
+3. **テストの作成**
+   - 各バリデータの単体テスト
+   - パーサーの統合テスト
+   - エラーケースのカバレッジ
+
+4. **統合テスト**
+   - エンドツーエンドのバリデーションフロー
+   - エラーハンドリングシナリオ
+   - パフォーマンステスト
+
+### 9.3 エラーハンドリング
+
+1. **バリデーションエラー**
+   - 明確なエラーメッセージ
+   - 定義されたエラーコード
+   - 詳細なエラー情報
+
+2. **例外処理**
+   - 予期しないエラーの処理
+   - エラーログの記録
+   - 適切なエラー回復
+
 ---
 
 [日本語版](layer5_implementation.ja.md) | [English Version](layer5_implementation.md) 
