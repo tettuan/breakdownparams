@@ -64,11 +64,21 @@ export interface OptionRule {
   format: string;
   validation: {
     customVariables: string[];
-    emptyValue: 'error' | 'warn' | 'ignore';
-    unknownOption: 'error' | 'warn' | 'ignore';
-    duplicateOption: 'error' | 'warn' | 'ignore';
+    emptyValue: string;
+    unknownOption: string;
+    duplicateOption: string;
     requiredOptions: string[];
     valueTypes: string[];
   };
   flagOptions: Record<string, string>;
+  paramSpecificOptions: {
+    zero: ParamOptionRules;
+    one: ParamOptionRules;
+    two: ParamOptionRules;
+  };
+}
+
+export interface ParamOptionRules {
+  allowedOptions: string[];
+  requiredOptions: string[];
 }

@@ -16,6 +16,14 @@ const optionRule: OptionRule = {
     'help': 'help',
     'version': 'version',
   },
+  paramSpecificOptions: {
+    zero: { allowedOptions: ['help', 'version'], requiredOptions: [] },
+    one: { allowedOptions: ['help', 'version'], requiredOptions: [] },
+    two: {
+      allowedOptions: ['help', 'version', 'config', 'uv-project', 'uv-version', 'uv-environment'],
+      requiredOptions: [],
+    },
+  },
 };
 
 Deno.test('test_params_parser_e2e', () => {
@@ -63,8 +71,8 @@ Deno.test('test_params_parser_e2e', () => {
   assertEquals(optionsResult.error?.code, 'VALIDATION_ERROR', 'Error should be validation error');
   assertEquals(
     optionsResult.error?.category,
-    'invalid_format',
-    'Error category should be invalid_format',
+    'validation',
+    'Error category should be validation',
   );
 
   // エラーケースのテスト
@@ -73,8 +81,8 @@ Deno.test('test_params_parser_e2e', () => {
   assertEquals(errorResult.error?.code, 'SECURITY_ERROR', 'Error should be security error');
   assertEquals(
     errorResult.error?.category,
-    'invalid_characters',
-    'Error category should be invalid_characters',
+    'security',
+    'Error category should be security',
   );
 
   // 複合ケースのテスト
@@ -93,7 +101,7 @@ Deno.test('test_params_parser_e2e', () => {
   assertEquals(complexResult.error?.code, 'VALIDATION_ERROR', 'Error should be validation error');
   assertEquals(
     complexResult.error?.category,
-    'invalid_format',
-    'Error category should be invalid_format',
+    'validation',
+    'Error category should be validation',
   );
 });

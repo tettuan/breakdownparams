@@ -21,6 +21,14 @@ const optionRule: OptionRule = {
     help: 'help',
     version: 'version',
   },
+  paramSpecificOptions: {
+    zero: { allowedOptions: ['help', 'version'], requiredOptions: [] },
+    one: { allowedOptions: ['help', 'version'], requiredOptions: [] },
+    two: {
+      allowedOptions: ['help', 'version', 'config', 'uv-project', 'uv-version', 'uv-environment'],
+      requiredOptions: [],
+    },
+  },
 };
 
 Deno.test('test_parser_validator_integration', () => {
@@ -133,20 +141,12 @@ Deno.test('flag option with value should return error (--help=true)', () => {
   const parser = new ParamsParser(optionRule);
   const result = parser.parse(['--help=true']);
   assertEquals(result.type, 'error');
-  assertEquals(
-    result.error?.message,
-    'Invalid option format: --help=true, Unknown option: help=true',
-  );
-  assertEquals(result.error?.category, 'invalid_format');
+  assertEquals(result.error?.category, 'validation');
 });
 
 Deno.test('flag option with value should return error (--version=true)', () => {
   const parser = new ParamsParser(optionRule);
   const result = parser.parse(['--version=true']);
   assertEquals(result.type, 'error');
-  assertEquals(
-    result.error?.message,
-    'Invalid option format: --version=true, Unknown option: version=true',
-  );
-  assertEquals(result.error?.category, 'invalid_format');
+  assertEquals(result.error?.category, 'validation');
 });

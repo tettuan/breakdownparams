@@ -5,7 +5,7 @@ Deno.test('test_option_rule_structure', () => {
   const rule: OptionRule = {
     format: '--key=value',
     validation: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['uv-project', 'uv-version', 'uv-environment'],
       emptyValue: 'error',
       unknownOption: 'error',
       duplicateOption: 'error',
@@ -15,6 +15,20 @@ Deno.test('test_option_rule_structure', () => {
     flagOptions: {
       help: 'help',
       version: 'version',
+    },
+    paramSpecificOptions: {
+      zero: {
+        allowedOptions: ['help', 'version'],
+        requiredOptions: [],
+      },
+      one: {
+        allowedOptions: ['help', 'version'],
+        requiredOptions: [],
+      },
+      two: {
+        allowedOptions: ['help', 'version'],
+        requiredOptions: [],
+      },
     },
   };
 

@@ -94,6 +94,20 @@ Deno.test('test_option_rule_interface', () => {
       help: 'help',
       version: 'version',
     },
+    paramSpecificOptions: {
+      zero: {
+        allowedOptions: ['help', 'version'],
+        requiredOptions: [],
+      },
+      one: {
+        allowedOptions: ['help', 'version'],
+        requiredOptions: [],
+      },
+      two: {
+        allowedOptions: ['help', 'version'],
+        requiredOptions: [],
+      },
+    },
   };
   assertEquals(typeof rule.format, 'string');
   assertEquals(typeof rule.validation, 'object');

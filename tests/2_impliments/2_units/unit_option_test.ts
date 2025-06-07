@@ -17,6 +17,14 @@ Deno.test('test_option_rule', () => {
       'help': 'help',
       'version': 'version',
     },
+    paramSpecificOptions: {
+      zero: { allowedOptions: ['help', 'version'], requiredOptions: [] },
+      one: { allowedOptions: ['help', 'version'], requiredOptions: [] },
+      two: {
+        allowedOptions: ['help', 'version', 'config', 'uv-project', 'uv-version', 'uv-environment'],
+        requiredOptions: [],
+      },
+    },
   };
 
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');

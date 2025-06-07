@@ -1,8 +1,20 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import type { TwoParamResult } from '../src/mod.ts';
+
+// Example arguments to demonstrate options usage
+const exampleArgs = [
+  'to',
+  'project',
+  '--from=input.md',
+  '--destination=output.md',
+  '--input=issue',
+  '--adaptation=strict',
+];
+
+console.log('Executing command with arguments:', exampleArgs.join(' '));
 
 const parser = new ParamsParser();
-const result = parser.parse(Deno.args);
+const result = parser.parse(exampleArgs);
 
 // Helper function to display usage
 function showUsage() {
@@ -36,38 +48,36 @@ Examples:
 `);
 }
 
-if (!result.success) {
+if (result.type === 'error') {
   console.error(`Error: ${result.error?.message}`);
   console.log('\nFor usage information, run: options_usage --help');
   Deno.exit(1);
 }
 
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
+if (result.type === 'zero' && result.options.help) {
   showUsage();
   Deno.exit(0);
 }
 
 // Process valid command
-if (data.type === 'two') {
-  const { demonstrativeType, layerType, options = {} } = data;
+if (result.type === 'two') {
+  const { demonstrativeType, layerType, options = {} } = result as TwoParamResult;
 
   console.log('Command processed successfully:');
   console.log('----------------------------');
   console.log(`Action: ${demonstrativeType} ${layerType}`);
 
-  if (options?.fromFile) {
-    console.log(`Input file: ${options.fromFile}`);
+  if (options?.from) {
+    console.log(`Input file: ${options.from}`);
   }
-  if (options?.destinationFile) {
-    console.log(`Output file: ${options.destinationFile}`);
+  if (options?.destination) {
+    console.log(`Output file: ${options.destination}`);
   }
-  if (options?.fromLayerType) {
-    console.log(`Converting from layer: ${options.fromLayerType}`);
+  if (options?.input) {
+    console.log(`Converting from layer: ${options.input}`);
   }
-  if (options?.adaptationType) {
-    console.log(`Prompt adaptation: ${options.adaptationType}`);
+  if (options?.adaptation) {
+    console.log(`Prompt adaptation: ${options.adaptation}`);
   }
 } else {
   console.log('Please provide both command and layer type.');

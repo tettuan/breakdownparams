@@ -16,6 +16,20 @@ const optionRule: OptionRule = {
     help: 'help',
     version: 'version',
   },
+  paramSpecificOptions: {
+    zero: {
+      allowedOptions: ['help', 'version'],
+      requiredOptions: [],
+    },
+    one: {
+      allowedOptions: ['help', 'version'],
+      requiredOptions: [],
+    },
+    two: {
+      allowedOptions: ['help', 'version'],
+      requiredOptions: [],
+    },
+  },
 };
 
 Deno.test('test_options_validator_implementation', () => {
