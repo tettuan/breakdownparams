@@ -1,201 +1,173 @@
-# Architecture Diagrams
+# アーキテクチャ図
 
-This document provides diagrams that illustrate the breakdownparams library architecture.
+このドキュメントは、breakdownparamsライブラリのアーキテクチャを図で説明します。
 
-## 1. Component Diagrams
+## 1. コンポーネント図
 
-### 1.1 Overall Structure
 ```mermaid
 graph TD
-    A[ParamsParser] --> B[SecurityErrorValidator]
-    A --> C[OptionsValidator]
-    A --> D[ParamSpecificOptionValidator]
-    A --> E[ZeroParamsValidator]
-    A --> F[OneParamValidator]
-    A --> G[TwoParamsValidator]
+    A[ParamsParser] --> B[BaseValidator]
+    B --> C[SecurityErrorValidator]
+    B --> D[OptionsValidator]
+    B --> E[DemonstrativeTypeValidator]
+    B --> F[LayerTypeValidator]
+    B --> G[ZeroParamValidator]
+    B --> H[OneParamValidator]
+    B --> I[TwoParamValidator]
     
-    D --> H[ZeroOptionRules]
-    F --> I[OneOptionRules]
-    G --> J[TwoOptionRules]
+    A --> J[ParserConfig]
+    J --> K[DEFAULT_CONFIG]
+    J --> L[CustomConfig]
+    
+    I --> M[CustomVariableValidator]
+
+    N[OptionRegistry] --> O[ValueOption]
+    N --> P[FlagOption]
+    N --> Q[CustomVariableOption]
+    
+    D --> N
 ```
 
-### 1.2 Validation Structure
-```mermaid
-graph TD
-    A[ParamsParser] --> B[ValidationFlow]
-    B --> C[SecurityValidation]
-    B --> D[OptionValidation]
-    B --> E[ParamValidation]
-    
-    D --> F[CommonOptionValidation]
-    D --> G[ParamSpecificOptionValidation]
-    
-    E --> H[ZeroParamValidation]
-    E --> I[OneParamValidation]
-    E --> J[TwoParamValidation]
-```
+## 2. シーケンス図
 
-## 2. Sequence Diagrams
+### 2.1 パラメータ解析フロー
 
-### 2.1 Parameter Parsing Flow
 ```mermaid
 sequenceDiagram
-    participant P as ParamsParser
-    participant S as SecurityValidator
-    participant O as OptionsValidator
-    participant PS as ParamSpecificValidator
-    participant PV as ParamValidator
-
-    P->>S: validate(args)
-    S-->>P: securityResult
-    P->>O: validate(args)
-    O-->>P: optionsResult
-    P->>PS: validateForParamType(options)
-    PS-->>P: paramSpecificResult
-    P->>PV: validate(params)
-    PV-->>P: paramResult
+    participant User
+    participant Parser as ParamsParser
+    participant Validator as ParamsValidator
+    participant Config as ParserConfig
+    participant Options as OptionRegistry
+    
+    User->>Parser: parse(args)
+    Parser->>Config: getConfig()
+    Config-->>Parser: config
+    
+    par Validation
+        Parser->>Validator: validate(args)
+        Validator->>Validator: checkSecurity()
+        Validator->>Options: validateOptions()
+        Options->>Options: validateOption()
+        Options-->>Validator: optionResult
+        Validator->>Validator: validateParams()
+        Validator-->>Parser: result
+    end
+    
+    Parser->>Parser: determineResultType()
+    Parser-->>User: ParamsResult
 ```
 
-### 2.2 Option Validation Flow
+### 2.2 エラー処理フロー
+
 ```mermaid
 sequenceDiagram
-    participant P as ParamsParser
-    participant O as OptionsValidator
-    participant PS as ParamSpecificValidator
-    participant R as Result
-
-    P->>O: validateCommonOptions(args)
-    O-->>P: commonValidationResult
-    P->>PS: validateParamSpecificOptions(options, paramType)
-    PS-->>P: specificValidationResult
-    P->>R: createResult(validationResults)
+    participant Parser as ParamsParser
+    participant Validator as ParamsValidator
+    participant Error as ErrorHandler
+    participant Options as OptionRegistry
+    
+    Parser->>Validator: validate(args)
+    Validator->>Validator: validateInput()
+    
+    alt Validation Error
+        Validator->>Error: createError()
+        Error-->>Validator: ErrorResult
+        Validator-->>Parser: ErrorResult
+    else Security Error
+        Validator->>Error: createSecurityError()
+        Error-->>Validator: ErrorResult
+        Validator-->>Parser: ErrorResult
+    else Config Error
+        Validator->>Error: createConfigError()
+        Error-->>Validator: ErrorResult
+        Validator-->>Parser: ErrorResult
+    else Option Error
+        Options->>Error: createOptionError()
+        Error-->>Options: ErrorResult
+        Options-->>Validator: ErrorResult
+        Validator-->>Parser: ErrorResult
+    end
+    
+    Parser->>Parser: handleError()
+    Parser-->>User: ErrorResult
 ```
 
-## 3. State Transition Diagrams
+### 2.3 オプション処理フロー
 
-### 3.1 Parameter Parsing State Transition
+```mermaid
+sequenceDiagram
+    participant Parser as ParamsParser
+    participant Registry as OptionRegistry
+    participant Option as Option
+    
+    Parser->>Registry: register(option)
+    Registry->>Option: validate()
+    Option->>Option: validateValue()
+    Option-->>Registry: ValidationResult
+    
+    Parser->>Registry: parse(args)
+    Registry->>Option: parse(value)
+    Option->>Option: convertValue()
+    Option-->>Registry: OptionValue
+    Registry-->>Parser: ParsedOptions
+```
+
+## 3. 状態遷移図
+
+### 3.1 バリデーション状態
+
 ```mermaid
 stateDiagram-v2
-    [*] --> SecurityValidation
-    SecurityValidation --> OptionValidation: Valid
-    SecurityValidation --> Error: Invalid
-    OptionValidation --> ParamSeparation: Valid
-    OptionValidation --> Error: Invalid
-    ParamSeparation --> ParamSpecificValidation: Separated
-    ParamSpecificValidation --> ParamValidation: Valid
-    ParamSpecificValidation --> Error: Invalid
-    ParamValidation --> Result: Valid
-    ParamValidation --> Error: Invalid
+    [*] --> Initial
+    Initial --> SecurityCheck
+    SecurityCheck --> OptionValidation
+    OptionValidation --> ParamValidation
+    ParamValidation --> ResultGeneration
+    ResultGeneration --> [*]
+    
+    SecurityCheck --> Error: Security Error
+    OptionValidation --> Error: Option Error
+    ParamValidation --> Error: Param Error
     Error --> [*]
-    Result --> [*]
 ```
 
-### 3.2 Option Validation State Transition
+### 3.2 エラー状態
+
 ```mermaid
 stateDiagram-v2
-    [*] --> CommonValidation
-    CommonValidation --> ParamSpecificValidation: Valid
-    CommonValidation --> Error: Invalid
-    ParamSpecificValidation --> Result: Valid
-    ParamSpecificValidation --> Error: Invalid
-    Error --> [*]
-    Result --> [*]
+    [*] --> ErrorDetection
+    ErrorDetection --> ValidationError
+    ErrorDetection --> SecurityError
+    ErrorDetection --> ConfigError
+    ErrorDetection --> OptionError
+    
+    ValidationError --> ErrorHandling
+    SecurityError --> ErrorHandling
+    ConfigError --> ErrorHandling
+    OptionError --> ErrorHandling
+    
+    ErrorHandling --> ErrorResult
+    ErrorResult --> [*]
 ```
 
-## 4. Class Diagrams
+### 3.3 オプション状態
 
-### 4.1 Validator Structure
 ```mermaid
-classDiagram
-    class ParamsParser {
-        +parse(args: string[]): ParamsResult
-        -validateSecurity(args: string[]): ValidationResult
-        -validateOptions(args: string[]): ValidationResult
-        -validateParams(params: string[]): ValidationResult
-    }
+stateDiagram-v2
+    [*] --> OptionRegistration
+    OptionRegistration --> OptionValidation
+    OptionValidation --> OptionParsing
+    OptionParsing --> ValueConversion
+    ValueConversion --> [*]
     
-    class SecurityErrorValidator {
-        +validate(args: string[]): ValidationResult
-    }
-    
-    class OptionsValidator {
-        +validate(args: string[]): ValidationResult
-    }
-    
-    class ParamSpecificOptionValidator {
-        +validateForZero(options: Record<string, string>): ValidationResult
-        +validateForOne(options: Record<string, string>): ValidationResult
-        +validateForTwo(options: Record<string, string>): ValidationResult
-    }
-    
-    class ParamsValidator {
-        <<interface>>
-        +validate(params: string[]): ValidationResult
-    }
-    
-    class ZeroParamsValidator {
-        +validate(params: string[]): ValidationResult
-    }
-    
-    class OneParamValidator {
-        +validate(params: string[]): ValidationResult
-    }
-    
-    class TwoParamsValidator {
-        +validate(params: string[]): ValidationResult
-    }
-    
-    ParamsParser --> SecurityErrorValidator
-    ParamsParser --> OptionsValidator
-    ParamsParser --> ParamSpecificOptionValidator
-    ParamsParser --> ParamsValidator
-    ParamsValidator <|-- ZeroParamsValidator
-    ParamsValidator <|-- OneParamValidator
-    ParamsValidator <|-- TwoParamsValidator
+    OptionValidation --> OptionError: Invalid Option
+    OptionParsing --> OptionError: Parse Error
+    ValueConversion --> OptionError: Conversion Error
+    OptionError --> [*]
 ```
 
-### 4.2 Result Type Structure
-```mermaid
-classDiagram
-    class ParamsResult {
-        <<interface>>
-        +type: string
-        +params: string[]
-        +options: Record<string, string>
-    }
-    
-    class ZeroParamsResult {
-        +type: "zero"
-        +params: string[]
-        +options: Record<string, string>
-    }
-    
-    class OneParamResult {
-        +type: "one"
-        +params: string[]
-        +options: Record<string, string>
-        +demonstrativeType: string
-    }
-    
-    class TwoParamResult {
-        +type: "two"
-        +params: string[]
-        +options: Record<string, string>
-        +demonstrativeType: string
-        +layerType: string
-    }
-    
-    class ErrorResult {
-        +type: "error"
-        +error: ErrorInfo
-    }
-    
-    ParamsResult <|-- ZeroParamsResult
-    ParamsResult <|-- OneParamResult
-    ParamsResult <|-- TwoParamResult
-```
-
-## 5. Data Flow Diagrams
+## 4. データフロー図
 
 ```mermaid
 graph LR
@@ -213,7 +185,7 @@ graph LR
     K[OptionValues] --> I
 ```
 
-## 6. Class Hierarchy Diagrams
+## 5. クラス階層図
 
 ```mermaid
 classDiagram
@@ -270,7 +242,7 @@ classDiagram
     Option <|.. CustomVariableOption
 ```
 
-## 7. Package Diagrams
+## 6. パッケージ図
 
 ```mermaid
 graph TD
@@ -289,4 +261,4 @@ graph TD
 
 ---
 
-[Japanese Version](layer2_diagrams.ja.md) | [English Version](layer2_diagrams.md) 
+[日本語版](layer2_diagrams.ja.md) | [English Version](layer2_diagrams.md) 
