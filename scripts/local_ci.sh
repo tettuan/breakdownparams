@@ -286,7 +286,7 @@ if ! deno check "src/**/*.ts"; then
 fi
 
 echo "Running JSR type check..."
-if ! deno run --allow-read --allow-write --allow-env --allow-net https://jsr.io/@tettuan/breakdownparams/publish --dry-run --allow-dirty; then
+if ! npx jsr publish --dry-run --allow-dirty; then
     handle_type_error "JSR" "Failed to check JSR compatibility"
 fi
 
