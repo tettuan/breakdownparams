@@ -2,7 +2,7 @@ import { OptionRule, ParamsResult, ZeroParamsResult, OneParamResult, TwoParamRes
 import { SecurityErrorValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
-import { ParserConfig, DEFAULT_CONFIG } from "../types/parser_config.ts";
+import { TwoParamsConfig, DEFAULT_TWO_PARAMS_CONFIG } from "../types/two_params_config.ts";
 import { ZeroParamsValidator } from '../validator/zero_params_validator.ts';
 import { OneParamValidator } from '../validator/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/two_params_validator.ts';
@@ -22,7 +22,7 @@ export interface ParamsParser {
 
 export class ParamsParser {
   private readonly optionRule: OptionRule;
-  private readonly config: ParserConfig;
+  private readonly config: TwoParamsConfig;
   /**
    * セキュリティバリデーター
    * パラメータにシステムを壊す不正な文字列がないかをチェックする
@@ -33,7 +33,7 @@ export class ParamsParser {
   protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
   protected readonly twoOptionCombinationValidator: OptionCombinationValidator;
 
-  constructor(optionRule?: OptionRule, config?: ParserConfig) {
+  constructor(optionRule?: OptionRule, config?: TwoParamsConfig) {
     this.optionRule = optionRule || {
       format: '--key=value',
       validation: {
@@ -49,7 +49,7 @@ export class ParamsParser {
         version: 'version',
       },
     };
-    this.config = config || DEFAULT_CONFIG;
+    this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
 
     this.securityValidator = new SecurityErrorValidator(this.optionRule);
     this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
@@ -97,11 +97,11 @@ export class ParamsParser {
     */
     const zeroValidator = new ZeroParamsValidator();
     const oneValidator = new OneParamValidator();
-    const twoValidator = new TwoParamsValidator();
+    const twoValidator = new TwoParamsValidator(this.config);
 
-    const zeroResult = zeroValidator.validate(params, this.config);
-    const oneResult = oneValidator.validate(params, this.config);
-    const twoResult = twoValidator.validate(params, this.config);
+    const zeroResult = zeroValidator.validate(params);
+    const oneResult = oneValidator.validate(params);
+    const twoResult = twoValidator.validate(params);
 
     /*
      * 0個の場合
