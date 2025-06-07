@@ -67,15 +67,8 @@ export class ParamsParser {
    * @returns 解析結果
    */
   public parse(args: string[]): ParamsResult {
-    console.log('[DEBUG] ParamsParser.parse: start with args:', JSON.stringify(args, null, 2));
-    console.log('[DEBUG] ParamsParser.parse: expected format:', this.optionRule.format);
-
     // First, check for security issues
     const securityResult = this.securityValidator.validate(args);
-    console.log(
-      '[DEBUG] ParamsParser.parse: securityResult:',
-      JSON.stringify(securityResult, null, 2),
-    );
     if (!securityResult.isValid) {
       return {
         type: 'error',
@@ -91,10 +84,6 @@ export class ParamsParser {
 
     // Then validate options
     const optionsResult = this.optionsValidator.validate(args);
-    console.log(
-      '[DEBUG] ParamsParser.parse: optionsResult:',
-      JSON.stringify(optionsResult, null, 2),
-    );
     if (!optionsResult.isValid) {
       return {
         type: 'error',
@@ -110,29 +99,13 @@ export class ParamsParser {
 
     // Extract options and params
     const validatedParams = optionsResult.validatedParams;
-    console.log(
-      '[DEBUG] ParamsParser.parse: validatedParams:',
-      JSON.stringify(validatedParams, null, 2),
-    );
-
     const options: Record<string, string | undefined> = {};
     const params: string[] = [];
 
     for (const arg of validatedParams) {
-      console.log('[DEBUG] ParamsParser.parse: processing param:', arg);
       if (arg.startsWith('--')) {
         const [key, value] = arg.slice(2).split('=');
         const normalizedKey = key.toLowerCase();
-        console.log('[DEBUG] normalizeKey:', {
-          original: key,
-          normalized: normalizedKey,
-        });
-        console.log('[DEBUG] isFlagOption check:', {
-          option: key,
-          normalizedOption: normalizedKey,
-          isFlag: this.optionRule.flagOptions[normalizedKey] !== undefined,
-          flagOptions: this.optionRule.flagOptions,
-        });
         // Set flag options in options object with undefined value
         if (this.optionRule.flagOptions[normalizedKey]) {
           options[normalizedKey] = undefined;
@@ -144,14 +117,8 @@ export class ParamsParser {
       }
     }
 
-    console.log('[DEBUG] ParamsParser.parse: extracted:', { options, params });
-
     // Validate parameter-specific options
     const paramSpecificResult = this.paramSpecificValidator.validate(args);
-    console.log(
-      '[DEBUG] ParamsParser.parse: paramSpecificResult:',
-      JSON.stringify(paramSpecificResult, null, 2),
-    );
     if (!paramSpecificResult.isValid) {
       return {
         type: 'error',
@@ -167,7 +134,6 @@ export class ParamsParser {
 
     // Try each parameter validator
     const zeroResult = this.zeroParamsValidator.validate(params);
-    console.log('[DEBUG] ParamsParser.parse: zeroResult:', JSON.stringify(zeroResult, null, 2));
     if (zeroResult.isValid && params.length === 0) {
       return {
         type: 'zero',
@@ -178,7 +144,6 @@ export class ParamsParser {
 
     // One and two params validators only accept params
     const oneResult = this.oneParamValidator.validate(params);
-    console.log('[DEBUG] ParamsParser.parse: oneResult:', JSON.stringify(oneResult, null, 2));
     if (oneResult.isValid) {
       return {
         type: 'one',
@@ -189,7 +154,6 @@ export class ParamsParser {
     }
 
     const twoResult = this.twoParamsValidator.validate(params);
-    console.log('[DEBUG] ParamsParser.parse: twoResult:', JSON.stringify(twoResult, null, 2));
     if (twoResult.isValid) {
       return {
         type: 'two',

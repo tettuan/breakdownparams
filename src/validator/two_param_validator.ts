@@ -11,10 +11,7 @@ export class TwoParamValidator extends BaseValidator {
    * @returns バリデーション結果
    */
   public override validate(args: string[]): ValidationResult {
-    console.log('[DEBUG] validate: start', args);
-
     if (args.length !== 2) {
-      console.log('[DEBUG] validate: args length is not 2', { length: args.length, args });
       return this.createErrorResult(
         'Exactly two parameters expected',
         'VALIDATION_ERROR',
@@ -23,10 +20,8 @@ export class TwoParamValidator extends BaseValidator {
     }
 
     const [demonstrativeType, layerType] = args;
-    console.log('[DEBUG] validate: extracted params', { demonstrativeType, layerType });
 
     if (!this.isValidDemonstrativeType(demonstrativeType)) {
-      console.log('[DEBUG] validate: invalid demonstrative type', { demonstrativeType });
       return this.createErrorResult(
         'Invalid demonstrative type',
         'VALIDATION_ERROR',
@@ -35,7 +30,6 @@ export class TwoParamValidator extends BaseValidator {
     }
 
     if (!this.isValidLayerType(layerType)) {
-      console.log('[DEBUG] validate: invalid layer type', { layerType });
       return this.createErrorResult(
         'Invalid layer type',
         'VALIDATION_ERROR',
@@ -43,7 +37,6 @@ export class TwoParamValidator extends BaseValidator {
       );
     }
 
-    console.log('[DEBUG] validate: success', { demonstrativeType, layerType });
     return {
       isValid: true,
       validatedParams: args,
