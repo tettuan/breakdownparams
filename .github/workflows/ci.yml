@@ -19,7 +19,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: '2.1.9'
+          deno-version: 2.1.9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -40,7 +40,7 @@ jobs:
           deno check "scripts/**/*.ts"
 
       - name: JSR Type Check
-        run: deno run --allow-read --allow-write --allow-env --allow-net https://jsr.io/@tettuan/breakdownparams/publish --dry-run --allow-dirty
+        run: npx jsr publish --dry-run --allow-dirty
 
       - name: Format Check
         run: deno fmt --check "**/*.ts" "**/*.js" "**/*.jsx" "**/*.tsx"
