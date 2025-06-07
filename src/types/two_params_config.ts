@@ -1,7 +1,8 @@
 /**
- * Configuration for parameter validation rules
+ * Configuration for two parameters validation rules
+ * Used only in TwoParamsValidator for validating demonstrativeType and layerType
  */
-export interface ParserConfig {
+export interface TwoParamsConfig {
   /**
    * DemonstrativeType configuration
    */
@@ -36,9 +37,9 @@ export interface ParserConfig {
 }
 
 /**
- * Default configuration for parameter validation rules
+ * Default configuration for two parameters validation rules
  */
-export const DEFAULT_CONFIG: ParserConfig = {
+export const DEFAULT_TWO_PARAMS_CONFIG: TwoParamsConfig = {
   demonstrativeType: {
     pattern: '^(to|summary|defect)$',
     errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect'
