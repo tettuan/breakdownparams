@@ -2,10 +2,10 @@ import { OptionRule, ParamsResult, ZeroParamsResult, OneParamResult, TwoParamRes
 import { SecurityErrorValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
-import { TwoParamsConfig, DEFAULT_TWO_PARAMS_CONFIG } from "../types/two_params_config.ts";
-import { ZeroParamsValidator } from '../validator/zero_params_validator.ts';
-import { OneParamValidator } from '../validator/one_param_validator.ts';
-import { TwoParamsValidator } from '../validator/two_params_validator.ts';
+import { TwoParamsConfig, DEFAULT_TWO_PARAMS_CONFIG } from "../types/params_config.ts";
+import { ZeroParamsValidator } from '../validator/params/zero_params_validator.ts';
+import { OneParamValidator } from '../validator/params/one_param_validator.ts';
+import { TwoParamsValidator } from '../validator/params/two_params_validator.ts';
 import { ZeroOptionValidator, OneOptionValidator, TwoOptionValidator } from '../validator/options/option_validator.ts';
 import { OptionRegistry } from '../validator/options/option_registry.ts';
 
@@ -48,9 +48,16 @@ export class ParamsParser {
 
   /**
    * パラメータを解析する
+   * 処理の流れ:
+   * 1. セキュリティチェック
+   * 2. パラメータとオプションの分離
+   * 3. パラメータ数のバリデーション（0個、1個、2個）
+   * 4. パラメータ数に応じたオプションのバリデーション
+   *    - オプションの存在チェック
+   *    - オプションの組み合わせチェック
    */
   public parse(args: string[]): ParamsResult {
-    // セキュリティチェック
+    // 1. セキュリティチェック
     // パラメータにシステムを壊す不正な文字列がないかをチェックする
     // それ以上のチェックは不要
     const securityResult = this.securityValidator.validate(args);
@@ -67,7 +74,7 @@ export class ParamsParser {
       };
     }
 
-    // パラメータとオプションを分離する
+    // 2. パラメータとオプションを分離する
     // パラメータは、オプションではないもの
     // オプションは、-- から始まるもの
     const params = args.filter(arg => !arg.startsWith('--'));
@@ -76,12 +83,9 @@ export class ParamsParser {
       return acc;
     }, {} as Record<string, unknown>);
 
-    /* 
-     * // パラメータのバリデーション
-     * // パラメータのバリデーションは、パラメータの数に応じて、バリデーションを行う
-     * // パラメータの数に応じて、バリデーションを行う
-     * 3つ同時にバリデーションを行い、それぞれの結果を判定する
-    */
+    // 3. パラメータのバリデーション
+    // パラメータの数に応じて、バリデーションを行う
+    // 3つ同時にバリデーションを行い、それぞれの結果を判定する
     const zeroValidator = new ZeroParamsValidator();
     const oneValidator = new OneParamValidator();
     const twoValidator = new TwoParamsValidator(this.config);
@@ -91,10 +95,11 @@ export class ParamsParser {
     const twoResult = twoValidator.validate(params);
 
     /*
-     * 0個の場合
+     * 4. パラメータ数に応じたオプションのバリデーション
+     * 4.1. 0個の場合
     */
     if (zeroResult.isValid && !oneResult.isValid && !twoResult.isValid) {
-      // オプションのバリデーション
+      // 4.1.1. オプションの存在チェック
       const optionValidator = new ZeroOptionValidator();
       const optionResult = optionValidator.validate(args, 'zero', this.optionRule);
 
@@ -111,7 +116,7 @@ export class ParamsParser {
         };
       }
 
-      // パラメータが0個の場合は、0個の場合のオプションの組み合わせをチェックする
+      // 4.1.2. オプションの組み合わせチェック
       const zeroOptionCombinationResult = this.zeroOptionCombinationValidator.validate(options);
 
       if (!zeroOptionCombinationResult.isValid) {
@@ -135,10 +140,10 @@ export class ParamsParser {
     }
 
     /*
-     * 1個の場合
+     * 4.2. 1個の場合
     */
     if (!zeroResult.isValid && oneResult.isValid && !twoResult.isValid) {
-      // オプションのバリデーション
+      // 4.2.1. オプションの存在チェック
       const optionValidator = new OneOptionValidator();
       const optionResult = optionValidator.validate(args, 'one', this.optionRule);
 
@@ -155,7 +160,7 @@ export class ParamsParser {
         };
       }
 
-      // パラメータが1個の場合は、1個の場合のオプションの組み合わせをチェックする
+      // 4.2.2. オプションの組み合わせチェック
       const oneOptionCombinationResult = this.oneOptionCombinationValidator.validate(options);
 
       if (!oneOptionCombinationResult.isValid) {
@@ -180,10 +185,10 @@ export class ParamsParser {
     }
 
     /*
-     * 2個の場合
+     * 4.3. 2個の場合
     */
     if (!zeroResult.isValid && !oneResult.isValid && twoResult.isValid) {
-      // オプションのバリデーション
+      // 4.3.1. オプションの存在チェック
       const optionValidator = new TwoOptionValidator();
       const optionResult = optionValidator.validate(args, 'two', this.optionRule);
 
@@ -200,7 +205,7 @@ export class ParamsParser {
         };
       }
 
-      // パラメータが2個の場合は、2個の場合のオプションの組み合わせをチェックする
+      // 4.3.2. オプションの組み合わせチェック
       const twoOptionCombinationResult = this.twoOptionCombinationValidator.validate(options);
 
       if (!twoOptionCombinationResult.isValid) {
