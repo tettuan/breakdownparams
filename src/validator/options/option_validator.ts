@@ -2,6 +2,16 @@ import { ValidationResult } from "../../result/types.ts";
 import { OptionRule } from "../../result/types.ts";
 
 /**
+ * Error messages for option validation
+ */
+const ERROR_MESSAGES = {
+  INVALID_TYPE: (type: string) => `Invalid parameter type for this validator: ${type}`,
+  INVALID_OPTIONS: (type: string, options: string[]) => 
+    `Invalid options for ${type} parameters: ${options.join(', ')}`,
+  EMPTY_VALUE: (option: string) => `Empty value not allowed for option: ${option}`
+} as const;
+
+/**
  * Base interface for option validators
  */
 export interface OptionValidator {
@@ -16,116 +26,131 @@ export interface OptionValidator {
 }
 
 /**
- * Validator for zero parameter options (help/version)
+ * Base class for option validators
  */
-export class ZeroOptionValidator implements OptionValidator {
-  validate(args: string[], type: 'zero' | 'one' | 'two', optionRule: OptionRule): ValidationResult {
-    const options = args.filter(arg => arg.startsWith('--'));
-    const validOptions = Object.keys(optionRule.flagOptions);
+abstract class BaseOptionValidator implements OptionValidator {
+  protected abstract readonly paramType: 'zero' | 'one' | 'two';
+  protected abstract readonly validOptions: string[];
+  protected abstract readonly allowCustomVariables: boolean;
+
+  /**
+   * Normalize an option string into key and value
+   */
+  protected static normalizeOption(option: string): { key: string; value: string | undefined } {
+    const [key, value] = option.slice(2).split('=');
+    return { key, value };
+  }
+
+  /**
+   * Validate options against allowed options
+   */
+  protected static validateOptions(
+    options: string[],
+    validOptions: string[],
+    allowCustomVariables: boolean
+  ): { isValid: boolean; invalidOptions: string[] } {
     const invalidOptions = options.filter(opt => {
-      const [key] = opt.slice(2).split('=');
-      return !validOptions.includes(key);
+      const { key } = this.normalizeOption(opt);
+      return !validOptions.includes(key) && (!allowCustomVariables || !key.startsWith('uv-'));
     });
+    return {
+      isValid: invalidOptions.length === 0,
+      invalidOptions
+    };
+  }
 
-    if (invalidOptions.length > 0) {
-      return {
-        isValid: false,
-        validatedParams: [],
-        errorMessage: `Invalid options for zero parameters: ${invalidOptions.join(', ')}`,
-        errorCode: 'INVALID_OPTIONS',
-        errorCategory: 'validation'
-      };
-    }
+  /**
+   * Create an error validation result
+   */
+  protected createError(message: string, code: string): ValidationResult {
+    return {
+      isValid: false,
+      validatedParams: [],
+      errorMessage: message,
+      errorCode: code,
+      errorCategory: 'validation'
+    };
+  }
 
+  /**
+   * Create a success validation result
+   */
+  protected createSuccess(options: string[]): ValidationResult {
     return {
       isValid: true,
       validatedParams: [],
       options: options.reduce((acc, opt) => {
-        const [key] = opt.slice(2).split('=');
-        acc[key] = undefined;
+        const { key, value } = BaseOptionValidator.normalizeOption(opt);
+        acc[key] = value;
         return acc;
       }, {} as Record<string, unknown>)
     };
   }
+
+  /**
+   * Validate the options
+   */
+  validate(args: string[], type: string, optionRule: OptionRule): ValidationResult {
+    // Type check
+    if (type !== this.paramType) {
+      return this.createError(
+        ERROR_MESSAGES.INVALID_TYPE(type),
+        'INVALID_PARAMETER_TYPE'
+      );
+    }
+
+    const options = args.filter(arg => arg.startsWith('--'));
+    const { isValid, invalidOptions } = BaseOptionValidator.validateOptions(
+      options,
+      [...this.validOptions, ...Object.keys(optionRule.flagOptions)],
+      this.allowCustomVariables
+    );
+
+    if (!isValid) {
+      return this.createError(
+        ERROR_MESSAGES.INVALID_OPTIONS(this.paramType, invalidOptions),
+        'INVALID_OPTIONS'
+      );
+    }
+
+    return this.createSuccess(options);
+  }
+}
+
+/**
+ * Validator for zero parameter options (help/version)
+ */
+export class ZeroOptionValidator extends BaseOptionValidator {
+  protected readonly paramType = 'zero' as const;
+  protected readonly validOptions = ['help', 'version'];
+  protected readonly allowCustomVariables = false;
 }
 
 /**
  * Validator for one parameter options (init)
  */
-export class OneOptionValidator implements OptionValidator {
-  validate(args: string[], type: 'zero' | 'one' | 'two', optionRule: OptionRule): ValidationResult {
-    const options = args.filter(arg => arg.startsWith('--'));
-    const validOptions = [
-      ...Object.keys(optionRule.flagOptions),
-      'from',
-      'destination',
-      'input',
-      'adaptation'
-    ];
-    const invalidOptions = options.filter(opt => {
-      const [key] = opt.slice(2).split('=');
-      return !validOptions.includes(key) && !key.startsWith('uv-');
-    });
-
-    if (invalidOptions.length > 0) {
-      return {
-        isValid: false,
-        validatedParams: [],
-        errorMessage: `Invalid options for one parameter: ${invalidOptions.join(', ')}`,
-        errorCode: 'INVALID_OPTIONS',
-        errorCategory: 'validation'
-      };
-    }
-
-    return {
-      isValid: true,
-      validatedParams: [],
-      options: options.reduce((acc, opt) => {
-        const [key, value] = opt.slice(2).split('=');
-        acc[key] = value;
-        return acc;
-      }, {} as Record<string, unknown>)
-    };
-  }
+export class OneOptionValidator extends BaseOptionValidator {
+  protected readonly paramType = 'one' as const;
+  protected readonly validOptions = [
+    'from',
+    'destination',
+    'input',
+    'adaptation'
+  ];
+  protected readonly allowCustomVariables = true;
 }
 
 /**
  * Validator for two parameter options (main functionality)
  */
-export class TwoOptionValidator implements OptionValidator {
-  validate(args: string[], type: 'zero' | 'one' | 'two', optionRule: OptionRule): ValidationResult {
-    const options = args.filter(arg => arg.startsWith('--'));
-    const validOptions = [
-      ...Object.keys(optionRule.flagOptions),
-      'from',
-      'destination',
-      'input',
-      'adaptation',
-      'config'
-    ];
-    const invalidOptions = options.filter(opt => {
-      const [key] = opt.slice(2).split('=');
-      return !validOptions.includes(key) && !key.startsWith('uv-');
-    });
-
-    if (invalidOptions.length > 0) {
-      return {
-        isValid: false,
-        validatedParams: [],
-        errorMessage: `Invalid options for two parameters: ${invalidOptions.join(', ')}`,
-        errorCode: 'INVALID_OPTIONS',
-        errorCategory: 'validation'
-      };
-    }
-
-    return {
-      isValid: true,
-      validatedParams: [],
-      options: options.reduce((acc, opt) => {
-        const [key, value] = opt.slice(2).split('=');
-        acc[key] = value;
-        return acc;
-      }, {} as Record<string, unknown>)
-    };
-  }
+export class TwoOptionValidator extends BaseOptionValidator {
+  protected readonly paramType = 'two' as const;
+  protected readonly validOptions = [
+    'from',
+    'destination',
+    'input',
+    'adaptation',
+    'config'
+  ];
+  protected readonly allowCustomVariables = true;
 } 
