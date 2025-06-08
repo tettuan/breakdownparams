@@ -100,6 +100,12 @@ abstract class BaseOptionValidator implements OptionValidator {
     }
 
     const options = args.filter(arg => arg.startsWith('--'));
+    
+    // オプションがない場合は成功とする
+    if (options.length === 0) {
+      return this.createSuccess([]);
+    }
+
     const { isValid, invalidOptions } = BaseOptionValidator.validateOptions(
       options,
       [...this.validOptions, ...Object.keys(optionRule.flagOptions)],
@@ -137,7 +143,7 @@ export class OneOptionValidator extends BaseOptionValidator {
     'input',
     'adaptation'
   ];
-  protected readonly allowCustomVariables = true;
+  protected readonly allowCustomVariables = false;
 }
 
 /**

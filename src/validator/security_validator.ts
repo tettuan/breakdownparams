@@ -15,19 +15,19 @@ export class SecurityValidator extends BaseValidator {
    * バリデーションを実行する
    */
   public validate(args: string[]): ValidationResult {
-    // シェルコマンド実行の試みを検出
-    if (args.some(arg => arg.includes(';') || arg.includes('|') || arg.includes('&'))) {
+    // シェルコマンド実行の試みやリダイレクト記号の検出
+    if (args.some(arg => /[;|&<>]/.test(arg))) {
       return {
         isValid: false,
         validatedParams: args,
-        errorMessage: 'Security error: Shell command execution attempt detected',
+        errorMessage: 'Security error: Shell command execution or redirection attempt detected',
         errorCode: 'SECURITY_ERROR',
         errorCategory: 'security',
       };
     }
 
-    // パストラバーサルの試みを検出
-    if (args.some(arg => arg.includes('../') || arg.includes('..\\'))) {
+    // パストラバーサルの試みを検出（../, ..\, 直結型も含む）
+    if (args.some(arg => /\.\.(\/|\\|[a-zA-Z0-9_\-\.])/g.test(arg))) {
       return {
         isValid: false,
         validatedParams: args,
