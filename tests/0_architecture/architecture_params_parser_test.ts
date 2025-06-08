@@ -1,20 +1,22 @@
 import { assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { ParamsParser } from '../../src/parser/params_parser.ts';
-import { OptionRule } from "../../src/types/option_rule.ts"';
+import { OptionRule, DEFAULT_OPTION_RULE } from "../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
-    customVariables: ['uv-project', 'uv-version', 'uv-environment'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
-    requiredOptions: [],
-    valueTypes: ['string'],
-  },
   flagOptions: {
     help: 'help',
     version: 'version',
+  },
+  rules: {
+    customVariables: ['uv-project', 'uv-version', 'uv-environment'],
+    requiredOptions: [],
+    valueTypes: ['string'],
+  },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
   },
 };
 
@@ -33,5 +35,5 @@ Deno.test('test_params_parser_default_option_rule', () => {
   assertEquals(parser instanceof ParamsParser, true);
   const result = parser.parse(['--help']);
   assertEquals(result.type, 'zero');
-  assertEquals(result.options.help, undefined, 'Flag option should be undefined');
+  assertEquals(result.options.help, true, 'Flag option should be true');
 });
