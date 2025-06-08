@@ -10,156 +10,137 @@
    - 前段階のテストが成功していることを前提とする
 
 2. **階層的な構造**
-   - 基礎テスト（基本機能の検証）
-   - コア機能テスト（中核となる機能の検証）
-   - 単体機能テスト（個別機能の検証）
-   - 連携機能テスト（機能間の連携検証）
-   - 統合テスト（全体の動作検証）
+   - 単体テスト（実装ファイルと同じ階層に配置）
+   - アーキテクチャテスト（実装ファイルと同じ階層に配置）
+   - 構造テスト（実装ファイルと同じ階層に配置）
+   - 結合テスト（tests/配下に配置）
+   - E2Eテスト（tests/配下に配置）
 
-3. **番号による順序付け**
-   - テストファイル名に番号を付与（例：`01_basic_test.ts`）
-   - 番号は実行順序を表す
-   - 依存関係を明確に示す
+3. **テストファイルの配置**
+   - 単体/アーキテクチャ/構造テスト: 実装ファイルと同じ階層
+   - 結合/E2Eテスト: tests/ディレクトリ配下
 
 4. **実行順序の保証**
-   - 番号順にテストが実行される
-   - 前段階のテストが成功していることを確認
    - 依存関係に基づいた実行順序の制御
+   - 前段階のテストが成功していることを確認
 
 ## テストディレクトリ構造
 
 ```
+src/
+├── models/
+│   ├── model.ts
+│   ├── 0_architecture_model.ts # アーキテクチャテスト
+│   ├── 1_structure_model.ts   # 構造テスト
+│   └── 2_unit_model.ts        # 単体テスト
+│
+├── types/
+│   ├── type.ts
+│   ├── 0_architecture_type.ts
+│   ├── 1_structure_type.ts
+│   └── 2_unit_type.ts
+│
+└── parser/
+    ├── params_parser.ts
+    ├── 0_architecture_params_parser.ts
+    ├── 1_structure_params_parser.ts
+    └── 2_unit_params_parser.ts
+
 tests/
-├── 01_basic/                    # 基礎テスト
-│   ├── 01_zero_params_test.ts     # パラメータなしのテスト
-│   └── 02_one_param_test.ts     # 単一パラメータのテスト
+├── integration/             # 結合テスト
+│   └── 3_integration_params_parser.ts
 │
-├── 02_core/                     # コア機能テスト
-│   └── 01_two_params_test.ts # 2パラメータのテスト
-│
-├── 03_unit/                     # 単体機能テスト
-│   ├── 01_options_test.ts       # オプション処理のテスト
-│   └── 02_extended_params_test.ts # 拡張パラメータのテスト
-│
-├── 04_integration/              # 連携機能テスト
-│   └── 01_error_test.ts         # エラー処理のテスト
-│
-└── 05_e2e/                      # 統合テスト
-    └── 01_params_parser_test.ts # パラメータパーサーの統合テスト
+└── e2e/                    # E2Eテスト
+    └── 4_e2e_params_parser.ts
 ```
 
 ## テストファイル命名規則
 
 テストファイルは、その目的に応じて以下の命名規則に従います：
 
-1. **通常のテスト**
-   - 命名規則: `*_test.ts`
-   - 例: `01_zero_params_test.ts`
-   - 用途: 機能の動作検証
-
-2. **アーキテクチャテスト**
-   - 命名規則: `*.architecture_test.ts`
-   - 例: `params_parser.architecture_test.ts`
+1. **アーキテクチャテスト**
+   - 命名規則: `0_architecture_<実装ファイル名>.ts`
+   - 例: `0_architecture_model.ts`
    - 用途: アーキテクチャの制約や依存関係の検証
+   - 配置: 実装ファイルと同じ階層
    - 検証項目:
      - 依存関係の方向性
      - 循環参照の有無
      - レイヤー間の境界
      - インターフェースの一貫性
-   - 制約:
-     - スタブやモックの多用を避ける
-     - 実際の依存関係を検証する
-     - テストの複雑性を最小限に抑える
 
-3. **構造テスト**
-   - 命名規則: `*.structure_test.ts`
-   - 例: `validator.structure_test.ts`
+2. **構造テスト**
+   - 命名規則: `1_structure_<実装ファイル名>.ts`
+   - 例: `1_structure_model.ts`
    - 用途: クラス構造や責務分離の検証
+   - 配置: 実装ファイルと同じ階層
    - 検証項目:
      - 単一責任の原則の遵守
      - 責務の重複の有無
      - 適切な抽象化レベル
      - クラス間の関係性
-   - 制約:
-     - スタブやモックの多用を避ける
-     - 実際のクラス構造を検証する
-     - テストの複雑性を最小限に抑える
 
-### 命名規則の使用例
+3. **単体テスト**
+   - 命名規則: `2_unit_<実装ファイル名>.ts`
+   - 例: `2_unit_model.ts`
+   - 用途: 機能の動作検証
+   - 配置: 実装ファイルと同じ階層
 
-```
-tests/
-├── 01_basic/
-│   ├── 01_zero_params_test.ts
-│   ├── 01_zero_params.architecture_test.ts
-│   └── 01_zero_params.structure_test.ts
-│
-└── 02_core/
-    ├── 01_two_params_test.ts
-    ├── 01_two_params.architecture_test.ts
-    └── 01_two_params.structure_test.ts
-```
+4. **結合テスト**
+   - 命名規則: `3_integration_<機能名>.ts`
+   - 例: `3_integration_params_parser.ts`
+   - 用途: 複数のコンポーネント間の連携検証
+   - 配置: tests/integration/
 
-### テストの実行順序
+5. **E2Eテスト**
+   - 命名規則: `4_e2e_<機能名>.ts`
+   - 例: `4_e2e_params_parser.ts`
+   - 用途: エンドツーエンドの動作検証
+   - 配置: tests/e2e/
 
-1. アーキテクチャテスト
-   - 設計の制約が守られていることを最初に確認
-   - 依存関係の方向性を検証
-
-2. 構造テスト
-   - クラス構造の整合性を確認
-   - 責務分離の状態を検証
-
-3. 通常のテスト
-   - 機能の動作を検証
-   - ユースケースの確認
-
-## テスト階層構造
-
-テストは以下の階層構造に従って実装されています：
-
-1. **基礎テスト** (`01_basic/`)
-   - `01_zero_params_test.ts`: パラメータなしのケース
-   - `02_one_param_test.ts`: 単一パラメータのケース
-
-2. **コア機能テスト** (`02_core/`)
-   - `01_two_params_test.ts`: 2パラメータのケース
-
-3. **単体機能テスト** (`03_unit/`)
-   - `01_options_test.ts`: オプション処理の基本機能
-   - `02_extended_params_test.ts`: 拡張パラメータの機能
-     - 拡張モードの有効/無効
-     - DemonstrativeTypeの拡張設定
-     - LayerTypeの拡張設定
-     - カスタムバリデーションルール
-     - エラーメッセージのカスタマイズ
-
-4. **連携機能テスト** (`04_integration/`)
-   - `01_error_test.ts`: 各種エラーケースの検証
-
-5. **統合テスト** (`05_e2e/`)
-   - `01_params_parser_test.ts`: パーサーの統合的な動作確認
-
-### テストの依存関係
+## テストの依存関係
 
 テストは以下の順序で実行されます：
 
-1. 基礎テスト (`01_basic/`)
-   - 01: パラメータなし
-   - 02: 単一パラメータ
+1. モデルと型のテスト
+   - 基本的なデータ構造と型の検証
+   - バリデーションルールの検証
 
-2. コア機能テスト (`02_core/`)
-   - 01: 2パラメータ
+2. 派生コンポーネントのテスト
+   - モデルや型を利用した機能の検証
+   - Factoryやユーティリティの検証
 
-3. 単体機能テスト (`03_unit/`)
-   - 01: オプション処理
-   - 02: 拡張パラメータ処理
+3. ParamsParserのテスト
+   - 個別の機能検証
+   - 全体の統合検証
 
-4. 連携機能テスト (`04_integration/`)
-   - 01: エラー処理
+### 依存関係の例
 
-5. 統合テスト (`05_e2e/`)
-   - 01: パーサー統合
+```
+models/
+  └── model.ts
+      ├── 0_architecture_model.ts
+      ├── 1_structure_model.ts
+      └── 2_unit_model.ts
+
+types/
+  └── type.ts
+      ├── 0_architecture_type.ts
+      ├── 1_structure_type.ts
+      └── 2_unit_type.ts
+
+parser/
+  └── params_parser.ts
+      ├── 0_architecture_params_parser.ts
+      ├── 1_structure_params_parser.ts
+      └── 2_unit_params_parser.ts
+
+tests/
+  ├── integration/
+  │   └── 3_integration_params_parser.ts
+  └── e2e/
+      └── 4_e2e_params_parser.ts
+```
 
 ## テスト実行手順
 
@@ -172,9 +153,8 @@ deno task ci
 ```
 
 - CIと同等のフローをローカルで再現します。
-- すべての *_test.ts を順に実行し、テスト通過後にフォーマット・Lintチェックを行います。
+- すべてのテストを依存関係順に実行し、テスト通過後にフォーマット・Lintチェックを行います。
 - エラー時は `LOG_LEVEL=debug deno task ci` で詳細なデバッグ出力が得られます。
-- テストは依存順（番号順）で実行されます。
 - コミット・プッシュ・マージ前に必ずこのスクリプトで全チェックを通過させてください。
 
 ### 特定のテストファイルの実行
@@ -234,7 +214,7 @@ logger.debug('テスト実行開始', { testName: 'example' });
 
 # スケルトンコードの構築順序(テスト駆動)
 
-- 「テストディレクトリ構造」に従い、テストファイルを作成する
+- 実装ファイルと同じ階層にテストファイルを作成する
 - スケルトンの作成：テスト項目を、先にテスト対象として記述する（まだテストの内容は書かない）
 - スケルトンには、テストが失敗する記述を入れておく
 - コメントを記載する
