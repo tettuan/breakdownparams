@@ -37,11 +37,28 @@ export const validateEmptyValue = (value: string | undefined): boolean => {
 
 /**
  * Validates custom variable option format (--uv-*)
+ * Case-sensitive validation for custom variables
+ * Following custom_variable_options.ja.md specifications:
+ * - Only alphanumeric and underscore allowed
+ * - Must start with a letter
+ * - Case sensitive
+ * - Must not be empty
  * @param option The option string to validate
  * @returns true if the format is valid
  */
 export const validateCustomVariableOption = (option: string): boolean => {
-  return /^--uv-[a-zA-Z0-9_]+(?:=[^=]*)?$/.test(option);
+  if (!option.startsWith('--uv-')) {
+    return false;
+  }
+  // Extract variable name from option format (remove --uv- prefix)
+  const [variableName] = option.split('=');
+  const cleanVariableName = variableName.replace('--uv-', '');
+  console.log('Extracted variable name:', cleanVariableName);
+  if (!cleanVariableName) {
+    return false;
+  }
+  // Check if variable name starts with a letter and contains only allowed characters
+  return /^[a-zA-Z][a-zA-Z0-9_]*$/.test(cleanVariableName);
 };
 
 /**
@@ -84,7 +101,18 @@ export const validateOptionFormat = (option: string): { isValid: boolean; error?
     };
   }
 
-  // Validate long form format
+  // For custom variable options, use case-sensitive validation
+  if (option.startsWith('--uv-')) {
+    if (!validateCustomVariableOption(option)) {
+      return {
+        isValid: false,
+        error: 'Invalid custom variable option format'
+      };
+    }
+    return { isValid: true };
+  }
+
+  // For other options, use case-insensitive validation
   if (!validateLongFormOption(option)) {
     return {
       isValid: false,

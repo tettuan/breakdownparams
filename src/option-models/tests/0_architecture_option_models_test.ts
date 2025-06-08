@@ -14,7 +14,7 @@ Deno.test('Option Models Architecture', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new CustomVariableOption('--uv-config', 'Configuration', /^--uv-config$/);
+    const customOption = new CustomVariableOption('--uv-config', 'Configuration');
 
     assert(flagOption instanceof FlagOption);
     assert(valueOption instanceof ValueOption);
@@ -30,7 +30,7 @@ Deno.test('Option Models Architecture', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new CustomVariableOption('--uv-config', 'Configuration', /^--uv-config$/);
+    const customOption = new CustomVariableOption('--uv-config', 'Configuration');
 
     assertEquals(flagOption.type, OptionType.FLAG);
     assertEquals(valueOption.type, OptionType.VALUE);
@@ -46,7 +46,7 @@ Deno.test('Option Models Architecture', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new CustomVariableOption('--uv-config', 'Configuration', /^--uv-config$/);
+    const customOption = new CustomVariableOption('--uv-config', 'Configuration');
 
     const flagResult = flagOption.validate('');
     const valueResult = valueOption.validate('test.txt');

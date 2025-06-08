@@ -1,56 +1,73 @@
 import { Option, OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
-import { validateOptionFormat, validateCustomVariableOption, validateEmptyValue } from './format_utils.ts';
+import { CustomVariableValidator } from '../validator/options/custom_variable_validator.ts';
 
+/**
+ * CustomVariableOption class for handling custom variable options (--uv-*)
+ * Following custom_variable_options.ja.md specifications:
+ * - Only alphanumeric and underscore allowed
+ * - Must start with a letter
+ * - Case sensitive
+ * - Must not be empty
+ */
 export class CustomVariableOption implements Option {
   readonly type = OptionType.CUSTOM_VARIABLE;
   readonly isRequired = false;
   readonly aliases: string[] = [];
+  private readonly validator: CustomVariableValidator;
 
   constructor(
     readonly name: string,
-    readonly description: string,
-    private pattern: RegExp,
-  ) {}
+    readonly description: string
+  ) {
+    this.validator = new CustomVariableValidator();
+  }
 
   validate(value: unknown): ValidationResult {
-    // Validate option format
-    const formatValidation = validateOptionFormat(this.name);
-    if (!formatValidation.isValid) {
+    // Handle undefined value
+    if (value === undefined) {
       return {
-        isValid: false,
+        isValid: true,
         validatedParams: [],
-        errorMessage: formatValidation.error,
       };
     }
 
-    // Validate custom variable format
-    if (!validateCustomVariableOption(this.name)) {
+    const strValue = value as string;
+
+    // 1. Format Check: Basic structure validation
+    if (!strValue.startsWith('--uv-')) {
       return {
         isValid: false,
         validatedParams: [],
-        errorMessage: `Invalid custom variable name: ${this.name}`,
+        errorMessage: 'Option must start with --uv-',
       };
     }
 
-    // Validate pattern if value is provided
-    if (value !== undefined && !validateEmptyValue(value as string)) {
-      if (!this.pattern.test(value as string)) {
-        return {
-          isValid: false,
-          validatedParams: [],
-          errorMessage: `Invalid value for custom variable: ${value}`,
-        };
-      }
+    if (!strValue.includes('=')) {
+      return {
+        isValid: false,
+        validatedParams: [],
+        errorMessage: 'Invalid value format: Expected --uv-name=value',
+      };
     }
 
-    return {
-      isValid: true,
-      validatedParams: [],
-    };
+    // 2. Extract variable name and value
+    const [variableName] = strValue.split('=');
+    const cleanVariableName = variableName.replace('--uv-', '');
+
+    // 3. Delegate to validator for variable name validation
+    return this.validator.validateVariableName(cleanVariableName);
   }
 
   parse(value: unknown): string | undefined {
-    return value as string | undefined;
+    if (value === undefined) {
+      return undefined;
+    }
+    const strValue = value as string;
+    if (strValue.includes('=')) {
+      // Get everything after the first =
+      return strValue.substring(strValue.indexOf('=') + 1);
+    }
+    return strValue;
   }
 }

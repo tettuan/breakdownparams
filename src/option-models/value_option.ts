@@ -1,6 +1,6 @@
 import { Option, OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
-import { validateOptionFormat, validateEmptyValue } from './format_utils.ts';
+import { validateOptionFormat } from './format_utils.ts';
 
 export class ValueOption implements Option {
   readonly type = OptionType.VALUE;
@@ -10,7 +10,7 @@ export class ValueOption implements Option {
     readonly aliases: string[],
     readonly isRequired: boolean,
     readonly description: string,
-    private validator: (value: string) => ValidationResult,
+    readonly validator: (value: string) => ValidationResult
   ) {}
 
   validate(value: unknown): ValidationResult {
@@ -24,27 +24,52 @@ export class ValueOption implements Option {
       };
     }
 
-    // Check required value
-    if (this.isRequired && validateEmptyValue(value as string | undefined)) {
+    // Handle undefined value for optional options
+    if (value === undefined) {
+      if (this.isRequired) {
+        return {
+          isValid: false,
+          validatedParams: [],
+          errorMessage: 'Required value is missing',
+        };
+      }
       return {
-        isValid: false,
+        isValid: true,
         validatedParams: [],
-        errorMessage: `${this.name} is required`,
       };
     }
 
-    // If value is provided, validate it
-    if (value !== undefined && !validateEmptyValue(value as string)) {
-      return this.validator(value as string);
+    // Extract value from option format
+    const strValue = value as string;
+    const actualValue = strValue.includes('=') ? strValue.split('=')[1] : strValue;
+
+    // Handle empty value
+    if (actualValue === '') {
+      if (this.isRequired) {
+        return {
+          isValid: false,
+          validatedParams: [],
+          errorMessage: 'Value cannot be empty',
+        };
+      }
+      return {
+        isValid: true,
+        validatedParams: [],
+      };
     }
 
-    return {
-      isValid: true,
-      validatedParams: [],
-    };
+    // Validate value using custom validator
+    return this.validator(actualValue);
   }
 
   parse(value: unknown): string | undefined {
-    return value as string | undefined;
+    if (value === undefined) {
+      return undefined;
+    }
+    const strValue = value as string;
+    if (strValue.includes('=')) {
+      return strValue.split('=')[1];
+    }
+    return strValue;
   }
 }

@@ -13,7 +13,17 @@ export class FlagOption implements Option {
   ) {}
 
   validate(value: unknown): ValidationResult {
-    // Validate option format
+    // 値が未定義または空文字列の場合は有効（フラグが設定されていない）
+    if (value === undefined || value === '') {
+      return {
+        isValid: true,
+        validatedParams: [],
+      };
+    }
+
+    const strValue = value as string;
+
+    // オプションの書式をチェック
     const formatValidation = validateOptionFormat(this.name);
     if (!formatValidation.isValid) {
       return {
@@ -23,8 +33,8 @@ export class FlagOption implements Option {
       };
     }
 
-    // Flag options should not have values
-    if (value !== undefined && !validateEmptyValue(value as string)) {
+    // フラグオプションは値を持たないことをチェック
+    if (!validateEmptyValue(strValue)) {
       return {
         isValid: false,
         validatedParams: [],
@@ -38,7 +48,11 @@ export class FlagOption implements Option {
     };
   }
 
-  parse(_value: unknown): undefined {
-    return undefined;
+  parse(value: unknown): boolean {
+    if (value === undefined || value === '') {
+      return false;
+    }
+    const strValue = value as string;
+    return strValue === this.name || this.aliases.includes(strValue);
   }
 }
