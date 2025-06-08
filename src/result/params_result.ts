@@ -1,4 +1,4 @@
-import { OptionParams } from "../types/option_type.ts";
+import { OptionParams } from '../types/option_type.ts';
 
 /**
  * Base interface for parameter results
@@ -24,14 +24,14 @@ export interface ParamsResult {
  * Result for zero parameters (help/version commands)
  */
 export interface ZeroParamsResult extends ParamsResult {
-  type: "zero";
+  type: 'zero';
 }
 
 /**
  * Result for one parameter (init command)
  */
 export interface OneParamResult extends ParamsResult {
-  type: "one";
+  type: 'one';
   param: string;
 }
 
@@ -39,7 +39,7 @@ export interface OneParamResult extends ParamsResult {
  * Result for two parameters (main functionality)
  */
 export interface TwoParamResult extends ParamsResult {
-  type: "two";
+  type: 'two';
   demonstrativeType: string;
   layerType: string;
-} 
+}

@@ -31,16 +31,16 @@ interface ParamsResult {
 }
 
 interface ZeroParamsResult extends ParamsResult {
-  type: "zero";
+  type: 'zero';
 }
 
 interface OneParamResult extends ParamsResult {
-  type: "one";
+  type: 'one';
   param: string;
 }
 
 interface TwoParamResult extends ParamsResult {
-  type: "two";
+  type: 'two';
   demonstrativeType: string;
   layerType: string;
 }
@@ -68,31 +68,31 @@ interface TwoParamResult extends ParamsResult {
 ```typescript
 // ZeroParamsResult の例
 const helpResult: ZeroParamsResult = {
-  type: "zero",
+  type: 'zero',
   isValid: true,
-  options: {}
+  options: {},
 };
 
 // OneParamResult の例
 const initResult: OneParamResult = {
-  type: "one",
+  type: 'one',
   isValid: true,
-  param: "init",
+  param: 'init',
   options: {
-    fromFile: "input.json"
-  }
+    fromFile: 'input.json',
+  },
 };
 
 // TwoParamResult の例
 const toResult: TwoParamResult = {
-  type: "two",
+  type: 'two',
   isValid: true,
-  demonstrativeType: "to",
-  layerType: "project",
+  demonstrativeType: 'to',
+  layerType: 'project',
   options: {
-    fromFile: "input.json",
-    destinationFile: "output.json"
-  }
+    fromFile: 'input.json',
+    destinationFile: 'output.json',
+  },
 };
 ```
 
@@ -101,4 +101,4 @@ const toResult: TwoParamResult = {
 - [パラメータ型の定義](docs/params_type.ja.md)
 - [パラメータの仕様](docs/params.ja.md)
 - [アーキテクチャ概要](docs/architecture/layer1_overview.ja.md)
-- [用語集](docs/glossary.ja.md) 
+- [用語集](docs/glossary.ja.md)

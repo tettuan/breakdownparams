@@ -1,10 +1,10 @@
-import { assert, assertEquals } from "jsr:@std/assert@^0.218.2";
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
-  ParamsResult,
-  ZeroParamsResult,
   OneParamResult,
+  ParamsResult,
   TwoParamResult,
-} from "../types/params_result.ts";
+  ZeroParamsResult,
+} from '../types/params_result.ts';
 
 // 1. 型変換のテスト
 Deno.test('test_type_conversion', () => {
@@ -70,4 +70,4 @@ Deno.test('test_options_type_safety', () => {
   assertEquals(result.options.configFile, 'config.json');
   assertEquals((result.options.customVariables as Record<string, string>).key1, 'value1');
   assertEquals((result.options.customVariables as Record<string, string>).key2, 'value2');
-}); 
+});

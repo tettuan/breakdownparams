@@ -1,10 +1,10 @@
-import { assert, assertEquals } from "jsr:@std/assert@^0.218.2";
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
-  ParamsResult,
-  ZeroParamsResult,
   OneParamResult,
+  ParamsResult,
   TwoParamResult,
-} from "../types/params_result.ts";
+  ZeroParamsResult,
+} from '../types/params_result.ts';
 
 // 1. インターフェースの基本設計テスト
 Deno.test('test_params_result_interface', () => {
@@ -76,4 +76,4 @@ Deno.test('test_error_result_structure', () => {
   assertEquals(errorResult.error?.message, 'Error message');
   assertEquals(errorResult.error?.code, 'ERROR_CODE');
   assertEquals(errorResult.error?.category, 'error_category');
-}); 
+});
