@@ -7,7 +7,7 @@ import { ZeroParamsValidator } from '../validator/params/zero_params_validator.t
 import { OneParamValidator } from '../validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/params/two_params_validator.ts';
 import { ZeroOptionValidator, OneOptionValidator, TwoOptionValidator } from '../validator/options/option_validator.ts';
-import { OptionRegistry } from '../validator/options/option_registry.ts';
+import { CommandLineOptionRegistry } from '../registries/option_registry.ts';
 
 /**
  * パラメータパーサー
@@ -30,7 +30,7 @@ export class ParamsParser {
    * それ以上のチェックは不要
    */
   private readonly securityValidator: SecurityErrorValidator;
-  private readonly optionRegistry: OptionRegistry;
+  private readonly optionRegistry: CommandLineOptionRegistry;
   protected readonly zeroOptionCombinationValidator: OptionCombinationValidator;
   protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
   protected readonly twoOptionCombinationValidator: OptionCombinationValidator;
@@ -40,7 +40,7 @@ export class ParamsParser {
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
 
     this.securityValidator = new SecurityErrorValidator(this.optionRule);
-    this.optionRegistry = new OptionRegistry(this.optionRule);
+    this.optionRegistry = new CommandLineOptionRegistry(this.optionRule);
     this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
     this.oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);
     this.twoOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.two);
@@ -78,7 +78,7 @@ export class ParamsParser {
     // パラメータは、オプションではないもの
     // オプションは、-- から始まるもの
     const params = args.filter(arg => !arg.startsWith('--'));
-    const options = this.optionRegistry.extractOptions(args).reduce((acc, opt) => {
+    const options = this.optionRegistry.extractOptions(args).reduce((acc: Record<string, unknown>, opt: { name: string; value: unknown }) => {
       acc[opt.name] = opt.value;
       return acc;
     }, {} as Record<string, unknown>);
