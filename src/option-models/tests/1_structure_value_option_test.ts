@@ -1,6 +1,6 @@
-import { assert, assertEquals } from "jsr:@std/assert@^0.218.2";
-import { ValueOption } from "../value_option.ts";
-import { OptionType } from "../../types/option_type.ts";
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { ValueOption } from '../value_option.ts';
+import { OptionType } from '../../types/option_type.ts';
 
 Deno.test('ValueOption Structure', async (t) => {
   const validator = (value: string) => ({
@@ -44,4 +44,4 @@ Deno.test('ValueOption Structure', async (t) => {
     const value = option.parse('test');
     assertEquals(value, 'test');
   });
-}); 
+});

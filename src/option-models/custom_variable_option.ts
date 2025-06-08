@@ -18,7 +18,7 @@ export class CustomVariableOption implements Option {
 
   constructor(
     readonly name: string,
-    readonly description: string
+    readonly description: string,
   ) {
     this.validator = new CustomVariableValidator();
   }

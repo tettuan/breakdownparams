@@ -81,7 +81,7 @@ export const validateOptionFormat = (option: string): { isValid: boolean; error?
   if (!option.startsWith('--')) {
     return {
       isValid: false,
-      error: 'Option must start with --'
+      error: 'Option must start with --',
     };
   }
 
@@ -89,7 +89,7 @@ export const validateOptionFormat = (option: string): { isValid: boolean; error?
   if (option.includes(' ')) {
     return {
       isValid: false,
-      error: 'Space-separated format is not supported'
+      error: 'Space-separated format is not supported',
     };
   }
 
@@ -97,7 +97,7 @@ export const validateOptionFormat = (option: string): { isValid: boolean; error?
   if ((option.match(/=/g) || []).length > 1) {
     return {
       isValid: false,
-      error: 'Multiple = signs are not allowed'
+      error: 'Multiple = signs are not allowed',
     };
   }
 
@@ -106,7 +106,7 @@ export const validateOptionFormat = (option: string): { isValid: boolean; error?
     if (!validateCustomVariableOption(option)) {
       return {
         isValid: false,
-        error: 'Invalid custom variable option format'
+        error: 'Invalid custom variable option format',
       };
     }
     return { isValid: true };
@@ -116,9 +116,9 @@ export const validateOptionFormat = (option: string): { isValid: boolean; error?
   if (!validateLongFormOption(option)) {
     return {
       isValid: false,
-      error: 'Invalid long form option format'
+      error: 'Invalid long form option format',
     };
   }
 
   return { isValid: true };
-}; 
+};

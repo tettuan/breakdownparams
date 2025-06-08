@@ -1,5 +1,12 @@
-import { assert, assertEquals } from "jsr:@std/assert@^0.218.2";
-import { validateLongFormOption, validateShortFormOption, validateEmptyValue, validateCustomVariableOption, parseOption, validateOptionFormat } from "../format_utils.ts";
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import {
+  parseOption,
+  validateCustomVariableOption,
+  validateEmptyValue,
+  validateLongFormOption,
+  validateOptionFormat,
+  validateShortFormOption,
+} from '../format_utils.ts';
 
 Deno.test('Format Utils Unit Tests', async (t) => {
   await t.step('should validate long form options', () => {
@@ -50,4 +57,4 @@ Deno.test('Format Utils Unit Tests', async (t) => {
     assert(!invalidResult.isValid);
     assertEquals(invalidResult.error, 'Option must start with --');
   });
-}); 
+});

@@ -10,7 +10,7 @@ export class ValueOption implements Option {
     readonly aliases: string[],
     readonly isRequired: boolean,
     readonly description: string,
-    readonly validator: (value: string) => ValidationResult
+    readonly validator: (value: string) => ValidationResult,
   ) {}
 
   validate(value: unknown): ValidationResult {

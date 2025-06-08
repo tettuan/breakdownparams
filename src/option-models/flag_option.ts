@@ -1,6 +1,6 @@
 import { Option, OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
-import { validateOptionFormat, validateEmptyValue } from './format_utils.ts';
+import { validateEmptyValue, validateOptionFormat } from './format_utils.ts';
 
 export class FlagOption implements Option {
   readonly type = OptionType.FLAG;

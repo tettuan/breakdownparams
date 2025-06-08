@@ -1,8 +1,8 @@
-import { assert, assertEquals } from "jsr:@std/assert@^0.218.2";
-import { FlagOption } from "../flag_option.ts";
-import { ValueOption } from "../value_option.ts";
-import { CustomVariableOption } from "../custom_variable_option.ts";
-import { OptionType } from "../../types/option_type.ts";
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { FlagOption } from '../flag_option.ts';
+import { ValueOption } from '../value_option.ts';
+import { CustomVariableOption } from '../custom_variable_option.ts';
+import { OptionType } from '../../types/option_type.ts';
 
 Deno.test('Option Models Architecture', async (t) => {
   await t.step('should maintain option model interfaces', () => {
@@ -60,4 +60,4 @@ Deno.test('Option Models Architecture', async (t) => {
     assert(valueResult.isValid);
     assert(customResult.isValid);
   });
-}); 
+});

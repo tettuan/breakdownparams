@@ -1,6 +1,6 @@
-import { assert, assertEquals } from "jsr:@std/assert@^0.218.2";
-import { FlagOption } from "../flag_option.ts";
-import { OptionType } from "../../types/option_type.ts";
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { FlagOption } from '../flag_option.ts';
+import { OptionType } from '../../types/option_type.ts';
 
 Deno.test('FlagOption Structure', async (t) => {
   const option = new FlagOption('--flag', ['-f'], 'Flag option');
@@ -24,4 +24,4 @@ Deno.test('FlagOption Structure', async (t) => {
     assertEquals(option.parse('--flag'), true);
     assertEquals(option.parse('-f'), true);
   });
-}); 
+});

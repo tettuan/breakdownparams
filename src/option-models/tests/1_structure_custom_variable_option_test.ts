@@ -1,6 +1,6 @@
-import { assert, assertEquals } from "jsr:@std/assert@^0.218.2";
-import { CustomVariableOption } from "../custom_variable_option.ts";
-import { OptionType } from "../../types/option_type.ts";
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { CustomVariableOption } from '../custom_variable_option.ts';
+import { OptionType } from '../../types/option_type.ts';
 
 Deno.test('CustomVariableOption Structure', async (t) => {
   const option = new CustomVariableOption('--uv-test', 'Test variable');
@@ -24,4 +24,4 @@ Deno.test('CustomVariableOption Structure', async (t) => {
     const value = option.parse('test');
     assertEquals(value, 'test');
   });
-}); 
+});
