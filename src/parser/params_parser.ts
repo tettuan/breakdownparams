@@ -1,4 +1,4 @@
-import { OptionRule, ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult } from '../result/types.ts';
+import { OptionRule, ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult, DEFAULT_OPTION_RULE } from '../result/types.ts';
 import { SecurityErrorValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
@@ -7,6 +7,7 @@ import { ZeroParamsValidator } from '../validator/zero_params_validator.ts';
 import { OneParamValidator } from '../validator/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/two_params_validator.ts';
 import { ZeroOptionValidator, OneOptionValidator, TwoOptionValidator } from '../validator/options/option_validator.ts';
+import { OptionRegistry } from '../validator/options/option_registry.ts';
 
 /**
  * パラメータパーサー
@@ -29,29 +30,17 @@ export class ParamsParser {
    * それ以上のチェックは不要
    */
   private readonly securityValidator: SecurityErrorValidator;
+  private readonly optionRegistry: OptionRegistry;
   protected readonly zeroOptionCombinationValidator: OptionCombinationValidator;
   protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
   protected readonly twoOptionCombinationValidator: OptionCombinationValidator;
 
   constructor(optionRule?: OptionRule, config?: TwoParamsConfig) {
-    this.optionRule = optionRule || {
-      format: '--key=value',
-      validation: {
-        customVariables: [],
-        emptyValue: 'error',
-        unknownOption: 'error',
-        duplicateOption: 'error',
-        requiredOptions: [],
-        valueTypes: ['string'],
-      },
-      flagOptions: {
-        help: 'help',
-        version: 'version',
-      },
-    };
+    this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
 
     this.securityValidator = new SecurityErrorValidator(this.optionRule);
+    this.optionRegistry = new OptionRegistry(this.optionRule);
     this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
     this.oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);
     this.twoOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.two);
@@ -82,10 +71,8 @@ export class ParamsParser {
     // パラメータは、オプションではないもの
     // オプションは、-- から始まるもの
     const params = args.filter(arg => !arg.startsWith('--'));
-    const options = args.filter(arg => arg.startsWith('--')).reduce((acc, opt) => {
-      const [key, value] = opt.slice(2).split('=');
-      const cleanKey = key.startsWith('--') ? key.slice(2) : key;
-      acc[cleanKey] = value;
+    const options = this.optionRegistry.extractOptions(args).reduce((acc, opt) => {
+      acc[opt.name] = opt.value;
       return acc;
     }, {} as Record<string, unknown>);
 
