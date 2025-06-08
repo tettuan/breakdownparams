@@ -18,7 +18,7 @@ export class OneParamValidator extends BaseValidator {
         validatedParams: params,
         errorMessage: 'Expected exactly one parameter',
         errorCode: 'INVALID_PARAMS',
-        errorCategory: 'validation'
+        errorCategory: 'validation',
       };
     }
 
@@ -29,7 +29,7 @@ export class OneParamValidator extends BaseValidator {
       demonstrativeType: params[0],
       errorMessage: isValid ? undefined : 'Invalid parameter. Only "init" is allowed',
       errorCode: isValid ? undefined : 'INVALID_PARAM',
-      errorCategory: isValid ? undefined : 'validation'
+      errorCategory: isValid ? undefined : 'validation',
     };
   }
 }

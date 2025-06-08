@@ -12,6 +12,10 @@ Deno.test('test_zero_params_validator_unit', () => {
   // 異常系テスト
   const invalidResult = validator.validate(['test']);
   assertEquals(invalidResult.isValid, false, 'Non-empty params should be invalid');
-  assertEquals(invalidResult.errorMessage, 'Expected zero parameters', 'Should return correct error message');
+  assertEquals(
+    invalidResult.errorMessage,
+    'Expected zero parameters',
+    'Should return correct error message',
+  );
   assertEquals(invalidResult.errorCode, 'INVALID_PARAMS', 'Should return correct error code');
-}); 
+});

@@ -6,4 +6,4 @@ Deno.test('test_zero_params_validator_structure', () => {
   const result = validator.validate([]);
   assertEquals(result.isValid, true, 'Zero params validator should accept empty params');
   assertEquals(result.validatedParams, [], 'Zero params validator should return empty params');
-}); 
+});

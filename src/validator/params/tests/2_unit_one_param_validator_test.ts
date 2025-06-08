@@ -13,6 +13,10 @@ Deno.test('test_one_param_validator_unit', () => {
   // 異常系テスト
   const invalidResult = validator.validate(['invalid']);
   assertEquals(invalidResult.isValid, false, 'Non-init param should be invalid');
-  assertEquals(invalidResult.errorMessage, 'Invalid parameter. Only "init" is allowed', 'Should return correct error message');
+  assertEquals(
+    invalidResult.errorMessage,
+    'Invalid parameter. Only "init" is allowed',
+    'Should return correct error message',
+  );
   assertEquals(invalidResult.errorCode, 'INVALID_PARAM', 'Should return correct error code');
-}); 
+});

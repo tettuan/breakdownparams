@@ -6,5 +6,9 @@ Deno.test('test_one_param_validator_structure', () => {
   const result = validator.validate(['init']);
   assertEquals(result.isValid, true, 'One param validator should accept init param');
   assertEquals(result.validatedParams, ['init'], 'One param validator should return correct param');
-  assertEquals(result.demonstrativeType, 'init', 'One param validator should set demonstrative type');
-}); 
+  assertEquals(
+    result.demonstrativeType,
+    'init',
+    'One param validator should set demonstrative type',
+  );
+});

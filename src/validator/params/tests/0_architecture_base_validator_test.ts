@@ -14,4 +14,4 @@ Deno.test('test_base_validator_architecture', () => {
   const baseValidator = new TestValidator();
   assertEquals(baseValidator instanceof BaseValidator, true, 'Should be instance of BaseValidator');
   assertEquals(typeof baseValidator.validate, 'function', 'Should have validate method');
-}); 
+});

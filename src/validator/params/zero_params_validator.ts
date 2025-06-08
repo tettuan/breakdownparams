@@ -25,7 +25,7 @@ export class ZeroParamsValidator extends BaseValidator {
       validatedParams: [],
       errorMessage: 'Expected zero parameters',
       errorCode: 'INVALID_PARAMS',
-      errorCategory: 'validation'
+      errorCategory: 'validation',
     };
   }
 }

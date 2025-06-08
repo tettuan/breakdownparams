@@ -16,4 +16,4 @@ Deno.test('test_base_validator_unit', () => {
   const result = validator.validate(['test']);
   assertEquals(result.isValid, true, 'Should return valid result');
   assertEquals(result.validatedParams, ['test'], 'Should return correct params');
-}); 
+});

@@ -14,16 +14,32 @@ Deno.test('test_two_params_validator_unit', () => {
   // 異常系テスト - パラメータ数
   const invalidCountResult = validator.validate(['to']);
   assertEquals(invalidCountResult.isValid, false, 'Single param should be invalid');
-  assertEquals(invalidCountResult.errorMessage, 'Expected exactly two parameters', 'Should return correct error message');
+  assertEquals(
+    invalidCountResult.errorMessage,
+    'Expected exactly two parameters',
+    'Should return correct error message',
+  );
   assertEquals(invalidCountResult.errorCode, 'INVALID_PARAMS', 'Should return correct error code');
 
   // 異常系テスト - 不正な DemonstrativeType
   const invalidDemonstrativeResult = validator.validate(['invalid', 'project']);
-  assertEquals(invalidDemonstrativeResult.isValid, false, 'Invalid demonstrative type should be rejected');
-  assertEquals(invalidDemonstrativeResult.errorCode, 'INVALID_DEMONSTRATIVE_TYPE', 'Should return correct error code');
+  assertEquals(
+    invalidDemonstrativeResult.isValid,
+    false,
+    'Invalid demonstrative type should be rejected',
+  );
+  assertEquals(
+    invalidDemonstrativeResult.errorCode,
+    'INVALID_DEMONSTRATIVE_TYPE',
+    'Should return correct error code',
+  );
 
   // 異常系テスト - 不正な LayerType
   const invalidLayerResult = validator.validate(['to', 'invalid']);
   assertEquals(invalidLayerResult.isValid, false, 'Invalid layer type should be rejected');
-  assertEquals(invalidLayerResult.errorCode, 'INVALID_LAYER_TYPE', 'Should return correct error code');
-}); 
+  assertEquals(
+    invalidLayerResult.errorCode,
+    'INVALID_LAYER_TYPE',
+    'Should return correct error code',
+  );
+});
