@@ -1,4 +1,4 @@
-import { OptionParams } from "../types/option_params.ts";
+import { OptionParams } from "../types/option_type.ts";
 
 /**
  * Base interface for parameter results
