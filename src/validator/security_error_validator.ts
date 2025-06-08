@@ -1,19 +1,20 @@
-import { BaseValidator } from './base_validator.ts';
+import { BaseValidator } from './params/base_validator.ts';
 import { ValidationResult } from '../result/types.ts';
 import { OptionRule } from '../result/types.ts';
 
 /**
  * セキュリティエラーバリデータ
+ * パラメータにシステムを壊す不正な文字列がないかをチェックする
  */
 export class SecurityErrorValidator extends BaseValidator {
   constructor(optionRule: OptionRule) {
-    super(optionRule);
+    super();
   }
 
   /**
    * バリデーションを実行する
    */
-  public override validate(args: string[]): ValidationResult {
+  public validate(args: string[]): ValidationResult {
     // セキュリティチェック
     const securityResult = this.checkSecurity(args);
     if (!securityResult.isValid) {
@@ -21,7 +22,7 @@ export class SecurityErrorValidator extends BaseValidator {
     }
 
     // 位置引数の抽出
-    const params = this.extractParams(args);
+    const params = args.filter(arg => !arg.startsWith('--'));
 
     return {
       isValid: true,
@@ -33,34 +34,44 @@ export class SecurityErrorValidator extends BaseValidator {
   /**
    * セキュリティチェックを実行する
    */
-  protected override checkSecurity(args: string[]): ValidationResult {
+  private checkSecurity(args: string[]): ValidationResult {
     // シェルコマンド実行の試みを検出
     if (args.some(arg => arg.includes(';') || arg.includes('|') || arg.includes('&') || arg.includes('`') || arg.includes('$'))) {
-      return this.createErrorInfo(
-        'Security error: Shell command execution attempt detected',
-        'SECURITY_ERROR',
-        'security',
-      );
+      return {
+        isValid: false,
+        validatedParams: args,
+        errorMessage: 'Security error: Shell command execution attempt detected',
+        errorCode: 'SECURITY_ERROR',
+        errorCategory: 'security',
+      };
     }
 
     // リダイレクト記号の試みを検出
     if (args.some(arg => arg.includes('>') || arg.includes('<'))) {
-      return this.createErrorInfo(
-        'Security error: Redirect symbol detected',
-        'SECURITY_ERROR',
-        'security',
-      );
+      return {
+        isValid: false,
+        validatedParams: args,
+        errorMessage: 'Security error: Redirect symbol detected',
+        errorCode: 'SECURITY_ERROR',
+        errorCategory: 'security',
+      };
     }
 
     // パストラバーサルの試みを検出
     if (args.some(arg => arg.includes('../') || arg.includes('..\\'))) {
-      return this.createErrorInfo(
-        'Security error: Path traversal attempt detected',
-        'SECURITY_ERROR',
-        'security',
-      );
+      return {
+        isValid: false,
+        validatedParams: args,
+        errorMessage: 'Security error: Path traversal attempt detected',
+        errorCode: 'SECURITY_ERROR',
+        errorCategory: 'security',
+      };
     }
 
-    return this.createSuccessResult(args, []);
+    return {
+      isValid: true,
+      validatedParams: args,
+      errors: [],
+    };
   }
 }
