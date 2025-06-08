@@ -1,6 +1,6 @@
 import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/mod.ts';
-import { OptionRule, TwoParamResult } from '../../../src/result/types.ts';
+import { OptionRule, TwoParamResult } from "../../src/types/option_rule.ts"';
 
 Deno.test('test_examples_execution', async (t) => {
   await t.step('basic_usage example', () => {

@@ -32,7 +32,7 @@ export type {
   TwoParamResult,
   ValidationResult,
   ZeroParamsResult,
-} from './src/result/types.ts';
+} from "../../src/types/option_rule.ts"';
 
 /**
  * @module breakdownparams

@@ -1,7 +1,7 @@
 import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { DefaultOptionRegistry } from '../../src/options/registry.ts';
 import { CustomVariableOption, FlagOption, ValueOption } from '../../src/options/base.ts';
-import { OptionType } from '../../src/options/types.ts';
+import { OptionType } from "../../src/types/option_type.ts"';
 
 Deno.test('OptionRegistry', async (t) => {
   const registry = new DefaultOptionRegistry();

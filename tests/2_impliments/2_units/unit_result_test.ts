@@ -7,7 +7,7 @@ import {
   TwoParamResult,
   ValidationResult,
   ZeroParamsResult,
-} from '../../../src/result/types.ts';
+} from "../../src/types/option_rule.ts"';
 
 Deno.test('test_result_unit', () => {
   // ParamsResultのテスト

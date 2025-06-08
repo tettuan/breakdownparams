@@ -5,7 +5,7 @@ import { OptionsValidator } from '../../../src/validator/options_validator.ts';
 import { ZeroParamsValidator } from '../../../src/validator/zero_params_validator.ts';
 import { OneParamValidator } from '../../../src/validator/one_param_validator.ts';
 import { TwoParamValidator } from '../../../src/validator/two_param_validator.ts';
-import { OptionRule } from '../../../src/result/types.ts';
+import { OptionRule } from "../../src/types/option_rule.ts"';
 
 const optionRule: OptionRule = {
   format: '--key=value',

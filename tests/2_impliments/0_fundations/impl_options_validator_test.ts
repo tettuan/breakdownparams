@@ -1,6 +1,6 @@
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OptionRule } from '../../../src/result/types.ts';
+import { OptionRule } from "../../src/types/option_rule.ts"';
 
 const rule: OptionRule = {
   format: '--key=value',

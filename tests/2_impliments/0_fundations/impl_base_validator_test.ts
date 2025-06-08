@@ -1,6 +1,6 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { SecurityErrorValidator } from '../../../src/validator/security_error_validator.ts';
-import { OptionRule, ValidationResult } from '../../../src/result/types.ts';
+import { OptionRule, ValidationResult } from "../../src/types/option_rule.ts"';
 
 const optionRule: OptionRule = {
   format: '--key=value',
