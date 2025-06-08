@@ -1,14 +1,15 @@
 import { OptionRule } from '../../types/option_rule.ts';
 import { ValidationResult } from '../../types/validation_result.ts';
+import { debug } from '../../utils/logger.ts';
 
 /**
  * Error messages for option validation
  */
 const ERROR_MESSAGES = {
   INVALID_TYPE: (type: string) => `Invalid parameter type for this validator: ${type}`,
-  INVALID_OPTIONS: (type: string, options: string[]) => 
+  INVALID_OPTIONS: (type: string, options: string[]) =>
     `Invalid options for ${type} parameters: ${options.join(', ')}`,
-  EMPTY_VALUE: (option: string) => `Empty value not allowed for option: ${option}`
+  EMPTY_VALUE: (option: string) => `Empty value not allowed for option: ${option}`,
 } as const;
 
 /**
@@ -47,15 +48,17 @@ abstract class BaseOptionValidator implements OptionValidator {
   protected static validateOptions(
     options: string[],
     validOptions: string[],
-    allowCustomVariables: boolean
+    flagOptions: Record<string, boolean>,
+    allowCustomVariables: boolean,
   ): { isValid: boolean; invalidOptions: string[] } {
-    const invalidOptions = options.filter(opt => {
+    const invalidOptions = options.filter((opt) => {
       const { key } = this.normalizeOption(opt);
-      return !validOptions.includes(key) && (!allowCustomVariables || !key.startsWith('uv-'));
+      return !validOptions.includes(key) && !Object.keys(flagOptions).includes(key) &&
+        (!allowCustomVariables || !key.startsWith('uv-'));
     });
     return {
       isValid: invalidOptions.length === 0,
-      invalidOptions
+      invalidOptions,
     };
   }
 
@@ -68,22 +71,28 @@ abstract class BaseOptionValidator implements OptionValidator {
       validatedParams: [],
       errorMessage: message,
       errorCode: code,
-      errorCategory: 'validation'
+      errorCategory: 'validation',
     };
   }
 
   /**
    * Create a success validation result
    */
-  protected createSuccess(options: string[]): ValidationResult {
+  protected createSuccess(options: string[], optionRule: OptionRule): ValidationResult {
     return {
       isValid: true,
       validatedParams: [],
       options: options.reduce((acc, opt) => {
         const { key, value } = BaseOptionValidator.normalizeOption(opt);
-        acc[key] = value;
+        if (Object.keys(optionRule.flagOptions).includes(key)) {
+          acc[key] = true;
+        } else if (value === undefined) {
+          acc[key] = true;
+        } else {
+          acc[key] = value;
+        }
         return acc;
-      }, {} as Record<string, unknown>)
+      }, {} as Record<string, unknown>),
     };
   }
 
@@ -91,35 +100,61 @@ abstract class BaseOptionValidator implements OptionValidator {
    * Validate the options
    */
   validate(args: string[], type: string, optionRule: OptionRule): ValidationResult {
+    debug('OptionValidator', 'Start validating options', { args, type, optionRule });
+
     // Type check
     if (type !== this.paramType) {
+      debug('OptionValidator', 'Invalid parameter type', {
+        expected: this.paramType,
+        actual: type,
+      });
       return this.createError(
         ERROR_MESSAGES.INVALID_TYPE(type),
-        'INVALID_PARAMETER_TYPE'
+        'INVALID_PARAMETER_TYPE',
       );
     }
 
-    const options = args.filter(arg => arg.startsWith('--'));
-    
+    const options = args.filter((arg) => arg.startsWith('--'));
+    debug('OptionValidator', 'Filtered options', options);
+
     // オプションがない場合は成功とする
     if (options.length === 0) {
-      return this.createSuccess([]);
+      debug('OptionValidator', 'No options found, returning success');
+      return this.createSuccess([], optionRule);
+    }
+
+    // 空の値のチェック
+    const emptyValueOptions = options.filter((opt) => {
+      const { key, value } = BaseOptionValidator.normalizeOption(opt);
+      return !Object.keys(optionRule.flagOptions).includes(key) && value === '';
+    });
+
+    if (emptyValueOptions.length > 0) {
+      debug('OptionValidator', 'Empty value options found', emptyValueOptions);
+      return this.createError(
+        ERROR_MESSAGES.EMPTY_VALUE(emptyValueOptions[0]),
+        'INVALID_OPTIONS',
+      );
     }
 
     const { isValid, invalidOptions } = BaseOptionValidator.validateOptions(
       options,
       [...this.validOptions, ...Object.keys(optionRule.flagOptions)],
-      this.allowCustomVariables
+      optionRule.flagOptions,
+      this.allowCustomVariables,
     );
+    debug('OptionValidator', 'Options validation result', { isValid, invalidOptions });
 
     if (!isValid) {
+      debug('OptionValidator', 'Invalid options found, returning error');
       return this.createError(
         ERROR_MESSAGES.INVALID_OPTIONS(this.paramType, invalidOptions),
-        'INVALID_OPTIONS'
+        'INVALID_OPTIONS',
       );
     }
 
-    return this.createSuccess(options);
+    debug('OptionValidator', 'All options valid, returning success');
+    return this.createSuccess(options, optionRule);
   }
 }
 
@@ -128,7 +163,7 @@ abstract class BaseOptionValidator implements OptionValidator {
  */
 export class ZeroOptionValidator extends BaseOptionValidator {
   protected readonly paramType = 'zero' as const;
-  protected readonly validOptions = ['help', 'version'];
+  protected readonly validOptions = [];
   protected readonly allowCustomVariables = false;
 }
 
@@ -141,7 +176,7 @@ export class OneOptionValidator extends BaseOptionValidator {
     'from',
     'destination',
     'input',
-    'adaptation'
+    'adaptation',
   ];
   protected readonly allowCustomVariables = false;
 }
@@ -156,7 +191,7 @@ export class TwoOptionValidator extends BaseOptionValidator {
     'destination',
     'input',
     'adaptation',
-    'config'
+    'config',
   ];
   protected readonly allowCustomVariables = true;
-} 
+}

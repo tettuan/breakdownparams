@@ -45,4 +45,4 @@ export const DEFAULT_OPTION_COMBINATION_RULES: OptionCombinationRules = {
       from: ['destination'],
     },
   },
-}; 
+};

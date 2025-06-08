@@ -1,10 +1,10 @@
-import { assertEquals, assert } from "jsr:@std/assert@^0.218.2";
-import { DEFAULT_OPTION_COMBINATION_RULES } from "../option_combination_rule.ts";
+import { assert } from 'jsr:@std/assert@^0.218.2';
+import { DEFAULT_OPTION_COMBINATION_RULES } from '../option_combination_rule.ts';
 
 Deno.test('OptionCombinationRule Unit Tests', async (t) => {
   await t.step('should validate zero options rules', () => {
     const zeroRules = DEFAULT_OPTION_COMBINATION_RULES.zero;
-    
+
     // 許可オプションの検証
     assert(zeroRules.allowedOptions.length === 2);
     assert(zeroRules.allowedOptions.includes('help'));
@@ -17,7 +17,7 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
 
   await t.step('should validate one options rules', () => {
     const oneRules = DEFAULT_OPTION_COMBINATION_RULES.one;
-    
+
     // 許可オプションの検証
     assert(oneRules.allowedOptions.length === 1);
     assert(oneRules.allowedOptions.includes('config'));
@@ -29,7 +29,7 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
 
   await t.step('should validate two options rules', () => {
     const twoRules = DEFAULT_OPTION_COMBINATION_RULES.two;
-    
+
     // 許可オプションの検証
     assert(twoRules.allowedOptions.length === 5);
     assert(twoRules.allowedOptions.includes('from'));
@@ -51,13 +51,9 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
   await t.step('should maintain rule consistency', () => {
     // 必須オプションは許可オプションに含まれている必要がある
     const twoRules = DEFAULT_OPTION_COMBINATION_RULES.two;
-    assert(twoRules.requiredOptions?.every(opt => 
-      twoRules.allowedOptions.includes(opt)
-    ));
+    assert(twoRules.requiredOptions?.every((opt) => twoRules.allowedOptions.includes(opt)));
 
     // 組み合わせルールの依存先も許可オプションに含まれている必要がある
-    assert(twoRules.combinationRules?.from?.every(opt => 
-      twoRules.allowedOptions.includes(opt)
-    ));
+    assert(twoRules.combinationRules?.from?.every((opt) => twoRules.allowedOptions.includes(opt)));
   });
-}); 
+});

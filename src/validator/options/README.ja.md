@@ -21,8 +21,9 @@
   - `OptionCombinationValidator` クラス: validate(options: Record<string, unknown>): OptionCombinationResult
   - `OptionCombinationResult` インターフェース: isValid, errorMessage, errorCode など
 - **特徴**:
-  - 標準オプションとカスタム変数（uv-）を分離して検証
-  - 必須オプション・依存関係・カスタム変数名の形式チェック
+  - 入力は検証済みのオプション（`--` プレフィックスは除去済み）
+  - オプションの組み合わせルールのみを検証（カスタム変数の検証は `CustomVariableValidator` の責務）
+  - 標準オプションの組み合わせ、必須オプションの存在、オプション間の依存関係を検証
 - **参考**: [docs/architecture/layer2_diagrams.ja.md](../../docs/architecture/layer2_diagrams.ja.md), [docs/validation.ja.md](../../docs/validation.ja.md)
 
 ### option_validator.ts

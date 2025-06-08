@@ -1,5 +1,5 @@
-import { assertEquals, assert } from "jsr:@std/assert@^0.218.2";
-import { OptionCombinationRule, OptionCombinationRules } from "../option_combination_rule.ts";
+import { assert } from 'jsr:@std/assert@^0.218.2';
+import { OptionCombinationRule, OptionCombinationRules } from '../option_combination_rule.ts';
 
 Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
   await t.step('should maintain correct interface structure', () => {
@@ -7,7 +7,7 @@ Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
     const rule: OptionCombinationRule = {
       allowedOptions: ['test'],
       requiredOptions: ['test'],
-      combinationRules: { test: ['test2'] }
+      combinationRules: { test: ['test2'] },
     };
 
     assert('allowedOptions' in rule);
@@ -23,7 +23,7 @@ Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
     const rules: OptionCombinationRules = {
       zero: { allowedOptions: ['test'] },
       one: { allowedOptions: ['test'] },
-      two: { allowedOptions: ['test'] }
+      two: { allowedOptions: ['test'] },
     };
 
     assert('zero' in rules);
@@ -39,11 +39,11 @@ Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
     const rule: OptionCombinationRule = {
       allowedOptions: ['test'],
       combinationRules: {
-        test: ['test2']
-      }
+        test: ['test2'],
+      },
     };
 
     assert(rule.combinationRules?.test instanceof Array);
     assert(rule.combinationRules?.test[0] === 'test2');
   });
-}); 
+});

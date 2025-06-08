@@ -1,5 +1,5 @@
-import { assertEquals, assert } from "jsr:@std/assert@^0.218.2";
-import { DEFAULT_OPTION_COMBINATION_RULES } from "../option_combination_rule.ts";
+import { assert } from 'jsr:@std/assert@^0.218.2';
+import { DEFAULT_OPTION_COMBINATION_RULES } from '../option_combination_rule.ts';
 
 Deno.test('OptionCombinationRule Structure Tests', async (t) => {
   await t.step('should have correct default rules structure', () => {
@@ -44,4 +44,4 @@ Deno.test('OptionCombinationRule Structure Tests', async (t) => {
     assert(Array.isArray(twoRules.combinationRules?.from));
     assert(twoRules.combinationRules?.from?.includes('destination'));
   });
-}); 
+});
