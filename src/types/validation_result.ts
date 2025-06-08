@@ -20,4 +20,4 @@ export interface ValidationResult {
   demonstrativeType?: string;
   /** レイヤーの種類 */
   layerType?: string;
-} 
+}

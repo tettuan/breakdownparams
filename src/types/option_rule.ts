@@ -88,4 +88,4 @@ export const DEFAULT_OPTION_RULE: OptionRule = {
     unknownOption: 'error',
     duplicateOption: 'error',
   },
-}; 
+};

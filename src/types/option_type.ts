@@ -58,4 +58,4 @@ export interface OptionParams {
 
   /** Custom variables */
   customVariables?: Record<string, string>;
-} 
+}

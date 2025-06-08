@@ -42,10 +42,10 @@ export interface TwoParamsConfig {
 export const DEFAULT_TWO_PARAMS_CONFIG: TwoParamsConfig = {
   demonstrativeType: {
     pattern: '^(to|summary|defect)$',
-    errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect'
+    errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
   },
   layerType: {
     pattern: '^(project|issue|task)$',
-    errorMessage: 'Invalid layer type. Must be one of: project, issue, task'
-  }
-}; 
+    errorMessage: 'Invalid layer type. Must be one of: project, issue, task',
+  },
+};

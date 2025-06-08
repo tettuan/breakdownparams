@@ -1,4 +1,4 @@
-import { assertEquals, assert } from 'jsr:@std/assert@^0.218.2';
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { OptionType } from '../option_type.ts';
 import { ValidationResult } from '../validation_result.ts';
 import { ParamsResult } from '../params_result.ts';
@@ -99,7 +99,10 @@ Deno.test('test_type_safety', async (t) => {
       params: [],
       options: {},
     };
-    assert(result.type === 'zero' || result.type === 'one' || result.type === 'two' || result.type === 'error');
+    assert(
+      result.type === 'zero' || result.type === 'one' || result.type === 'two' ||
+        result.type === 'error',
+    );
     assert(Array.isArray(result.params));
     assert(typeof result.options === 'object');
   });
@@ -170,8 +173,20 @@ Deno.test('test_params_config_structure', () => {
 
   assertEquals(typeof config.demonstrativeType, 'object', 'demonstrativeType should be an object');
   assertEquals(typeof config.layerType, 'object', 'layerType should be an object');
-  assertEquals(typeof config.demonstrativeType?.pattern, 'string', 'demonstrativeType.pattern should be string');
-  assertEquals(typeof config.demonstrativeType?.errorMessage, 'string', 'demonstrativeType.errorMessage should be string');
+  assertEquals(
+    typeof config.demonstrativeType?.pattern,
+    'string',
+    'demonstrativeType.pattern should be string',
+  );
+  assertEquals(
+    typeof config.demonstrativeType?.errorMessage,
+    'string',
+    'demonstrativeType.errorMessage should be string',
+  );
   assertEquals(typeof config.layerType?.pattern, 'string', 'layerType.pattern should be string');
-  assertEquals(typeof config.layerType?.errorMessage, 'string', 'layerType.errorMessage should be string');
-}); 
+  assertEquals(
+    typeof config.layerType?.errorMessage,
+    'string',
+    'layerType.errorMessage should be string',
+  );
+});
