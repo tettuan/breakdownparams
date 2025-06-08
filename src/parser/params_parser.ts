@@ -40,7 +40,7 @@ export class ParamsParser {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
 
-    this.securityValidator = new SecurityValidator(this.optionRule);
+    this.securityValidator = new SecurityValidator();
     this.optionRegistry = new CommandLineOptionRegistry(this.optionRule);
     this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
     this.oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);

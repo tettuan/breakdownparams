@@ -1,6 +1,5 @@
 import { BaseValidator } from './params/base_validator.ts';
 import { ValidationResult } from '../types/validation_result.ts';
-import { OptionRule } from '../types/option_rule.ts';
 
 /**
  * セキュリティバリデータ
@@ -8,7 +7,7 @@ import { OptionRule } from '../types/option_rule.ts';
  * それ以上のチェックは不要
  */
 export class SecurityValidator extends BaseValidator {
-  constructor(optionRule: OptionRule) {
+  constructor() {
     super();
   }
 
