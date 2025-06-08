@@ -1,5 +1,5 @@
 import { BaseValidator } from './base_validator.ts';
-import { ValidationResult } from '../result/types.ts';
+import { ValidationResult } from '../../types/validation_result.ts';
 
 /**
  * 1パラメータバリデータ

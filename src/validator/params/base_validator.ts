@@ -1,4 +1,4 @@
-import { ValidationResult } from '../result/types.ts';
+import { ValidationResult } from '../../types/validation_result.ts';
 
 /**
  * バリデータの基本クラス

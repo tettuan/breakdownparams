@@ -1,6 +1,6 @@
 import { BaseValidator } from './base_validator.ts';
-import { ValidationResult } from '../result/types.ts';
-import { TwoParamsConfig, DEFAULT_TWO_PARAMS_CONFIG } from '../types/parser_config.ts';
+import { ValidationResult } from '../../types/validation_result.ts';
+import { TwoParamsConfig, DEFAULT_TWO_PARAMS_CONFIG } from '../../types/params_config.ts';
 
 /**
  * 2パラメータバリデータ
