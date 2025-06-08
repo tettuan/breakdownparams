@@ -1,8 +1,8 @@
 import { assert, assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OptionRegistry } from '../../../src/options/option_registry.ts';
-import { ValueOption } from '../../../src/options/value_option.ts';
-import { FlagOption } from '../../../src/options/flag_option.ts';
-import { CustomVariableOption } from '../../../src/options/custom_variable_option.ts';
+import { OptionRegistry } from '../../../src/registries/option_registry.ts';
+import { ValueOption } from '../../../src/option-models/value_option.ts';
+import { FlagOption } from '../../../src/option-models/flag_option.ts';
+import { CustomVariableOption } from '../../../src/option-models/custom_variable_option.ts';
 import { ValidationResult } from "../../src/types/option_rule.ts"';
 
 Deno.test('test_option_registry', async (t) => {

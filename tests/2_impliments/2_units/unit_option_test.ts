@@ -1,6 +1,6 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { OptionRule } from "../../src/types/option_rule.ts"';
-import { FlagOption } from '../../../src/options/flag_option.ts';
+import { FlagOption } from '../../../src/option-models/flag_option.ts';
 import { OptionType } from "../../src/types/option_type.ts"';
 
 Deno.test('test_option_rule', () => {
