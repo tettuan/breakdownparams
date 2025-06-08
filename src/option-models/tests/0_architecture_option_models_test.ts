@@ -48,7 +48,7 @@ Deno.test('Option Models Architecture', async (t) => {
     );
     const customOption = new CustomVariableOption('--uv-config', 'Configuration');
 
-    const flagResult = flagOption.validate('');
+    const flagResult = flagOption.validate();
     const valueResult = valueOption.validate('test.txt');
     const customResult = customOption.validate('--uv-config=test_config');
 

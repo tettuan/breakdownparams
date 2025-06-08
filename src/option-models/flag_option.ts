@@ -1,6 +1,6 @@
 import { Option, OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
-import { validateEmptyValue, validateOptionFormat } from './format_utils.ts';
+import { validateOptionName } from './format_utils.ts';
 
 export class FlagOption implements Option {
   readonly type = OptionType.FLAG;
@@ -10,49 +10,28 @@ export class FlagOption implements Option {
     readonly name: string,
     readonly aliases: string[],
     readonly description: string,
-  ) {}
-
-  validate(value: unknown): ValidationResult {
-    // 値が未定義または空文字列の場合は有効（フラグが設定されていない）
-    if (value === undefined || value === '') {
-      return {
-        isValid: true,
-        validatedParams: [],
-      };
+  ) {
+    // Validate option name (remove -- prefix if present)
+    const cleanName = name.startsWith('--') ? name.slice(2) : name;
+    const nameValidation = validateOptionName(cleanName);
+    if (!nameValidation.isValid) {
+      throw new Error(`Invalid option name: ${nameValidation.error}`);
     }
 
-    const strValue = value as string;
-
-    // オプションの書式をチェック
-    const formatValidation = validateOptionFormat(this.name);
-    if (!formatValidation.isValid) {
-      return {
-        isValid: false,
-        validatedParams: [],
-        errorMessage: formatValidation.error,
-      };
+    // Validate aliases
+    for (const alias of aliases) {
+      const cleanAlias = alias.startsWith('-') ? alias.slice(1) : alias;
+      const aliasValidation = validateOptionName(cleanAlias);
+      if (!aliasValidation.isValid) {
+        throw new Error(`Invalid alias: ${aliasValidation.error}`);
+      }
     }
+  }
 
-    // フラグオプションは値を持たないことをチェック
-    if (!validateEmptyValue(strValue)) {
-      return {
-        isValid: false,
-        validatedParams: [],
-        errorMessage: 'Invalid option format: Flag options should not have values',
-      };
-    }
-
+  validate(): ValidationResult {
     return {
       isValid: true,
       validatedParams: [],
     };
-  }
-
-  parse(value: unknown): boolean {
-    if (value === undefined || value === '') {
-      return false;
-    }
-    const strValue = value as string;
-    return strValue === this.name || this.aliases.includes(strValue);
   }
 }

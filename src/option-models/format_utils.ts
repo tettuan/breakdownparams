@@ -4,6 +4,40 @@
  */
 
 /**
+ * Validates option name format
+ * Following options.ja.md specifications:
+ * - Only lowercase letters, numbers, and hyphens allowed
+ * - Must start with a letter
+ * - Must not be empty
+ * @param name The option name to validate (without -- prefix)
+ * @returns Object containing validation result and error message if invalid
+ */
+export const validateOptionName = (name: string): { isValid: boolean; error?: string } => {
+  if (!name) {
+    return {
+      isValid: false,
+      error: 'Option name cannot be empty',
+    };
+  }
+
+  if (!/^[a-z]/.test(name)) {
+    return {
+      isValid: false,
+      error: 'Option name must start with a letter',
+    };
+  }
+
+  if (!/^[a-z0-9-]+$/.test(name)) {
+    return {
+      isValid: false,
+      error: 'Option name can only contain lowercase letters, numbers, and hyphens',
+    };
+  }
+
+  return { isValid: true };
+};
+
+/**
  * Validates long form option format (--option=value)
  * @param option The option string to validate
  * @returns true if the format is valid
