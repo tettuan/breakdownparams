@@ -1,6 +1,8 @@
 import { Option, OptionType } from '../types/option_type.ts';
 import { OptionRule } from '../types/option_rule.ts';
-import { ValidationResult } from '../types/validation_result.ts';
+import { FlagOption } from '../option-models/flag_option.ts';
+import { CustomVariableOption } from '../option-models/custom_variable_option.ts';
+import { ValueOption } from '../option-models/value_option.ts';
 
 /**
  * オプションレジストリのインターフェース
@@ -99,34 +101,26 @@ export class CommandLineOptionRegistry implements OptionRegistry {
   private registerOptions(optionRule: OptionRule): void {
     // フラグオプションの登録
     for (const [name, description] of Object.entries(optionRule.flagOptions)) {
-      this.register({
-        name: `--${name}`,
-        description,
-        aliases: [],
-        type: OptionType.FLAG,
-        isRequired: false,
-        validate: (): ValidationResult => ({
-          isValid: true,
-          validatedParams: []
-        }),
-        parse: () => true
-      });
+      const flagOption = new FlagOption(`--${name}`, [], String(description));
+      this.register(flagOption);
+    }
+
+    // 値を持つオプションの登録
+    for (const name of optionRule.rules.requiredOptions) {
+      const valueOption = new ValueOption(
+        `--${name}`,
+        [],
+        true, // required
+        `Required option: ${name}`,
+        (value) => ({ isValid: true, validatedParams: [] }) // バリデーションは別コンポーネントで実行
+      );
+      this.register(valueOption);
     }
 
     // カスタム変数の登録
     for (const name of optionRule.rules.customVariables) {
-      this.register({
-        name: `--${name}`,
-        description: 'Custom variable',
-        aliases: [],
-        type: OptionType.CUSTOM_VARIABLE,
-        isRequired: false,
-        validate: (): ValidationResult => ({
-          isValid: true,
-          validatedParams: []
-        }),
-        parse: (value) => value
-      });
+      const customOption = new CustomVariableOption(`--${name}`, 'Custom variable');
+      this.register(customOption);
     }
   }
-}
+} 
