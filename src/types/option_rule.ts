@@ -13,7 +13,7 @@ export interface OptionRule {
    * 値を持たないオプション（例：--help, --version）
    */
   flagOptions: {
-    [key: string]: string;
+    [key: string]: boolean;
   };
 
   /**
@@ -75,8 +75,8 @@ export interface OptionRule {
 export const DEFAULT_OPTION_RULE: OptionRule = {
   format: '--key=value',
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
   rules: {
     customVariables: [],

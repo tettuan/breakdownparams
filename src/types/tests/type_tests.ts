@@ -110,8 +110,8 @@ Deno.test('test_option_rule_structure', () => {
   const rule: OptionRule = {
     format: '--key=value',
     flagOptions: {
-      help: 'help',
-      version: 'version',
+      help: true,
+      version: true,
     },
     rules: {
       customVariables: ['--demonstrative-type', '--layer-type'],
