@@ -9,6 +9,7 @@ import { OneParamValidator } from '../validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/params/two_params_validator.ts';
 import { ZeroOptionValidator, OneOptionValidator, TwoOptionValidator } from '../validator/options/option_validator.ts';
 import { CommandLineOptionRegistry } from '../registries/option_registry.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
  * パラメータパーサー
@@ -25,6 +26,7 @@ export interface ParamsParser {
 export class ParamsParser {
   private readonly optionRule: OptionRule;
   private readonly config: TwoParamsConfig;
+  private readonly logger: BreakdownLogger;
   /**
    * セキュリティバリデーター
    * パラメータにシステムを壊す不正な文字列がないかをチェックする
@@ -39,6 +41,7 @@ export class ParamsParser {
   constructor(optionRule?: OptionRule, config?: TwoParamsConfig) {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
+    this.logger = new BreakdownLogger();
 
     this.securityValidator = new SecurityValidator();
     this.optionRegistry = new CommandLineOptionRegistry(this.optionRule);
@@ -94,6 +97,12 @@ export class ParamsParser {
     const zeroResult = zeroValidator.validate(params);
     const oneResult = oneValidator.validate(params);
     const twoResult = twoValidator.validate(params);
+
+    this.logger.debug('Validation results:', {
+      zeroResult,
+      oneResult,
+      twoResult,
+    });
 
     /*
      * 4. パラメータ数に応じたオプションのバリデーション
