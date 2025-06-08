@@ -27,9 +27,9 @@ export interface Option {
   /** 必須オプションかどうか */
   isRequired: boolean;
   /** 値のバリデーション関数 */
-  validate(value: unknown): ValidationResult;
-  /** 値のパース関数 */
-  parse(value: unknown): unknown;
+  validate(value?: unknown): ValidationResult;
+  /** 値のパース関数（オプション） */
+  parse?(value: unknown): unknown;
 }
 
 /**
