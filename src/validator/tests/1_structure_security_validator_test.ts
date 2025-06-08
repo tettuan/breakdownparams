@@ -1,5 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@^0.218.2';
-import { SecurityValidator } from '../../security_validator.ts';
+import { SecurityValidator } from '../security_validator.ts';
 
 Deno.test('test_security_validator_structure', () => {
   const validator = new SecurityValidator();
