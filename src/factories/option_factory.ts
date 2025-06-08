@@ -1,12 +1,12 @@
-import { Option } from "../types/option_type.ts";
-import { FlagOption } from "../option-models/flag_option.ts";
-import { ValueOption } from "../option-models/value_option.ts";
-import { CustomVariableOption } from "../option-models/custom_variable_option.ts";
+import { Option } from '../types/option_type.ts';
+import { FlagOption } from '../option-models/flag_option.ts';
+import { ValueOption } from '../option-models/value_option.ts';
+import { CustomVariableOption } from '../option-models/custom_variable_option.ts';
 
 type OptionConfig = {
   longname: string;
   shortname: string;
-  type: "flag" | "value";
+  type: 'flag' | 'value';
 };
 
 /**
@@ -14,39 +14,39 @@ type OptionConfig = {
  */
 export const STANDARD_OPTIONS: Record<string, OptionConfig> = {
   help: {
-    longname: "help",
-    shortname: "h",
-    type: "flag",
+    longname: 'help',
+    shortname: 'h',
+    type: 'flag',
   },
   version: {
-    longname: "version",
-    shortname: "v",
-    type: "flag",
+    longname: 'version',
+    shortname: 'v',
+    type: 'flag',
   },
   from: {
-    longname: "from",
-    shortname: "f",
-    type: "value",
+    longname: 'from',
+    shortname: 'f',
+    type: 'value',
   },
   destination: {
-    longname: "destination",
-    shortname: "o",
-    type: "value",
+    longname: 'destination',
+    shortname: 'o',
+    type: 'value',
   },
   input: {
-    longname: "input",
-    shortname: "i",
-    type: "value",
+    longname: 'input',
+    shortname: 'i',
+    type: 'value',
   },
   adaptation: {
-    longname: "adaptation",
-    shortname: "a",
-    type: "value",
+    longname: 'adaptation',
+    shortname: 'a',
+    type: 'value',
   },
   config: {
-    longname: "config",
-    shortname: "c",
-    type: "value",
+    longname: 'config',
+    shortname: 'c',
+    type: 'value',
   },
 } as const;
 
@@ -72,7 +72,7 @@ export class CommandLineOptionFactory implements OptionFactory {
    * @returns Array of created options
    */
   createOptionsFromArgs(args: string[]): Option[] {
-    return args.map(arg => this.createOptionFromString(arg));
+    return args.map((arg) => this.createOptionFromString(arg));
   }
 
   /**
@@ -81,12 +81,12 @@ export class CommandLineOptionFactory implements OptionFactory {
    * @returns Created option
    */
   private createOptionFromString(arg: string): Option {
-    const [name, value] = arg.split("=");
+    const [name, value] = arg.split('=');
     const normalizedName = this.normalizeOptionName(name);
 
     // Handle custom variable options (e.g., --uv-config=value)
-    if (name.startsWith("--uv-")) {
-      return new CustomVariableOption(name, "Custom variable option");
+    if (name.startsWith('--uv-')) {
+      return new CustomVariableOption(name, 'Custom variable option');
     }
 
     // Find the standard option configuration
@@ -97,18 +97,22 @@ export class CommandLineOptionFactory implements OptionFactory {
 
     // Create option based on its type
     switch (optionConfig.type) {
-      case "flag":
-        return new FlagOption(optionConfig.longname, [optionConfig.shortname], "Flag option");
-      case "value":
+      case 'flag':
+        return new FlagOption(
+          `--${optionConfig.longname}`,
+          [optionConfig.shortname],
+          'Flag option',
+        );
+      case 'value':
         if (!value) {
           throw new Error(`Option ${name} requires a value`);
         }
         return new ValueOption(
-          optionConfig.longname,
+          `--${optionConfig.longname}`,
           [optionConfig.shortname],
           false,
-          "Value option",
-          (_value: string) => ({ isValid: true, validatedParams: [] })
+          'Value option',
+          (val: string) => ({ isValid: true, validatedParams: [val] }),
         );
       default:
         throw new Error(`Unsupported option type: ${optionConfig.type}`);
@@ -121,7 +125,7 @@ export class CommandLineOptionFactory implements OptionFactory {
    * @returns Normalized option name
    */
   private normalizeOptionName(name: string): string {
-    return name.replace(/^--?/, "");
+    return name.replace(/^--?/, '');
   }
 
   /**
@@ -129,9 +133,11 @@ export class CommandLineOptionFactory implements OptionFactory {
    * @param name Option name
    * @returns Standard option configuration or undefined if not found
    */
-  private findStandardOptionConfig(name: string): (typeof STANDARD_OPTIONS)[keyof typeof STANDARD_OPTIONS] | undefined {
+  private findStandardOptionConfig(
+    name: string,
+  ): (typeof STANDARD_OPTIONS)[keyof typeof STANDARD_OPTIONS] | undefined {
     return Object.values(STANDARD_OPTIONS).find(
-      config => config.longname === name || config.shortname === name
+      (config) => config.longname === name || config.shortname === name,
     );
   }
 }
