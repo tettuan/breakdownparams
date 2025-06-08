@@ -40,7 +40,6 @@ export const DEFAULT_OPTION_COMBINATION_RULES: OptionCombinationRules = {
   },
   two: {
     allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
-    requiredOptions: ['from'],
     combinationRules: {
       from: ['destination'],
     },

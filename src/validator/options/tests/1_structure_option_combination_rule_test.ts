@@ -35,9 +35,8 @@ Deno.test('OptionCombinationRule Structure Tests', async (t) => {
     assert(twoRules.allowedOptions.includes('adaptation'));
     assert(twoRules.allowedOptions.includes('input'));
 
-    // 必須オプションの検証
-    assert(Array.isArray(twoRules.requiredOptions));
-    assert(twoRules.requiredOptions?.includes('from'));
+    // 必須オプションの検証 - two rules には必須オプションなし
+    assert(!twoRules.requiredOptions);
 
     // 組み合わせルールの検証
     assert(typeof twoRules.combinationRules === 'object');
