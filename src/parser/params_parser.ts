@@ -1,5 +1,6 @@
-import { OptionRule, ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult, DEFAULT_OPTION_RULE } from '../result/types.ts';
-import { SecurityErrorValidator } from '../validator/security_validator.ts';
+import { OptionRule, DEFAULT_OPTION_RULE } from '../types/option_rule.ts';
+import { ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult } from '../types/params_result.ts';
+import { SecurityValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
 import { TwoParamsConfig, DEFAULT_TWO_PARAMS_CONFIG } from "../types/params_config.ts";
@@ -29,7 +30,7 @@ export class ParamsParser {
    * パラメータにシステムを壊す不正な文字列がないかをチェックする
    * それ以上のチェックは不要
    */
-  private readonly securityValidator: SecurityErrorValidator;
+  private readonly securityValidator: SecurityValidator;
   private readonly optionRegistry: CommandLineOptionRegistry;
   protected readonly zeroOptionCombinationValidator: OptionCombinationValidator;
   protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
@@ -39,7 +40,7 @@ export class ParamsParser {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
 
-    this.securityValidator = new SecurityErrorValidator(this.optionRule);
+    this.securityValidator = new SecurityValidator(this.optionRule);
     this.optionRegistry = new CommandLineOptionRegistry(this.optionRule);
     this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
     this.oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);

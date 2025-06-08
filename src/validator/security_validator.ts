@@ -1,13 +1,13 @@
 import { BaseValidator } from './params/base_validator.ts';
-import { ValidationResult } from '../result/types.ts';
-import { OptionRule } from '../result/types.ts';
+import { ValidationResult } from '../types/validation_result.ts';
+import { OptionRule } from '../types/option_rule.ts';
 
 /**
- * セキュリティエラーバリデータ
+ * セキュリティバリデータ
  * パラメータにシステムを壊す不正な文字列がないかをチェックする
  * それ以上のチェックは不要
  */
-export class SecurityErrorValidator extends BaseValidator {
+export class SecurityValidator extends BaseValidator {
   constructor(optionRule: OptionRule) {
     super();
   }
