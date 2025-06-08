@@ -1,5 +1,6 @@
-import { Option, OptionType } from './types.ts';
-import { ValidationResult } from '../result/types.ts';
+import { Option, OptionType } from '../types/option_type.ts';
+import { ValidationResult } from '../types/validation_result.ts';
+import { validateOptionFormat, validateEmptyValue } from './format_utils.ts';
 
 export class ValueOption implements Option {
   readonly type = OptionType.VALUE;
@@ -12,24 +13,38 @@ export class ValueOption implements Option {
     private validator: (value: string) => ValidationResult,
   ) {}
 
-  validate(value: string | undefined): ValidationResult {
-    if (this.isRequired && value === undefined) {
+  validate(value: unknown): ValidationResult {
+    // Validate option format
+    const formatValidation = validateOptionFormat(this.name);
+    if (!formatValidation.isValid) {
+      return {
+        isValid: false,
+        validatedParams: [],
+        errorMessage: formatValidation.error,
+      };
+    }
+
+    // Check required value
+    if (this.isRequired && validateEmptyValue(value as string | undefined)) {
       return {
         isValid: false,
         validatedParams: [],
         errorMessage: `${this.name} is required`,
       };
     }
-    if (value !== undefined) {
-      return this.validator(value);
+
+    // If value is provided, validate it
+    if (value !== undefined && !validateEmptyValue(value as string)) {
+      return this.validator(value as string);
     }
+
     return {
       isValid: true,
       validatedParams: [],
     };
   }
 
-  parse(value: string | undefined): string | undefined {
-    return value;
+  parse(value: unknown): string | undefined {
+    return value as string | undefined;
   }
 }
