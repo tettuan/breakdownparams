@@ -1,5 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OneParamValidator } from '../../../src/validator/one_param_validator.ts';
+import { OneParamValidator } from "../../src/validator/params/one_param_validator.ts"';
 import { OptionRule } from "../../src/types/option_rule.ts"';
 
 const optionRule: OptionRule = {

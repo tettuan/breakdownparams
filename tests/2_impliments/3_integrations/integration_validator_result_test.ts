@@ -2,8 +2,8 @@ import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { SecurityErrorValidator } from '../../../src/validator/security_error_validator.ts';
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { OneOptionValidator } from '../../../src/validator/options/option_validator.ts';
-import { ZeroParamsValidator } from '../../../src/validator/zero_params_validator.ts';
-import { OneParamValidator } from '../../../src/validator/one_param_validator.ts';
+import { ZeroParamsValidator } from "../../src/validator/params/zero_params_validator.ts"';
+import { OneParamValidator } from "../../src/validator/params/one_param_validator.ts"';
 import { TwoParamValidator } from '../../../src/validator/two_param_validator.ts';
 import { OptionRule } from "../../src/types/option_rule.ts"';
 
