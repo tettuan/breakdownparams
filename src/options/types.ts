@@ -1,20 +1,25 @@
-import { ValidationResult } from '../result/types.ts';
+import { ValidationResult as ResultValidationResult } from '../result/types.ts';
 
-export interface Option {
-  readonly name: string;
-  readonly aliases: string[];
-  readonly type: OptionType;
-  readonly isRequired: boolean;
-  readonly description: string;
-
-  validate(value: string | undefined): ValidationResult;
-  parse(value: string | undefined): OptionValue;
+/**
+ * オプションタイプ
+ */
+export enum OptionType {
+  VALUE = 'value',
+  FLAG = 'flag',
+  CUSTOM_VARIABLE = 'custom_variable',
 }
 
-export enum OptionType {
-  VALUE,
-  FLAG,
-  CUSTOM_VARIABLE,
+/**
+ * オプションの基本インターフェース
+ */
+export interface Option {
+  type: OptionType;
+  name: string;
+  aliases: string[];
+  description: string;
+  isRequired: boolean;
+  validate(value: unknown): ResultValidationResult;
+  parse(value: unknown): unknown;
 }
 
 export type OptionValue = string | boolean | undefined;

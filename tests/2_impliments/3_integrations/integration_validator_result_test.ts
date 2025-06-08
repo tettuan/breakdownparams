@@ -1,6 +1,7 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { SecurityErrorValidator } from '../../../src/validator/security_error_validator.ts';
-import { OptionsValidator } from '../../../src/validator/options_validator.ts';
+import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
+import { OneOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { ZeroParamsValidator } from '../../../src/validator/zero_params_validator.ts';
 import { OneParamValidator } from '../../../src/validator/one_param_validator.ts';
 import { TwoParamValidator } from '../../../src/validator/two_param_validator.ts';
@@ -41,8 +42,8 @@ Deno.test('test_validator_result_integration', () => {
   assertEquals(typeof securityResult.error?.category, 'string', 'Should have error category');
 
   // オプションバリデーターの結果テスト
-  const optionsValidator = new OptionsValidator(optionRule);
-  const optionsResult = optionsValidator.validate(['--help', '--version']);
+  const zeroOptionValidator = new ZeroOptionValidator();
+  const optionsResult = zeroOptionValidator.validate(['--help', '--version'], 'zero', optionRule);
   assertEquals(optionsResult.isValid, true, 'Options validation should pass for valid options');
   assertEquals(
     optionsResult.validatedParams,
@@ -81,7 +82,7 @@ Deno.test('test_validator_result_integration', () => {
   );
 
   // エラーケースの結果テスト
-  const invalidOptionsResult = optionsValidator.validate(['--invalid-option']);
+  const invalidOptionsResult = zeroOptionValidator.validate(['--invalid-option'], 'zero', optionRule);
   assertEquals(
     invalidOptionsResult.isValid,
     false,

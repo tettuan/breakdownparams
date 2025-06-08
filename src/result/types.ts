@@ -1,31 +1,22 @@
 /**
- * パラメータ解析結果の基本インターフェース
+ * パラメータ結果の基本型
  */
 export interface ParamsResult {
   type: 'zero' | 'one' | 'two' | 'error';
   params: string[];
-  options: Record<string, string | undefined>;
+  options: Record<string, unknown>;
   error?: ErrorInfo;
 }
 
 /**
- * エラー情報を保持するインターフェース
- */
-export interface ErrorInfo {
-  message: string;
-  code: string;
-  category: string;
-}
-
-/**
- * 位置引数なしのパラメータ結果
+ * パラメータなしの結果
  */
 export interface ZeroParamsResult extends ParamsResult {
   type: 'zero';
 }
 
 /**
- * 位置引数1つのパラメータ結果
+ * 単一パラメータの結果
  */
 export interface OneParamResult extends ParamsResult {
   type: 'one';
@@ -33,7 +24,7 @@ export interface OneParamResult extends ParamsResult {
 }
 
 /**
- * 位置引数2つのパラメータ結果
+ * 二重パラメータの結果
  */
 export interface TwoParamResult extends ParamsResult {
   type: 'two';
@@ -42,33 +33,54 @@ export interface TwoParamResult extends ParamsResult {
 }
 
 /**
- * バリデーション結果を保持するインターフェース
+ * エラー結果
+ */
+export interface ErrorResult {
+  type: 'error';
+  params: string[];
+  options: Record<string, unknown>;
+  error: ErrorInfo;
+}
+
+/**
+ * エラー情報
+ */
+export interface ErrorInfo {
+  message: string;
+  code: string;
+  category: string;
+}
+
+/**
+ * バリデーション結果
  */
 export interface ValidationResult {
   isValid: boolean;
   validatedParams: string[];
-  error?: ErrorInfo;
   errorMessage?: string;
   errorCode?: string;
   errorCategory?: string;
-  errorDetails?: Record<string, unknown>;
+  errors?: string[];
+  options?: Record<string, unknown>;
   demonstrativeType?: string;
   layerType?: string;
-  options?: Record<string, string>;
 }
 
 /**
- * オプション処理ルールを定義するインターフェース
+ * オプションルール
  */
 export interface OptionRule {
   format: string;
   validation: {
     customVariables: string[];
-    emptyValue: 'error' | 'warn' | 'ignore';
-    unknownOption: 'error' | 'warn' | 'ignore';
-    duplicateOption: 'error' | 'warn' | 'ignore';
+    emptyValue: 'error' | 'warning' | 'ignore';
+    unknownOption: 'error' | 'warning' | 'ignore';
+    duplicateOption: 'error' | 'warning' | 'ignore';
     requiredOptions: string[];
     valueTypes: string[];
   };
-  flagOptions: Record<string, string>;
+  flagOptions: {
+    help: string;
+    version: string;
+  };
 }

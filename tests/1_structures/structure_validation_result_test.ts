@@ -19,10 +19,7 @@ Deno.test('test_validation_result_structure', () => {
     errorMessage: 'Validation error',
     errorCode: 'INVALID_PARAM',
     errorCategory: 'validation',
-    errorDetails: {
-      field: 'param1',
-      reason: 'Invalid value',
-    },
+    errors: ['error'],
   };
 
   // 成功ケースのテスト
@@ -50,5 +47,6 @@ Deno.test('test_validation_result_structure', () => {
   assertEquals(typeof errorResult.errorMessage, 'string', 'errorMessage should be a string');
   assertEquals(typeof errorResult.errorCode, 'string', 'errorCode should be a string');
   assertEquals(typeof errorResult.errorCategory, 'string', 'errorCategory should be a string');
-  assertEquals(typeof errorResult.errorDetails, 'object', 'errorDetails should be an object');
+  assertEquals(typeof errorResult.errors, 'object', 'errors should be an object');
+  assertEquals(Array.isArray(errorResult.errors), true, 'errors should be an array');
 });

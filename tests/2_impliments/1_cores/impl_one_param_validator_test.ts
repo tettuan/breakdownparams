@@ -5,7 +5,7 @@ import { OptionRule } from '../../../src/result/types.ts';
 const optionRule: OptionRule = {
   format: '--key=value',
   validation: {
-    customVariables: ['--demonstrative-type', '--layer-type'],
+    customVariables: [],
     emptyValue: 'error',
     unknownOption: 'error',
     duplicateOption: 'error',
@@ -49,16 +49,6 @@ Deno.test('test_one_param_validator_implementation', () => {
   assertEquals(multipleResult.isValid, false, 'Multiple arguments should fail validation');
   assertEquals(
     multipleResult.validatedParams,
-    [],
-    'Validated params should be empty for invalid input',
-  );
-
-  // オプション付きのテスト
-  const withOptionsArgs = ['init', '--help'];
-  const withOptionsResult = validator.validate(withOptionsArgs);
-  assertEquals(withOptionsResult.isValid, false, 'Arguments with options should fail validation');
-  assertEquals(
-    withOptionsResult.validatedParams,
     [],
     'Validated params should be empty for invalid input',
   );

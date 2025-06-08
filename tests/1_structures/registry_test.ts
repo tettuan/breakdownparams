@@ -1,19 +1,14 @@
 import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { DefaultOptionRegistry } from '../../src/options/registry.ts';
 import { CustomVariableOption, FlagOption, ValueOption } from '../../src/options/base.ts';
-import { OptionType } from '../../src/types/option.ts';
+import { OptionType } from '../../src/options/types.ts';
 
 Deno.test('OptionRegistry', async (t) => {
   const registry = new DefaultOptionRegistry();
 
   await t.step('should register and retrieve options', () => {
-    const option = new ValueOption(
-      'test',
-      ['t'],
-      false,
-      'Test option',
-      (_v) => ({ isValid: true, errors: [] }),
-    );
+    const validator = (_v: string) => ({ isValid: true, validatedParams: [], errors: [] });
+    const option = new ValueOption('test', ['t'], true, 'Test option', validator);
     registry.register(option);
 
     const retrieved = registry.get('test');
@@ -30,21 +25,25 @@ Deno.test('OptionRegistry', async (t) => {
 
   await t.step('should get all registered options', () => {
     const registry = new DefaultOptionRegistry();
-    const option1 = new ValueOption(
-      'test1',
-      ['t1'],
-      false,
-      'Test option 1',
-      (_v) => ({ isValid: true, errors: [] }),
-    );
+    const validator = (_v: string) => ({ isValid: true, validatedParams: [], errors: [] });
+    const option1 = new ValueOption('test1', ['t1'], true, 'Test option 1', validator);
     const option2 = new FlagOption('test2', ['t2'], 'Test flag');
-    const option3 = new CustomVariableOption('uv-test3', 'Test variable', /^uv-[a-zA-Z0-9_]+$/);
+    const pattern = /^uv-[a-zA-Z0-9_]+$/;
+    const option3 = new CustomVariableOption('uv-test3', [], 'Test variable', pattern);
 
     registry.register(option1);
     registry.register(option2);
     registry.register(option3);
 
     const options = registry.getAll();
+    console.log('Registered options:', {
+      count: options.length,
+      options: options.map(o => ({
+        name: o.name,
+        type: o.type,
+        aliases: o.aliases,
+      })),
+    });
     assertEquals(options.length, 3);
     assert(options.includes(option1));
     assert(options.includes(option2));
@@ -56,7 +55,7 @@ Deno.test('OptionRegistry', async (t) => {
     registry.register(option);
 
     const retrieved = registry.get('help');
-    assertEquals(retrieved?.type, OptionType.FLAG);
+    assert(retrieved?.type === OptionType.FLAG);
     assertEquals(retrieved?.name, 'help');
     assertEquals(retrieved?.aliases, ['h']);
   });

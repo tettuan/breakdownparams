@@ -10,7 +10,7 @@ Deno.test('test_flag_option_properties', async (t) => {
 });
 
 Deno.test('test_option_type_enum', () => {
-  assertEquals(OptionType.VALUE, 0);
-  assertEquals(OptionType.FLAG, 1);
-  assertEquals(OptionType.CUSTOM_VARIABLE, 2);
+  assertEquals(OptionType.VALUE, 'value');
+  assertEquals(OptionType.FLAG, 'flag');
+  assertEquals(OptionType.CUSTOM_VARIABLE, 'custom_variable');
 });

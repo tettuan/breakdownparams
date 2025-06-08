@@ -1,4 +1,4 @@
-設計の方針を docs// 配下へまとめた。
+設計の方針を docs/architecture/ 配下へまとめた。
 src/, および tests/ に実装して。
 まずは、Architecture, Structures のみを実装し、テストを完成させて。
 

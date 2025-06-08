@@ -1,6 +1,6 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OneParamResult, OptionRule, TwoParamResult } from '../../../src/result/types.ts';
+import { OneParamResult, OptionRule, TwoParamResult, ErrorResult } from '../../../src/result/types.ts';
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -72,7 +72,7 @@ Deno.test('test_params_parser_implementation', () => {
 
   // 無効な引数のテスト
   const invalidArgs = ['invalid'];
-  const invalidResult = parser.parse(invalidArgs);
+  const invalidResult = parser.parse(invalidArgs) as ErrorResult;
   assertEquals(invalidResult.type, 'error', 'Invalid arguments should be error type');
   assertEquals(invalidResult.params, [], 'Params should be empty for invalid input');
   assertEquals(invalidResult.options, {}, 'Options should be empty for invalid input');

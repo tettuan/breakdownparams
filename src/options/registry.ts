@@ -1,43 +1,53 @@
-import { Option, OptionRegistry } from '../types/option.ts';
+import { Option } from './types.ts';
 
+/**
+ * オプションレジストリのインターフェース
+ */
+export interface OptionRegistry {
+  register(option: Option): void;
+  get(name: string): Option | undefined;
+  getAll(): Option[];
+  validateCustomVariable(name: string): boolean;
+}
+
+/**
+ * デフォルトのオプションレジストリ
+ */
 export class DefaultOptionRegistry implements OptionRegistry {
-  private options: Map<string, Option>;
-  private customVariablePattern: RegExp;
-  private uniqueOptions: Set<Option>;
+  private options: Map<string, Option> = new Map();
 
-  constructor() {
-    this.options = new Map();
-    this.customVariablePattern = /^uv-[a-zA-Z0-9_]+$/;
-    this.uniqueOptions = new Set();
-  }
-
-  private normalizeKey(key: string): string {
-    // Remove leading -- or - and normalize to lowercase
-    return key.replace(/^--?/, '').toLowerCase();
-  }
-
+  /**
+   * オプションを登録する
+   */
   public register(option: Option): void {
-    const normalizedName = this.normalizeKey(option.name);
-    this.options.set(normalizedName, option);
-    this.uniqueOptions.add(option);
-
-    // Register aliases with normalized keys
+    this.options.set(option.name, option);
     for (const alias of option.aliases) {
-      const normalizedAlias = this.normalizeKey(alias);
-      this.options.set(normalizedAlias, option);
+      this.options.set(alias, option);
     }
   }
 
+  /**
+   * オプションを取得する
+   */
   public get(name: string): Option | undefined {
-    const normalizedName = this.normalizeKey(name);
-    return this.options.get(normalizedName);
+    return this.options.get(name);
   }
 
-  public validateCustomVariable(name: string): boolean {
-    return this.customVariablePattern.test(name);
-  }
-
+  /**
+   * 全てのオプションを取得する
+   */
   public getAll(): Option[] {
-    return Array.from(this.uniqueOptions);
+    const uniqueOptions = new Set<Option>();
+    for (const option of this.options.values()) {
+      uniqueOptions.add(option);
+    }
+    return Array.from(uniqueOptions);
+  }
+
+  /**
+   * カスタム変数名を検証する
+   */
+  public validateCustomVariable(name: string): boolean {
+    return /^uv-[a-zA-Z0-9_]+$/.test(name);
   }
 }

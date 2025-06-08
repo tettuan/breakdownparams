@@ -1,72 +1,118 @@
-import { Option, OptionType, ValidationResult } from '../types/option.ts';
+import { Option, OptionType } from './types.ts';
+import { ValidationResult } from '../result/types.ts';
 
+/**
+ * 値を持つオプション
+ */
 export class ValueOption implements Option {
-  readonly type = OptionType.VALUE;
+  public readonly type = OptionType.VALUE;
+  public readonly name: string;
+  public readonly aliases: string[];
+  public readonly isRequired: boolean;
+  public readonly description: string;
+  private readonly validator: (value: string) => ValidationResult;
 
   constructor(
-    readonly name: string,
-    readonly aliases: string[],
-    readonly isRequired: boolean,
-    readonly description: string,
-    private validator: (value: string) => ValidationResult,
-  ) {}
-
-  validate(_value: string | undefined): ValidationResult {
-    if (this.isRequired && _value === undefined) {
-      return { isValid: false, errors: [`${this.name} is required`] };
-    }
-    if (_value !== undefined) {
-      return this.validator(_value);
-    }
-    return { isValid: true, errors: [] };
+    name: string,
+    aliases: string[],
+    isRequired: boolean,
+    description: string,
+    validator: (value: string) => ValidationResult,
+  ) {
+    this.name = name;
+    this.aliases = aliases;
+    this.isRequired = isRequired;
+    this.description = description;
+    this.validator = validator;
   }
 
-  parse(value: string | undefined): string | undefined {
+  public validate(value: string): ValidationResult {
+    if (this.isRequired && !value) {
+      return {
+        isValid: false,
+        validatedParams: [],
+        errorMessage: `${this.name} is required`,
+        errorCode: 'REQUIRED_OPTION',
+        errorCategory: 'validation',
+        errors: [`${this.name} is required`],
+      };
+    }
+
+    if (!value) {
+      return {
+        isValid: true,
+        validatedParams: [],
+      };
+    }
+
+    return this.validator(value);
+  }
+
+  public parse(value: string): unknown {
     return value;
   }
 }
 
+/**
+ * フラグオプション
+ */
 export class FlagOption implements Option {
-  readonly type = OptionType.FLAG;
-  readonly isRequired = false;
+  public readonly type = OptionType.FLAG;
+  public readonly isRequired = false;
 
   constructor(
-    readonly name: string,
-    readonly aliases: string[],
-    readonly description: string,
+    public readonly name: string,
+    public readonly aliases: string[],
+    public readonly description: string,
   ) {}
 
-  validate(_value: string | undefined): ValidationResult {
-    return { isValid: true, errors: [] };
+  public validate(_value: string): ValidationResult {
+    return {
+      isValid: true,
+      validatedParams: [],
+      errors: [],
+    };
   }
 
-  parse(value: string | undefined): boolean {
-    return value === 'true';
+  public parse(_value: string): boolean {
+    return true;
   }
 }
 
+/**
+ * カスタム変数オプション
+ */
 export class CustomVariableOption implements Option {
-  readonly type = OptionType.CUSTOM_VARIABLE;
-  readonly isRequired = false;
-  readonly aliases: string[] = [];
+  public readonly type = OptionType.CUSTOM_VARIABLE;
+  public readonly isRequired = false;
 
   constructor(
-    readonly name: string,
-    readonly description: string,
-    private pattern: RegExp,
+    public readonly name: string,
+    public readonly aliases: string[],
+    public readonly description: string,
+    private readonly pattern: RegExp,
   ) {}
 
-  validate(_value: string | undefined): ValidationResult {
-    if (!this.pattern.test(this.name)) {
+  public validate(value: string): ValidationResult {
+    if (!this.pattern.test(value)) {
       return {
         isValid: false,
-        errors: [`Invalid custom variable name: ${this.name}`],
+        validatedParams: [],
+        errorMessage: `Invalid custom variable name: ${value}`,
+        errorCode: 'INVALID_CUSTOM_VARIABLE',
+        errorCategory: 'validation',
+        errors: [`Invalid custom variable name: ${value}`],
       };
     }
-    return { isValid: true, errors: [] };
+
+    return {
+      isValid: true,
+      validatedParams: [value],
+      errors: [],
+    };
   }
 
-  parse(value: string | undefined): string | undefined {
+  public parse(value: string): string {
     return value;
   }
 }
