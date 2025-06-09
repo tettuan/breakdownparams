@@ -26,13 +26,12 @@ export class UserVariableOption extends BaseOption {
     // Initialize base option - user variables always use their full name with prefix
     super(rawInput || name, name, undefined);
     this.validator = new UserVariableOptionValidator();
-    
+
     // Extract value from raw input if provided
     if (rawInput) {
       this.value = this.extractValue(rawInput);
     }
   }
-
 
   /**
    * Get the value for this user variable

@@ -7,4 +7,4 @@ export const LOG_CONFIG = {
    * 環境変数から設定を読み込む
    */
   debug: Deno.env.get('loglevel_debug') === 'true',
-} as const; 
+} as const;

@@ -1,10 +1,5 @@
-import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
-import {
-  OneParamsResult,
-  ParamsResult,
-  TwoParamsResult,
-  ZeroParamsResult,
-} from '../types/params_result.ts';
+import { assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { ParamsResult } from '../types/params_result.ts';
 
 // 1. インターフェースの基本設計テスト
 Deno.test('test_params_result_interface', () => {

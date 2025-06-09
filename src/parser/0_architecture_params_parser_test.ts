@@ -42,4 +42,4 @@ Deno.test('test_params_parser_architecture', () => {
   assertEquals(typeof errorResult.error?.message, 'string', 'Error should have a message');
   assertEquals(typeof errorResult.error?.code, 'string', 'Error should have a code');
   assertEquals(typeof errorResult.error?.category, 'string', 'Error should have a category');
-}); 
+});

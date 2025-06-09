@@ -82,15 +82,18 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     const zeroShortResult = OptionCombinationValidator.validate(['-h', '-v'], 'zero');
     console.log('Zero short result:', zeroShortResult);
     // 短縮形は認識されないが、エラーになるかvalidになるか確認
-    
+
     // OneParam with short options
     const oneShortResult = OptionCombinationValidator.validate(['-c=test'], 'one');
     console.log('One short result:', oneShortResult);
-    
+
     // TwoParams with short options
-    const twoShortResult = OptionCombinationValidator.validate(['-f=input.md', '-o=output.md'], 'two');
+    const twoShortResult = OptionCombinationValidator.validate(
+      ['-f=input.md', '-o=output.md'],
+      'two',
+    );
     console.log('Two short result:', twoShortResult);
-    
+
     // 現在の実装では短縮形オプションは認識されない
     // OptionCombinationValidatorはオプション辞書を受け取るので、
     // 上流でパースされていない短縮形は到達しない可能性がある
@@ -106,9 +109,9 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     const validator = new OptionCombinationValidator(rule);
 
     // カスタム変数は特別扱いされるべき
-    const customVarResult = validator.validate({ 
+    const customVarResult = validator.validate({
       'uv-project': 'myproject',
-      'uv-version': '1.0.0' 
+      'uv-version': '1.0.0',
     });
     console.log('Custom variable result:', customVarResult);
     // 現在はuv-*が許可リストにないためエラーになる
@@ -117,9 +120,9 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     assert(customVarResult.errorCode === 'INVALID_OPTION');
 
     // 標準オプションとカスタム変数の混在
-    const mixedResult = validator.validate({ 
+    const mixedResult = validator.validate({
       from: 'input.md',
-      'uv-project': 'myproject' 
+      'uv-project': 'myproject',
     });
     console.log('Mixed options result:', mixedResult);
     assert(!mixedResult.isValid);

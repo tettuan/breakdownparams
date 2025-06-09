@@ -41,7 +41,7 @@ Deno.test('CommandLineOptionFactory Structure', async (t) => {
     assertThrows(
       () => factory.createOptionsFromArgs(['--input']),
       Error,
-      'Option --input requires a value'
+      'Option --input requires a value',
     );
   });
 });

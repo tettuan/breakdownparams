@@ -1,9 +1,16 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, TwoParamsResult } from '../src/mod.ts';
+import type { TwoParamsResult, ZeroParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
-  ['to', 'issue', '--from=input.md', '--destination=output.md', '--input=project', '--adaptation=strict'],
+  [
+    'to',
+    'issue',
+    '--from=input.md',
+    '--destination=output.md',
+    '--input=project',
+    '--adaptation=strict',
+  ],
   ['to', 'issue', '-f=input.md', '-o=output.md', '-i=project', '-a=strict'],
   ['to', 'issue', '--from=input.md', '-o=output.md', '--input=project', '-a=strict'],
   ['summary', 'task', '--adaptation=strict'],
@@ -12,7 +19,7 @@ const testArgs = [
 // Run tests for each argument set
 for (const args of testArgs) {
   console.log(`\n=== Testing: ${args.join(' ')} ===`);
-  
+
   const parser = new ParamsParser();
   const result = parser.parse(args);
 
@@ -25,7 +32,7 @@ for (const args of testArgs) {
   if (result.type === 'zero') {
     const zeroResult = result as ZeroParamsResult;
     const options = zeroResult.options as { help?: boolean };
-    
+
     if (options.help) {
       console.log(`
 Usage: options_usage <command> <layer> [options]

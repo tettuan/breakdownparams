@@ -98,6 +98,10 @@ export class CommandLineOptionFactory implements OptionFactory {
     // Create option based on its type
     switch (optionConfig.type) {
       case 'flag':
+        // Flag options should not have values
+        if (value !== undefined) {
+          throw new Error(`Flag option ${name} should not have a value`);
+        }
         return new FlagOption(
           `--${optionConfig.longname}`,
           [`-${optionConfig.shortname}`],

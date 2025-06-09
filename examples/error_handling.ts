@@ -3,18 +3,18 @@ import type { ParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing error cases
 const testArgs = [
-  ['unknown'],                        // Invalid command
-  ['to', 'issue', 'extra'],          // Too many arguments
-  ['invalid', 'issue'],              // Invalid demonstrative type
-  ['to', 'invalid'],                 // Invalid layer type
+  ['unknown'], // Invalid command
+  ['to', 'issue', 'extra'], // Too many arguments
+  ['invalid', 'issue'], // Invalid demonstrative type
+  ['to', 'invalid'], // Invalid layer type
   ['to', 'project', '--unknown=value'], // Unknown option
-  ['--help'],                        // Help
+  ['--help'], // Help
 ];
 
 // Run tests for each argument set
 for (const args of testArgs) {
   console.log(`\n=== Testing: ${args.join(' ')} ===`);
-  
+
   const parser = new ParamsParser();
   const result = parser.parse(args) as ParamsResult;
 

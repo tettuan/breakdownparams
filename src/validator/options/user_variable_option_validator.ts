@@ -74,7 +74,9 @@ export class UserVariableOptionValidator {
     const cleanVariableName = variableName.replace('--uv-', '');
 
     // 3. Validation: Variable name rules
-    if (!cleanVariableName || !UserVariableOptionValidator.DEFAULT_PATTERN.test(cleanVariableName)) {
+    if (
+      !cleanVariableName || !UserVariableOptionValidator.DEFAULT_PATTERN.test(cleanVariableName)
+    ) {
       return {
         isValid: false,
         validatedParams: [],

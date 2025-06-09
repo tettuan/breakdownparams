@@ -1,24 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
-import { OptionRule } from "../../../src/types/option_rule.ts";
-
-const optionRule: OptionRule = {
-  format: '--key=value',
-  rules: {
-    customVariables: ['--demonstrative-type', '--layer-type'],
-    requiredOptions: [],
-    valueTypes: ['string'],
-  },
-  errorHandling: {
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
-  },
-  flagOptions: {
-    help: true,
-    version: true,
-  },
-};
 
 Deno.test('test_security_error_validator_implementation', () => {
   const validator = new SecurityValidator();
@@ -35,10 +16,10 @@ Deno.test('test_security_error_validator_implementation', () => {
 
   // 危険な文字を含むパラメータのテスト（基本的なセキュリティチェック）
   const dangerousArgs = [
-    'test;rm -rf /',      // コマンド実行
+    'test;rm -rf /', // コマンド実行
     'test|cat /etc/passwd', // パイプ
-    'test>malicious.txt',   // リダイレクト
-    'test../etc/passwd',    // パストラバーサル
+    'test>malicious.txt', // リダイレクト
+    'test../etc/passwd', // パストラバーサル
   ];
 
   dangerousArgs.forEach((arg) => {
@@ -63,5 +44,9 @@ Deno.test('test_security_error_validator_implementation', () => {
     false,
     'Parameters with any dangerous character should fail validation',
   );
-  assertEquals(mixedResult.validatedParams, mixedArgs, 'Validated params should contain all mixed input for tracking');
+  assertEquals(
+    mixedResult.validatedParams,
+    mixedArgs,
+    'Validated params should contain all mixed input for tracking',
+  );
 });

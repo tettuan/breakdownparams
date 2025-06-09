@@ -1,24 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OneParamValidator } from "../../../src/validator/params/one_param_validator.ts";
-import { OptionRule } from "../../../src/types/option_rule.ts";
-
-const optionRule: OptionRule = {
-  format: '--key=value',
-  rules: {
-    customVariables: [],
-    requiredOptions: [],
-    valueTypes: ['string'],
-  },
-  errorHandling: {
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
-  },
-  flagOptions: {
-    help: true,
-    version: true,
-  },
-};
+import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
 
 Deno.test('test_one_param_validator_implementation', () => {
   const validator = new OneParamValidator();
@@ -43,7 +24,11 @@ Deno.test('test_one_param_validator_implementation', () => {
   const emptyArgs: string[] = [];
   const emptyResult = validator.validate(emptyArgs);
   assertEquals(emptyResult.isValid, false, 'Empty arguments should fail validation');
-  assertEquals(emptyResult.validatedParams, emptyArgs, 'Validated params should contain the empty input for tracking');
+  assertEquals(
+    emptyResult.validatedParams,
+    emptyArgs,
+    'Validated params should contain the empty input for tracking',
+  );
 
   // 複数の引数のテスト
   const multipleArgs = ['init', 'to'];

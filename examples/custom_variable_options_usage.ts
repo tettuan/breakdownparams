@@ -1,18 +1,25 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, TwoParamsResult } from '../src/mod.ts';
+import type { TwoParamsResult, ZeroParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
   ['to', 'project', '--uv-project=myproject'],
   ['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0', '--uv-environment=production'],
-  ['to', 'project', '--from=input.txt', '--destination=output.txt', '--uv-project=myproject', '--uv-version=1.0.0'],
+  [
+    'to',
+    'project',
+    '--from=input.txt',
+    '--destination=output.txt',
+    '--uv-project=myproject',
+    '--uv-version=1.0.0',
+  ],
   ['summary', 'issue', '--uv-name=value', '--uv-type=test'],
 ];
 
 // Run tests for each argument set
 for (const args of testArgs) {
   console.log(`\n=== Testing: ${args.join(' ')} ===`);
-  
+
   const parser = new ParamsParser();
   const result = parser.parse(args);
 
@@ -25,7 +32,7 @@ for (const args of testArgs) {
   if (result.type === 'zero') {
     const zeroResult = result as ZeroParamsResult;
     const options = zeroResult.options as { help?: boolean };
-    
+
     if (options.help) {
       console.log(`
 Usage: custom_variable_options_usage <command> <layer> [options]

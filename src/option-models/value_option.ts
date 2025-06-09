@@ -1,6 +1,6 @@
 import { OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
-import { validateOptionFormat, validateOptionName } from './format_utils.ts';
+import { validateOptionName } from './format_utils.ts';
 import { BaseOption } from './base_option.ts';
 
 export class ValueOption extends BaseOption {
@@ -19,12 +19,12 @@ export class ValueOption extends BaseOption {
   ) {
     // Initialize base option with long and short names
     super(rawInput || name, longname || name, shortname);
-    
+
     // Extract value from raw input if provided
     if (rawInput) {
       this.value = this.extractValue(rawInput);
     }
-    
+
     // Validate option name (remove -- prefix if present)
     const cleanName = name.startsWith('--') ? name.slice(2) : name;
     const nameValidation = validateOptionName(cleanName);
@@ -50,15 +50,8 @@ export class ValueOption extends BaseOption {
   }
 
   validate(value: unknown): ValidationResult {
-    // Validate option format
-    const formatValidation = validateOptionFormat(this.name);
-    if (!formatValidation.isValid) {
-      return {
-        isValid: false,
-        validatedParams: [],
-        errorMessage: formatValidation.error,
-      };
-    }
+    // For value validation, we don't need to validate option format of name
+    // The option name format is validated in constructor
 
     // Handle undefined value for optional options
     if (value === undefined) {

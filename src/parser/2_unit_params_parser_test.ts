@@ -1,7 +1,7 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from './params_parser.ts';
 import { OptionRule } from '../types/option_rule.ts';
-import { OneParamsResult, TwoParamsResult, ErrorResult } from '../types/params_result.ts';
+import { ErrorResult, OneParamsResult, TwoParamsResult } from '../types/params_result.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
@@ -104,7 +104,11 @@ Deno.test('test_params_parser_unit', () => {
   logger.debug('Short version result:', shortVersionResult);
   // Currently fails with "Expected zero parameters"
   if (shortVersionResult.type === 'error') {
-    assertEquals(shortVersionResult.error?.code, 'INVALID_PARAMS', 'Short -v currently not supported');
+    assertEquals(
+      shortVersionResult.error?.code,
+      'INVALID_PARAMS',
+      'Short -v currently not supported',
+    );
   }
 
   // Test short form options - OneParam
@@ -114,7 +118,11 @@ Deno.test('test_params_parser_unit', () => {
   logger.debug('OneParam short result:', oneParamShortResult);
   // Currently fails with "Expected zero parameters"
   if (oneParamShortResult.type === 'error') {
-    assertEquals(oneParamShortResult.error?.code, 'INVALID_PARAMS', 'Short options currently not supported');
+    assertEquals(
+      oneParamShortResult.error?.code,
+      'INVALID_PARAMS',
+      'Short options currently not supported',
+    );
   }
 
   // Test short form options - TwoParams
@@ -124,7 +132,11 @@ Deno.test('test_params_parser_unit', () => {
   logger.debug('TwoParam short result:', twoParamShortResult);
   // Currently fails with "Expected zero parameters"
   if (twoParamShortResult.type === 'error') {
-    assertEquals(twoParamShortResult.error?.code, 'INVALID_PARAMS', 'Short options currently not supported');
+    assertEquals(
+      twoParamShortResult.error?.code,
+      'INVALID_PARAMS',
+      'Short options currently not supported',
+    );
   }
 
   // Test mixed long and short form options
@@ -133,7 +145,11 @@ Deno.test('test_params_parser_unit', () => {
   logger.debug('Mixed options result:', mixedResult);
   // Currently fails with "Expected zero parameters"
   if (mixedResult.type === 'error') {
-    assertEquals(mixedResult.error?.code, 'INVALID_PARAMS', 'Mixed short/long options not supported');
+    assertEquals(
+      mixedResult.error?.code,
+      'INVALID_PARAMS',
+      'Mixed short/long options not supported',
+    );
   }
 
   // Test custom variable options
@@ -143,6 +159,10 @@ Deno.test('test_params_parser_unit', () => {
   logger.debug('Custom variable result:', customVarResult);
   // Currently fails with "Option 'uv-project' is not allowed"
   if (customVarResult.type === 'error') {
-    assertEquals(customVarResult.error?.code, 'INVALID_OPTION', 'Custom variables currently not supported');
+    assertEquals(
+      customVarResult.error?.code,
+      'INVALID_OPTION',
+      'Custom variables currently not supported',
+    );
   }
-}); 
+});

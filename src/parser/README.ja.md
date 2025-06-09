@@ -64,16 +64,16 @@ class ParamsParser {
   public parse(args: string[]): ParamsResult {
     // 1. OptionFactoryでOptionインスタンスを生成
     const options = this.optionFactory.createOptions(args);
-    
+
     // 2. Optionインスタンスから正規化された値を取得
     const normalizedArgs = this.extractNormalizedArgs(options);
-    
+
     // 3. パラメータ検証
-    const results = this.validators.map(v => v.validate(normalizedArgs));
-    
+    const results = this.validators.map((v) => v.validate(normalizedArgs));
+
     // 4. オプション検証（Optionインスタンスから直接）
     const optionResults = this.validateOptions(options);
-    
+
     return this.determineResult(results, optionResults);
   }
 }
@@ -107,4 +107,4 @@ class ParamsParser {
 
 - このパーサーは型安全性を重視して設計されています
 - エラー情報は型安全な方法で提供されます
-- パラメータの型は一貫性を保ちます 
+- パラメータの型は一貫性を保ちます

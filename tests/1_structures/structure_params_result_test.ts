@@ -1,5 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OneParamsResult, ParamsResult, TwoParamsResult } from "../../src/types/params_result.ts";
+import { OneParamsResult, ParamsResult, TwoParamsResult } from '../../src/types/params_result.ts';
 
 Deno.test('test_params_result_structure', () => {
   // 基本構造のテスト

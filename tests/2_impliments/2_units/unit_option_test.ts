@@ -1,7 +1,7 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OptionRule } from "../../../src/types/option_rule.ts";
+import { OptionRule } from '../../../src/types/option_rule.ts';
 import { FlagOption } from '../../../src/option-models/flag_option.ts';
-import { OptionType } from "../../../src/types/option_type.ts";
+import { OptionType } from '../../../src/types/option_type.ts';
 
 Deno.test('test_option_rule', () => {
   // オプションルールのテスト
@@ -29,7 +29,11 @@ Deno.test('test_option_rule', () => {
     true,
     'customVariables should be an array',
   );
-  assertEquals(typeof optionRule.errorHandling.emptyValue, 'string', 'emptyValue should be a string');
+  assertEquals(
+    typeof optionRule.errorHandling.emptyValue,
+    'string',
+    'emptyValue should be a string',
+  );
   assertEquals(
     typeof optionRule.errorHandling.unknownOption,
     'string',

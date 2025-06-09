@@ -18,6 +18,7 @@
 ### 正規化ルールの統一
 
 すべてのオプションは以下の正規化ルールに従います：
+
 - 先頭のハイフンを除去した形式を正規名とする
 - エイリアスは主要名に解決される
 - 例：
@@ -70,22 +71,22 @@
 ```typescript
 interface Option {
   // 基本プロパティ
-  readonly rawInput: string;        // 元の入力
-  readonly canonicalName: string;   // 正規化名（ハイフン除去）
-  readonly longForm: string;        // ロングフォーム
-  readonly shortForm?: string;      // ショートフォーム
-  
+  readonly rawInput: string; // 元の入力
+  readonly canonicalName: string; // 正規化名（ハイフン除去）
+  readonly longForm: string; // ロングフォーム
+  readonly shortForm?: string; // ショートフォーム
+
   // 判定メソッド
   isShorthand(): boolean;
   isLongForm(): boolean;
   isCustomVariable(): boolean;
   matchesInput(input: string): boolean;
-  
+
   // 変換メソッド
   toNormalized(): string;
   toLong(): string;
   toShort(): string | undefined;
-  
+
   // バリデーション
   validate(): ValidationResult;
   getValue(): string | boolean;
@@ -134,12 +135,12 @@ class ValueOption implements Option {
   constructor(
     input: string,
     aliases: string[] = [],
-    private validator?: (value: string) => ValidationResult
+    private validator?: (value: string) => ValidationResult,
   ) {
     this.rawInput = input;
     this.longForm = input.startsWith('--') ? input : `--${input}`;
-    this.shortForm = aliases.find(a => a.startsWith('-') && !a.startsWith('--'));
-    
+    this.shortForm = aliases.find((a) => a.startsWith('-') && !a.startsWith('--'));
+
     // 正規化：先頭のハイフンを除去
     this.canonicalName = input.replace(/^-+/, '');
   }
@@ -173,11 +174,11 @@ class CustomVariableOption implements Option {
   constructor(input: string) {
     this.rawInput = input;
     this.longForm = input;
-    
+
     // --uv-nameから変数名を抽出
     const match = input.match(/^--uv-(.+)/);
     this.variableName = match ? match[1] : '';
-    
+
     // 正規化：--uv-config → uv-config
     this.canonicalName = `uv-${this.variableName}`;
   }
@@ -187,7 +188,7 @@ class CustomVariableOption implements Option {
     if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(this.variableName)) {
       return {
         isValid: false,
-        errors: [`Invalid user variable name: ${this.variableName}`]
+        errors: [`Invalid user variable name: ${this.variableName}`],
       };
     }
     return { isValid: true, validatedParams: [] };

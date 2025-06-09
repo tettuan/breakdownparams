@@ -1,4 +1,4 @@
-import { assertEquals, assert } from 'jsr:@std/assert@^0.218.2';
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { FlagOption } from '../../src/option-models/flag_option.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
@@ -153,4 +153,4 @@ Deno.test('test_option_model_integration_design', async (t) => {
     assert(valueResult.isValid);
     assert(customResult.isValid);
   });
-}); 
+});

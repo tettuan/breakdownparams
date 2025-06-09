@@ -14,4 +14,4 @@ export function debug(tag: string, message: string, data?: unknown): void {
       console.debug(`[${tag}] ${message}`);
     }
   }
-} 
+}

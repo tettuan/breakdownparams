@@ -1,7 +1,7 @@
 import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/mod.ts';
-import { OptionRule } from "../../../src/types/option_rule.ts";
-import { TwoParamsResult } from "../../../src/types/params_result.ts";
+import { OptionRule } from '../../../src/types/option_rule.ts';
+import { TwoParamsResult } from '../../../src/types/params_result.ts';
 
 Deno.test('test_examples_execution', async (t) => {
   await t.step('basic_usage example', () => {
@@ -24,7 +24,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--input=issue',
       '--adaptation=strict',
       '--uv-project=myproject',
-      '--uv-version=1.0.0'
+      '--uv-version=1.0.0',
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
@@ -49,7 +49,7 @@ Deno.test('test_examples_execution', async (t) => {
           '--input',
           '--adaptation',
           '--uv-project',
-          '--uv-version'
+          '--uv-version',
         ],
         requiredOptions: [],
         valueTypes: ['string'],
@@ -75,7 +75,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--input=issue',
       '--adaptation=strict',
       '--uv-project=myproject',
-      '--uv-version=1.0.0'
+      '--uv-version=1.0.0',
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
@@ -101,7 +101,7 @@ Deno.test('test_examples_execution', async (t) => {
           '--adaptation',
           '--uv-project',
           '--uv-version',
-          '--uv-environment'
+          '--uv-environment',
         ],
         requiredOptions: [],
         valueTypes: ['string'],
@@ -127,7 +127,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--adaptation=strict',
       '--uv-project=myproject',
       '--uv-version=1.0.0',
-      '--uv-environment=production'
+      '--uv-environment=production',
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
@@ -152,7 +152,7 @@ Deno.test('test_examples_execution', async (t) => {
           '--input',
           '--adaptation',
           '--uv-project',
-          '--uv-version'
+          '--uv-version',
         ],
         requiredOptions: [],
         valueTypes: ['string'],
@@ -188,7 +188,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--input=issue',
       '--adaptation=strict',
       '--uv-project=myproject',
-      '--uv-version=1.0.0'
+      '--uv-version=1.0.0',
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
@@ -212,7 +212,7 @@ Deno.test('test_examples_execution', async (t) => {
           '--input',
           '--adaptation',
           '--uv-project',
-          '--uv-version'
+          '--uv-version',
         ],
         requiredOptions: [],
         valueTypes: ['string'],
@@ -237,7 +237,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--input=project',
       '--adaptation=strict',
       '--uv-project=myproject',
-      '--uv-version=1.0.0'
+      '--uv-version=1.0.0',
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
@@ -250,4 +250,4 @@ Deno.test('test_examples_execution', async (t) => {
     assertExists(result.options['uv-project']);
     assertExists(result.options['uv-version']);
   });
-}); 
+});

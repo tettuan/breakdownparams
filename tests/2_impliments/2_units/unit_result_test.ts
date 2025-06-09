@@ -1,13 +1,13 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import {
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+import type {
   ErrorInfo,
   OneParamsResult,
-  OptionRule,
   ParamsResult,
   TwoParamsResult,
-  ValidationResult,
   ZeroParamsResult,
-} from "../../src/types/option_rule.ts";
+} from '../../../src/types/params_result.ts';
+import type { ValidationResult } from '../../../src/types/validation_result.ts';
 
 Deno.test('test_result_unit', () => {
   // ParamsResultのテスト
@@ -89,43 +89,49 @@ Deno.test('test_result_unit', () => {
   // OptionRuleのテスト
   const optionRule: OptionRule = {
     format: '--key=value',
-    validation: {
+    flagOptions: {
+      help: true,
+      version: true,
+    },
+    rules: {
       customVariables: ['--demonstrative-type', '--layer-type'],
-      emptyValue: 'error',
-      unknownOption: 'error',
-      duplicateOption: 'error',
       requiredOptions: [],
       valueTypes: ['string'],
     },
-    flagOptions: {
-      help: 'help',
-      version: 'version',
+    errorHandling: {
+      emptyValue: 'error',
+      unknownOption: 'error',
+      duplicateOption: 'error',
     },
   };
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
   assertEquals(
-    Array.isArray(optionRule.validation.customVariables),
+    Array.isArray(optionRule.rules.customVariables),
     true,
     'customVariables should be an array',
   );
-  assertEquals(typeof optionRule.validation.emptyValue, 'string', 'emptyValue should be a string');
   assertEquals(
-    typeof optionRule.validation.unknownOption,
+    typeof optionRule.errorHandling.emptyValue,
+    'string',
+    'emptyValue should be a string',
+  );
+  assertEquals(
+    typeof optionRule.errorHandling.unknownOption,
     'string',
     'unknownOption should be a string',
   );
   assertEquals(
-    typeof optionRule.validation.duplicateOption,
+    typeof optionRule.errorHandling.duplicateOption,
     'string',
     'duplicateOption should be a string',
   );
   assertEquals(
-    Array.isArray(optionRule.validation.requiredOptions),
+    Array.isArray(optionRule.rules.requiredOptions),
     true,
     'requiredOptions should be an array',
   );
   assertEquals(
-    Array.isArray(optionRule.validation.valueTypes),
+    Array.isArray(optionRule.rules.valueTypes),
     true,
     'valueTypes should be an array',
   );
@@ -140,65 +146,71 @@ Deno.test('test_validation_result', () => {
   };
   assertEquals(successResult.isValid, true, 'Success result should be valid');
   assertEquals(successResult.validatedParams, ['test'], 'Validated params should match');
-  assertEquals(successResult.error, undefined, 'Error should be undefined');
+  assertEquals(successResult.errorMessage, undefined, 'Error message should be undefined');
+  assertEquals(successResult.errorCode, undefined, 'Error code should be undefined');
+  assertEquals(successResult.errorCategory, undefined, 'Error category should be undefined');
 
   // エラー結果のテスト
   const errorResult: ValidationResult = {
     isValid: false,
     validatedParams: [],
-    error: {
-      message: 'Test error',
-      code: 'TEST_ERROR',
-      category: 'test_category',
-    },
+    errorMessage: 'Test error',
+    errorCode: 'TEST_ERROR',
+    errorCategory: 'test_category',
   };
   assertEquals(errorResult.isValid, false, 'Error result should be invalid');
   assertEquals(errorResult.validatedParams, [], 'Validated params should be empty');
-  assertEquals(errorResult.error?.message, 'Test error', 'Error message should match');
-  assertEquals(errorResult.error?.code, 'TEST_ERROR', 'Error code should match');
-  assertEquals(errorResult.error?.category, 'test_category', 'Error category should match');
+  assertEquals(errorResult.errorMessage, 'Test error', 'Error message should match');
+  assertEquals(errorResult.errorCode, 'TEST_ERROR', 'Error code should match');
+  assertEquals(errorResult.errorCategory, 'test_category', 'Error category should match');
 
   // オプションルールのテスト
   const optionRule: OptionRule = {
     format: '--key=value',
-    validation: {
+    flagOptions: {
+      help: true,
+      version: true,
+    },
+    rules: {
       customVariables: ['--demonstrative-type', '--layer-type'],
-      emptyValue: 'error',
-      unknownOption: 'error',
-      duplicateOption: 'error',
       requiredOptions: [],
       valueTypes: ['string'],
     },
-    flagOptions: {
-      help: 'help',
-      version: 'version',
+    errorHandling: {
+      emptyValue: 'error',
+      unknownOption: 'error',
+      duplicateOption: 'error',
     },
   };
 
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
   assertEquals(
-    Array.isArray(optionRule.validation.customVariables),
+    Array.isArray(optionRule.rules.customVariables),
     true,
     'customVariables should be an array',
   );
-  assertEquals(typeof optionRule.validation.emptyValue, 'string', 'emptyValue should be a string');
   assertEquals(
-    typeof optionRule.validation.unknownOption,
+    typeof optionRule.errorHandling.emptyValue,
+    'string',
+    'emptyValue should be a string',
+  );
+  assertEquals(
+    typeof optionRule.errorHandling.unknownOption,
     'string',
     'unknownOption should be a string',
   );
   assertEquals(
-    typeof optionRule.validation.duplicateOption,
+    typeof optionRule.errorHandling.duplicateOption,
     'string',
     'duplicateOption should be a string',
   );
   assertEquals(
-    Array.isArray(optionRule.validation.requiredOptions),
+    Array.isArray(optionRule.rules.requiredOptions),
     true,
     'requiredOptions should be an array',
   );
   assertEquals(
-    Array.isArray(optionRule.validation.valueTypes),
+    Array.isArray(optionRule.rules.valueTypes),
     true,
     'valueTypes should be an array',
   );

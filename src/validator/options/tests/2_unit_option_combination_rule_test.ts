@@ -47,7 +47,7 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
 
   await t.step('should maintain rule consistency', () => {
     const twoRules = DEFAULT_OPTION_COMBINATION_RULES.two;
-    
+
     // two rules には必須オプションがないことを確認
     assert(!twoRules.requiredOptions);
 

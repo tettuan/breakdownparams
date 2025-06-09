@@ -1,20 +1,23 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OneParamsResult, OptionRule, TwoParamsResult } from "../../src/types/option_rule.ts";
+import { OptionRule } from '../../../src/types/option_rule.ts';
+import { OneParamsResult, TwoParamsResult } from '../../../src/types/params_result.ts';
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  flagOptions: {
+    'help': true,
+    'version': true,
+  },
+  rules: {
     customVariables: ['--uv-*'],
+    requiredOptions: [],
+    valueTypes: ['string'],
+  },
+  errorHandling: {
     emptyValue: 'error',
     unknownOption: 'error',
     duplicateOption: 'error',
-    requiredOptions: [],
-    valueTypes: [],
-  },
-  flagOptions: {
-    'help': 'help',
-    'version': 'version',
   },
 };
 
@@ -25,13 +28,13 @@ Deno.test('test_params_parser_e2e', () => {
   const helpResult = parser.parse(['--help']);
   assertEquals(helpResult.type, 'zero', 'Help command should return zero params result');
   assertEquals(helpResult.params, [], 'Help command should be empty params');
-  assertEquals(helpResult.options.help, undefined, 'Help option should be present');
+  assertEquals(helpResult.options.help, true, 'Help option should be true');
 
   // バージョンコマンドのテスト
   const versionResult = parser.parse(['--version']);
   assertEquals(versionResult.type, 'zero', 'Version command should return zero params result');
   assertEquals(versionResult.params, [], 'Version command should be empty params');
-  assertEquals(versionResult.options.version, undefined, 'Version option should be present');
+  assertEquals(versionResult.options.version, true, 'Version option should be true');
 
   // initコマンドのテスト
   const initResult = parser.parse(['init']) as OneParamsResult;
@@ -60,11 +63,11 @@ Deno.test('test_params_parser_e2e', () => {
     'error',
     'Command with invalid options should return error result',
   );
-  assertEquals(optionsResult.error?.code, 'VALIDATION_ERROR', 'Error should be validation error');
+  assertEquals(optionsResult.error?.code, 'INVALID_OPTIONS', 'Error should be invalid options');
   assertEquals(
     optionsResult.error?.category,
-    'invalid_format',
-    'Error category should be invalid_format',
+    'validation',
+    'Error category should be validation',
   );
 
   // エラーケースのテスト
@@ -73,8 +76,8 @@ Deno.test('test_params_parser_e2e', () => {
   assertEquals(errorResult.error?.code, 'SECURITY_ERROR', 'Error should be security error');
   assertEquals(
     errorResult.error?.category,
-    'invalid_characters',
-    'Error category should be invalid_characters',
+    'security',
+    'Error category should be security',
   );
 
   // 複合ケースのテスト
@@ -90,10 +93,10 @@ Deno.test('test_params_parser_e2e', () => {
     'error',
     'Complex command with invalid option should return error result',
   );
-  assertEquals(complexResult.error?.code, 'VALIDATION_ERROR', 'Error should be validation error');
+  assertEquals(complexResult.error?.code, 'INVALID_OPTIONS', 'Error should be invalid options');
   assertEquals(
     complexResult.error?.category,
-    'invalid_format',
-    'Error category should be invalid_format',
+    'validation',
+    'Error category should be validation',
   );
 });

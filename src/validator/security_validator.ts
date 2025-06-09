@@ -16,7 +16,7 @@ export class SecurityValidator extends BaseValidator {
    */
   public validate(args: string[]): ValidationResult {
     // シェルコマンド実行の試みやリダイレクト記号の検出
-    if (args.some(arg => /[;|&<>]/.test(arg))) {
+    if (args.some((arg) => /[;|&<>]/.test(arg))) {
       return {
         isValid: false,
         validatedParams: args,
@@ -27,7 +27,7 @@ export class SecurityValidator extends BaseValidator {
     }
 
     // パストラバーサルの試みを検出（../, ..\, 直結型も含む）
-    if (args.some(arg => /\.\.(\/|\\|[a-zA-Z0-9_\-\.])/g.test(arg))) {
+    if (args.some((arg) => /\.\.(\/|\\|[a-zA-Z0-9_\-\.])/g.test(arg))) {
       return {
         isValid: false,
         validatedParams: args,
@@ -43,4 +43,4 @@ export class SecurityValidator extends BaseValidator {
       errors: [],
     };
   }
-} 
+}

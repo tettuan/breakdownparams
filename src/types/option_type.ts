@@ -30,7 +30,7 @@ export interface Option {
   validate(value?: unknown): ValidationResult;
   /** 値のパース関数（オプション） */
   parse?(value: unknown): unknown;
-  
+
   // New methods for enhanced functionality
   /** Check if the input is in shorthand form */
   isShorthand(): boolean;

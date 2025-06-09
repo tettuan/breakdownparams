@@ -1,7 +1,7 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from './params_parser.ts';
 import { OptionRule } from '../types/option_rule.ts';
-import { ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../types/params_result.ts';
+import { OneParamsResult, TwoParamsResult, ZeroParamsResult } from '../types/params_result.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
@@ -46,7 +46,12 @@ Deno.test('test_params_parser_structure_with_option_rule', () => {
   assertEquals(typeof oneResult.options, 'object', 'Options should be an object');
 
   // Test two params structure with valid demonstrative and layer types
-  const twoResult = parser.parse(['summary', 'task', '--from=input.txt', '--destination=output.txt']) as TwoParamsResult;
+  const twoResult = parser.parse([
+    'summary',
+    'task',
+    '--from=input.txt',
+    '--destination=output.txt',
+  ]) as TwoParamsResult;
   logger.debug('Two params result:', twoResult);
   assertEquals(twoResult.type, 'two', 'Two params should have type two');
   assertEquals(Array.isArray(twoResult.params), true, 'Params should be an array');
@@ -55,7 +60,6 @@ Deno.test('test_params_parser_structure_with_option_rule', () => {
   assertEquals(typeof twoResult.layerType, 'string', 'Should have layer type');
   assertEquals(typeof twoResult.options, 'object', 'Options should be an object');
 });
-
 
 Deno.test('test_params_parser_structure_without_option_rule', () => {
   const parser = new ParamsParser();
@@ -77,7 +81,12 @@ Deno.test('test_params_parser_structure_without_option_rule', () => {
   assertEquals(typeof oneResult.options, 'object', 'Options should be an object');
 
   // Test two params structure with valid demonstrative and layer types
-  const twoResult = parser.parse(['summary', 'task', '--from=input.txt', '--destination=output.txt']) as TwoParamsResult;
+  const twoResult = parser.parse([
+    'summary',
+    'task',
+    '--from=input.txt',
+    '--destination=output.txt',
+  ]) as TwoParamsResult;
   logger.debug('Two params result:', twoResult);
   assertEquals(twoResult.type, 'two', 'Two params should have type two');
   assertEquals(Array.isArray(twoResult.params), true, 'Params should be an array');
@@ -85,4 +94,4 @@ Deno.test('test_params_parser_structure_without_option_rule', () => {
   assertEquals(typeof twoResult.demonstrativeType, 'string', 'Should have demonstrative type');
   assertEquals(typeof twoResult.layerType, 'string', 'Should have layer type');
   assertEquals(typeof twoResult.options, 'object', 'Options should be an object');
-}); 
+});

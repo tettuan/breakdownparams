@@ -1,13 +1,22 @@
-import { OptionRule, DEFAULT_OPTION_RULE } from '../types/option_rule.ts';
-import { ParamsResult, ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../types/params_result.ts';
+import { DEFAULT_OPTION_RULE, OptionRule } from '../types/option_rule.ts';
+import {
+  OneParamsResult,
+  ParamsResult,
+  TwoParamsResult,
+  ZeroParamsResult,
+} from '../types/params_result.ts';
 import { SecurityValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
-import { TwoParamsConfig, DEFAULT_TWO_PARAMS_CONFIG } from "../types/params_config.ts";
+import { DEFAULT_TWO_PARAMS_CONFIG, TwoParamsConfig } from '../types/params_config.ts';
 import { ZeroParamsValidator } from '../validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/params/two_params_validator.ts';
-import { ZeroOptionValidator, OneOptionValidator, TwoOptionValidator } from '../validator/options/option_validator.ts';
+import {
+  OneOptionValidator,
+  TwoOptionValidator,
+  ZeroOptionValidator,
+} from '../validator/options/option_validator.ts';
 import { CommandLineOptionFactory } from '../factories/option_factory.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
@@ -45,9 +54,15 @@ export class ParamsParser {
 
     this.securityValidator = new SecurityValidator();
     this.optionFactory = new CommandLineOptionFactory();
-    this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
-    this.oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);
-    this.twoOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.two);
+    this.zeroOptionCombinationValidator = new OptionCombinationValidator(
+      DEFAULT_OPTION_COMBINATION_RULES.zero,
+    );
+    this.oneOptionCombinationValidator = new OptionCombinationValidator(
+      DEFAULT_OPTION_COMBINATION_RULES.one,
+    );
+    this.twoOptionCombinationValidator = new OptionCombinationValidator(
+      DEFAULT_OPTION_COMBINATION_RULES.two,
+    );
   }
 
   /**
@@ -57,8 +72,8 @@ export class ParamsParser {
    */
   private extractOptionsUsingFactory(args: string[]): Record<string, unknown> {
     const options: Record<string, unknown> = {};
-    const optionArgs = args.filter(arg => arg.startsWith('--') || arg.startsWith('-'));
-    
+    const optionArgs = args.filter((arg) => arg.startsWith('--') || arg.startsWith('-'));
+
     for (const arg of optionArgs) {
       try {
         const option = this.optionFactory.createOptionsFromArgs([arg])[0];
@@ -70,14 +85,20 @@ export class ParamsParser {
           options[optionName] = value;
         }
       } catch (error) {
-        // 無効なオプションは無視
+        // Flag options with values should throw an error
+        if (
+          error instanceof Error && error.message.includes('Flag option') &&
+          error.message.includes('should not have a value')
+        ) {
+          throw error;
+        }
+        // その他の無効なオプションは無視
         this.logger.debug(`Skipping invalid option: ${arg}`, error);
       }
     }
-    
+
     return options;
   }
-
 
   /**
    * パラメータを解析する
@@ -110,8 +131,26 @@ export class ParamsParser {
     // 2. パラメータとオプションを分離する
     // パラメータは、オプションではないもの
     // オプションは、-- または - から始まるもの
-    const params = args.filter(arg => !arg.startsWith('--') && !arg.startsWith('-'));
-    const options = this.extractOptionsUsingFactory(args);
+    const params = args.filter((arg) => !arg.startsWith('--') && !arg.startsWith('-'));
+
+    let options: Record<string, unknown>;
+    try {
+      options = this.extractOptionsUsingFactory(args);
+    } catch (error) {
+      if (error instanceof Error) {
+        return {
+          type: 'error',
+          params: [],
+          options: {},
+          error: {
+            message: error.message,
+            code: 'INVALID_OPTION_FORMAT',
+            category: 'invalid_format',
+          },
+        };
+      }
+      throw error;
+    }
 
     // 3. パラメータのバリデーション
     // パラメータの数に応じて、バリデーションを行う
@@ -133,7 +172,7 @@ export class ParamsParser {
     /*
      * 4. パラメータ数に応じたオプションのバリデーション
      * 4.1. 0個の場合
-    */
+     */
     if (zeroResult.isValid && !oneResult.isValid && !twoResult.isValid) {
       // 4.1.1. オプションの存在チェック
       const optionValidator = new ZeroOptionValidator();
@@ -177,7 +216,7 @@ export class ParamsParser {
 
     /*
      * 4.2. 1個の場合
-    */
+     */
     if (!zeroResult.isValid && oneResult.isValid && !twoResult.isValid) {
       // 4.2.1. オプションの存在チェック
       const optionValidator = new OneOptionValidator();
@@ -222,7 +261,7 @@ export class ParamsParser {
 
     /*
      * 4.3. 2個の場合
-    */
+     */
     if (!zeroResult.isValid && !oneResult.isValid && twoResult.isValid) {
       // 4.3.1. オプションの存在チェック
       const optionValidator = new TwoOptionValidator();
@@ -266,9 +305,9 @@ export class ParamsParser {
       } as TwoParamsResult;
     }
 
-    /* 
+    /*
      * パラメータのバリデーションが失敗した場合は、パラメータ数に応じて適切なエラーを返却する
-    */
+     */
     // パラメータ数に基づいて、どのバリデーターのエラーを使用するか決定
     let errorMessage: string | undefined;
     let errorCode: string | undefined;

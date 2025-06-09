@@ -17,7 +17,7 @@ export class FlagOption extends BaseOption {
   ) {
     // Initialize base option with long and short names
     super(rawInput || name, longname || name, shortname);
-    
+
     // Validate option name (remove -- prefix if present)
     const cleanName = name.startsWith('--') ? name.slice(2) : name;
     const nameValidation = validateOptionName(cleanName);

@@ -1,19 +1,19 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../src/mod.ts';
+import type { OneParamsResult, TwoParamsResult, ZeroParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
   ['to', 'project', '--config=test'],
   ['to', 'project', '-c=test'],
   ['to', 'project', '--from=input.md', '--destination=output.md', '--config=prod'],
-  ['init', '--config=test'],  // Config should be ignored for single param
+  ['init', '--config=test'], // Config should be ignored for single param
   ['--help'],
 ];
 
 // Run tests for each argument set
 for (const args of testArgs) {
   console.log(`\n=== Testing: ${args.join(' ')} ===`);
-  
+
   const parser = new ParamsParser();
   const result = parser.parse(args);
 
@@ -55,7 +55,7 @@ for (const args of testArgs) {
     const oneResult = result as OneParamsResult;
     console.log('Single param mode');
     console.log(`Command: ${oneResult.demonstrativeType}`);
-    
+
     const typedOptions = oneResult.options as { config?: string };
     if (typedOptions.config) {
       console.log('Note: Config option is ignored in single param mode');
@@ -63,7 +63,7 @@ for (const args of testArgs) {
   } else if (result.type === 'zero') {
     const zeroResult = result as ZeroParamsResult;
     const typedOptions = zeroResult.options as { help?: boolean; version?: boolean };
-    
+
     console.log('No params mode');
     if (typedOptions.help) {
       console.log(`

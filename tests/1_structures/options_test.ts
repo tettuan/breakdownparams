@@ -2,7 +2,7 @@ import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { FlagOption } from '../../src/option-models/flag_option.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
-import { OptionType } from "../../src/types/option_type.ts";
+import { OptionType } from '../../src/types/option_type.ts';
 
 Deno.test('ValueOption', async (t) => {
   const validator = (value: string) => ({

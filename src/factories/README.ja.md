@@ -120,12 +120,12 @@ const factory = new OptionFactory();
 const options = factory.createOptions(['to', 'project', '-h', '--uv-name=test']);
 
 // Optionインスタンスの分類
-const positionalArgs = options.filter(opt => !opt.isOption());
-const optionArgs = options.filter(opt => opt.isOption());
+const positionalArgs = options.filter((opt) => !opt.isOption());
+const optionArgs = options.filter((opt) => opt.isOption());
 
 // 正規化された値の取得
 const normalizedOptions = {};
-optionArgs.forEach(opt => {
+optionArgs.forEach((opt) => {
   normalizedOptions[opt.canonicalName] = opt.getValue();
 });
 // 結果: { help: true, 'uv-name': 'test' }

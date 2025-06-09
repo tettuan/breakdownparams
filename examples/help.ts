@@ -3,7 +3,7 @@ import type { ZeroParamsResult } from '../src/mod.ts';
 
 /**
  * Help example
- * 
+ *
  * This example demonstrates the help functionality.
  * It should be the first example users run according to README.md
  */
@@ -17,19 +17,19 @@ const testCases = [
 
 for (const args of testCases) {
   console.log(`\n=== Testing: ${args.length > 0 ? args.join(' ') : '(no arguments)'} ===`);
-  
+
   const parser = new ParamsParser();
   const result = parser.parse(args);
-  
+
   if (result.type === 'error') {
     console.error(`Error: ${result.error?.message}`);
     continue;
   }
-  
+
   if (result.type === 'zero') {
     const zeroResult = result as ZeroParamsResult;
     const options = zeroResult.options as { help?: boolean; version?: boolean };
-    
+
     if (options.help) {
       console.log(`
 breakdownparams - Command line parameter parser

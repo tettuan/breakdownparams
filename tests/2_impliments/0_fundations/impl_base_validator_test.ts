@@ -1,25 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
-import { OptionRule } from "../../../src/types/option_rule.ts";
-import { ValidationResult } from "../../../src/types/validation_result.ts";
-
-const optionRule: OptionRule = {
-  format: '--key=value',
-  rules: {
-    customVariables: ['--demonstrative-type', '--layer-type'],
-    requiredOptions: [],
-    valueTypes: ['string'],
-  },
-  errorHandling: {
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
-  },
-  flagOptions: {
-    help: true,
-    version: true,
-  },
-};
 
 Deno.test('test_security_validator_implementation', () => {
   const validator = new SecurityValidator();
@@ -38,7 +18,7 @@ Deno.test('test_security_validator_implementation', () => {
   assertEquals(
     shellCommandResult.errorMessage,
     'Security error: Shell command execution or redirection attempt detected',
-    'Should have correct error message'
+    'Should have correct error message',
   );
 
   // パストラバーサルの試み
@@ -49,7 +29,7 @@ Deno.test('test_security_validator_implementation', () => {
   assertEquals(
     pathTraversalResult.errorMessage,
     'Security error: Path traversal attempt detected',
-    'Should have correct error message'
+    'Should have correct error message',
   );
 
   // 複数のセキュリティチェック

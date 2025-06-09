@@ -13,7 +13,7 @@ Deno.test('CommandLineOptionFactory Unit Tests', async (t) => {
     assertThrows(
       () => factory.createOptionsFromArgs(['--unknown']),
       Error,
-      'Unknown option: --unknown'
+      'Unknown option: --unknown',
     );
   });
 
@@ -42,7 +42,7 @@ Deno.test('CommandLineOptionFactory Unit Tests', async (t) => {
     assertThrows(
       () => factory.createOptionsFromArgs(['--input']),
       Error,
-      'Option --input requires a value'
+      'Option --input requires a value',
     );
   });
 

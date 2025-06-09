@@ -1,12 +1,12 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../src/mod.ts';
+import type { OneParamsResult, TwoParamsResult, ZeroParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
-  ['--help'],                           // Show help
-  ['--version'],                        // Show version
-  ['init'],                             // Initialize command
-  ['to', 'project'],                    // Two params example
+  ['--help'], // Show help
+  ['--version'], // Show version
+  ['init'], // Initialize command
+  ['to', 'project'], // Two params example
   ['to', 'issue', '--from=input.md', '--destination=output.md'],
   ['summary', 'task', '--config=test'],
 ];
@@ -14,7 +14,7 @@ const testArgs = [
 // Run tests for each argument set
 for (const args of testArgs) {
   console.log(`\n=== Testing: ${args.join(' ')} ===`);
-  
+
   const parser = new ParamsParser();
   const result = parser.parse(args);
 
@@ -27,7 +27,7 @@ for (const args of testArgs) {
     case 'zero': {
       const zeroResult = result as ZeroParamsResult;
       const options = zeroResult.options as { help?: boolean; version?: boolean };
-      
+
       if (options.help) {
         console.log(`
 Usage: basic_usage [command] [options]

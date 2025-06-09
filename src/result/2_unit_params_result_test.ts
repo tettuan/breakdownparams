@@ -1,4 +1,4 @@
-import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
   OneParamsResult,
   ParamsResult,

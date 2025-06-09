@@ -106,7 +106,10 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     const versionResult = validator.validate(['-v'], 'zero', DEFAULT_OPTION_RULE);
     console.log('Short version result:', versionResult);
     assert(versionResult.isValid);
-    assert(Object.keys(versionResult.options || {}).length === 0, 'Short options are not recognized');
+    assert(
+      Object.keys(versionResult.options || {}).length === 0,
+      'Short options are not recognized',
+    );
   });
 
   await t.step('should handle short form options - OneParam', () => {
@@ -124,14 +127,22 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     const validator = new TwoOptionValidator();
 
     // 短縮形オプション
-    const shortResult = validator.validate(['-f=input.md', '-o=output.md'], 'two', DEFAULT_OPTION_RULE);
+    const shortResult = validator.validate(
+      ['-f=input.md', '-o=output.md'],
+      'two',
+      DEFAULT_OPTION_RULE,
+    );
     console.log('TwoParams short result:', shortResult);
     // 現在は認識されず、オプションが空になる
     assert(shortResult.isValid);
     assert(Object.keys(shortResult.options || {}).length === 0, 'Short options are not recognized');
 
     // 長形式と短縮形の混在
-    const mixedResult = validator.validate(['--from=input.md', '-o=output.md'], 'two', DEFAULT_OPTION_RULE);
+    const mixedResult = validator.validate(
+      ['--from=input.md', '-o=output.md'],
+      'two',
+      DEFAULT_OPTION_RULE,
+    );
     console.log('Mixed options result:', mixedResult);
     // 長形式のみ認識される
     assert(mixedResult.isValid);
@@ -143,7 +154,11 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     const validator = new TwoOptionValidator();
 
     // 現在のテストでは成功しているはずだが、実際のパーサーでは失敗する
-    const customVarResult = validator.validate(['--uv-project=myproject'], 'two', DEFAULT_OPTION_RULE);
+    const customVarResult = validator.validate(
+      ['--uv-project=myproject'],
+      'two',
+      DEFAULT_OPTION_RULE,
+    );
     console.log('Custom variable result in validator:', customVarResult);
     assert(customVarResult.isValid, 'Custom variables should be valid in TwoParams');
     assert(customVarResult.options?.['uv-project'] === 'myproject');
@@ -152,7 +167,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     const multiCustomResult = validator.validate(
       ['--uv-project=myproject', '--uv-version=1.0.0'],
       'two',
-      DEFAULT_OPTION_RULE
+      DEFAULT_OPTION_RULE,
     );
     assert(multiCustomResult.isValid);
     assert(multiCustomResult.options?.['uv-project'] === 'myproject');
