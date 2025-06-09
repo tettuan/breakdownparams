@@ -10,7 +10,7 @@ This specification defines the type definitions and parsing flow of the paramete
 ### 1. Basic Types
 
 ```typescript
-type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult;
 
 // Error information type
 type ErrorResult = {
@@ -32,7 +32,7 @@ type ZeroParamsResult = {
 };
 
 // One argument
-type OneParamResult = {
+type OneParamsResult = {
   type: 'one';
   command: 'init';
   options: OptionParams;
@@ -82,7 +82,7 @@ type OptionParams = {
          }
        };
      }
-     // Return OneParamResult
+     // Return OneParamsResult
    } else if (nonOptionArgs.length === 2) {
      // Parameter validation
      if (!isValidDemonstrativeType(nonOptionArgs[0])) {
@@ -209,7 +209,7 @@ When an error occurs in parameters or options, the error information is set in t
 
 ### 3. Type Consistency
 
-- Maintain parameter types (ZeroParamsResult, OneParamResult, TwoParamsResult)
+- Maintain parameter types (ZeroParamsResult, OneParamsResult, TwoParamsResult)
 - Error information is kept as error property of each parameter type
 - No type conversion is performed
 

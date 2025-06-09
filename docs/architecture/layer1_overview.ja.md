@@ -41,8 +41,8 @@ graph TD
 ```typescript
 type ParamsResult =
   | ZeroParamsResult   // パラメータなし
-  | OneParamResult     // init のみ
-  | TwoParamResult     // 指示型 + レイヤー型
+  | OneParamsResult     // init のみ
+  | TwoParamsResult     // 指示型 + レイヤー型
   | ErrorResult;       // エラー
 ```
 
@@ -84,8 +84,8 @@ interface ParamsValidator {
 
 - **判定ルール**:
   - 成功・失敗・失敗: ZeroParamsResult
-  - 失敗・成功・失敗: OneParamResult
-  - 失敗・失敗・成功: TwoParamResult
+  - 失敗・成功・失敗: OneParamsResult
+  - 失敗・失敗・成功: TwoParamsResult
   - その他: ErrorResult
 
 ### 2.3 オプション（Option）
@@ -155,7 +155,7 @@ const result = parser.parse(["init", "--from=input.md"]);
 
 // 結果に応じた処理
 if (result.type === "one") {
-  // OneParamResult の処理
+  // OneParamsResult の処理
   // オプションの結果も含まれている
 } else if (result.type === "error") {
   // ErrorResult の処理

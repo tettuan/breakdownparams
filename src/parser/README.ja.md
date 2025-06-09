@@ -2,37 +2,42 @@
 
 このディレクトリには、コマンドライン引数の解析を担当するパラメータパーサーの実装が含まれています。
 
+## オプションクラス中心設計による簡素化
+
+新しい設計では、ParamsParserはオプションの正規化処理をOptionクラスに委譲し、よりシンプルな構造になりました：
+
+- **OptionFactoryの活用**: コマンドライン引数からOptionインスタンスを生成
+- **正規化の委譲**: 各Optionインスタンスが自身の正規化を担当
+- **バリデーションの統合**: Optionインスタンスから直接バリデーション結果を取得
+
 ## 主要な責務
 
-`params_parser.ts` は以下の責務を持ちます：
+`params_parser.ts` は以下の簡素化された責務を持ちます：
 
-1. **コマンドライン引数の解析**
-   - 位置引数（パラメータ）の解析
-   - オプション引数の解析
-   - 引数の型安全性の保証
+1. **Optionインスタンスの作成**
+   - OptionFactoryを使用してコマンドライン引数からOptionインスタンスを生成
+   - 正規化処理はOptionクラスに委譲
 
 2. **パラメータの分類**
    - ZeroParams: 位置引数なし（オプションのみ）
    - OneParam: 1つの位置引数（`init` コマンド）
    - TwoParams: 2つの位置引数（`<demonstrativeType> <layerType>`）
 
-3. **バリデーション**
+3. **バリデーションの統合**
+   - Optionインスタンスからバリデーション結果を取得
    - パラメータ数の制約チェック
-   - DemonstrativeType の有効性チェック
-   - LayerType の有効性チェック
-   - オプションの有効性チェック
+   - DemonstrativeType と LayerType の有効性チェック
 
-4. **エラー処理**
-   - パラメータエラーの検出と報告
-   - オプションエラーの検出と報告
-   - 型安全なエラー情報の提供
+4. **統一された結果返却**
+   - パラメータエラーとオプションエラーの統合
+   - 型安全な結果情報の提供
 
 ## 型定義
 
 パーサーは以下の型定義に基づいて動作します：
 
 ```typescript
-type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult;
 ```
 
 各型の詳細な定義は `docs/params_type.md` を参照してください。
@@ -41,14 +46,36 @@ type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
 
 ```typescript
 const parser = new ParamsParser();
-const result = parser.parse(args);
+const result = parser.parse(['to', 'project', '--uv-name=test']);
 
-if (result.type === 'zero-params') {
-  // オプションのみの処理
-} else if (result.type === 'one') {
-  // init コマンドの処理
-} else if (result.type === 'two') {
-  // demonstrativeType と layerType の処理
+if (result.type === 'break') {
+  console.log(result.demonstrativeType); // 'to'
+  console.log(result.layerType); // 'project'
+  console.log(result.options['uv-name']); // 'test' (正規化後: uv-name)
+}
+```
+
+## 新しい実装フロー
+
+```typescript
+class ParamsParser {
+  private optionFactory: OptionFactory;
+
+  public parse(args: string[]): ParamsResult {
+    // 1. OptionFactoryでOptionインスタンスを生成
+    const options = this.optionFactory.createOptions(args);
+    
+    // 2. Optionインスタンスから正規化された値を取得
+    const normalizedArgs = this.extractNormalizedArgs(options);
+    
+    // 3. パラメータ検証
+    const results = this.validators.map(v => v.validate(normalizedArgs));
+    
+    // 4. オプション検証（Optionインスタンスから直接）
+    const optionResults = this.validateOptions(options);
+    
+    return this.determineResult(results, optionResults);
+  }
 }
 ```
 

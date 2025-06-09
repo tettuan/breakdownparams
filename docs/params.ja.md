@@ -13,7 +13,7 @@
 ## パラメータの型定義
 
 ```typescript
-type ParamPatternResult = ZeroParamResult | OneParamResult | TwoParamResult;
+type ParamPatternResult = ZeroParamResult | OneParamsResult | TwoParamsResult;
 
 type ZeroParamResult = {
   type: 'help' | 'version';
@@ -22,14 +22,14 @@ type ZeroParamResult = {
   error?: ErrorInfo;
 };
 
-type OneParamResult = {
+type OneParamsResult = {
   type: 'layer';
   command: string;
   options: OptionParams;
   error?: ErrorInfo;
 };
 
-type TwoParamResult = {
+type TwoParamsResult = {
   type: 'break';
   demonstrativeType: string;
   layerType: string;
@@ -75,11 +75,11 @@ const DEFAULT_CONFIG: ParserConfig = {
    - helpコマンド
    - versionコマンド
 
-2. 単一パラメータ（OneParamResult）
+2. 単一パラメータ（OneParamsResult）
    - layerコマンド
    - コマンド名とオプション
 
-3. 二重パラメータ（TwoParamResult）
+3. 二重パラメータ（TwoParamsResult）
    - breakコマンド
    - DemonstrativeTypeとLayerTypeのバリデーション
    - オプション
@@ -120,7 +120,7 @@ const helpResult: ZeroParamResult = {
 };
 
 // 単一パラメータ
-const layerResult: OneParamResult = {
+const layerResult: OneParamsResult = {
   type: 'layer',
   command: 'create',
   options: {
@@ -129,7 +129,7 @@ const layerResult: OneParamResult = {
 };
 
 // 二重パラメータ（デフォルト設定値を使用）
-const breakResult: TwoParamResult = {
+const breakResult: TwoParamsResult = {
   type: 'break',
   demonstrativeType: 'to',      // パターン: ^(to|summary|defect)$
   layerType: 'project',         // パターン: ^(project|issue|task)$
@@ -329,5 +329,5 @@ TwoParamsモードでのみ使用可能で、以下の形式で指定します�
 パラメータの解析結果は、以下の型で返却されます：
 
 ```typescript
-type ParamsResult = ZeroParamResult | OneParamResult | TwoParamResult;
+type ParamsResult = ZeroParamResult | OneParamsResult | TwoParamsResult;
 ```

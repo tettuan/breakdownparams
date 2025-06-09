@@ -1,6 +1,6 @@
 import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { CustomVariableOption, FlagOption, ValueOption } from '../../src/option-models/base.ts';
-import { OptionType } from "../../src/types/option_type.ts"';
+import { OptionType } from "../../src/types/option_type.ts";
 
 Deno.test('ValueOption', async (t) => {
   const validator = (value: string) => ({

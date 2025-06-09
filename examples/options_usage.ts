@@ -1,5 +1,5 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, TwoParamResult } from '../src/mod.ts';
+import type { ZeroParamsResult, TwoParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
@@ -60,7 +60,7 @@ Examples:
 
   // Process valid command
   if (result.type === 'two') {
-    const twoResult = result as TwoParamResult;
+    const twoResult = result as TwoParamsResult;
     const { demonstrativeType, layerType, options = {} } = twoResult;
 
     console.log('Command processed successfully:');

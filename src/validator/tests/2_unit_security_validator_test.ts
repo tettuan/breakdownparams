@@ -20,4 +20,20 @@ Deno.test('test_security_validator_unit', () => {
   assertEquals(pathTraversalResult.isValid, false, 'Path traversal should be rejected');
   assertEquals(pathTraversalResult.errorMessage, 'Security error: Path traversal attempt detected', 'Should return correct error message');
   assertEquals(pathTraversalResult.errorCode, 'SECURITY_ERROR', 'Should return correct error code');
+
+  // 短縮形オプションのセキュリティチェック
+  // 短縮形オプションが通過するか確認
+  const shortOptionsResult = validator.validate(['-h', '-v', '-f=input.md']);
+  assertEquals(shortOptionsResult.isValid, true, 'Short form options should pass security check');
+  assertEquals(shortOptionsResult.validatedParams, ['-h', '-v', '-f=input.md'], 'Should return all short options');
+
+  // カスタム変数オプションのセキュリティチェック
+  const customVarResult = validator.validate(['--uv-project=myproject', '--uv-version=1.0.0']);
+  assertEquals(customVarResult.isValid, true, 'Custom variables should pass security check');
+  assertEquals(customVarResult.validatedParams, ['--uv-project=myproject', '--uv-version=1.0.0'], 'Should return all custom variables');
+
+  // 短縮形オプションと通常パラメータの組み合わせ
+  const mixedArgsResult = validator.validate(['to', 'project', '-f=input.md', '-o=output.md']);
+  assertEquals(mixedArgsResult.isValid, true, 'Mixed params and short options should pass security check');
+  assertEquals(mixedArgsResult.validatedParams, ['to', 'project', '-f=input.md', '-o=output.md'], 'Should return all arguments');
 }); 

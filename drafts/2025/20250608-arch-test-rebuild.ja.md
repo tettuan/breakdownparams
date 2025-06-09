@@ -26,8 +26,8 @@
 - バリデーション3つの結果を、成功・失敗の組み合わせで判定する
   - 成功・失敗の組み合わせは、以下の通り
     - 成功・失敗・失敗: ZeroParamsResult
-    - 失敗・成功・失敗: OneParamResult
-    - 失敗・失敗・成功: TwoParamResult
+    - 失敗・成功・失敗: OneParamsResult
+    - 失敗・失敗・成功: TwoParamsResult
     - その他複数の成功は起こり得ないためエラー
 
 ## 目的レベル4

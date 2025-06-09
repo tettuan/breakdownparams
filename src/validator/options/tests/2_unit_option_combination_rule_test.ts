@@ -41,10 +41,8 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
     // 必須オプションの検証 - two rules には必須オプションなし
     assert(!twoRules.requiredOptions);
 
-    // 組み合わせルールの検証
-    assert(Object.keys(twoRules.combinationRules || {}).length === 1);
-    assert(twoRules.combinationRules?.from?.length === 1);
-    assert(twoRules.combinationRules?.from?.includes('destination'));
+    // 組み合わせルールの検証 - 現在は組み合わせルールなし
+    assert(!twoRules.combinationRules);
   });
 
   await t.step('should maintain rule consistency', () => {
@@ -53,7 +51,7 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
     // two rules には必須オプションがないことを確認
     assert(!twoRules.requiredOptions);
 
-    // 組み合わせルールの依存先も許可オプションに含まれている必要がある
-    assert(twoRules.combinationRules?.from?.every((opt) => twoRules.allowedOptions.includes(opt)));
+    // 組み合わせルールがないことを確認
+    assert(!twoRules.combinationRules);
   });
 });

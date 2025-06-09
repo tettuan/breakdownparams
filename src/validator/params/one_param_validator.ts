@@ -27,8 +27,8 @@ export class OneParamValidator extends BaseValidator {
       isValid,
       validatedParams: params,
       demonstrativeType: params[0],
-      errorMessage: isValid ? undefined : 'Invalid parameter. Only "init" is allowed',
-      errorCode: isValid ? undefined : 'INVALID_PARAM',
+      errorMessage: isValid ? undefined : `Invalid command: ${params[0]}. Only "init" is allowed`,
+      errorCode: isValid ? undefined : 'INVALID_COMMAND',
       errorCategory: isValid ? undefined : 'validation',
     };
   }

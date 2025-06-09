@@ -70,9 +70,10 @@ export class TwoParamsValidator extends BaseValidator {
         errorMessage: !demonstrativeValid
           ? (this.config.demonstrativeType?.errorMessage ||
             DEFAULT_TWO_PARAMS_CONFIG.demonstrativeType?.errorMessage ||
-            'Invalid demonstrative type')
+            `Invalid demonstrative type: ${params[0]}`)
           : (this.config.layerType?.errorMessage ||
-            DEFAULT_TWO_PARAMS_CONFIG.layerType?.errorMessage || 'Invalid layer type'),
+            DEFAULT_TWO_PARAMS_CONFIG.layerType?.errorMessage || 
+            `Invalid layer type: ${params[1]}`),
         errorCode: !demonstrativeValid ? 'INVALID_DEMONSTRATIVE_TYPE' : 'INVALID_LAYER_TYPE',
         errorCategory: 'validation',
       };

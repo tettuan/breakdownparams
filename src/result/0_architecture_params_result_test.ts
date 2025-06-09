@@ -1,8 +1,8 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
-  OneParamResult,
+  OneParamsResult,
   ParamsResult,
-  TwoParamResult,
+  TwoParamsResult,
   ZeroParamsResult,
 } from '../types/params_result.ts';
 

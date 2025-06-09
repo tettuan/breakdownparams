@@ -11,9 +11,9 @@ export { TwoParamsValidator } from './validator/params/two_params_validator.ts';
 // 型定義
 export type {
   ErrorInfo,
-  OneParamResult,
+  OneParamsResult,
   ParamsResult,
-  TwoParamResult,
+  TwoParamsResult,
   ZeroParamsResult,
 } from './types/params_result.ts';
 export type { OptionRule } from './types/option_rule.ts';

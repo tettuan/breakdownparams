@@ -45,21 +45,21 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
 
   await t.step('should validate combination rules correctly', () => {
     const rule: OptionCombinationRule = {
-      allowedOptions: ['from', 'destination'],
+      allowedOptions: ['option1', 'option2'],
       requiredOptions: [],
       combinationRules: {
-        from: ['destination'],
+        option1: ['option2'],
       },
     };
 
     const validator = new OptionCombinationValidator(rule);
 
     // 正しい組み合わせ
-    const validResult = validator.validate({ from: 'value', destination: 'value' });
+    const validResult = validator.validate({ option1: 'value', option2: 'value' });
     assert(validResult.isValid);
 
     // 不正な組み合わせ
-    const invalidResult = validator.validate({ from: 'value' });
+    const invalidResult = validator.validate({ option1: 'value' });
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('requires'));
     assert(invalidResult.errorCode === 'INVALID_OPTION_COMBINATION');
@@ -75,5 +75,54 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('not allowed'));
     assert(invalidResult.errorCode === 'INVALID_OPTION');
+  });
+
+  await t.step('should handle short form options', () => {
+    // ZeroParams with short options
+    const zeroShortResult = OptionCombinationValidator.validate(['-h', '-v'], 'zero');
+    console.log('Zero short result:', zeroShortResult);
+    // 短縮形は認識されないが、エラーになるかvalidになるか確認
+    
+    // OneParam with short options
+    const oneShortResult = OptionCombinationValidator.validate(['-c=test'], 'one');
+    console.log('One short result:', oneShortResult);
+    
+    // TwoParams with short options
+    const twoShortResult = OptionCombinationValidator.validate(['-f=input.md', '-o=output.md'], 'two');
+    console.log('Two short result:', twoShortResult);
+    
+    // 現在の実装では短縮形オプションは認識されない
+    // OptionCombinationValidatorはオプション辞書を受け取るので、
+    // 上流でパースされていない短縮形は到達しない可能性がある
+  });
+
+  await t.step('should handle custom variable options in TwoParams', () => {
+    const rule: OptionCombinationRule = {
+      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
+      requiredOptions: [],
+      combinationRules: {},
+    };
+
+    const validator = new OptionCombinationValidator(rule);
+
+    // カスタム変数は特別扱いされるべき
+    const customVarResult = validator.validate({ 
+      'uv-project': 'myproject',
+      'uv-version': '1.0.0' 
+    });
+    console.log('Custom variable result:', customVarResult);
+    // 現在はuv-*が許可リストにないためエラーになる
+    assert(!customVarResult.isValid);
+    assert(customVarResult.errorMessage?.includes('uv-project'));
+    assert(customVarResult.errorCode === 'INVALID_OPTION');
+
+    // 標準オプションとカスタム変数の混在
+    const mixedResult = validator.validate({ 
+      from: 'input.md',
+      'uv-project': 'myproject' 
+    });
+    console.log('Mixed options result:', mixedResult);
+    assert(!mixedResult.isValid);
+    assert(mixedResult.errorMessage?.includes('uv-project'));
   });
 });

@@ -1,6 +1,6 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OneParamResult, OptionRule, TwoParamResult } from "../../src/types/option_rule.ts"';
+import { OneParamsResult, OptionRule, TwoParamsResult } from "../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -33,7 +33,7 @@ Deno.test('test_params_parser_unit', () => {
   );
 
   // 1つの引数のテスト
-  const oneParamResult = parser.parse(['init']) as OneParamResult;
+  const oneParamResult = parser.parse(['init']) as OneParamsResult;
   console.log('[DEBUG] oneParamResult:', oneParamResult);
   assertEquals(oneParamResult.type, 'one', 'One parameter should be one type');
   assertEquals(oneParamResult.params, ['init'], 'Params should match input');
@@ -41,7 +41,7 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(oneParamResult.demonstrativeType, 'init', 'Demonstrative type should match');
 
   // 2つの引数のテスト
-  const twoParamResult = parser.parse(['to', 'project']) as TwoParamResult;
+  const twoParamResult = parser.parse(['to', 'project']) as TwoParamsResult;
   console.log('[DEBUG] twoParamResult:', twoParamResult);
   assertEquals(twoParamResult.type, 'two', 'Two parameters should be two type');
   assertEquals(twoParamResult.params, ['to', 'project'], 'Params should match input');
@@ -55,7 +55,7 @@ Deno.test('test_params_parser_unit', () => {
     'project',
     '--help',
     '--version',
-  ]) as TwoParamResult;
+  ]) as TwoParamsResult;
   console.log('[DEBUG] twoParamWithOptionsResult:', twoParamWithOptionsResult);
   assertEquals(
     twoParamWithOptionsResult.type,

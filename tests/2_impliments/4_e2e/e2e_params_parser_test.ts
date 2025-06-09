@@ -1,6 +1,6 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OneParamResult, OptionRule, TwoParamResult } from "../../src/types/option_rule.ts"';
+import { OneParamsResult, OptionRule, TwoParamsResult } from "../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -34,14 +34,14 @@ Deno.test('test_params_parser_e2e', () => {
   assertEquals(versionResult.options.version, undefined, 'Version option should be present');
 
   // initコマンドのテスト
-  const initResult = parser.parse(['init']) as OneParamResult;
+  const initResult = parser.parse(['init']) as OneParamsResult;
   assertEquals(initResult.type, 'one', 'Init command should return one param result');
   assertEquals(initResult.params, ['init'], 'Init command should be included in params');
   assertEquals(Object.keys(initResult.options).length, 0, 'Init command should have no options');
   assertEquals(initResult.demonstrativeType, 'init', 'Demonstrative type should be init');
 
   // toコマンドのテスト
-  const toResult = parser.parse(['to', 'project']) as TwoParamResult;
+  const toResult = parser.parse(['to', 'project']) as TwoParamsResult;
   assertEquals(toResult.type, 'two', 'To command should return two params result');
   assertEquals(toResult.params, ['to', 'project'], 'To command should be included in params');
   assertEquals(Object.keys(toResult.options).length, 0, 'To command should have no options');

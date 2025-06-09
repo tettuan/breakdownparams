@@ -1,8 +1,8 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
-  OneParamResult,
+  OneParamsResult,
   ParamsResult,
-  TwoParamResult,
+  TwoParamsResult,
   ZeroParamsResult,
 } from '../types/params_result.ts';
 
@@ -17,26 +17,26 @@ Deno.test('test_type_conversion', () => {
   const zeroParamsResult = zeroResult as ZeroParamsResult;
   assertEquals(zeroParamsResult.type, 'zero');
 
-  // OneParamResult への変換
-  const oneResult: OneParamResult = {
+  // OneParamsResult への変換
+  const oneResult: OneParamsResult = {
     type: 'one',
     params: ['init'],
     options: {},
     demonstrativeType: 'init',
   };
-  const oneParamResult = oneResult as OneParamResult;
+  const oneParamResult = oneResult as OneParamsResult;
   assertEquals(oneParamResult.type, 'one');
   assertEquals(oneParamResult.demonstrativeType, 'init');
 
-  // TwoParamResult への変換
-  const twoResult: TwoParamResult = {
+  // TwoParamsResult への変換
+  const twoResult: TwoParamsResult = {
     type: 'two',
     params: ['to', 'project'],
     options: {},
     demonstrativeType: 'to',
     layerType: 'project',
   };
-  const twoParamResult = twoResult as TwoParamResult;
+  const twoParamResult = twoResult as TwoParamsResult;
   assertEquals(twoParamResult.type, 'two');
   assertEquals(twoParamResult.demonstrativeType, 'to');
   assertEquals(twoParamResult.layerType, 'project');

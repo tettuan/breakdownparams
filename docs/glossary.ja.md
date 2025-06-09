@@ -111,8 +111,8 @@
 |------|------|------|
 | ParamPatternResult | パラメータパターン結果の基本型。パラメータの組み合わせパターンに基づく結果を型安全に扱うためのインターフェース。エラー情報も含む。 | [params_type.ja.md](params_type.ja.md) |
 | ZeroParamResult | パラメータなしの結果型。help/versionコマンド用。 | [params_type.ja.md](params_type.ja.md) |
-| OneParamResult | 単一パラメータの結果型。layerコマンド用。 | [params_type.ja.md](params_type.ja.md) |
-| TwoParamResult | 二重パラメータの結果型。breakコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| OneParamsResult | 単一パラメータの結果型。layerコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| TwoParamsResult | 二重パラメータの結果型。breakコマンド用。 | [params_type.ja.md](params_type.ja.md) |
 
 ---
 

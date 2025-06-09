@@ -1,5 +1,5 @@
 import { OptionRule, DEFAULT_OPTION_RULE } from '../types/option_rule.ts';
-import { ParamsResult, ZeroParamsResult, OneParamResult, TwoParamResult } from '../types/params_result.ts';
+import { ParamsResult, ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../types/params_result.ts';
 import { SecurityValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
@@ -217,7 +217,7 @@ export class ParamsParser {
         params: oneResult.validatedParams,
         options,
         demonstrativeType: oneResult.validatedParams[0],
-      } as OneParamResult;
+      } as OneParamsResult;
     }
 
     /*
@@ -263,20 +263,47 @@ export class ParamsParser {
         options,
         demonstrativeType: twoResult.validatedParams[0],
         layerType: twoResult.validatedParams[1],
-      } as TwoParamResult;
+      } as TwoParamsResult;
     }
 
     /* 
-     * パラメータのバリデーションが失敗した場合は、エラーを返却する
+     * パラメータのバリデーションが失敗した場合は、パラメータ数に応じて適切なエラーを返却する
     */
+    // パラメータ数に基づいて、どのバリデーターのエラーを使用するか決定
+    let errorMessage: string | undefined;
+    let errorCode: string | undefined;
+    let errorCategory: string | undefined;
+
+    if (params.length === 0) {
+      // 0個の場合は、オプションのみが許可される
+      errorMessage = 'No command specified. Use --help for usage information';
+      errorCode = 'NO_COMMAND';
+      errorCategory = 'validation';
+    } else if (params.length === 1) {
+      // 1個の場合は、OneParamValidatorのエラーを使用
+      errorMessage = oneResult.errorMessage || 'Invalid command';
+      errorCode = oneResult.errorCode || 'INVALID_COMMAND';
+      errorCategory = oneResult.errorCategory || 'validation';
+    } else if (params.length === 2) {
+      // 2個の場合は、TwoParamsValidatorのエラーを使用
+      errorMessage = twoResult.errorMessage || 'Invalid parameters';
+      errorCode = twoResult.errorCode || 'INVALID_PARAMS';
+      errorCategory = twoResult.errorCategory || 'validation';
+    } else {
+      // 3個以上の場合は、引数が多すぎるエラー
+      errorMessage = 'Too many arguments. Maximum 2 arguments are allowed';
+      errorCode = 'TOO_MANY_ARGS';
+      errorCategory = 'validation';
+    }
+
     return {
       type: 'error',
       params: [],
       options: {},
       error: {
-        message: zeroResult.errorMessage || oneResult.errorMessage || twoResult.errorMessage || 'Invalid parameter combination',
-        code: zeroResult.errorCode || oneResult.errorCode || twoResult.errorCode || 'INVALID_PARAMS',
-        category: zeroResult.errorCategory || oneResult.errorCategory || twoResult.errorCategory || 'validation',
+        message: errorMessage,
+        code: errorCode,
+        category: errorCategory,
       },
     };
   }

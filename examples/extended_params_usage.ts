@@ -1,5 +1,5 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, OneParamResult, TwoParamResult } from '../src/mod.ts';
+import type { ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
@@ -69,7 +69,7 @@ Examples:
   }
 
   if (result.type === 'two') {
-    const twoResult = result as TwoParamResult;
+    const twoResult = result as TwoParamsResult;
     console.log('Command processed successfully:');
     console.log('----------------------------');
     console.log('Demonstrative Type:', twoResult.demonstrativeType);
@@ -78,7 +78,7 @@ Examples:
       console.log('Options:', twoResult.options);
     }
   } else if (result.type === 'one') {
-    const oneResult = result as OneParamResult;
+    const oneResult = result as OneParamsResult;
     console.log('Command:', oneResult.demonstrativeType);
     if (oneResult.options) {
       console.log('Options:', oneResult.options);

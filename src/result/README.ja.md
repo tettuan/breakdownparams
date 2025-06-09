@@ -12,11 +12,11 @@
    - パラメータなし（help/versionコマンド用）
    - オプションのみ指定可能
 
-2. **OneParamResult**
+2. **OneParamsResult**
    - 単一パラメータ（initコマンド用）
    - コマンド名とオプションを持つ
 
-3. **TwoParamResult**
+3. **TwoParamsResult**
    - 二重パラメータ（メイン機能用）
    - DemonstrativeTypeとLayerTypeの組み合わせ
    - オプションを持つ
@@ -34,12 +34,12 @@ interface ZeroParamsResult extends ParamsResult {
   type: 'zero';
 }
 
-interface OneParamResult extends ParamsResult {
+interface OneParamsResult extends ParamsResult {
   type: 'one';
   param: string;
 }
 
-interface TwoParamResult extends ParamsResult {
+interface TwoParamsResult extends ParamsResult {
   type: 'two';
   demonstrativeType: string;
   layerType: string;
@@ -73,8 +73,8 @@ const helpResult: ZeroParamsResult = {
   options: {},
 };
 
-// OneParamResult の例
-const initResult: OneParamResult = {
+// OneParamsResult の例
+const initResult: OneParamsResult = {
   type: 'one',
   isValid: true,
   param: 'init',
@@ -83,8 +83,8 @@ const initResult: OneParamResult = {
   },
 };
 
-// TwoParamResult の例
-const toResult: TwoParamResult = {
+// TwoParamsResult の例
+const toResult: TwoParamsResult = {
   type: 'two',
   isValid: true,
   demonstrativeType: 'to',

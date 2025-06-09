@@ -1,5 +1,5 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, OneParamResult, TwoParamResult } from '../src/mod.ts';
+import type { ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
@@ -25,7 +25,7 @@ for (const args of testArgs) {
 
   // Process valid command
   if (result.type === 'two') {
-    const twoResult = result as TwoParamResult;
+    const twoResult = result as TwoParamsResult;
     const { demonstrativeType, layerType, options = {} } = twoResult;
 
     console.log('Command processed successfully:');
@@ -52,7 +52,7 @@ for (const args of testArgs) {
       console.log(`Using config: ${typedOptions.config}`);
     }
   } else if (result.type === 'one') {
-    const oneResult = result as OneParamResult;
+    const oneResult = result as OneParamsResult;
     console.log('Single param mode');
     console.log(`Command: ${oneResult.demonstrativeType}`);
     

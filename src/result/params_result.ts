@@ -30,7 +30,7 @@ export interface ZeroParamsResult extends ParamsResult {
 /**
  * Result for one parameter (init command)
  */
-export interface OneParamResult extends ParamsResult {
+export interface OneParamsResult extends ParamsResult {
   type: 'one';
   param: string;
 }
@@ -38,7 +38,7 @@ export interface OneParamResult extends ParamsResult {
 /**
  * Result for two parameters (main functionality)
  */
-export interface TwoParamResult extends ParamsResult {
+export interface TwoParamsResult extends ParamsResult {
   type: 'two';
   demonstrativeType: string;
   layerType: string;

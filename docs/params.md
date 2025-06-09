@@ -97,7 +97,7 @@ breakdown summary task -c test
 The parameter parsing result is returned with the following type:
 
 ```typescript
-type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult;
 ```
 
 For detailed type definitions and usage, please refer to the [Parameter Parser Type Definition Specification](params_type.md).

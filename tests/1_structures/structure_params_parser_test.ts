@@ -1,6 +1,6 @@
 import { assertEquals } from 'https://deno.land/std/testing/asserts.ts';
 import { ParamsParser } from '../../src/parser/params_parser.ts';
-import { OptionRule } from "../../src/types/option_rule.ts"';
+import { OptionRule } from "../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',

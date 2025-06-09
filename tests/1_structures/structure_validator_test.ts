@@ -1,11 +1,11 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { BaseValidator } from "../../src/validator/params/base_validator.ts"';
+import { BaseValidator } from "../../src/validator/params/base_validator.ts";
 import { SecurityErrorValidator } from '../../src/validator/security_error_validator.ts';
 import { OptionsValidator } from '../../src/validator/options_validator.ts';
-import { ZeroParamsValidator } from "../../src/validator/params/zero_params_validator.ts"';
-import { OneParamValidator } from "../../src/validator/params/one_param_validator.ts"';
-import { TwoParamsValidator } from "../../src/validator/params/two_params_validator.ts"';
-import { OptionRule } from "../../src/types/option_rule.ts"';
+import { ZeroParamsValidator } from "../../src/validator/params/zero_params_validator.ts";
+import { OneParamValidator } from "../../src/validator/params/one_param_validator.ts";
+import { TwoParamsValidator } from "../../src/validator/params/two_params_validator.ts";
+import { OptionRule } from "../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',

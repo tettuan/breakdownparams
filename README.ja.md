@@ -63,8 +63,8 @@ switch (result.type) {
 コマンドライン引数に基づいて、以下の結果タイプが利用可能です。各タイプで利用可能なオプションの詳細については、[オプション ドキュメント](docs/options.ja.md)を参照してください。
 
 - `ZeroParamResult`: パラメータなしのコマンドまたはヘルプ/バージョンフラグ用
-- `OneParamResult`: "init"などの単一コマンド用
-- `TwoParamResult`: 指示タイプとレイヤータイプを持つコマンド用
+- `OneParamsResult`: "init"などの単一コマンド用
+- `TwoParamsResult`: 指示タイプとレイヤータイプを持つコマンド用
 
 ### オプション
 

@@ -91,4 +91,71 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     assert(result.errorMessage?.includes('Empty value not allowed'));
     assert(result.errorCode === 'INVALID_OPTIONS');
   });
+
+  await t.step('should handle short form options - ZeroParams', () => {
+    const validator = new ZeroOptionValidator();
+
+    // 短縮形ヘルプオプション
+    const helpResult = validator.validate(['-h'], 'zero', DEFAULT_OPTION_RULE);
+    console.log('Short help result:', helpResult);
+    // 現在は認識されず、オプションが空になる
+    assert(helpResult.isValid);
+    assert(Object.keys(helpResult.options || {}).length === 0, 'Short options are not recognized');
+
+    // 短縮形バージョンオプション
+    const versionResult = validator.validate(['-v'], 'zero', DEFAULT_OPTION_RULE);
+    console.log('Short version result:', versionResult);
+    assert(versionResult.isValid);
+    assert(Object.keys(versionResult.options || {}).length === 0, 'Short options are not recognized');
+  });
+
+  await t.step('should handle short form options - OneParam', () => {
+    const validator = new OneOptionValidator();
+
+    // 短縮形オプション
+    const shortResult = validator.validate(['-f=input.md'], 'one', DEFAULT_OPTION_RULE);
+    console.log('OneParam short result:', shortResult);
+    // 現在は認識されず、オプションが空になる
+    assert(shortResult.isValid);
+    assert(Object.keys(shortResult.options || {}).length === 0, 'Short options are not recognized');
+  });
+
+  await t.step('should handle short form options - TwoParams', () => {
+    const validator = new TwoOptionValidator();
+
+    // 短縮形オプション
+    const shortResult = validator.validate(['-f=input.md', '-o=output.md'], 'two', DEFAULT_OPTION_RULE);
+    console.log('TwoParams short result:', shortResult);
+    // 現在は認識されず、オプションが空になる
+    assert(shortResult.isValid);
+    assert(Object.keys(shortResult.options || {}).length === 0, 'Short options are not recognized');
+
+    // 長形式と短縮形の混在
+    const mixedResult = validator.validate(['--from=input.md', '-o=output.md'], 'two', DEFAULT_OPTION_RULE);
+    console.log('Mixed options result:', mixedResult);
+    // 長形式のみ認識される
+    assert(mixedResult.isValid);
+    assert(mixedResult.options?.from === 'input.md', 'Long form should be recognized');
+    assert(!mixedResult.options?.destination, 'Short form -o should not be recognized');
+  });
+
+  await t.step('should handle custom variable options correctly', () => {
+    const validator = new TwoOptionValidator();
+
+    // 現在のテストでは成功しているはずだが、実際のパーサーでは失敗する
+    const customVarResult = validator.validate(['--uv-project=myproject'], 'two', DEFAULT_OPTION_RULE);
+    console.log('Custom variable result in validator:', customVarResult);
+    assert(customVarResult.isValid, 'Custom variables should be valid in TwoParams');
+    assert(customVarResult.options?.['uv-project'] === 'myproject');
+
+    // 複数のカスタム変数
+    const multiCustomResult = validator.validate(
+      ['--uv-project=myproject', '--uv-version=1.0.0'],
+      'two',
+      DEFAULT_OPTION_RULE
+    );
+    assert(multiCustomResult.isValid);
+    assert(multiCustomResult.options?.['uv-project'] === 'myproject');
+    assert(multiCustomResult.options?.['uv-version'] === '1.0.0');
+  });
 });

@@ -1,13 +1,13 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import {
   ErrorInfo,
-  OneParamResult,
+  OneParamsResult,
   OptionRule,
   ParamsResult,
-  TwoParamResult,
+  TwoParamsResult,
   ValidationResult,
   ZeroParamsResult,
-} from "../../src/types/option_rule.ts"';
+} from "../../src/types/option_rule.ts";
 
 Deno.test('test_result_unit', () => {
   // ParamsResultのテスト
@@ -30,8 +30,8 @@ Deno.test('test_result_unit', () => {
   assertEquals(Array.isArray(zeroParamsResult.params), true, 'params should be an array');
   assertEquals(typeof zeroParamsResult.options, 'object', 'options should be an object');
 
-  // OneParamResultのテスト
-  const oneParamResult: OneParamResult = {
+  // OneParamsResultのテスト
+  const oneParamResult: OneParamsResult = {
     type: 'one',
     params: ['init'],
     options: {},
@@ -46,23 +46,23 @@ Deno.test('test_result_unit', () => {
     'demonstrativeType should be a string',
   );
 
-  // TwoParamResultのテスト
-  const twoParamResult: TwoParamResult = {
+  // TwoParamsResultのテスト
+  const twoParamsResult: TwoParamsResult = {
     type: 'two',
     params: ['to', 'project'],
     options: {},
     demonstrativeType: 'to',
     layerType: 'project',
   };
-  assertEquals(twoParamResult.type, 'two', 'type should be two');
-  assertEquals(Array.isArray(twoParamResult.params), true, 'params should be an array');
-  assertEquals(typeof twoParamResult.options, 'object', 'options should be an object');
+  assertEquals(twoParamsResult.type, 'two', 'type should be two');
+  assertEquals(Array.isArray(twoParamsResult.params), true, 'params should be an array');
+  assertEquals(typeof twoParamsResult.options, 'object', 'options should be an object');
   assertEquals(
-    typeof twoParamResult.demonstrativeType,
+    typeof twoParamsResult.demonstrativeType,
     'string',
     'demonstrativeType should be a string',
   );
-  assertEquals(typeof twoParamResult.layerType, 'string', 'layerType should be a string');
+  assertEquals(typeof twoParamsResult.layerType, 'string', 'layerType should be a string');
 
   // ErrorInfoのテスト
   const errorInfo: ErrorInfo = {

@@ -1,5 +1,5 @@
 import { ParamsParser } from '../src/mod.ts';
-import type { ZeroParamsResult, OneParamResult, TwoParamResult } from '../src/mod.ts';
+import type { ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../src/mod.ts';
 
 // Example arguments for testing
 const testArgs = [
@@ -60,7 +60,7 @@ Options:
     }
 
     case 'one': {
-      const oneResult = result as OneParamResult;
+      const oneResult = result as OneParamsResult;
       if (oneResult.demonstrativeType === 'init') {
         console.log('Initializing new project...');
         // Add initialization logic here
@@ -69,7 +69,7 @@ Options:
     }
 
     case 'two': {
-      const twoResult = result as TwoParamResult;
+      const twoResult = result as TwoParamsResult;
       const { demonstrativeType, layerType, options = {} } = twoResult;
       console.log(`Action: ${demonstrativeType} ${layerType}`);
 

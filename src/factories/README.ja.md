@@ -2,17 +2,24 @@
 
 オプションファクトリは、コマンドラインオプションの生成と管理を行うコンポーネントです。
 
+## オプションクラス中心設計における役割
+
+新しい設計では、OptionFactoryはシステムの中核として以下の重要な役割を担います：
+
+- **Optionインスタンスの生成**: コマンドライン引数から適切なOptionクラスのインスタンスを生成
+- **オプションタイプの判定**: ValueOption、FlagOption、CustomVariableOptionの適切な選択
+- **正規化の委譲**: 各Optionインスタンスが自身の正規化を担当
+
 ## 概要
 
 オプションファクトリは以下の機能を提供します：
 
-- 標準オプションの定義と管理
-- オプションの登録と取得
-- エイリアス（短縮形）の管理
-- コマンドライン引数からのオプション生成
-- カスタム変数オプションのサポート
+- Optionインスタンスの生成と管理
+- 標準オプションの定義とエイリアス管理
+- コマンドライン引数の解析とオプションタイプ判定
+- ユーザー変数オプションのサポート
 
-> 注意: バリデーションは `/validator` ディレクトリの別コンポーネントで行われます。このファクトリはオプションの生成と管理のみを担当します。
+> 注意: 各Optionインスタンスが自身の正規化とバリデーションを担当します。OptionFactoryは適切なOptionクラスのインスタンス生成のみを担当します。
 
 ## 標準オプション
 
@@ -63,43 +70,65 @@ interface OptionFactory {
 - 存在するかどうかのみを管理
 - 常に有効なオプションとして扱う
 
-### 3. カスタム変数オプション (CustomVariableOption)
+### 3. ユーザー変数オプション (CustomVariableOption)
 
-- `--uv-*` 形式のカスタム変数
-- 変数名のパターン検証
-- 任意の値を受け入れる
+- `--uv-*` 形式のユーザー変数
+- 正規化： `--uv-config` → `uv-config`
+- 変数名のパターン検証を自身で実装
 
 ## 使用例
 
 ### 基本的な使用
 
 ```typescript
-const factory = new CommandLineOptionFactory();
+const factory = new OptionFactory();
 
-// コマンドライン引数からのオプション生成
+// コマンドライン引数からのOptionインスタンス生成
 const args = ['--help', '-i=value', '--uv-config=config.json'];
-const options = factory.createOptionsFromArgs(args);
+const options = factory.createOptions(args);
 
-// 生成されたオプションの使用
+// 生成されたOptionインスタンスの使用
 options.forEach((option) => {
-  if (option.name === 'help') {
-    // ヘルプメッセージを表示
-  } else if (option.name === 'input') {
-    const value = option.parse('-i=value');
-    // 入力ファイルの処理
-  }
+  console.log(option.canonicalName); // 'help', 'input', 'uv-config'
+  console.log(option.validate()); // バリデーション結果
+  console.log(option.getValue()); // 値の取得
 });
 ```
 
-### エイリアスの使用
+### 正規化の例
 
 ```typescript
-// 長い名前と短い名前の両方で同じオプションにアクセス可能
-const helpOption = factory.createOptionsFromArgs(['--help'])[0];
-const shortHelpOption = factory.createOptionsFromArgs(['-h'])[0];
+const factory = new OptionFactory();
 
-// 両方とも同じオプションとして扱われる
-assertEquals(helpOption.name, shortHelpOption.name); // true
+// ショートオプション
+const helpShort = factory.createOptions(['-h'])[0];
+console.log(helpShort.canonicalName); // 'help'
+
+// ロングオプション
+const helpLong = factory.createOptions(['--help'])[0];
+console.log(helpLong.canonicalName); // 'help'
+
+// ユーザー変数オプション
+const userVar = factory.createOptions(['--uv-project=test'])[0];
+console.log(userVar.canonicalName); // 'uv-project'
+```
+
+### Optionクラスの活用
+
+```typescript
+const factory = new OptionFactory();
+const options = factory.createOptions(['to', 'project', '-h', '--uv-name=test']);
+
+// Optionインスタンスの分類
+const positionalArgs = options.filter(opt => !opt.isOption());
+const optionArgs = options.filter(opt => opt.isOption());
+
+// 正規化された値の取得
+const normalizedOptions = {};
+optionArgs.forEach(opt => {
+  normalizedOptions[opt.canonicalName] = opt.getValue();
+});
+// 結果: { help: true, 'uv-name': 'test' }
 ```
 
 ## エラー処理

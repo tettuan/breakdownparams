@@ -3,7 +3,7 @@
 ## 基本型
 
 ```typescript
-type ParamPatternResult = ZeroParamResult | OneParamResult | TwoParamResult;
+type ParamPatternResult = ZeroParamResult | OneParamsResult | TwoParamsResult;
 
 type ZeroParamResult = {
   type: 'help' | 'version';
@@ -12,14 +12,14 @@ type ZeroParamResult = {
   error?: ErrorInfo;
 };
 
-type OneParamResult = {
+type OneParamsResult = {
   type: 'layer';
   command: string;
   options: OptionParams;
   error?: ErrorInfo;
 };
 
-type TwoParamResult = {
+type TwoParamsResult = {
   type: 'break';
   demonstrativeType: string;
   layerType: string;
@@ -37,8 +37,8 @@ const helpResult: ZeroParamResult = {
   help: true
 };
 
-// OneParamResult を返す
-const layerResult: OneParamResult = {
+// OneParamsResult を返す
+const layerResult: OneParamsResult = {
   type: 'layer',
   command: 'create',
   options: {
@@ -46,8 +46,8 @@ const layerResult: OneParamResult = {
   }
 };
 
-// TwoParamResult を返す
-const breakResult: TwoParamResult = {
+// TwoParamsResult を返す
+const breakResult: TwoParamsResult = {
   type: 'break',
   demonstrativeType: 'type1',
   layerType: 'layer1',
@@ -62,8 +62,8 @@ const breakResult: TwoParamResult = {
 
 1. パラメータパターンに基づく型定義
    - `ZeroParamResult`: パラメータなし（help/version）
-   - `OneParamResult`: 単一パラメータ（layer command）
-   - `TwoParamResult`: 二重パラメータ（break command）
+   - `OneParamsResult`: 単一パラメータ（layer command）
+   - `TwoParamsResult`: 二重パラメータ（break command）
 
 2. 型安全性の確保
    - 各パターンに応じた必須プロパティ
@@ -71,7 +71,7 @@ const breakResult: TwoParamResult = {
    - エラー情報の統一的な扱い
 
 3. 拡張性の考慮
-   - パラメータの型（ZeroParamResult, OneParamResult, TwoParamResult）を維持
+   - パラメータの型（ZeroParamResult, OneParamsResult, TwoParamsResult）を維持
    - 新しいパターンの追加が容易
    - 既存の型との互換性を保持
 
@@ -147,7 +147,7 @@ const breakResult: TwoParamResult = {
 
 ### 3. 型の一貫性
 
-- パラメータの型（ZeroParamsResult, OneParamResult, TwoParamsResult）を維持
+- パラメータの型（ZeroParamsResult, OneParamsResult, TwoParamsResult）を維持
 - エラー情報は各パラメータ型の error プロパティとして保持
 - 型の変換は行わない
 

@@ -1,11 +1,11 @@
 import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/mod.ts';
-import { OptionRule, TwoParamResult } from "../../src/types/option_rule.ts"';
+import { OptionRule, TwoParamsResult } from "../../src/types/option_rule.ts";
 
 Deno.test('test_examples_execution', async (t) => {
   await t.step('basic_usage example', () => {
     const parser = new ParamsParser();
-    const result = parser.parse(['to', 'project']) as TwoParamResult;
+    const result = parser.parse(['to', 'project']) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
     assertEquals(result.demonstrativeType, 'to');
@@ -24,7 +24,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--adaptation=strict',
       '--uv-project=myproject',
       '--uv-version=1.0.0'
-    ]) as TwoParamResult;
+    ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
     assertEquals(result.demonstrativeType, 'to');
@@ -73,7 +73,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--adaptation=strict',
       '--uv-project=myproject',
       '--uv-version=1.0.0'
-    ]) as TwoParamResult;
+    ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
     assertEquals(result.demonstrativeType, 'to');
@@ -123,7 +123,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--uv-project=myproject',
       '--uv-version=1.0.0',
       '--uv-environment=production'
-    ]) as TwoParamResult;
+    ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
     assertEquals(result.demonstrativeType, 'to');
@@ -171,7 +171,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--adaptation=strict',
       '--uv-project=myproject',
       '--uv-version=1.0.0'
-    ]) as TwoParamResult;
+    ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
     assertEquals(result.demonstrativeType, 'custom');
@@ -218,7 +218,7 @@ Deno.test('test_examples_execution', async (t) => {
       '--adaptation=strict',
       '--uv-project=myproject',
       '--uv-version=1.0.0'
-    ]) as TwoParamResult;
+    ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
     assertEquals(result.demonstrativeType, 'to');

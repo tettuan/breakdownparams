@@ -1,8 +1,8 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
-  OneParamResult,
+  OneParamsResult,
   ParamsResult,
-  TwoParamResult,
+  TwoParamsResult,
   ZeroParamsResult,
 } from '../types/params_result.ts';
 
@@ -19,7 +19,7 @@ Deno.test('test_zero_params_result_structure', () => {
 });
 
 Deno.test('test_one_param_result_structure', () => {
-  const result: OneParamResult = {
+  const result: OneParamsResult = {
     type: 'one',
     params: ['init'],
     options: {},
@@ -32,7 +32,7 @@ Deno.test('test_one_param_result_structure', () => {
 });
 
 Deno.test('test_two_param_result_structure', () => {
-  const result: TwoParamResult = {
+  const result: TwoParamsResult = {
     type: 'two',
     params: ['to', 'project'],
     options: {},

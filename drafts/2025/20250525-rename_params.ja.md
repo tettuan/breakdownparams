@@ -23,8 +23,8 @@
 --------------------------------------------------------
 ParamsResult                 → ParamPatternResult
   ├─ ZeroParamResult         → ZeroParamResult
-  ├─ SingleParamResult      → OneParamResult
-  └─ DoubleParamsResult     → TwoParamResult
+  ├─ SingleParamResult      → OneParamsResult
+  └─ DoubleParamsResult     → TwoParamsResult
 
 関連する型の変更：
 --------------------------------------------------------

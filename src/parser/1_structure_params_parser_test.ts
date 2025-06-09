@@ -1,7 +1,7 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from './params_parser.ts';
 import { OptionRule } from '../types/option_rule.ts';
-import { ZeroParamsResult, OneParamResult, TwoParamResult } from '../types/params_result.ts';
+import { ZeroParamsResult, OneParamsResult, TwoParamsResult } from '../types/params_result.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
@@ -38,7 +38,7 @@ Deno.test('test_params_parser_structure_with_option_rule', () => {
   assertEquals(typeof zeroResult.options, 'object', 'Options should be an object');
 
   // Test one param structure
-  const oneResult = parser.parse(['init']) as OneParamResult;
+  const oneResult = parser.parse(['init']) as OneParamsResult;
   assertEquals(oneResult.type, 'one', 'One param should have type one');
   assertEquals(Array.isArray(oneResult.params), true, 'Params should be an array');
   assertEquals(oneResult.params.length, 1, 'One param should have one element');
@@ -46,7 +46,7 @@ Deno.test('test_params_parser_structure_with_option_rule', () => {
   assertEquals(typeof oneResult.options, 'object', 'Options should be an object');
 
   // Test two params structure with valid demonstrative and layer types
-  const twoResult = parser.parse(['summary', 'task', '--from=input.txt', '--destination=output.txt']) as TwoParamResult;
+  const twoResult = parser.parse(['summary', 'task', '--from=input.txt', '--destination=output.txt']) as TwoParamsResult;
   logger.debug('Two params result:', twoResult);
   assertEquals(twoResult.type, 'two', 'Two params should have type two');
   assertEquals(Array.isArray(twoResult.params), true, 'Params should be an array');
@@ -69,7 +69,7 @@ Deno.test('test_params_parser_structure_without_option_rule', () => {
   assertEquals(typeof zeroResult.options, 'object', 'Options should be an object');
 
   // Test one param structure
-  const oneResult = parser.parse(['init']) as OneParamResult;
+  const oneResult = parser.parse(['init']) as OneParamsResult;
   assertEquals(oneResult.type, 'one', 'One param should have type one');
   assertEquals(Array.isArray(oneResult.params), true, 'Params should be an array');
   assertEquals(oneResult.params.length, 1, 'One param should have one element');
@@ -77,7 +77,7 @@ Deno.test('test_params_parser_structure_without_option_rule', () => {
   assertEquals(typeof oneResult.options, 'object', 'Options should be an object');
 
   // Test two params structure with valid demonstrative and layer types
-  const twoResult = parser.parse(['summary', 'task', '--from=input.txt', '--destination=output.txt']) as TwoParamResult;
+  const twoResult = parser.parse(['summary', 'task', '--from=input.txt', '--destination=output.txt']) as TwoParamsResult;
   logger.debug('Two params result:', twoResult);
   assertEquals(twoResult.type, 'two', 'Two params should have type two');
   assertEquals(Array.isArray(twoResult.params), true, 'Params should be an array');

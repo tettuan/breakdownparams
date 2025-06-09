@@ -1,9 +1,9 @@
 import { assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
   ErrorInfo,
-  OneParamResult,
+  OneParamsResult,
   ParamsResult,
-  TwoParamResult,
+  TwoParamsResult,
   ZeroParamsResult,
 } from '../../src/types/params_result.ts';
 import { OptionRule } from '../../src/types/option_rule.ts';
@@ -32,7 +32,7 @@ Deno.test('test_zero_params_result_interface', () => {
 });
 
 Deno.test('test_one_param_result_interface', () => {
-  const result: OneParamResult = {
+  const result: OneParamsResult = {
     type: 'one',
     params: [],
     options: {},
@@ -45,7 +45,7 @@ Deno.test('test_one_param_result_interface', () => {
 });
 
 Deno.test('test_two_param_result_interface', () => {
-  const result: TwoParamResult = {
+  const result: TwoParamsResult = {
     type: 'two',
     params: [],
     options: {},

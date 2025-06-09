@@ -23,7 +23,7 @@ export interface ZeroParamsResult extends ParamsResult {
 /**
  * 単一パラメータの結果
  */
-export interface OneParamResult extends ParamsResult {
+export interface OneParamsResult extends ParamsResult {
   /** 単一パラメータを示す識別子 */
   type: 'one';
   /** 指示型の種類 */
@@ -33,7 +33,7 @@ export interface OneParamResult extends ParamsResult {
 /**
  * 二重パラメータの結果
  */
-export interface TwoParamResult extends ParamsResult {
+export interface TwoParamsResult extends ParamsResult {
   /** 二重パラメータを示す識別子 */
   type: 'two';
   /** 指示型の種類 */

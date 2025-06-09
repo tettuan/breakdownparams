@@ -59,10 +59,10 @@ class ParamsParser {
       return this.createZeroParamResult(zero, optionResults);
     }
     if (!zero.isValid() && one.isValid() && !two.isValid()) {
-      return this.createOneParamResult(one, optionResults);
+      return this.createOneParamsResult(one, optionResults);
     }
     if (!zero.isValid() && !one.isValid() && two.isValid()) {
-      return this.createTwoParamResult(two, optionResults);
+      return this.createTwoParamsResult(two, optionResults);
     }
     return this.createErrorResult();
   }

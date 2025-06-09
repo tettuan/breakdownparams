@@ -6,6 +6,25 @@
 
 ## 設計の背景と目的
 
+### オプションクラス中心の設計
+
+このライブラリは、各オプションインスタンスが独自の正規化、検証、変換ロジックを保持するオプションクラス中心の設計を採用しています。この設計により以下が実現されます：
+
+- **単一責任原則**: 各オプションクラスが自身の動作を管理
+- **一貫性**: システム全体で統一された正規化ルール
+- **拡張性**: 新しいオプションタイプの追加が容易
+- **カプセル化**: 内部表現と外部インターフェースの分離
+
+### 正規化ルールの統一
+
+すべてのオプションは以下の正規化ルールに従います：
+- 先頭のハイフンを除去した形式を正規名とする
+- エイリアスは主要名に解決される
+- 例：
+  - `--help` → `help`
+  - `-h` → `help`
+  - `--uv-config` → `uv-config`
+
 コマンドライン引数の処理において、以下の課題が存在していました：
 
 1. **型安全性の欠如**
@@ -13,10 +32,10 @@
    - 型の不一致による予期せぬ動作のリスクが高い
    - 開発時の型チェックが不十分
 
-2. **検証ロジックの分散**
-   - 各コマンドで独自に検証ロジックを実装する必要がある
-   - 検証ルールの一貫性が保てない
-   - 重複コードの発生
+2. **正規化処理の分散**
+   - 複数の場所で異なる正規化ロジックが実装されていた
+   - ショートハンドオプションの処理が不完全
+   - ユーザー変数オプションの扱いが一貫していない
 
 3. **拡張性の制限**
    - 新しいオプションタイプの追加が困難
@@ -30,10 +49,10 @@
    - 実行時エラーを事前に検出
    - 型変換の安全性を保証
 
-2. **検証の一元管理**
-   - 共通の検証ロジックを提供
-   - 一貫したエラーハンドリング
-   - 検証ルールの再利用性向上
+2. **正規化の一元管理**
+   - 各オプションクラスが自身の正規化ロジックを保持
+   - 一貫した正規化ルールの適用
+   - 内部表現と外部表現の明確な分離
 
 3. **拡張性の提供**
    - インターフェースベースの設計
@@ -46,7 +65,32 @@
 
 ### 1. コアインターフェース
 
-`Option`インターフェースは、すべてのオプションタイプの基本となる契約を定義します。このインターフェースは、オプションの基本的な属性（名前、エイリアス、型、必須性、説明）と、検証と解析の振る舞いを規定します。これにより、異なるオプションタイプ間で一貫した操作が可能になります。
+`Option`インターフェースは、すべてのオプションタイプの基本となる契約を定義します。このインターフェースは、オプションの基本的な属性と振る舞いを規定します：
+
+```typescript
+interface Option {
+  // 基本プロパティ
+  readonly rawInput: string;        // 元の入力
+  readonly canonicalName: string;   // 正規化名（ハイフン除去）
+  readonly longForm: string;        // ロングフォーム
+  readonly shortForm?: string;      // ショートフォーム
+  
+  // 判定メソッド
+  isShorthand(): boolean;
+  isLongForm(): boolean;
+  isCustomVariable(): boolean;
+  matchesInput(input: string): boolean;
+  
+  // 変換メソッド
+  toNormalized(): string;
+  toLong(): string;
+  toShort(): string | undefined;
+  
+  // バリデーション
+  validate(): ValidationResult;
+  getValue(): string | boolean;
+}
+```
 
 ### 2. オプション実装の階層
 
@@ -54,7 +98,7 @@
 
 - **`FlagOption`**: 値を持たないフラグの存在確認に特化
 - **`ValueOption`**: 値の検証と型変換を担当
-- **`CustomVariableOption`**: カスタム変数の命名規則と値の検証を管理
+- **`CustomVariableOption`**: ユーザー変数の命名規則と値の検証を管理（`--uv-*` → `uv-*`に正規化）
 
 ### 3. 検証パイプライン
 
@@ -74,6 +118,86 @@
    - オプションの登録と管理
    - エイリアスの解決
    - オプションの検索と取得
+
+## 実装例
+
+### Optionインターフェースの実装
+
+```typescript
+class ValueOption implements Option {
+  readonly rawInput: string;
+  readonly canonicalName: string;
+  readonly longForm: string;
+  readonly shortForm?: string;
+  private value?: string;
+
+  constructor(
+    input: string,
+    aliases: string[] = [],
+    private validator?: (value: string) => ValidationResult
+  ) {
+    this.rawInput = input;
+    this.longForm = input.startsWith('--') ? input : `--${input}`;
+    this.shortForm = aliases.find(a => a.startsWith('-') && !a.startsWith('--'));
+    
+    // 正規化：先頭のハイフンを除去
+    this.canonicalName = input.replace(/^-+/, '');
+  }
+
+  validate(): ValidationResult {
+    if (!this.value) {
+      return { isValid: true, validatedParams: [] };
+    }
+    if (this.validator) {
+      return this.validator(this.value);
+    }
+    return { isValid: true, validatedParams: [] };
+  }
+
+  getValue(): string | boolean {
+    return this.value || '';
+  }
+}
+```
+
+### ユーザー変数オプションの実装
+
+```typescript
+class CustomVariableOption implements Option {
+  readonly rawInput: string;
+  readonly canonicalName: string;
+  readonly longForm: string;
+  readonly variableName: string;
+  private value?: string;
+
+  constructor(input: string) {
+    this.rawInput = input;
+    this.longForm = input;
+    
+    // --uv-nameから変数名を抽出
+    const match = input.match(/^--uv-(.+)/);
+    this.variableName = match ? match[1] : '';
+    
+    // 正規化：--uv-config → uv-config
+    this.canonicalName = `uv-${this.variableName}`;
+  }
+
+  validate(): ValidationResult {
+    // 変数名の検証
+    if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(this.variableName)) {
+      return {
+        isValid: false,
+        errors: [`Invalid user variable name: ${this.variableName}`]
+      };
+    }
+    return { isValid: true, validatedParams: [] };
+  }
+
+  getValue(): string | boolean {
+    return this.value || '';
+  }
+}
+```
 
 ## 実装の特徴
 
@@ -119,14 +243,13 @@ const fromOption = new ValueOption(
 );
 ```
 
-### カスタム変数オプション
+### ユーザー変数オプション
 
 ```typescript
-const customOption = new CustomVariableOption(
-  '--uv-project',
-  'Project name',
-  /^uv-[a-zA-Z0-9_]+$/,
-);
+const userOption = new CustomVariableOption('--uv-project');
+console.log(userOption.canonicalName); // 'uv-project' (先頭のハイフンを除去)
+console.log(userOption.validate().isValid); // true
+console.log(userOption.getValue()); // ユーザーが指定した値
 ```
 
 ## 関連ドキュメント

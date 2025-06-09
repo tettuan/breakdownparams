@@ -1,5 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OptionRule, ValidationResult } from "../../src/types/option_rule.ts"';
+import { OptionRule, ValidationResult } from "../../src/types/option_rule.ts";
 
 Deno.test('test_validation_result', () => {
   // 成功結果のテスト

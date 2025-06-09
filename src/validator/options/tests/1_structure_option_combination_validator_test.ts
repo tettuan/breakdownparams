@@ -54,16 +54,17 @@ Deno.test('OptionCombinationValidator Structure Tests', async (t) => {
   });
 
   await t.step('should handle combination rules structure', () => {
+    // Create a custom rule to test combination logic
     const rule: OptionCombinationRule = {
-      allowedOptions: ['from', 'destination'],
+      allowedOptions: ['option1', 'option2'],
       requiredOptions: [],
       combinationRules: {
-        from: ['destination'],
+        option1: ['option2'],
       },
     };
 
     const validator = new OptionCombinationValidator(rule);
-    const result = validator.validate({ from: 'value' });
+    const result = validator.validate({ option1: 'value' });
 
     assert(!result.isValid);
     assert(result.errorMessage?.includes('requires'));

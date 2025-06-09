@@ -2,6 +2,14 @@
 
 このディレクトリは、コマンドラインオプションのバリデーションに関する主要なロジックを提供します。
 
+## オプションクラス中心設計による変更
+
+新しい設計では、バリデータは正規化処理を行わなくなりました：
+
+- **正規化の削除**: オプションの正規化はOptionクラスが担当
+- **バリデーションの純粋化**: バリデータは検証ロジックのみに集中
+- **Optionインスタンスの活用**: 正規化されたOptionインスタンスから値を取得
+
 > **メインの詳細ドキュメントは `docs/` 配下にあります。ここは概要・導入ガイドです。**
 
 ---
@@ -21,7 +29,7 @@
   - `OptionCombinationValidator` クラス: validate(options: Record<string, unknown>): OptionCombinationResult
   - `OptionCombinationResult` インターフェース: isValid, errorMessage, errorCode など
 - **特徴**:
-  - 入力は検証済みのオプション（`--` プレフィックスは除去済み）
+  - 入力はOptionインスタンスから取得した正規化済みの値（`help`, `uv-config` など）
   - オプションの組み合わせルールのみを検証（カスタム変数の検証は `CustomVariableValidator` の責務）
   - 標準オプションの組み合わせ、必須オプションの存在、オプション間の依存関係を検証
 - **参考**: [docs/architecture/layer2_diagrams.ja.md](../../docs/architecture/layer2_diagrams.ja.md), [docs/validation.ja.md](../../docs/validation.ja.md)
@@ -32,16 +40,25 @@
   - `ZeroOptionValidator`, `OneOptionValidator`, `TwoOptionValidator` クラス
   - `OptionValidator` インターフェース
 - **特徴**:
-  - 許可オプション・カスタム変数許可可否・型チェック・エラー生成ロジックを内包
-  - `validate(args, type, optionRule)` でコマンドライン引数配列を検証
+  - 許可オプション・ユーザー変数許可可否・型チェック・エラー生成ロジックを内包
+  - Optionインスタンスから検証結果を取得し、統合的な検証を実施
 - **参考**: [docs/validation.ja.md](../../docs/validation.ja.md), [docs/options.md](../../docs/options.md)
 
 ---
 
+### custom_variable_validator.ts
+- **役割**: ユーザー変数オプションの検証ロジックを提供します。
+- **主なエクスポート**:
+  - `CustomVariableValidator` クラス
+- **特徴**:
+  - ユーザー変数名の形式検証（`uv-` プレフィックス）
+  - 変数名の文字列パターン検証
+  - Optionインスタンスの検証結果を使用
+
 ## 関連仕様・詳細ドキュメント
 - [docs/options.md](../../docs/options.md): オプション仕様・フォーマット・制約
 - [docs/validation.ja.md](../../docs/validation.ja.md): バリデーション仕様・エラー定義
-- [docs/custom_variable_options.md](../../docs/custom_variable_options.md): カスタム変数オプション仕様
+- [docs/custom_variable_options.md](../../docs/custom_variable_options.md): ユーザー変数オプション仕様
 - [docs/architecture/layer2_diagrams.ja.md](../../docs/architecture/layer2_diagrams.ja.md): バリデーション・オプション検証のシーケンス/クラス図
 - [docs/architecture/layer5_implementation.ja.md](../../docs/architecture/layer5_implementation.ja.md): 実装詳細
 

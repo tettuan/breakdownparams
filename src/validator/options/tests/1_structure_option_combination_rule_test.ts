@@ -38,9 +38,7 @@ Deno.test('OptionCombinationRule Structure Tests', async (t) => {
     // 必須オプションの検証 - two rules には必須オプションなし
     assert(!twoRules.requiredOptions);
 
-    // 組み合わせルールの検証
-    assert(typeof twoRules.combinationRules === 'object');
-    assert(Array.isArray(twoRules.combinationRules?.from));
-    assert(twoRules.combinationRules?.from?.includes('destination'));
+    // 組み合わせルールの検証 - 現在は組み合わせルールなし
+    assert(!twoRules.combinationRules);
   });
 });
