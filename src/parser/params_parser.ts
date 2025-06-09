@@ -8,7 +8,7 @@ import { ZeroParamsValidator } from '../validator/params/zero_params_validator.t
 import { OneParamValidator } from '../validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/params/two_params_validator.ts';
 import { ZeroOptionValidator, OneOptionValidator, TwoOptionValidator } from '../validator/options/option_validator.ts';
-import { CommandLineOptionRegistry } from '../registries/option_registry.ts';
+import { CommandLineOptionFactory } from '../factories/option_factory.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
@@ -33,7 +33,7 @@ export class ParamsParser {
    * それ以上のチェックは不要
    */
   private readonly securityValidator: SecurityValidator;
-  private readonly optionRegistry: CommandLineOptionRegistry;
+  private readonly optionFactory: CommandLineOptionFactory;
   protected readonly zeroOptionCombinationValidator: OptionCombinationValidator;
   protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
   protected readonly twoOptionCombinationValidator: OptionCombinationValidator;
@@ -44,11 +44,40 @@ export class ParamsParser {
     this.logger = new BreakdownLogger();
 
     this.securityValidator = new SecurityValidator();
-    this.optionRegistry = new CommandLineOptionRegistry(this.optionRule);
+    this.optionFactory = new CommandLineOptionFactory();
     this.zeroOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
     this.oneOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.one);
     this.twoOptionCombinationValidator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.two);
   }
+
+  /**
+   * Factoryを使用してオプションを抽出する
+   * @param args - コマンドライン引数
+   * @returns 抽出されたオプション
+   */
+  private extractOptionsUsingFactory(args: string[]): Record<string, unknown> {
+    const options: Record<string, unknown> = {};
+    const optionArgs = args.filter(arg => arg.startsWith('--') || arg.startsWith('-'));
+    
+    for (const arg of optionArgs) {
+      try {
+        const option = this.optionFactory.createOptionsFromArgs([arg])[0];
+        if (option) {
+          // Use the option's normalized name method
+          const optionName = option.toNormalized();
+          // Get the value from the option instance
+          const value = option.getValue();
+          options[optionName] = value;
+        }
+      } catch (error) {
+        // 無効なオプションは無視
+        this.logger.debug(`Skipping invalid option: ${arg}`, error);
+      }
+    }
+    
+    return options;
+  }
+
 
   /**
    * パラメータを解析する
@@ -80,12 +109,9 @@ export class ParamsParser {
 
     // 2. パラメータとオプションを分離する
     // パラメータは、オプションではないもの
-    // オプションは、-- から始まるもの
-    const params = args.filter(arg => !arg.startsWith('--'));
-    const options = this.optionRegistry.extractOptions(args).reduce((acc: Record<string, unknown>, opt: { name: string; value: unknown }) => {
-      acc[opt.name] = opt.value;
-      return acc;
-    }, {} as Record<string, unknown>);
+    // オプションは、-- または - から始まるもの
+    const params = args.filter(arg => !arg.startsWith('--') && !arg.startsWith('-'));
+    const options = this.extractOptionsUsingFactory(args);
 
     // 3. パラメータのバリデーション
     // パラメータの数に応じて、バリデーションを行う

@@ -1,26 +1,44 @@
-import { Option, OptionType } from '../types/option_type.ts';
+import { OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
-import { CustomVariableValidator } from '../validator/options/custom_variable_validator.ts';
+import { UserVariableOptionValidator } from '../validator/options/user_variable_option_validator.ts';
+import { BaseOption } from './base_option.ts';
 
 /**
- * CustomVariableOption class for handling custom variable options (--uv-*)
- * Following custom_variable_options.ja.md specifications:
+ * UserVariableOption class for handling user variable options (--uv-*)
+ * Following user_variable_options specifications:
  * - Only alphanumeric and underscore allowed
  * - Must start with a letter
  * - Case sensitive
  * - Must not be empty
  */
-export class CustomVariableOption implements Option {
-  readonly type = OptionType.CUSTOM_VARIABLE;
+export class UserVariableOption extends BaseOption {
+  readonly type = OptionType.USER_VARIABLE;
   readonly isRequired = false;
   readonly aliases: string[] = [];
-  private readonly validator: CustomVariableValidator;
+  private readonly validator: UserVariableOptionValidator;
+  private value?: string;
 
   constructor(
     readonly name: string,
     readonly description: string,
+    rawInput: string = '',
   ) {
-    this.validator = new CustomVariableValidator();
+    // Initialize base option - user variables always use their full name with prefix
+    super(rawInput || name, name, undefined);
+    this.validator = new UserVariableOptionValidator();
+    
+    // Extract value from raw input if provided
+    if (rawInput) {
+      this.value = this.extractValue(rawInput);
+    }
+  }
+
+
+  /**
+   * Get the value for this user variable
+   */
+  getValue(): string {
+    return this.value || '';
   }
 
   validate(value: unknown): ValidationResult {

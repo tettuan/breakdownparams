@@ -1,7 +1,7 @@
 import { Option } from '../types/option_type.ts';
 import { FlagOption } from '../option-models/flag_option.ts';
 import { ValueOption } from '../option-models/value_option.ts';
-import { CustomVariableOption } from '../option-models/custom_variable_option.ts';
+import { UserVariableOption } from '../option-models/user_variable_option.ts';
 
 type OptionConfig = {
   longname: string;
@@ -77,16 +77,16 @@ export class CommandLineOptionFactory implements OptionFactory {
 
   /**
    * Creates an option from a command line argument string
-   * @param arg Command line argument string
+   * @param optionInput Command line argument string
    * @returns Created option
    */
-  private createOptionFromString(arg: string): Option {
-    const [name, value] = arg.split('=');
+  private createOptionFromString(optionInput: string): Option {
+    const [name, value] = optionInput.split('=');
     const normalizedName = this.normalizeOptionName(name);
 
-    // Handle custom variable options (e.g., --uv-config=value)
+    // Handle user variable options (e.g., --uv-config=value)
     if (name.startsWith('--uv-')) {
-      return new CustomVariableOption(name, 'Custom variable option');
+      return new UserVariableOption(name, 'User variable option', optionInput);
     }
 
     // Find the standard option configuration
@@ -100,19 +100,23 @@ export class CommandLineOptionFactory implements OptionFactory {
       case 'flag':
         return new FlagOption(
           `--${optionConfig.longname}`,
-          [optionConfig.shortname],
+          [`-${optionConfig.shortname}`],
           'Flag option',
+          optionInput, // Pass raw input
+          `--${optionConfig.longname}`,
+          `-${optionConfig.shortname}`,
         );
       case 'value':
-        if (!value) {
-          throw new Error(`Option ${name} requires a value`);
-        }
+        // Value options don't require a value at creation time
         return new ValueOption(
           `--${optionConfig.longname}`,
-          [optionConfig.shortname],
+          [`-${optionConfig.shortname}`],
           false,
           'Value option',
           (val: string) => ({ isValid: true, validatedParams: [val] }),
+          optionInput, // Pass raw input
+          `--${optionConfig.longname}`,
+          `-${optionConfig.shortname}`,
         );
       default:
         throw new Error(`Unsupported option type: ${optionConfig.type}`);

@@ -8,8 +8,8 @@ export enum OptionType {
   VALUE = 'value',
   /** フラグオプション */
   FLAG = 'flag',
-  /** カスタム変数オプション */
-  CUSTOM_VARIABLE = 'custom_variable',
+  /** ユーザー変数オプション */
+  USER_VARIABLE = 'user_variable',
 }
 
 /**
@@ -30,6 +30,24 @@ export interface Option {
   validate(value?: unknown): ValidationResult;
   /** 値のパース関数（オプション） */
   parse?(value: unknown): unknown;
+  
+  // New methods for enhanced functionality
+  /** Check if the input is in shorthand form */
+  isShorthand(): boolean;
+  /** Check if the input is in long form */
+  isLongForm(): boolean;
+  /** Check if this is a user variable option */
+  isCustomVariable(): boolean;
+  /** Check if an input string matches this option */
+  matchesInput(input: string): boolean;
+  /** Get the normalized (canonical) name */
+  toNormalized(): string;
+  /** Get the long form representation */
+  toLong(): string;
+  /** Get the short form representation (if available) */
+  toShort(): string | undefined;
+  /** Get the value */
+  getValue(): string | boolean;
 }
 
 /**

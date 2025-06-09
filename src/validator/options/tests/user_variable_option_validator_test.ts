@@ -1,10 +1,10 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
-import { CustomVariableValidator } from '../custom_variable_validator.ts';
+import { UserVariableOptionValidator } from '../user_variable_option_validator.ts';
 
-Deno.test('CustomVariableValidator Unit Tests', async (t) => {
-  const validator = new CustomVariableValidator();
+Deno.test('UserVariableOptionValidator Unit Tests', async (t) => {
+  const validator = new UserVariableOptionValidator();
 
-  await t.step('should handle valid custom variable name correctly', () => {
+  await t.step('should handle valid user variable name correctly', () => {
     const result = validator.validate('--uv-test=value');
     assert(result.isValid);
     assertEquals(result.validatedParams, []);

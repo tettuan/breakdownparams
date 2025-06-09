@@ -43,7 +43,7 @@ export interface OptionCombinationResult {
  * 3. オプション間の依存関係（組み合わせルール）が満たされているか
  */
 export class OptionCombinationValidator {
-  private readonly customVariablePattern = /^--uv-[a-zA-Z][a-zA-Z0-9]*$/;
+  private readonly customVariablePattern = /^uv-[a-zA-Z][a-zA-Z0-9_]*$/; // Normalized form
 
   /**
    * @param rule - オプションの組み合わせルールを定義するオブジェクト
@@ -99,7 +99,7 @@ export class OptionCombinationValidator {
   private validateStandardOptions(options: Record<string, unknown>): OptionCombinationResult {
     // 許可されていないoptionが含まれていないか
     for (const key of Object.keys(options)) {
-      if (key.startsWith('--uv-')) continue;
+      if (key.startsWith('uv-')) continue; // Skip user variables (normalized form)
       if (!this.rule.allowedOptions.includes(key)) {
         return {
           isValid: false,

@@ -1,8 +1,9 @@
-import { Option, OptionType } from '../types/option_type.ts';
+import { OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
 import { validateOptionName } from './format_utils.ts';
+import { BaseOption } from './base_option.ts';
 
-export class FlagOption implements Option {
+export class FlagOption extends BaseOption {
   readonly type = OptionType.FLAG;
   readonly isRequired = false;
 
@@ -10,7 +11,13 @@ export class FlagOption implements Option {
     readonly name: string,
     readonly aliases: string[],
     readonly description: string,
+    rawInput: string = '',
+    longname?: string,
+    shortname?: string,
   ) {
+    // Initialize base option with long and short names
+    super(rawInput || name, longname || name, shortname);
+    
     // Validate option name (remove -- prefix if present)
     const cleanName = name.startsWith('--') ? name.slice(2) : name;
     const nameValidation = validateOptionName(cleanName);
@@ -26,6 +33,13 @@ export class FlagOption implements Option {
         throw new Error(`Invalid alias: ${aliasValidation.error}`);
       }
     }
+  }
+
+  /**
+   * Get the value for flag options (always true when present)
+   */
+  getValue(): boolean {
+    return true;
   }
 
   validate(): ValidationResult {

@@ -1,9 +1,11 @@
-import { Option, OptionType } from '../types/option_type.ts';
+import { OptionType } from '../types/option_type.ts';
 import { ValidationResult } from '../types/validation_result.ts';
 import { validateOptionFormat, validateOptionName } from './format_utils.ts';
+import { BaseOption } from './base_option.ts';
 
-export class ValueOption implements Option {
+export class ValueOption extends BaseOption {
   readonly type = OptionType.VALUE;
+  private value?: string;
 
   constructor(
     readonly name: string,
@@ -11,7 +13,18 @@ export class ValueOption implements Option {
     readonly isRequired: boolean,
     readonly description: string,
     readonly validator: (value: string) => ValidationResult,
+    rawInput: string = '',
+    longname?: string,
+    shortname?: string,
   ) {
+    // Initialize base option with long and short names
+    super(rawInput || name, longname || name, shortname);
+    
+    // Extract value from raw input if provided
+    if (rawInput) {
+      this.value = this.extractValue(rawInput);
+    }
+    
     // Validate option name (remove -- prefix if present)
     const cleanName = name.startsWith('--') ? name.slice(2) : name;
     const nameValidation = validateOptionName(cleanName);
@@ -27,6 +40,13 @@ export class ValueOption implements Option {
         throw new Error(`Invalid alias: ${aliasValidation.error}`);
       }
     }
+  }
+
+  /**
+   * Get the value for this option
+   */
+  getValue(): string {
+    return this.value || '';
   }
 
   validate(value: unknown): ValidationResult {

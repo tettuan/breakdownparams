@@ -1,14 +1,14 @@
 import { ValidationResult } from '../../types/validation_result.ts';
 
 /**
- * Validator for custom variable options (--uv-*)
- * Following custom_variable_options.ja.md specifications:
+ * Validator for user variable options (--uv-*)
+ * Following user_variable_options specifications:
  * - Only alphanumeric and underscore allowed
  * - Must start with a letter
  * - Case sensitive
  * - Must not be empty
  */
-export class CustomVariableValidator {
+export class UserVariableOptionValidator {
   /**
    * Default pattern for variable name validation
    * - Must start with a letter
@@ -22,7 +22,7 @@ export class CustomVariableValidator {
    * @returns ValidationResult indicating if the variable name is valid
    */
   validateVariableName(variableName: string): ValidationResult {
-    if (!variableName || !CustomVariableValidator.DEFAULT_PATTERN.test(variableName)) {
+    if (!variableName || !UserVariableOptionValidator.DEFAULT_PATTERN.test(variableName)) {
       return {
         isValid: false,
         validatedParams: [],
@@ -37,7 +37,7 @@ export class CustomVariableValidator {
   }
 
   /**
-   * Validates a custom variable option value
+   * Validates a user variable option value
    * @param value The value to validate
    * @returns ValidationResult indicating if the value is valid
    */
@@ -74,7 +74,7 @@ export class CustomVariableValidator {
     const cleanVariableName = variableName.replace('--uv-', '');
 
     // 3. Validation: Variable name rules
-    if (!cleanVariableName || !CustomVariableValidator.DEFAULT_PATTERN.test(cleanVariableName)) {
+    if (!cleanVariableName || !UserVariableOptionValidator.DEFAULT_PATTERN.test(cleanVariableName)) {
       return {
         isValid: false,
         validatedParams: [],
@@ -89,7 +89,7 @@ export class CustomVariableValidator {
   }
 
   /**
-   * Extracts the value part from a custom variable option
+   * Extracts the value part from a user variable option
    * @param value The value to parse
    * @returns The extracted value or undefined
    */

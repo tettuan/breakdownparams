@@ -1,17 +1,17 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
-import { CustomVariableOption } from '../custom_variable_option.ts';
+import { UserVariableOption } from '../user_variable_option.ts';
 
-Deno.test('CustomVariableOption Unit Tests', async (t) => {
-  const customVariableOption = new CustomVariableOption(
+Deno.test('UserVariableOption Unit Tests', async (t) => {
+  const userVariableOption = new UserVariableOption(
     '--uv-test',
-    'Test custom variable option',
+    'Test user variable option',
   );
 
-  await t.step('should handle valid custom variable name correctly', () => {
-    const result = customVariableOption.validate('--uv-test=value');
+  await t.step('should handle valid user variable name correctly', () => {
+    const result = userVariableOption.validate('--uv-test=value');
     assert(result.isValid);
     assertEquals(result.validatedParams, []);
-    assertEquals(customVariableOption.parse('--uv-test=value'), 'value');
+    assertEquals(userVariableOption.parse('--uv-test=value'), 'value');
   });
 
   await t.step('should handle invalid pattern (starts with digit)', () => {
@@ -36,27 +36,27 @@ Deno.test('CustomVariableOption Unit Tests', async (t) => {
   });
 
   await t.step('should error if = is missing', () => {
-    const result = customVariableOption.validate('--uv-test');
+    const result = userVariableOption.validate('--uv-test');
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Invalid value format'));
   });
 
   await t.step('should handle multiple = signs', () => {
-    const result = customVariableOption.validate('--uv-test==val');
+    const result = userVariableOption.validate('--uv-test==val');
     assert(result.isValid);
-    assertEquals(customVariableOption.parse('--uv-test==val'), '=val');
+    assertEquals(userVariableOption.parse('--uv-test==val'), '=val');
   });
 
   await t.step('should allow empty value', () => {
-    const result = customVariableOption.validate('--uv-test=');
+    const result = userVariableOption.validate('--uv-test=');
     assert(result.isValid);
-    assertEquals(customVariableOption.parse('--uv-test='), '');
+    assertEquals(userVariableOption.parse('--uv-test='), '');
   });
 
   await t.step('should allow complex value', () => {
-    const result = customVariableOption.validate('--uv-test={"key":"value"}');
+    const result = userVariableOption.validate('--uv-test={"key":"value"}');
     assert(result.isValid);
-    assertEquals(customVariableOption.parse('--uv-test={"key":"value"}'), '{"key":"value"}');
+    assertEquals(userVariableOption.parse('--uv-test={"key":"value"}'), '{"key":"value"}');
   });
 
   await t.step('should distinguish case in variable name', () => {
@@ -78,9 +78,9 @@ Deno.test('CustomVariableOption Unit Tests', async (t) => {
   });
 
   await t.step('should handle undefined value correctly', () => {
-    const result = customVariableOption.validate(undefined);
+    const result = userVariableOption.validate(undefined);
     assert(result.isValid);
     assertEquals(result.validatedParams, []);
-    assertEquals(customVariableOption.parse(undefined), undefined);
+    assertEquals(userVariableOption.parse(undefined), undefined);
   });
 });
