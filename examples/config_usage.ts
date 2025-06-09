@@ -60,6 +60,12 @@ for (const args of testArgs) {
     if (typedOptions.config) {
       console.log('Note: Config option is ignored in single param mode');
     }
+    
+    // Handle the error case
+    if (oneResult.error) {
+      console.log(`Note: ${oneResult.error.message}`);
+      console.log('Config option is only available with TwoParams');
+    }
   } else if (result.type === 'zero') {
     const zeroResult = result as ZeroParamsResult;
     const typedOptions = zeroResult.options as { help?: boolean; version?: boolean };

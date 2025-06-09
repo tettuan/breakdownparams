@@ -18,7 +18,7 @@ for (const args of testArgs) {
   const parser = new ParamsParser();
   const result = parser.parse(args) as ParamsResult;
 
-  if (result.type === 'error') {
+  if (result.error) {
     console.error(`Error: ${result.error?.message}`);
     console.error(`Error Code: ${result.error?.code}`);
     console.error(`Error Category: ${result.error?.category}`);
@@ -52,7 +52,14 @@ Try these invalid commands to see error handling in action:
     // If we get here, the command was valid
     console.log('Command processed successfully:');
     console.log('Type:', result.type);
-    console.log('Params:', result.params);
-    console.log('Options:', result.options);
+    
+    if (result.type === 'one' && 'demonstrativeType' in result) {
+      console.log('Command:', result.demonstrativeType);
+    } else if (result.type === 'two' && 'demonstrativeType' in result && 'layerType' in result) {
+      console.log('Demonstrative Type:', result.demonstrativeType);
+      console.log('Layer Type:', result.layerType);
+    }
+    
+    console.log('Options:', result.options || {});
   }
 }
