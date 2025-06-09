@@ -1,5 +1,6 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OptionRule, ParamsResult } from "../../src/types/option_rule.ts";
+import { OptionRule } from "../../../src/types/option_rule.ts";
+import { ParamsResult } from "../../../src/types/params_result.ts";
 
 Deno.test('test_params_result', () => {
   // パラメータ結果のテスト
@@ -16,44 +17,46 @@ Deno.test('test_params_result', () => {
   // オプションルールのテスト
   const optionRule: OptionRule = {
     format: '--key=value',
-    validation: {
+    rules: {
       customVariables: ['--demonstrative-type', '--layer-type'],
-      emptyValue: 'error',
-      unknownOption: 'error',
-      duplicateOption: 'error',
       requiredOptions: [],
       valueTypes: ['string'],
     },
+    errorHandling: {
+      emptyValue: 'error',
+      unknownOption: 'error',
+      duplicateOption: 'error',
+    },
     flagOptions: {
-      help: 'help',
-      version: 'version',
+      help: true,
+      version: true,
     },
   };
 
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
   assertEquals(
-    Array.isArray(optionRule.validation.customVariables),
+    Array.isArray(optionRule.rules.customVariables),
     true,
     'customVariables should be an array',
   );
-  assertEquals(typeof optionRule.validation.emptyValue, 'string', 'emptyValue should be a string');
+  assertEquals(typeof optionRule.errorHandling.emptyValue, 'string', 'emptyValue should be a string');
   assertEquals(
-    typeof optionRule.validation.unknownOption,
+    typeof optionRule.errorHandling.unknownOption,
     'string',
     'unknownOption should be a string',
   );
   assertEquals(
-    typeof optionRule.validation.duplicateOption,
+    typeof optionRule.errorHandling.duplicateOption,
     'string',
     'duplicateOption should be a string',
   );
   assertEquals(
-    Array.isArray(optionRule.validation.requiredOptions),
+    Array.isArray(optionRule.rules.requiredOptions),
     true,
     'requiredOptions should be an array',
   );
   assertEquals(
-    Array.isArray(optionRule.validation.valueTypes),
+    Array.isArray(optionRule.rules.valueTypes),
     true,
     'valueTypes should be an array',
   );

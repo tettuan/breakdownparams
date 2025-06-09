@@ -1,38 +1,40 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { ZeroParamsValidator } from "../../src/validator/params/zero_params_validator.ts";
-import { OptionRule } from "../../src/types/option_rule.ts";
+import { ZeroParamsValidator } from "../../../src/validator/params/zero_params_validator.ts";
+import { OptionRule } from "../../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  rules: {
     customVariables: ['--demonstrative-type', '--layer-type'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
     requiredOptions: [],
     valueTypes: ['string'],
   },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+  },
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
 };
 
 Deno.test('test_zero_params_validator_implementation', () => {
-  const validator = new ZeroParamsValidator(optionRule);
+  const validator = new ZeroParamsValidator();
 
-  // オプションのみのテスト
-  const validArgs = ['--help', '--version'];
+  // パラメータなしのテスト
+  const validArgs: string[] = [];
   const validResult = validator.validate(validArgs);
-  assertEquals(validResult.isValid, true, 'Options only should pass validation');
+  assertEquals(validResult.isValid, true, 'Zero parameters should pass validation');
   assertEquals(validResult.validatedParams, validArgs, 'Validated params should match input');
 
-  // 位置引数がある場合のテスト
-  const withPositionalArgs = ['--help', 'init'];
-  const withPositionalResult = validator.validate(withPositionalArgs);
-  assertEquals(withPositionalResult.isValid, false, 'Positional arguments should fail validation');
+  // パラメータがある場合のテスト
+  const withParams = ['init'];
+  const withParamsResult = validator.validate(withParams);
+  assertEquals(withParamsResult.isValid, false, 'Parameters should fail validation');
   assertEquals(
-    withPositionalResult.validatedParams,
+    withParamsResult.validatedParams,
     [],
     'Validated params should be empty for invalid input',
   );

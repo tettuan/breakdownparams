@@ -99,22 +99,24 @@ Deno.test('test_validation_rules_structure', () => {
 
 Deno.test('test_validation_rules_default_values', () => {
   // オプションルールのデフォルト値
-  assertEquals(DEFAULT_OPTION_RULE.flagOptions.help, 'help');
-  assertEquals(DEFAULT_OPTION_RULE.flagOptions.version, 'version');
+  assertEquals(DEFAULT_OPTION_RULE.flagOptions.help, true);
+  assertEquals(DEFAULT_OPTION_RULE.flagOptions.version, true);
   assertEquals(DEFAULT_OPTION_RULE.errorHandling.emptyValue, 'error');
   assertEquals(DEFAULT_OPTION_RULE.errorHandling.unknownOption, 'error');
   assertEquals(DEFAULT_OPTION_RULE.errorHandling.duplicateOption, 'error');
 
   // オプション組み合わせルールのデフォルト値
   assertEquals(DEFAULT_OPTION_COMBINATION_RULES.zero.allowedOptions, ['help', 'version']);
-  assertEquals(DEFAULT_OPTION_COMBINATION_RULES.one.allowedOptions, ['from']);
-  assertEquals(DEFAULT_OPTION_COMBINATION_RULES.one.requiredOptions, ['from']);
+  assertEquals(DEFAULT_OPTION_COMBINATION_RULES.one.allowedOptions, ['config']);
+  assertEquals(DEFAULT_OPTION_COMBINATION_RULES.one.requiredOptions, undefined);
   assertEquals(DEFAULT_OPTION_COMBINATION_RULES.two.allowedOptions, [
     'from',
     'destination',
     'config',
+    'adaptation',
+    'input',
   ]);
-  assertEquals(DEFAULT_OPTION_COMBINATION_RULES.two.requiredOptions, ['from']);
+  assertEquals(DEFAULT_OPTION_COMBINATION_RULES.two.requiredOptions, undefined);
 
   // パラメータ設定のデフォルト値
   assertEquals(DEFAULT_TWO_PARAMS_CONFIG.demonstrativeType?.pattern, '^(to|summary|defect)$');

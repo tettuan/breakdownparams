@@ -1,6 +1,7 @@
 import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/mod.ts';
-import { OptionRule, TwoParamsResult } from "../../src/types/option_rule.ts";
+import { OptionRule } from "../../../src/types/option_rule.ts";
+import { TwoParamsResult } from "../../../src/types/params_result.ts";
 
 Deno.test('test_examples_execution', async (t) => {
   await t.step('basic_usage example', () => {
@@ -40,7 +41,7 @@ Deno.test('test_examples_execution', async (t) => {
   await t.step('config_usage example', () => {
     const customConfig: OptionRule = {
       format: '--key=value',
-      validation: {
+      rules: {
         customVariables: [
           '--config',
           '--from',
@@ -50,15 +51,17 @@ Deno.test('test_examples_execution', async (t) => {
           '--uv-project',
           '--uv-version'
         ],
-        emptyValue: 'error',
-        unknownOption: 'error',
-        duplicateOption: 'error',
         requiredOptions: [],
         valueTypes: ['string'],
       },
+      errorHandling: {
+        emptyValue: 'error',
+        unknownOption: 'error',
+        duplicateOption: 'error',
+      },
       flagOptions: {
-        help: 'help',
-        version: 'version',
+        help: true,
+        version: true,
       },
     };
 
@@ -90,7 +93,7 @@ Deno.test('test_examples_execution', async (t) => {
   await t.step('custom_variable_options_usage example', () => {
     const customConfig: OptionRule = {
       format: '--key=value',
-      validation: {
+      rules: {
         customVariables: [
           '--from',
           '--destination',
@@ -100,15 +103,17 @@ Deno.test('test_examples_execution', async (t) => {
           '--uv-version',
           '--uv-environment'
         ],
-        emptyValue: 'error',
-        unknownOption: 'error',
-        duplicateOption: 'error',
         requiredOptions: [],
         valueTypes: ['string'],
       },
+      errorHandling: {
+        emptyValue: 'error',
+        unknownOption: 'error',
+        duplicateOption: 'error',
+      },
       flagOptions: {
-        help: 'help',
-        version: 'version',
+        help: true,
+        version: true,
       },
     };
 
@@ -140,7 +145,7 @@ Deno.test('test_examples_execution', async (t) => {
   await t.step('extended_params_usage example', () => {
     const customConfig: OptionRule = {
       format: '--key=value',
-      validation: {
+      rules: {
         customVariables: [
           '--from',
           '--destination',
@@ -149,19 +154,32 @@ Deno.test('test_examples_execution', async (t) => {
           '--uv-project',
           '--uv-version'
         ],
-        emptyValue: 'error',
-        unknownOption: 'error',
-        duplicateOption: 'error',
         requiredOptions: [],
         valueTypes: ['string'],
       },
+      errorHandling: {
+        emptyValue: 'error',
+        unknownOption: 'error',
+        duplicateOption: 'error',
+      },
       flagOptions: {
-        help: 'help',
-        version: 'version',
+        help: true,
+        version: true,
       },
     };
 
-    const parser = new ParamsParser(customConfig);
+    const customParamsConfig = {
+      demonstrativeType: {
+        pattern: '^(to|summary|defect|custom)$',
+        errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect, custom',
+      },
+      layerType: {
+        pattern: '^(project|issue|task|custom)$',
+        errorMessage: 'Invalid layer type. Must be one of: project, issue, task, custom',
+      },
+    };
+
+    const parser = new ParamsParser(customConfig, customParamsConfig);
     const result = parser.parse([
       'custom',
       'custom',
@@ -187,7 +205,7 @@ Deno.test('test_examples_execution', async (t) => {
   await t.step('error_handling example', () => {
     const customConfig: OptionRule = {
       format: '--key=value',
-      validation: {
+      rules: {
         customVariables: [
           '--from',
           '--destination',
@@ -196,15 +214,17 @@ Deno.test('test_examples_execution', async (t) => {
           '--uv-project',
           '--uv-version'
         ],
-        emptyValue: 'error',
-        unknownOption: 'error',
-        duplicateOption: 'error',
         requiredOptions: [],
         valueTypes: ['string'],
       },
+      errorHandling: {
+        emptyValue: 'error',
+        unknownOption: 'error',
+        duplicateOption: 'error',
+      },
       flagOptions: {
-        help: 'help',
-        version: 'version',
+        help: true,
+        version: true,
       },
     };
 

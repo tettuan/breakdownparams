@@ -5,8 +5,8 @@ import { OptionRule } from '../../src/types/option_rule.ts';
 const optionRule: OptionRule = {
   format: '--key=value',
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
   rules: {
     customVariables: ['uv-project', 'uv-version', 'uv-environment'],

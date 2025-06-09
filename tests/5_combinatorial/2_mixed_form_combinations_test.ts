@@ -10,13 +10,13 @@
  * - オプション順序の影響確認
  * 
  * 優先度ルール:
- * - 長形式 (--option) が短形式 (-o) より優先される
- * - 後から指定されたオプションが前の同一オプションを上書きする
+ * - 最後に指定されたオプションが有効（後勝ち）
+ * - 長形式・短形式に関係なく、順序で決定される
  */
 
-import { assertEquals } from 'https://deno.land/std@0.208.0/assert/mod.ts';
+import { assertEquals, assertStringIncludes } from 'https://deno.land/std@0.208.0/assert/mod.ts';
 import { ParamsParser } from '../../src/mod.ts';
-import type { TwoParamsResult } from '../../src/mod.ts';
+import type { TwoParamsResult, ParamsResult } from '../../src/mod.ts';
 
 // テスト用の共通パラメータ
 const DEMO_TYPE = 'to';
@@ -102,23 +102,23 @@ Deno.test('Mixed Form Combinations - Priority Tests', async (t) => {
   
   // 優先度テストデータ
   const priorityTests = [
-    // 長形式が先、短形式が後 → 長形式が優先
+    // 長形式が先、短形式が後 → 最後のオプション（短形式）が優先
     { 
       args: [DEMO_TYPE, LAYER_TYPE, '--from=long.md', '-f=short.md'], 
-      expected: { from: 'long.md' },
-      description: 'Long form first, short form second - long should win'
+      expected: { from: 'short.md' },
+      description: 'Long form first, short form second - last option should win'
     },
-    // 短形式が先、長形式が後 → 長形式が優先
+    // 短形式が先、長形式が後 → 最後のオプション（長形式）が優先
     { 
       args: [DEMO_TYPE, LAYER_TYPE, '-f=short.md', '--from=long.md'], 
       expected: { from: 'long.md' },
-      description: 'Short form first, long form second - long should win'
+      description: 'Short form first, long form second - last option should win'
     },
     // 複数オプションでの混合優先度テスト
     { 
       args: [DEMO_TYPE, LAYER_TYPE, '-f=short.md', '--from=long.md', '-o=short_out.md', '--destination=long_out.md'], 
       expected: { from: 'long.md', destination: 'long_out.md' },
-      description: 'Multiple options priority test - all long forms should win'
+      description: 'Multiple options priority test - last options should win'
     },
     // 同一形式の重複（後勝ち）
     { 
@@ -169,8 +169,8 @@ Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
     // 極端な重複
     { 
       args: [DEMO_TYPE, LAYER_TYPE, '-f=1.md', '--from=2.md', '-f=3.md', '--from=4.md', '-f=5.md'], 
-      expected: { from: '4.md' },
-      description: 'Extreme duplication - last long form should win'
+      expected: { from: '5.md' },
+      description: 'Extreme duplication - last option should win'
     },
   ];
   
@@ -232,17 +232,16 @@ Deno.test('Mixed Form Combinations - Order Independence', async (t) => {
 Deno.test('Mixed Form Combinations - Edge Cases', async (t) => {
   const parser = new ParamsParser();
   
-  await t.step('Empty values with mixed forms', () => {
+  await t.step('Empty values with mixed forms should error', () => {
     const args = [DEMO_TYPE, LAYER_TYPE, '-f=', '--destination=', '--input=task'];
-    const expected = { from: '', destination: '', input: 'task' };
+    const result = parser.parse(args) as ParamsResult;
     
-    const result = parser.parse(args) as TwoParamsResult;
-    
-    assertBasicResult(result, 'Empty values with mixed forms');
-    assertOptionsMatch(
-      result.options as Record<string, unknown>, 
-      expected, 
-      'Empty values with mixed forms'
+    // 空値はエラーになることを確認
+    assertEquals(result.type, 'error', 'Empty values should result in error');
+    assertStringIncludes(
+      result.error?.message || '', 
+      'Empty value not allowed',
+      'Should indicate empty value error'
     );
   });
   

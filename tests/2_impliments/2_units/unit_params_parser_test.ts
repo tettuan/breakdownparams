@@ -1,20 +1,23 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OneParamsResult, OptionRule, TwoParamsResult } from "../../src/types/option_rule.ts";
+import { OptionRule } from "../../../src/types/option_rule.ts";
+import { OneParamsResult, TwoParamsResult } from "../../../src/types/params_result.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  rules: {
     customVariables: ['--demonstrative-type', '--layer-type'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
     requiredOptions: [],
     valueTypes: ['string'],
   },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+  },
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
 };
 
@@ -28,7 +31,7 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(optionsOnlyResult.params, [], 'Params should be empty for options only');
   assertEquals(
     optionsOnlyResult.options,
-    { help: undefined, version: undefined },
+    { help: true, version: true },
     'Options should match',
   );
 
@@ -53,8 +56,8 @@ Deno.test('test_params_parser_unit', () => {
   const twoParamWithOptionsResult = parser.parse([
     'to',
     'project',
-    '--help',
-    '--version',
+    '--from=source',
+    '--destination=target',
   ]) as TwoParamsResult;
   console.log('[DEBUG] twoParamWithOptionsResult:', twoParamWithOptionsResult);
   assertEquals(
@@ -65,7 +68,7 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(twoParamWithOptionsResult.params, ['to', 'project'], 'Params should match input');
   assertEquals(
     twoParamWithOptionsResult.options,
-    { help: undefined, version: undefined },
+    { from: 'source', destination: 'target' },
     'Options should match',
   );
   assertEquals(

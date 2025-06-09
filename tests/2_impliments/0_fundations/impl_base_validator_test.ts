@@ -1,31 +1,34 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { SecurityErrorValidator } from '../../../src/validator/security_error_validator.ts';
-import { OptionRule, ValidationResult } from "../../src/types/option_rule.ts";
+import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+import { OptionRule } from "../../../src/types/option_rule.ts";
+import { ValidationResult } from "../../../src/types/validation_result.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  rules: {
     customVariables: ['--demonstrative-type', '--layer-type'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
     requiredOptions: [],
     valueTypes: ['string'],
   },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+  },
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
 };
 
-Deno.test('test_security_error_validator_implementation', () => {
-  const validator = new SecurityErrorValidator(optionRule);
+Deno.test('test_security_validator_implementation', () => {
+  const validator = new SecurityValidator();
 
   // 正常系のバリデーション
   const result = validator.validate(['test']);
   assertEquals(result.isValid, true, 'Normal validation should succeed');
   assertEquals(result.validatedParams, ['test'], 'Validated params should match input');
-  assertEquals(result.errors, [], 'Should have no errors');
+  assertEquals(result.errorMessage, undefined, 'Should have no error message');
 
   // シェルコマンド実行の試み
   const shellCommandResult = validator.validate(['test; ls']);
@@ -34,7 +37,7 @@ Deno.test('test_security_error_validator_implementation', () => {
   assertEquals(shellCommandResult.errorCategory, 'security', 'Should have security category');
   assertEquals(
     shellCommandResult.errorMessage,
-    'Security error: Shell command execution attempt detected',
+    'Security error: Shell command execution or redirection attempt detected',
     'Should have correct error message'
   );
 

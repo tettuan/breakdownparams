@@ -83,8 +83,8 @@ Deno.test('test_option_rule_interface', async (t) => {
   const rule: OptionRule = {
     format: '--key=value',
     flagOptions: {
-      help: 'help',
-      version: 'version',
+      help: true,
+      version: true,
     },
     rules: {
       customVariables: ['uv-project', 'uv-version', 'uv-environment'],
@@ -103,7 +103,7 @@ Deno.test('test_option_rule_interface', async (t) => {
     assertEquals(typeof rule.flagOptions, 'object');
     assertEquals(typeof rule.rules, 'object');
     assertEquals(typeof rule.errorHandling, 'object');
-    assertEquals(typeof rule.flagOptions.help, 'string');
-    assertEquals(typeof rule.flagOptions.version, 'string');
+    assertEquals(typeof rule.flagOptions.help, 'boolean');
+    assertEquals(typeof rule.flagOptions.version, 'boolean');
   });
 });

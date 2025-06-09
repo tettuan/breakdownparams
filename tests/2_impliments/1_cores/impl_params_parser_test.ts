@@ -1,20 +1,23 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OneParamsResult, OptionRule, TwoParamsResult, ErrorResult } from "../../src/types/option_rule.ts";
+import { OptionRule } from "../../../src/types/option_rule.ts";
+import { OneParamsResult, TwoParamsResult, ErrorResult } from "../../../src/types/params_result.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  rules: {
     customVariables: ['demonstrative-type', 'layer-type'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
     requiredOptions: [],
     valueTypes: ['string'],
   },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+  },
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
 };
 
@@ -28,7 +31,7 @@ Deno.test('test_params_parser_implementation', () => {
   assertEquals(optionsOnlyResult.params, [], 'Params should be empty for options only');
   assertEquals(
     optionsOnlyResult.options,
-    { help: undefined, version: undefined },
+    { help: true, version: true },
     'Options should match',
   );
 
@@ -49,8 +52,8 @@ Deno.test('test_params_parser_implementation', () => {
   assertEquals(twoParamResult.demonstrativeType, 'to', 'Demonstrative type should match');
   assertEquals(twoParamResult.layerType, 'project', 'Layer type should match');
 
-  // オプション付きの2つの引数のテスト
-  const twoParamWithOptionsArgs = ['to', 'project', '--help', '--version'];
+  // オプション付きの2つの引数のテスト (from/destination are allowed for two params)
+  const twoParamWithOptionsArgs = ['to', 'project', '--from=source', '--destination=target'];
   const twoParamWithOptionsResult = parser.parse(twoParamWithOptionsArgs) as TwoParamsResult;
   assertEquals(
     twoParamWithOptionsResult.type,
@@ -60,7 +63,7 @@ Deno.test('test_params_parser_implementation', () => {
   assertEquals(twoParamWithOptionsResult.params, ['to', 'project'], 'Params should match');
   assertEquals(
     twoParamWithOptionsResult.options,
-    { help: undefined, version: undefined },
+    { from: 'source', destination: 'target' },
     'Options should match',
   );
   assertEquals(
@@ -76,5 +79,5 @@ Deno.test('test_params_parser_implementation', () => {
   assertEquals(invalidResult.type, 'error', 'Invalid arguments should be error type');
   assertEquals(invalidResult.params, [], 'Params should be empty for invalid input');
   assertEquals(invalidResult.options, {}, 'Options should be empty for invalid input');
-  assertEquals(invalidResult.error?.code, 'VALIDATION_ERROR', 'Error code should match');
+  assertEquals(invalidResult.error?.code, 'INVALID_COMMAND', 'Error code should match');
 });

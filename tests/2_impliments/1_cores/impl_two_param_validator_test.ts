@@ -1,25 +1,27 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { TwoParamsValidator } from "../../src/validator/params/two_params_validator.ts";
-import { OptionRule } from "../../src/types/option_rule.ts";
+import { TwoParamsValidator } from "../../../src/validator/params/two_params_validator.ts";
+import { OptionRule } from "../../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  rules: {
     customVariables: ['demonstrative-type', 'layer-type'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
     requiredOptions: [],
     valueTypes: ['string'],
   },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+  },
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
 };
 
 Deno.test('test_two_param_validator_implementation', () => {
-  const validator = new TwoParamsValidator(optionRule);
+  const validator = new TwoParamsValidator();
 
   // 2つの引数のテスト
   const twoParams = ['to', 'project'];
@@ -31,6 +33,6 @@ Deno.test('test_two_param_validator_implementation', () => {
   const invalidParams = ['invalid'];
   const invalidResult = validator.validate(invalidParams);
   assertEquals(invalidResult.isValid, false, 'Invalid parameters should fail validation');
-  assertEquals(invalidResult.validatedParams, [], 'Params should be empty for invalid input');
-  assertEquals(invalidResult.errorCode, 'VALIDATION_ERROR', 'Error code should match');
+  assertEquals(invalidResult.validatedParams, invalidParams, 'Params should contain invalid input for tracking');
+  assertEquals(invalidResult.errorCode, 'INVALID_PARAMS', 'Error code should match');
 });

@@ -1,25 +1,27 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { SecurityErrorValidator } from '../../../src/validator/security_error_validator.ts';
-import { OptionRule } from "../../src/types/option_rule.ts";
+import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+import { OptionRule } from "../../../src/types/option_rule.ts";
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  rules: {
     customVariables: ['--demonstrative-type', '--layer-type'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
     requiredOptions: [],
     valueTypes: ['string'],
   },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+  },
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
 };
 
 Deno.test('test_security_error_validator_implementation', () => {
-  const validator = new SecurityErrorValidator(optionRule);
+  const validator = new SecurityValidator();
 
   // 安全なパラメータのテスト
   const safeArgs = ['test', '--option=value', 'normal-param'];
@@ -27,8 +29,8 @@ Deno.test('test_security_error_validator_implementation', () => {
   assertEquals(safeResult.isValid, true, 'Safe parameters should pass validation');
   assertEquals(
     safeResult.validatedParams,
-    ['test', 'normal-param'],
-    'Validated params should only include positional arguments',
+    ['test', '--option=value', 'normal-param'],
+    'Validated params should include all parameters when validation passes',
   );
 
   // 危険な文字を含むパラメータのテスト（基本的なセキュリティチェック）
@@ -48,8 +50,8 @@ Deno.test('test_security_error_validator_implementation', () => {
     );
     assertEquals(
       result.validatedParams,
-      [],
-      'Validated params should be empty for dangerous input',
+      [arg],
+      'Validated params should contain the dangerous input for tracking',
     );
   });
 
@@ -61,5 +63,5 @@ Deno.test('test_security_error_validator_implementation', () => {
     false,
     'Parameters with any dangerous character should fail validation',
   );
-  assertEquals(mixedResult.validatedParams, [], 'Validated params should be empty for mixed input');
+  assertEquals(mixedResult.validatedParams, mixedArgs, 'Validated params should contain all mixed input for tracking');
 });

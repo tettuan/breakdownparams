@@ -2,13 +2,13 @@ import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { FlagOption } from '../../src/option-models/flag_option.ts';
 import { OptionType } from '../../src/types/option_type.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
-import { CustomVariableOption } from '../../src/option-models/custom_variable_option.ts';
+import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
 
 // 1. 基本的な型の定義と値の確認
 Deno.test('test_option_type_enum', () => {
   assertEquals(OptionType.VALUE, 'value');
   assertEquals(OptionType.FLAG, 'flag');
-  assertEquals(OptionType.CUSTOM_VARIABLE, 'custom_variable');
+  assertEquals(OptionType.USER_VARIABLE, 'user_variable');
 });
 
 // 2. インターフェースの実装確認
@@ -21,7 +21,6 @@ Deno.test('test_option_interface_implementation', async (t) => {
     assert('description' in flagOption);
     assert('isRequired' in flagOption);
     assert('validate' in flagOption);
-    assert('parse' in flagOption);
   });
 
   await t.step('ValueOption should implement Option interface', () => {
@@ -41,15 +40,15 @@ Deno.test('test_option_interface_implementation', async (t) => {
     assert('parse' in valueOption);
   });
 
-  await t.step('CustomVariableOption should implement Option interface', () => {
-    const customVarOption = new CustomVariableOption('config', 'Configuration', /^[a-zA-Z0-9_]+$/);
-    assert('type' in customVarOption);
-    assert('name' in customVarOption);
-    assert('aliases' in customVarOption);
-    assert('description' in customVarOption);
-    assert('isRequired' in customVarOption);
-    assert('validate' in customVarOption);
-    assert('parse' in customVarOption);
+  await t.step('UserVariableOption should implement Option interface', () => {
+    const userVarOption = new UserVariableOption('--uv-config', 'Configuration');
+    assert('type' in userVarOption);
+    assert('name' in userVarOption);
+    assert('aliases' in userVarOption);
+    assert('description' in userVarOption);
+    assert('isRequired' in userVarOption);
+    assert('validate' in userVarOption);
+    assert('parse' in userVarOption);
   });
 });
 
@@ -75,10 +74,10 @@ Deno.test('test_option_naming_conventions', async (t) => {
     assertEquals(valueOption.type, OptionType.VALUE);
   });
 
-  await t.step('should follow naming conventions for custom variable options', () => {
-    const customVarOption = new CustomVariableOption('config', 'Configuration', /^[a-zA-Z0-9_]+$/);
-    assertEquals(customVarOption.name, 'config');
-    assertEquals(customVarOption.type, OptionType.CUSTOM_VARIABLE);
+  await t.step('should follow naming conventions for user variable options', () => {
+    const userVarOption = new UserVariableOption('--uv-config', 'Configuration');
+    assertEquals(userVarOption.name, '--uv-config');
+    assertEquals(userVarOption.type, OptionType.USER_VARIABLE);
   });
 });
 
@@ -94,7 +93,7 @@ Deno.test('test_option_design_consistency', async (t) => {
 
   await t.step('should maintain consistent method signatures', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
-    const validateResult = flagOption.validate(undefined);
+    const validateResult = flagOption.validate();
     assert('isValid' in validateResult);
     assert('validatedParams' in validateResult);
   });

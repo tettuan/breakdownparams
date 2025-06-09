@@ -1,20 +1,22 @@
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { OptionRule } from "../../src/types/option_rule.ts";
+import { OptionRule } from "../../../src/types/option_rule.ts";
 
 const rule: OptionRule = {
   format: '--key=value',
-  validation: {
+  rules: {
     customVariables: ['--uv-*'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
     requiredOptions: [],
     valueTypes: [],
   },
+  errorHandling: {
+    emptyValue: 'error',
+    unknownOption: 'error',
+    duplicateOption: 'error',
+  },
   flagOptions: {
-    help: 'help',
-    version: 'version',
+    help: true,
+    version: true,
   },
 };
 
@@ -24,7 +26,9 @@ Deno.test('impl_options_validator_test', async (t) => {
   await t.step('should validate valid options', () => {
     const result = validator.validate(['--help', '--version'], 'zero', rule);
     assertEquals(result.isValid, true);
-    assertEquals(result.validatedParams, ['--help', '--version']);
+    assertEquals(result.validatedParams, []);
+    assertEquals(result.options?.help, true);
+    assertEquals(result.options?.version, true);
   });
 
   await t.step('should reject invalid options', () => {
