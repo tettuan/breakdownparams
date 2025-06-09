@@ -15,7 +15,7 @@ Deno.test('UserVariableOption Structure', async (t) => {
   });
 
   await t.step('should reject invalid name pattern', () => {
-    const invalidOption = new CustomVariableOption('invalid', 'Invalid');
+    const invalidOption = new UserVariableOption('invalid', 'Invalid');
     const result = invalidOption.validate('invalid');
     assert(result.errorMessage === 'Option must start with --uv-');
   });

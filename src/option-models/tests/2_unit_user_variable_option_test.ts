@@ -15,21 +15,21 @@ Deno.test('UserVariableOption Unit Tests', async (t) => {
   });
 
   await t.step('should handle invalid pattern (starts with digit)', () => {
-    const option = new CustomVariableOption('--uv-1abc', 'desc');
+    const option = new UserVariableOption('--uv-1abc', 'desc');
     const result = option.validate('--uv-1abc=value');
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Invalid variable name pattern'));
   });
 
   await t.step('should handle invalid pattern (contains hyphen)', () => {
-    const option = new CustomVariableOption('--uv-ab-c', 'desc');
+    const option = new UserVariableOption('--uv-ab-c', 'desc');
     const result = option.validate('--uv-ab-c=value');
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Invalid variable name pattern'));
   });
 
   await t.step('should handle empty variable name', () => {
-    const option = new CustomVariableOption('--uv-', 'desc');
+    const option = new UserVariableOption('--uv-', 'desc');
     const result = option.validate('--uv-=');
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Invalid variable name pattern'));
@@ -60,8 +60,8 @@ Deno.test('UserVariableOption Unit Tests', async (t) => {
   });
 
   await t.step('should distinguish case in variable name', () => {
-    const option1 = new CustomVariableOption('--uv-Project', 'desc');
-    const option2 = new CustomVariableOption('--uv-project', 'desc');
+    const option1 = new UserVariableOption('--uv-Project', 'desc');
+    const option2 = new UserVariableOption('--uv-project', 'desc');
     const result1 = option1.validate('--uv-Project=foo');
     const result2 = option2.validate('--uv-project=bar');
     assert(result1.isValid);
@@ -71,7 +71,7 @@ Deno.test('UserVariableOption Unit Tests', async (t) => {
   });
 
   await t.step('should error on invalid syntax (no -- prefix)', () => {
-    const option = new CustomVariableOption('uv-test', 'desc');
+    const option = new UserVariableOption('uv-test', 'desc');
     const result = option.validate('uv-test=value');
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Option must start with --'));
