@@ -133,13 +133,13 @@ const breakResult: TwoParamResult = {
   }
 }
 
-// 例3: オプションエラー（カスタム変数の命名規則違反）
+// 例3: オプションエラー（ユーザー変数の命名規則違反）
 {
   type: 'one',
   command: 'init',
   options: {},
   error: {
-    message: 'Invalid custom variable name: invalid@name',
+    message: 'Invalid user variable name: invalid@name',
     code: 'INVALID_CUSTOM_VARIABLE'
   }
 }

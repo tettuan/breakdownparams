@@ -57,7 +57,7 @@ type OptionParams = {
   fromLayerType?: LayerType;
   adaptationType?: string;
   configFile?: string;
-  customVariables?: Record<string, string>;
+  [key: `uv-${string}`]?: string;  // User variables in normalized form
 };
 ```
 
@@ -125,7 +125,7 @@ type OptionParams = {
 
 2. **Option Types**
    - Standard options (--from, --destination, etc.)
-   - Custom variable options (--uv-*)
+   - User variable options (--uv-*) normalized to uv-* format
 
 ### 3. Return Type Determination
 
@@ -195,14 +195,14 @@ When an error occurs in parameters or options, the error information is set in t
   }
 }
 
-// Example 3: Option error (custom variable naming rule violation)
+// Example 3: Option error (user variable naming rule violation)
 {
   type: 'one',
   command: 'init',
   options: {},
   error: {
-    message: 'Invalid custom variable name: invalid@name',
-    code: 'INVALID_CUSTOM_VARIABLE'
+    message: 'Invalid user variable name: invalid@name',
+    code: 'INVALID_USER_VARIABLE'
   }
 }
 ```

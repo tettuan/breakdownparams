@@ -1,5 +1,15 @@
 # パラメータの仕様
 
+## オプションの正規化ルール
+
+ライブラリはすべてのオプションに対して一貫した正規化ルールを適用します：
+- 正規形式では先頭のハイフンを除去
+- エイリアスは主要名に解決
+- 例：
+  - `--help` → `help`
+  - `-h` → `help`
+  - `--uv-config` → `uv-config`
+
 ## パラメータの型定義
 
 ```typescript
@@ -83,7 +93,7 @@ type OptionParams = {
   fromLayerType?: string;  // LayerTypeのパターンでバリデーション
   adaptationType?: string;
   configFile?: string;
-  customVariables?: Record<string, string>;
+  [key: `uv-${string}`]?: string; // ユーザー変数は先頭のハイフンを除去して正規化
 };
 ```
 
@@ -296,9 +306,9 @@ const parser = new ParamsParser(customConfig);
 - `<config_file>`部分を取得
 - 例：`--config=test`の場合、`test`を保存
 
-#### カスタム変数オプション（`--uv-*`）
+#### ユーザー変数オプション（`--uv-*`）
 
-カスタム変数オプションは、ユーザー定義の変数を指定するためのオプションです。
+ユーザー変数オプションは、ユーザー定義の変数を指定するためのオプションです。
 TwoParamsモードでのみ使用可能で、以下の形式で指定します：
 
 ```bash

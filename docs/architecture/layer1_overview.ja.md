@@ -5,28 +5,34 @@
 ## 1. コアコンセプト
 
 ### 1.1 最上位の目的
-パラメータとオプションの処理を完全に分離し、最終的な結果を統合して返却する。
+オプションクラス中心の設計により、各オプションが自身の正規化、検証、変換ロジックを保持し、パラメータとオプションの処理を明確に分離する。
 
 ```mermaid
 graph TD
-    A[CLI Args] --> B[ParamsParser]
-    B --> C1[ParamsValidator]
-    C1 --> D1[パラメータ検証結果]
-    D1 --> E[パラメータタイプ判定]
-    E --> F1[ZeroOptionValidator]
-    E --> F2[OneOptionValidator]
-    E --> F3[TwoOptionValidator]
-    F1 --> G1[オプション検証]
-    F2 --> G1
-    F3 --> G1
-    G1 --> H1[オプション組み合わせ検証]
-    H1 --> I[結果統合]
-    I --> J[ParamsResult]
+    A[CLI Args] --> B[OptionFactory]
+    B --> C[Option Instances]
+    C --> D[ParamsParser]
+    D --> E1[Extract Params]
+    D --> E2[Extract Options]
+    E1 --> F[ParamsValidator]
+    E2 --> G[Option.validate()]
+    F --> H[パラメータタイプ判定]
+    G --> H
+    H --> I1[ZeroOptionValidator]
+    H --> I2[OneOptionValidator]
+    H --> I3[TwoOptionValidator]
+    I1 --> J[Option Combination Validation]
+    I2 --> J
+    I3 --> J
+    J --> K[結果統合]
+    K --> L[ParamsResult]
 ```
 
 ### 1.2 責務の分離
-- パラメータのバリデーションとオプションのバリデーションを完全に分離
-- 各バリデータは単一の責務のみを持つ
+- **オプションクラス**: 自身の正規化、検証、変換ロジックを保持
+- **OptionFactory**: CLI引数からOptionインスタンスを生成
+- **ParamsParser**: Optionインスタンスを使用してパラメータとオプションを処理
+- **バリデータ**: パラメータとオプションの組み合わせ検証に特化
 - パラメータの検証結果に基づいて適切なオプション検証を実行
 
 ### 1.3 パラメータの3区分
@@ -86,36 +92,58 @@ interface ParamsValidator {
 
 ```typescript
 interface Option {
-  validate(value: string): ValidationResult;
+  // 基本プロパティ
+  readonly rawInput: string;
+  readonly canonicalName: string;
+  readonly longForm: string;
+  readonly shortForm?: string;
+  
+  // 判定メソッド
+  isShorthand(): boolean;
+  isLongForm(): boolean;
+  isCustomVariable(): boolean;
+  matchesInput(input: string): boolean;
+  
+  // 変換メソッド
+  toNormalized(): string;
+  toLong(): string;
+  toShort(): string | undefined;
+  
+  // バリデーション
+  validate(): ValidationResult;
+  getValue(): string | boolean;
 }
 ```
 
 - **種類**:
   - FlagOption: フラグオプション
-  - TextOption: テキスト値オプション
-  - EnumOption: 列挙型オプション
-  - UserVariableOption: ユーザー変数オプション（--uv-*）
+  - ValueOption: 値付きオプション
+  - CustomVariableOption: ユーザー変数オプション（--uv-*）
 
 - **責務**:
-  - オプション単体のバリデーション
-  - パラメータとの組み合わせは知らない
-  - パラメータ3区分に応じて使用可能なオプションを事前定義
-  - パラメータ3区分が判明後に組み合わせ検証
+  - 自身の入力形式の判定（ショート/ロング）
+  - 正規化された名前の提供
+  - 自身のバリデーション
+  - 値の抽出と提供
 
 ## 3. 処理フロー
 
 1. **入力**: CLIコマンドライン引数
-2. **パラメータ検証**:
-   - 3つのバリデータで同時に検証
-   - 成功・失敗の組み合わせで結果を判定
-3. **オプション検証**:
-   - パラメータの結果に応じた適切なオプションバリデータを選択
-   - 個別のオプション検証を実行
+2. **オプション生成**:
+   - OptionFactoryが各引数に対してOptionインスタンスを生成
+   - 各Optionが自身の入力形式を判定し、内部状態を設定
+3. **パラメータ・オプション分離**:
+   - ParamsParserがOptionインスタンスのコレクションを受け取る
+   - option.toNormalized()で正規化された名前を取得
+   - option.getValue()で値を取得
+4. **検証**:
+   - パラメータの検証（3つのバリデータで同時に実行）
+   - 各option.validate()を呼び出し
    - オプションの組み合わせ検証を実行
-4. **結果統合**:
+5. **結果統合**:
    - パラメータの結果にオプションの結果を含める
    - ParamsParserが適切な結果型を作成
-5. **出力**: 統合された結果
+6. **出力**: 統合された結果（正規化された形式）
 
 ## 4. 使用例
 
@@ -134,8 +162,15 @@ if (result.type === "one") {
 }
 ```
 
-## 5. 制約
+## 5. 制約と設計原則
 
+### 5.1 オプションクラスの原則
+- 各オプションクラスは自身の正規化ロジックを保持
+- 入力形式（ショート/ロング）の判定は自身で行う
+- 内部表現と外部表現を明確に分離
+- ユーザー変数も先頭のハイフンを除去した正規化（`--uv-*` → `uv-*`）
+
+### 5.2 処理の制約
 - パラメータとオプションの検証は完全に独立
 - パラメータの結果は必ず3区分のいずれか
 - オプションの結果はパラメータの結果に含まれる

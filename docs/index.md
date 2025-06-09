@@ -6,6 +6,15 @@ In the use case, this library's scope focuses on parameter parsing and storage.
 This library parses runtime parameters and stores their values.
 The scope covers from parsing to validation and returning stored values.
 
+## Architecture Overview
+
+This library adopts an option-class-centered design where each option instance holds its own normalization, validation, and transformation logic. This design promotes:
+
+- **Single Responsibility**: Each option class manages its own behavior
+- **Consistency**: Unified normalization rules across the system
+- **Extensibility**: Easy addition of new option types
+- **Encapsulation**: Internal representation separated from external interface
+
 For detailed specifications, please refer to the following documents:
 
 - [Parameter Specification](params.md) - Definition and constraints of positional arguments
@@ -188,6 +197,14 @@ For detailed specifications, please refer to the [Custom Variable Options Specif
 
 - When both short and long form options are specified, the long form takes precedence. The long form is primary, and the short form is considered an alias.
 - No path processing is performed (values are used as is)
+
+# Option Normalization
+
+The library uses a unified normalization approach:
+- Short options (`-h`) are internally normalized to their canonical names (`help`)
+- Long options (`--help`) are also normalized to canonical names (`help`)
+- User variable options (`--uv-config`) are normalized to `uv-config` (removing leading hyphens)
+- Each option class handles its own normalization logic
 
 ---
 

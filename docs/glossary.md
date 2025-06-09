@@ -53,6 +53,15 @@ This glossary is created for the following purposes:
 
 ## Option Related
 
+### Option Normalization
+
+All options follow unified normalization rules where leading hyphens are removed from the canonical form:
+- Long options: `--help` → `help`
+- Short options: `-h` → `help` (resolved to primary name)
+- User variables: `--uv-config` → `uv-config`
+
+This normalization is handled by the Option classes themselves, following the option-class-centered design.
+
 ### Standard Options
 
 | Option        | Alias | Description                                                                                                                                    | Reference Specification    |
@@ -65,13 +74,13 @@ This glossary is created for the following purposes:
 | --adaptation  | -a    | Prompt adaptation type. Used to adjust processing behavior. Specifies customizable behavior.                                                   | [options.md](options.md)   |
 | --config      | -c    | Configuration file name. Only available in TwoParams. Loads processing settings from external file.                                         | [options.md](options.md)   |
 
-### Custom Variable Options
+### User Variable Options
 
 | Term                    | Description                                                                                                                                    | Reference Specification    |
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| Custom Variable Option  | User-defined variables specified in `--uv-*` format. Only available in TwoParams mode, can hold any value.                                  | [custom_variable_options.md](custom_variable_options.md) |
-| Custom Variable Name    | Variable name following the `--uv-` prefix. Only allows alphanumeric and minimal special characters, case-sensitive.                           | [custom_variable_options.md](custom_variable_options.md) |
-| CustomVariables         | Type that holds custom variable options. Consists of key-value pairs, maintains values as received from command line.                          | [custom_variable_options.md](custom_variable_options.md) |
+| User Variable Option    | User-defined variables specified in `--uv-*` format where `uv` stands for "user variable". Only available in TwoParams mode. Normalized to `uv-*` format internally. | [custom_variable_options.md](custom_variable_options.md) |
+| User Variable Name      | Variable name following the `--uv-` prefix. Only allows alphanumeric, underscore, and hyphen characters, case-sensitive.                       | [custom_variable_options.md](custom_variable_options.md) |
+| UserVariables           | Type that holds user variable options. Consists of key-value pairs with keys in `uv-*` format, maintains values as received from command line. | [custom_variable_options.md](custom_variable_options.md) |
 
 ## Extension Related
 

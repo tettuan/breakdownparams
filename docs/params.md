@@ -2,6 +2,16 @@
 
 This document defines the specification for parameters (positional arguments) in the breakdownparams library.
 
+## Option Normalization Rules
+
+The library applies consistent normalization rules for all options:
+- Leading hyphens are removed from the canonical form
+- Aliases are resolved to their primary names
+- Examples:
+  - `--help` → `help`
+  - `-h` → `help` 
+  - `--uv-config` → `uv-config`
+
 ## Parameter Types
 
 Parameters are classified into three types based on the number of positional arguments:

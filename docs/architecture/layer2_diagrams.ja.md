@@ -6,27 +6,34 @@
 
 ```mermaid
 graph TD
+    subgraph "オプション生成"
+        A[CLI Args] --> B[OptionFactory]
+        B --> C[Option Instances]
+    end
+
     subgraph "パラメータ処理"
-        A[ParamsParser] --> B[ParamsValidator]
-        B --> C1[ZeroParamsValidator]
-        B --> C2[OneParamValidator]
-        B --> C3[TwoParamsValidator]
+        C --> D[ParamsParser]
+        D --> E[ParamsValidator]
+        E --> F1[ZeroParamsValidator]
+        E --> F2[OneParamValidator]
+        E --> F3[TwoParamsValidator]
     end
 
     subgraph "オプション処理"
-        A --> D[OptionValidator]
-        D --> E1[ZeroOptionValidator]
-        D --> E2[OneOptionValidator]
-        D --> E3[TwoOptionValidator]
-        E1 --> F[OptionCombinationValidator]
-        E2 --> F
-        E3 --> F
+        C --> G[Option自身の検証]
+        G --> H[OptionValidator]
+        H --> I1[ZeroOptionValidator]
+        H --> I2[OneOptionValidator]
+        H --> I3[TwoOptionValidator]
+        I1 --> J[OptionCombinationValidator]
+        I2 --> J
+        I3 --> J
     end
 
     subgraph "設定"
-        A --> G[ParserConfig]
-        G --> H1[DEFAULT_CONFIG]
-        G --> H2[CustomConfig]
+        D --> K[ParserConfig]
+        K --> L1[DEFAULT_CONFIG]
+        K --> L2[CustomConfig]
     end
 ```
 
@@ -37,25 +44,36 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant User
+    participant Factory as OptionFactory
+    participant Option as Option Instance
     participant Parser as ParamsParser
     participant PValidator as ParamsValidator
     participant OValidator as OptionValidator
     participant OCombValidator as OptionCombinationValidator
     participant Result as ParamsResult
     
-    User->>Parser: parse(args)
+    User->>Factory: createOptions(args)
+    Factory->>Option: new Option(rawInput)
+    Option->>Option: 入力形式判定
+    Option->>Option: 正規化
+    Factory-->>Parser: Option[]
     
-    Parser->>PValidator: validate(args)
+    Parser->>Option: toNormalized()
+    Parser->>Option: getValue()
+    
+    Parser->>PValidator: validate(params)
     PValidator->>PValidator: パラメータ検証実行
     PValidator-->>Parser: パラメータ検証結果
     
+    Parser->>Option: validate()
+    Option->>Option: 自身の検証
+    Option-->>Parser: 個別検証結果
+    
     alt パラメータタイプ判定
-        Parser->>OValidator: validate(args, type, optionRule)
-        OValidator->>OValidator: オプション検証実行
+        Parser->>OValidator: validate(options, type)
         OValidator-->>Parser: オプション検証結果
         
         Parser->>OCombValidator: validate(options)
-        OCombValidator->>OCombValidator: 組み合わせ検証実行
         OCombValidator-->>Parser: 組み合わせ検証結果
     end
     
@@ -120,33 +138,74 @@ stateDiagram-v2
 
 ```mermaid
 graph LR
-    A[CLI Args] --> B[ParamsParser]
+    A[CLI Args] --> B[OptionFactory]
+    B --> C[Option Instances]
+    C --> D[ParamsParser]
     
     subgraph "パラメータ処理"
-        B --> C1[ParamsValidator]
-        C1 --> D1[パラメータ検証結果]
+        D --> E1[ParamsValidator]
+        E1 --> F1[パラメータ検証結果]
     end
     
     subgraph "オプション処理"
-        D1 --> E[パラメータタイプ判定]
-        E --> F1[ZeroOptionValidator]
-        E --> F2[OneOptionValidator]
-        E --> F3[TwoOptionValidator]
-        F1 --> G[オプション検証]
-        F2 --> G
-        F3 --> G
-        G --> H[組み合わせ検証]
+        C --> G[Option.validate()]
+        G --> H[個別検証結果]
+        F1 --> I[パラメータタイプ判定]
+        I --> J1[ZeroOptionValidator]
+        I --> J2[OneOptionValidator]
+        I --> J3[TwoOptionValidator]
+        J1 --> K[組み合わせ検証]
+        J2 --> K
+        J3 --> K
     end
     
-    D1 --> I[結果統合]
-    H --> I
-    I --> J[ParamsResult]
+    F1 --> L[結果統合]
+    H --> L
+    K --> L
+    L --> M[ParamsResult]
 ```
 
 ## 5. クラス階層図
 
 ```mermaid
 classDiagram
+    class Option {
+        <<interface>>
+        +rawInput: string
+        +canonicalName: string
+        +longForm: string
+        +shortForm?: string
+        +isShorthand(): boolean
+        +isLongForm(): boolean
+        +isCustomVariable(): boolean
+        +matchesInput(input: string): boolean
+        +toNormalized(): string
+        +toLong(): string
+        +toShort(): string | undefined
+        +validate(): ValidationResult
+        +getValue(): string | boolean
+    }
+    
+    class FlagOption {
+        +validate(): ValidationResult
+        +getValue(): boolean
+    }
+    
+    class ValueOption {
+        +validate(): ValidationResult
+        +getValue(): string
+    }
+    
+    class CustomVariableOption {
+        +validate(): ValidationResult
+        +getValue(): string
+        +toNormalized(): string
+    }
+    
+    class OptionFactory {
+        +createOptions(args: string[]): Option[]
+    }
+    
     class ParamsParser {
         +parse(args: string[]): ParamsResult
         -config: ParserConfig
@@ -159,46 +218,16 @@ classDiagram
     
     class OptionValidator {
         <<interface>>
-        +validate(args: string[], type: string, optionRule: OptionRule): ValidationResult
+        +validate(options: Option[], type: string): ValidationResult
     }
     
-    class ZeroParamsValidator {
-        +validate(args: string[]): ValidationResult
-    }
-    
-    class OneParamValidator {
-        +validate(args: string[]): ValidationResult
-    }
-    
-    class TwoParamsValidator {
-        +validate(args: string[]): ValidationResult
-    }
-    
-    class ZeroOptionValidator {
-        +validate(args: string[], type: string, optionRule: OptionRule): ValidationResult
-    }
-    
-    class OneOptionValidator {
-        +validate(args: string[], type: string, optionRule: OptionRule): ValidationResult
-    }
-    
-    class TwoOptionValidator {
-        +validate(args: string[], type: string, optionRule: OptionRule): ValidationResult
-    }
-    
-    class OptionCombinationValidator {
-        +validate(options: Record<string, unknown>): OptionCombinationResult
-    }
-    
+    Option <|.. FlagOption
+    Option <|.. ValueOption
+    Option <|.. CustomVariableOption
+    OptionFactory --> Option
+    ParamsParser --> OptionFactory
     ParamsParser --> ParamsValidator
     ParamsParser --> OptionValidator
-    ParamsValidator <|.. ZeroParamsValidator
-    ParamsValidator <|.. OneParamValidator
-    ParamsValidator <|.. TwoParamsValidator
-    OptionValidator <|.. ZeroOptionValidator
-    OptionValidator <|.. OneOptionValidator
-    OptionValidator <|.. TwoOptionValidator
-    ParamsParser --> OptionCombinationValidator
 ```
 
 ## 6. パッケージ図
@@ -207,20 +236,24 @@ classDiagram
 graph TD
     A[breakdownparams] --> B[parser]
     A --> C[validator]
-    A --> D[options]
-    A --> E[result]
+    A --> D[option-models]
+    A --> E[factories]
+    A --> F[result]
+    
+    subgraph "option-models"
+        D --> D1[FlagOption]
+        D --> D2[ValueOption]
+        D --> D3[CustomVariableOption]
+    end
+    
+    subgraph "factories"
+        E --> E1[OptionFactory]
+    end
     
     subgraph "validator"
         C --> C1[params]
         C --> C2[options]
-    end
-    
-    subgraph "options"
-        D --> D1[combination]
-        D --> D2[individual]
-        D2 --> D3[zero]
-        D2 --> D4[one]
-        D2 --> D5[two]
+        C2 --> C3[combination]
     end
 ```
 

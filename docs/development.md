@@ -19,6 +19,12 @@ It specializes in parameter parsing, validation, and value storage, aiming for a
    - Error: Clear error messages
    - Returns error result without the failed parameter on validation failure
 
+3. **Option-Class-Centered Design**
+   - Each option instance holds its own normalization logic
+   - Option classes manage their own validation
+   - Unified normalization rules across the system
+   - OptionFactory creates appropriate Option instances from CLI arguments
+
 ## Implementation Specification
 
 ### 1. Type Definitions
@@ -46,16 +52,26 @@ For detailed type definitions and usage of each type, please refer to the [Param
 
 Options are specified as hyphenated arguments. Each option supports both long and short forms:
 
-| Long Form     | Short Form | Description                |
-|--------------|------------|----------------------------|
-| --help       | -h         | Display help              |
-| --version    | -v         | Display version           |
-| --from       | -f         | Input file specification  |
-| --destination| -o         | Output file specification |
-| --input      | -i         | Input layer specification |
-| --adaptation | -a         | Prompt adaptation type    |
-| --config     | -c         | Configuration file name   |
-| --uv-*       | None       | Custom variable option    |
+| Long Form     | Short Form | Description                | Normalized Form |
+|--------------|------------|----------------------------|------------------|
+| --help       | -h         | Display help               | `help`           |
+| --version    | -v         | Display version            | `version`        |
+| --from       | -f         | Input file specification   | `from`           |
+| --destination| -o         | Output file specification  | `destination`    |
+| --input      | -i         | Input layer specification  | `input`          |
+| --adaptation | -a         | Prompt adaptation type     | `adaptation`     |
+| --config     | -c         | Configuration file name    | `config`         |
+| --uv-*       | None       | User variable option       | `uv-*`           |
+
+### Option Normalization
+
+All options follow unified normalization rules:
+- Leading hyphens are removed from the canonical form
+- Aliases are resolved to their primary names
+- Examples:
+  - `--help` → `help`
+  - `-h` → `help`
+  - `--uv-config` → `uv-config`
 
 ### 3. Validation Rules
 
@@ -75,13 +91,14 @@ Options are specified as hyphenated arguments. Each option supports both long an
    - Last specification takes effect when same option is specified multiple times
 
 4. **Case Sensitivity**
-   - Custom variable option names are case sensitive and used as specified
+   - User variable option names are case sensitive and used as specified
 
-5. **Custom Variable Option Constraints**
+5. **User Variable Option Constraints**
    - Only available in TwoParams mode
    - Syntax must strictly follow `--uv-<name>=<value>` format
    - Variable names only allow alphanumeric and minimal special characters
    - Values are treated as strings without validation
+   - Internally normalized to `uv-*` format (leading hyphens removed)
 
 ### 4. Error Definitions
 
@@ -92,7 +109,7 @@ Errors return appropriate messages based on the type of problem encountered:
 | Too Many Args | "Too many arguments. Maximum 2 arguments are allowed." |
 | Invalid Value | "Invalid value for demonstrativeType: {value}"    |
 | Missing Param | "Missing required parameter: {param}"             |
-| Custom Var Syntax Error | "Invalid custom variable option syntax: {value}" |
+| User Var Syntax Error | "Invalid user variable option syntax: {value}" |
 
 ## Usage Examples
 
@@ -134,20 +151,18 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // }
 ```
 
-### Two Parameters with Custom Variable Options
+### Two Parameters with User Variable Options
 
 ```typescript
-// Two parameters with custom variable options
+// Two parameters with user variable options (normalized)
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
 //   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "project",
 //   options: {
-//     customVariables: {
-//       "project": "myproject",
-//       "version": "1.0.0"
-//     }
+//     "uv-project": "myproject",  // Normalized from --uv-project
+//     "uv-version": "1.0.0"       // Normalized from --uv-version
 //   }
 // }
 ```
@@ -157,13 +172,39 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 1. **Unsupported Features**
    - Parameter meaning interpretation
    - Path validation/normalization
-   - Custom variable option value validation (syntax check only)
+   - User variable option value validation (syntax check only)
 
 2. **Limitations**
    - Maximum of 2 parameters
    - No path string processing
    - Last specification takes effect for duplicate options
-   - Custom variable options only available in TwoParams mode
+   - User variable options only available in TwoParams mode
+
+## Architecture Overview
+
+### Key Components
+
+1. **OptionFactory**
+   - Creates Option instances from command-line arguments
+   - Determines option type (ValueOption, FlagOption, CustomVariableOption)
+   - Manages standard option definitions and aliases
+
+2. **Option Classes**
+   - `ValueOption`: Options that accept values
+   - `FlagOption`: Boolean options without values
+   - `CustomVariableOption`: User-defined variables with `--uv-*` prefix
+   - Each class implements the Option interface with normalization and validation
+
+3. **ParamsParser**
+   - Uses OptionFactory to create Option instances
+   - Extracts normalized values from Option instances
+   - Delegates validation to Option instances
+   - Returns structured parameter results
+
+4. **Validators**
+   - Work with normalized Option instances
+   - No longer handle normalization (delegated to Option classes)
+   - Focus purely on validation logic
 
 ## Testing Strategy
 
