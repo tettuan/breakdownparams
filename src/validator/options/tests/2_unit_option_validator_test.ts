@@ -25,16 +25,21 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should validate one options correctly', () => {
     const validator = new OneOptionValidator();
 
-    // 正しいオプション
-    const validResult = validator.validate(['--from=test'], 'one', DEFAULT_OPTION_RULE);
+    // オプションなし
+    const validResult = validator.validate([], 'one', DEFAULT_OPTION_RULE);
     assert(validResult.isValid);
-    assert(validResult.options?.from === 'test');
+    assert(Object.keys(validResult.options || {}).length === 0);
 
-    // 不正なオプション
-    const invalidResult = validator.validate(['--invalid=test'], 'one', DEFAULT_OPTION_RULE);
+    // どのオプションも無効
+    const invalidResult = validator.validate(['--from=test'], 'one', DEFAULT_OPTION_RULE);
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('Invalid options'));
     assert(invalidResult.errorCode === 'INVALID_OPTIONS');
+
+    const invalidResult2 = validator.validate(['--invalid=test'], 'one', DEFAULT_OPTION_RULE);
+    assert(!invalidResult2.isValid);
+    assert(invalidResult2.errorMessage?.includes('Invalid options'));
+    assert(invalidResult2.errorCode === 'INVALID_OPTIONS');
   });
 
   await t.step('should validate two options correctly', () => {
@@ -83,10 +88,10 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   });
 
   await t.step('should handle empty values correctly', () => {
-    const validator = new OneOptionValidator();
+    const validator = new TwoOptionValidator();
 
     // 空の値
-    const result = validator.validate(['--from='], 'one', DEFAULT_OPTION_RULE);
+    const result = validator.validate(['--from='], 'two', DEFAULT_OPTION_RULE);
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Empty value not allowed'));
     assert(result.errorCode === 'INVALID_OPTIONS');

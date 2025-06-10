@@ -172,13 +172,7 @@ export class ZeroOptionValidator extends BaseOptionValidator {
  */
 export class OneOptionValidator extends BaseOptionValidator {
   protected readonly paramType = 'one' as const;
-  protected readonly validOptions = [
-    'from',
-    'destination',
-    'input',
-    'adaptation',
-    'config',
-  ];
+  protected readonly validOptions = [];
   protected readonly allowCustomVariables = false;
 }
 

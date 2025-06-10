@@ -367,7 +367,7 @@ process_test_directory() {
     
     # Finally process regular test files in current directory and subdirectories
     echo "Running regular tests in $dir and subdirectories..."
-    for test_file in $(find "$dir" -name "*_test.ts" -not -name "*_architecture_test.ts" -not -name "*_structure_test.ts" | sort); do
+    for test_file in $(find "$dir" \( -name "*_test.ts" -o -name "*.test.ts" -o -name "*tests.ts" \) -not -name "*_architecture_test.ts" -not -name "*_structure_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -421,6 +421,23 @@ fi
 echo "Running JSR type check..."
 if ! error_output=$(npx jsr publish --dry-run --allow-dirty 2>&1); then
     handle_jsr_error "$error_output"
+fi
+
+echo "Running comprehensive test suite..."
+if ! deno test --allow-env --allow-write --allow-read --allow-run; then
+    echo "
+===============================================================================
+>>> COMPREHENSIVE TEST FAILED <<<
+===============================================================================
+Error: Full test suite failed
+This may indicate issues with test interactions or dependencies
+
+Next steps:
+1. Run individual test files to isolate the failure
+2. Check for test side effects or order dependencies
+3. Review test setup and teardown procedures
+==============================================================================="
+    exit 1
 fi
 
 echo "Running format check..."

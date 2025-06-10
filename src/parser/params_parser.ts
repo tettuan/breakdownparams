@@ -60,13 +60,22 @@ export class ParamsParser {
     // Use custom config for option combination rules
     const validationRules = this.customConfig.validation;
     this.zeroOptionCombinationValidator = new OptionCombinationValidator({
-      allowedOptions: [...validationRules.zero.allowedOptions, ...(validationRules.zero.allowedValueOptions || [])],
+      allowedOptions: [
+        ...validationRules.zero.allowedOptions,
+        ...(validationRules.zero.allowedValueOptions || []),
+      ],
     });
     this.oneOptionCombinationValidator = new OptionCombinationValidator({
-      allowedOptions: [...validationRules.one.allowedOptions, ...(validationRules.one.allowedValueOptions || [])],
+      allowedOptions: [
+        ...validationRules.one.allowedOptions,
+        ...(validationRules.one.allowedValueOptions || []),
+      ],
     });
     this.twoOptionCombinationValidator = new OptionCombinationValidator({
-      allowedOptions: [...validationRules.two.allowedOptions, ...(validationRules.two.allowedValueOptions || [])],
+      allowedOptions: [
+        ...validationRules.two.allowedOptions,
+        ...(validationRules.two.allowedValueOptions || []),
+      ],
     });
   }
 

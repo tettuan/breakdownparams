@@ -123,7 +123,7 @@ Deno.test('CustomConfig functionality', async (t) => {
 
     // Test one mode
     const result3 = parser.parse(['init', '--from=src']);
-    assertEquals(result3.type, 'one');
+    assertEquals(result3.type, 'error'); // OneOptionValidator doesn't allow any options
 
     const result4 = parser.parse(['init', '--config=test']);
     assertEquals(result4.type, 'error'); // config not allowed in one mode

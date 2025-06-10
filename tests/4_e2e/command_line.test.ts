@@ -16,10 +16,9 @@ Deno.test('Command Line E2E Tests', async (t) => {
     const args = ['init', '--from=input.txt', '--destination=output.txt'];
     const result = parser.parse(args);
 
-    assertEquals(result.type, 'one');
-    assertEquals(result.params[0], 'init');
-    assertEquals(result.options.from, 'input.txt');
-    assertEquals(result.options.destination, 'output.txt');
+    assertEquals(result.type, 'error'); // OneParam doesn't allow options
+    assertExists(result.error);
+    assertEquals(result.error.code, 'INVALID_OPTIONS');
   });
 
   await t.step('should handle file comparison with two parameters', () => {
@@ -48,8 +47,8 @@ Deno.test('Command Line E2E Tests', async (t) => {
     const args = ['init', '--config=config.json'];
     const result = parser.parse(args);
 
-    assertEquals(result.type, 'one');
-    assertEquals(result.params[0], 'init');
-    assertEquals(result.options.config, 'config.json');
+    assertEquals(result.type, 'error'); // OneParam doesn't allow options
+    assertExists(result.error);
+    assertEquals(result.error.code, 'INVALID_OPTIONS');
   });
 });

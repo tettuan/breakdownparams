@@ -1,9 +1,5 @@
 import { assert } from 'jsr:@std/assert@^0.218.2';
-import {
-  OneOptionValidator,
-  TwoOptionValidator,
-  ZeroOptionValidator,
-} from '../option_validator.ts';
+import { TwoOptionValidator, ZeroOptionValidator } from '../option_validator.ts';
 import { DEFAULT_OPTION_RULE } from '../../../types/option_rule.ts';
 
 Deno.test('OptionValidator Structure Tests', async (t) => {
@@ -43,8 +39,8 @@ Deno.test('OptionValidator Structure Tests', async (t) => {
   });
 
   await t.step('should handle value options correctly', () => {
-    const validator = new OneOptionValidator();
-    const result = validator.validate(['--from=test'], 'one', DEFAULT_OPTION_RULE);
+    const validator = new TwoOptionValidator();
+    const result = validator.validate(['--from=test'], 'two', DEFAULT_OPTION_RULE);
 
     assert(result.isValid);
     assert(result.validatedParams.length === 0);
