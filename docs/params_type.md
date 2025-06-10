@@ -1,284 +1,190 @@
-# Parameter Parser Type Definition Specification
+# Parameter Type Definitions
 
-## Overview
-
-The parameter parser (`ParamsParser`) is a class that parses command line arguments and returns type-safe results.
-This specification defines the type definitions and parsing flow of the parameter parser.
-
-## Type Hierarchy
-
-### 1. Basic Types
+## Basic Types
 
 ```typescript
-type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult | ErrorResult;
 
-// Error information type
-type ErrorResult = {
-  message: string;
-  code: string;
-};
-```
-
-### 2. Type Definitions
-
-#### 2.1 Types by Parameter Count
-```typescript
-// No arguments
 type ZeroParamsResult = {
-  type: 'zero-params';
-  help: boolean;
-  version: boolean;
-  error?: ErrorResult;  // Set when parameter or option error occurs
+  type: 'zero';
+  options: OptionParams;
 };
 
-// One argument
 type OneParamsResult = {
   type: 'one';
-  command: 'init';
-  options: OptionParams;
-  error?: ErrorResult;  // Set when parameter or option error occurs
+  demonstrativeType: string;
 };
 
-// Two arguments
 type TwoParamsResult = {
   type: 'two';
-  demonstrativeType: DemonstrativeType;
-  layerType: LayerType;
+  demonstrativeType: string;
+  layerType: string;
   options: OptionParams;
-  error?: ErrorResult;  // Set when parameter or option error occurs
+  userVariables?: UserVariables;
 };
-```
 
-#### 2.2 Option Types
-```typescript
+type ErrorResult = {
+  type: 'error';
+  error: ErrorInfo;
+};
+
+type ErrorInfo = {
+  message: string;
+  code: string;
+  details?: Record<string, unknown>;
+};
+
 type OptionParams = {
+  help?: boolean;
+  version?: boolean;
   fromFile?: string;
   destinationFile?: string;
-  fromLayerType?: LayerType;
+  fromLayerType?: string;
   adaptationType?: string;
   configFile?: string;
-  [key: `uv-${string}`]?: string;  // User variables in normalized form
+};
+
+type UserVariables = {
+  [key: `uv-${string}`]: string;
 };
 ```
-
-## Parsing Flow
-
-### 1. Parameter Parsing
-
-1. **Branching by Argument Count**
-   ```typescript
-   if (nonOptionArgs.length === 0) {
-     // Return ZeroParamsResult
-   } else if (nonOptionArgs.length === 1) {
-     // Parameter validation
-     if (!isValidCommand(nonOptionArgs[0])) {
-       return {
-         type: 'one',
-         command: 'init',
-         options: {},
-         error: {
-           message: `Invalid command: ${nonOptionArgs[0]}`,
-           code: 'INVALID_COMMAND'
-         }
-       };
-     }
-     // Return OneParamsResult
-   } else if (nonOptionArgs.length === 2) {
-     // Parameter validation
-     if (!isValidDemonstrativeType(nonOptionArgs[0])) {
-       return {
-         type: 'two',
-         demonstrativeType: '...',
-         layerType: '...',
-         options: {},
-         error: {
-           message: `Invalid demonstrative type: ${nonOptionArgs[0]}`,
-           code: 'INVALID_DEMONSTRATIVE_TYPE'
-         }
-       };
-     }
-     // Return TwoParamsResult
-   }
-   ```
-
-2. **Processing in Each Branch**
-   - Parameter validation
-   - Type determination
-   - Option parsing preparation
-
-### 2. Option Parsing
-
-1. **Execute Option Parsing**
-   ```typescript
-   const options = this.parseOptions(args);
-   if ('error' in options) {
-     // Maintain current parameter type and set error property when error occurs
-     return {
-       ...currentParamResult,
-       error: {
-         message: options.error,
-         code: 'INVALID_OPTION'
-       }
-     };
-   }
-   ```
-
-2. **Option Types**
-   - Standard options (--from, --destination, etc.)
-   - User variable options (--uv-*) normalized to uv-* format
-
-### 3. Return Type Determination
-
-1. **Normal Case**
-   - Maintain parameter type
-   - Add option information
-
-2. **Error Case**
-   - Maintain parameter type
-   - Add error information as error property
-
-## Return Type for Option Errors
-
-### 1. Return Type Determination
-
-When an error occurs in parameters or options, the error information is set in the error property while maintaining the parameter type:
-
-```typescript
-// Example: Parameter error
-{
-  type: 'two',
-  demonstrativeType: '...',
-  layerType: '...',
-  options: {},
-  error: {
-    message: 'Invalid demonstrative type: invalid-type',
-    code: 'INVALID_DEMONSTRATIVE_TYPE'
-  }
-}
-
-// Example: Option error
-{
-  type: 'two',
-  demonstrativeType: '...',
-  layerType: '...',
-  options: {},
-  error: {
-    message: 'Invalid option: --invalid-option',
-    code: 'INVALID_OPTION'
-  }
-}
-```
-
-### 2. Return Type Examples
-
-```typescript
-// Example 1: Parameter error (invalid command)
-{
-  type: 'one',
-  command: 'init',
-  options: {},
-  error: {
-    message: 'Invalid command: invalid-command',
-    code: 'INVALID_COMMAND'
-  }
-}
-
-// Example 2: Parameter error (invalid layer type)
-{
-  type: 'two',
-  demonstrativeType: '...',
-  layerType: '...',
-  options: {},
-  error: {
-    message: 'Invalid layer type: invalid-layer',
-    code: 'INVALID_LAYER_TYPE'
-  }
-}
-
-// Example 3: Option error (user variable naming rule violation)
-{
-  type: 'one',
-  command: 'init',
-  options: {},
-  error: {
-    message: 'Invalid user variable name: invalid@name',
-    code: 'INVALID_USER_VARIABLE'
-  }
-}
-```
-
-### 3. Type Consistency
-
-- Maintain parameter types (ZeroParamsResult, OneParamsResult, TwoParamsResult)
-- Error information is kept as error property of each parameter type
-- No type conversion is performed
 
 ## Usage Examples
 
 ```typescript
-const parser = new ParamsParser();
-const result = parser.parse(args);
-
-if (result.type === 'zero-params') {
-  if (result.error) {
-    // Error handling
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // Normal processing
+// ZeroParamsResult return
+const zeroResult: ZeroParamsResult = {
+  type: 'zero',
+  options: {
+    help: true
   }
-} else if (result.type === 'one') {
-  if (result.error) {
-    // Error handling
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // Normal processing
+};
+
+// OneParamsResult return
+const oneResult: OneParamsResult = {
+  type: 'one',
+  demonstrativeType: 'init'
+};
+
+// TwoParamsResult return
+const twoResult: TwoParamsResult = {
+  type: 'two',
+  demonstrativeType: 'to',
+  layerType: 'project',
+  options: {
+    fromFile: 'input.json',
+    destinationFile: 'output.json'
+  },
+  userVariables: {
+    'uv-project': 'myproject',
+    'uv-version': '1.0.0'
   }
-} else if (result.type === 'two') {
-  if (result.error) {
-    // Error handling
-    console.error(`Error ${result.error.code}: ${result.error.message}`);
-  } else {
-    // Normal processing
+};
+
+// ErrorResult return
+const errorResult: ErrorResult = {
+  type: 'error',
+  error: {
+    message: 'Invalid demonstrative type: invalid-type',
+    code: 'INVALID_DEMONSTRATIVE_TYPE',
+    details: {
+      value: 'invalid-type',
+      expected: 'to, summary, or defect'
+    }
   }
-}
-```
-
-## Notes
-
-1. **Type Consistency**
-   - Maintain type consistency within each branch
-   - Minimize type conversions 
-
-## Error Handling and Options Persistence
-
-### 1. Error Handling Strategy
-
-The parameter parser maintains a debug-friendly approach to error handling:
-
-```typescript
-// Example of error result with preserved options
-type ParseResult<T> = {
-  success: false;
-  error: ErrorResult;
-  data?: T;  // Contains parsed options even when validation fails
 };
 ```
 
-### 2. Options Persistence
+## Type Features
 
-- Even when validation fails (`success: false`), the parser preserves the parsed options
-- This design choice enables:
-  - Easier debugging by maintaining the state at the time of error
-  - Better user experience by allowing partial corrections
-  - Flexible error handling in the application layer
+1. Type definitions based on parameter patterns
+   - `ZeroParamsResult`: No parameters (options only)
+   - `OneParamsResult`: Single parameter (init command)
+   - `TwoParamsResult`: Two parameters (main application execution)
+   - `ErrorResult`: Error result
 
-### 3. Security Considerations
+2. Type safety guarantee
+   - Required properties for each pattern
+   - Clear definition of optional properties
+   - Unified handling of error information
 
-While maintaining options during errors is beneficial for debugging, be aware that:
-- Invalid or potentially malicious data may be preserved
-- Sensitive information in options should be handled with care
-- Application layer should implement appropriate security checks
+3. Extensibility considerations
+   - Clearly distinguished result types
+   - Easy addition of new patterns
+   - Maintains compatibility with existing types
+
+## Type Details
+
+### ZeroParamsResult
+
+Result type when executed with no parameters. Only options can be specified.
+
+- `type`: Always `'zero'`
+- `options`: Specified options (help, version, etc.)
+
+### OneParamsResult
+
+Result type when executed with a single parameter. Currently only supports `init` command.
+
+- `type`: Always `'one'`
+- `demonstrativeType`: Specified command (usually `'init'`)
+
+**Note**: Options are ignored in OneParamsResult.
+
+### TwoParamsResult
+
+Result type when executed with two parameters. Used for main application execution.
+
+- `type`: Always `'two'`
+- `demonstrativeType`: First parameter (e.g., `'to'`, `'summary'`, `'defect'`)
+- `layerType`: Second parameter (e.g., `'project'`, `'issue'`, `'task'`)
+- `options`: Specified options
+- `userVariables`: User variable options (`--uv-*` format)
+
+### ErrorResult
+
+Result type when an error occurs.
+
+- `type`: Always `'error'`
+- `error`: Error information
+  - `message`: Error message
+  - `code`: Error code
+  - `details`: Additional error details (optional)
+
+## Option Normalization
+
+All options are returned in normalized form:
+
+- Long options: `--help` → `help: true`
+- Short options: `-h` → `help: true`
+- Options with values: `--from=file.txt` → `fromFile: 'file.txt'`
+- User variables: `--uv-config=value` → `userVariables: { 'uv-config': 'value' }`
+
+## Error Codes
+
+Main error codes:
+
+- `INVALID_DEMONSTRATIVE_TYPE`: Invalid demonstrativeType
+- `INVALID_LAYER_TYPE`: Invalid layerType
+- `INVALID_OPTION`: Invalid option
+- `INVALID_CUSTOM_VARIABLE`: Invalid user variable
+- `TOO_MANY_ARGUMENTS`: Too many arguments
+- `INVALID_COMMAND`: Invalid command
+
+## Notes
+
+1. **Type Discrimination**
+   - Use the `type` field to discriminate result types
+   - Leverage TypeScript's type guard features
+
+2. **Error Handling**
+   - All errors are returned as `ErrorResult`
+   - Error details can be checked in `error.details`
+
+3. **Option Handling**
+   - Options are ignored in OneParamsResult
+   - All options are valid only in TwoParamsResult
 
 ---
 
-[日本語版](params_type.ja.md) | [English Version](params_type.md) 
+[日本語版](params_type.ja.md) | [English Version](params_type.md)

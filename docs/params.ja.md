@@ -13,28 +13,24 @@
 ## パラメータの型定義
 
 ```typescript
-type ParamPatternResult = ZeroParamResult | OneParamsResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult | ErrorResult;
 
-type ZeroParamResult = {
-  type: 'help' | 'version';
-  help?: boolean;
-  version?: boolean;
-  error?: ErrorInfo;
+type ZeroParamsResult = {
+  type: 'zero';
+  options: OptionParams;
 };
 
 type OneParamsResult = {
-  type: 'layer';
-  command: string;
-  options: OptionParams;
-  error?: ErrorInfo;
+  type: 'one';
+  demonstrativeType: string;
 };
 
 type TwoParamsResult = {
-  type: 'break';
+  type: 'two';
   demonstrativeType: string;
   layerType: string;
   options: OptionParams;
-  error?: ErrorInfo;
+  userVariables?: UserVariables;
 };
 
 // パーサー設定の型定義
@@ -72,17 +68,17 @@ const DEFAULT_CONFIG: ParserConfig = {
 ## パラメータのパターン
 
 1. **ZeroParams**
-   - helpコマンド
-   - versionコマンド
+   - パラメータなし
+   - オプションのみ（--help、--versionなど）
 
 2. 単一パラメータ（OneParamsResult）
-   - layerコマンド
-   - コマンド名とオプション
+   - initコマンド
+   - demonstrativeTypeのみ（オプションは無視）
 
 3. 二重パラメータ（TwoParamsResult）
-   - breakコマンド
+   - メインアプリケーション実行
    - DemonstrativeTypeとLayerTypeのバリデーション
-   - オプション
+   - オプションとユーザー変数
 
 ## オプションパラメータ
 
@@ -102,10 +98,14 @@ type OptionParams = {
 各パラメータ型は`error`プロパティを持ち、エラー情報を含むことができます：
 
 ```typescript
+type ErrorResult = {
+  type: 'error';
+  error: ErrorInfo;
+};
+
 type ErrorInfo = {
   message: string;
   code: string;
-  category: string;
   details?: Record<string, unknown>;
 };
 ```
@@ -114,23 +114,22 @@ type ErrorInfo = {
 
 ```typescript
 // パラメータなし
-const helpResult: ZeroParamResult = {
-  type: 'help',
-  help: true
-};
-
-// 単一パラメータ
-const layerResult: OneParamsResult = {
-  type: 'layer',
-  command: 'create',
+const zeroResult: ZeroParamsResult = {
+  type: 'zero',
   options: {
-    fromFile: 'input.json'
+    help: true
   }
 };
 
+// 単一パラメータ
+const oneResult: OneParamsResult = {
+  type: 'one',
+  demonstrativeType: 'init'
+};
+
 // 二重パラメータ（デフォルト設定値を使用）
-const breakResult: TwoParamsResult = {
-  type: 'break',
+const twoResult: TwoParamsResult = {
+  type: 'two',
   demonstrativeType: 'to',      // パターン: ^(to|summary|defect)$
   layerType: 'project',         // パターン: ^(project|issue|task)$
   options: {
@@ -173,7 +172,6 @@ const parser = new ParamsParser(customConfig);
   - DemonstrativeTypeとLayerTypeのバリデーション
   - ハイフン付きパラメータは追加オプションとして機能
 - 3つ以上のパラメータはエラー
-- パラメータなしは空のパラメータ結果を返す
 
 # 各パラメータパターンの処理
 
@@ -329,5 +327,9 @@ TwoParamsモードでのみ使用可能で、以下の形式で指定します�
 パラメータの解析結果は、以下の型で返却されます：
 
 ```typescript
-type ParamsResult = ZeroParamResult | OneParamsResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult | ErrorResult;
 ```
+
+---
+
+[日本語版](params.ja.md) | [English Version](params.md)
