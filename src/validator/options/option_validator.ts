@@ -3,7 +3,10 @@ import { ValidationResult } from '../../types/validation_result.ts';
 import { debug } from '../../utils/logger.ts';
 
 /**
- * Error messages for option validation
+ * Predefined error messages for option validation.
+ *
+ * Provides consistent error messaging across all option validators
+ * with parameterized message generation for specific contexts.
  */
 const ERROR_MESSAGES = {
   INVALID_TYPE: (type: string) => `Invalid parameter type for this validator: ${type}`,
@@ -13,21 +16,39 @@ const ERROR_MESSAGES = {
 } as const;
 
 /**
- * Base interface for option validators
+ * Base interface for option validators.
+ *
+ * Defines the contract for validating command-line options based on
+ * the number of parameters (zero, one, or two) and specified rules.
  */
 export interface OptionValidator {
   /**
-   * Validate the options
-   * @param args - Command line arguments
-   * @param type - Parameter type ('zero', 'one', or 'two')
-   * @param optionRule - Rules for option validation
-   * @returns ValidationResult containing validation results
+   * Validates command-line options based on parameter type and rules.
+   *
+   * @param args - Raw command line arguments including options
+   * @param type - The parameter type context for validation
+   * @param optionRule - Rules defining allowed options for each parameter type
+   * @returns Validation result indicating success or failure with details
+   *
+   * @example
+   * ```ts
+   * const validator = new ZeroOptionValidator();
+   * validator.validate(["--help"], "zero", optionRule);
+   * // { isValid: true, validatedParams: [] }
+   * ```
    */
   validate(args: string[], type: 'zero' | 'one' | 'two', optionRule: OptionRule): ValidationResult;
 }
 
 /**
- * Base class for option validators
+ * Base abstract class for option validators.
+ *
+ * Provides common functionality for validating command-line options
+ * including option normalization, validation against allowed lists,
+ * and custom variable support.
+ *
+ * @abstract
+ * @implements {OptionValidator}
  */
 abstract class BaseOptionValidator implements OptionValidator {
   protected abstract readonly paramType: 'zero' | 'one' | 'two';
@@ -35,7 +56,19 @@ abstract class BaseOptionValidator implements OptionValidator {
   protected abstract readonly allowCustomVariables: boolean;
 
   /**
-   * Normalize an option string into key and value
+   * Normalizes an option string into key and value components.
+   *
+   * Splits options in the format --key=value into separate parts.
+   *
+   * @param option - The option string to normalize (e.g., "--config=file.json")
+   * @returns Object with key and optional value
+   * @protected
+   *
+   * @example
+   * ```ts
+   * normalizeOption("--config=file.json"); // { key: "config", value: "file.json" }
+   * normalizeOption("--verbose"); // { key: "verbose", value: undefined }
+   * ```
    */
   protected static normalizeOption(option: string): { key: string; value: string | undefined } {
     const [key, value] = option.slice(2).split('=');
@@ -43,7 +76,11 @@ abstract class BaseOptionValidator implements OptionValidator {
   }
 
   /**
-   * Validate options against allowed options
+   * Validates options against a list of allowed options.
+   *
+   * @param options - Array of option strings to validate
+   * @param validOptions - Array of allowed option names
+   * @protected
    */
   protected static validateOptions(
     options: string[],
