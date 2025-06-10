@@ -14,6 +14,9 @@
 5. `custom_variable_options_usage.ts` - カスタム変数の使用方法
 6. `extended_params_usage.ts` - 拡張パラメータの使用方法
 7. `error_handling.ts` - エラー処理の確認
+8. `custom_config_usage.ts` - カスタム設定による自然な英語コマンド
+9. `project_management_usage.ts` - プロジェクト管理ツールの例
+10. `ai_processing_usage.ts` - AI/ML処理ツールの例
 
 各exampleは前のexampleの知識を前提としています。
 
@@ -110,6 +113,51 @@
 - 環境設定の管理
 - カスタムメタデータの管理
 
+## カスタム設定例 (`custom_config_usage.ts`)
+
+カスタム設定を使用した自然な英語コマンドの例を示します：
+
+- タスク分解ツールの実装（breakdown, split, divideなど）
+- 自然な英語のコマンド構造
+- 理解しやすいターゲット名（simple, manageable, smallerなど）
+
+想定されるユースケース：
+
+- 複雑なタスクの分解
+- 大きなファイルの分割
+- コードのリファクタリング
+- ドキュメントの変換
+
+## プロジェクト管理例 (`project_management_usage.ts`)
+
+プロジェクト管理ツールの実装例を示します：
+
+- プロジェクト管理アクション（create, update, assignなど）
+- プロジェクトエンティティ（ticket, epic, sprintなど）
+- 実務的なコマンド例
+
+想定されるユースケース：
+
+- チケットの作成・更新
+- スプリントの管理
+- バックログの優先度付け
+- マイルストーンの追跡
+
+## AI処理例 (`ai_processing_usage.ts`)
+
+AI/ML処理ツールの実装例を示します：
+
+- AIモデルの操作（train, fine-tune, deployなど）
+- モデル・データタイプ（model, dataset, pipelineなど）
+- 実用的なMLワークフロー
+
+想定されるユースケース：
+
+- モデルのトレーニング
+- ファインチューニング
+- モデルの最適化・圧縮
+- プロダクションへのデプロイ
+
 ## ヘルプ表示例 (`help.ts`)
 
 ヘルプ表示の例を示します：
@@ -139,6 +187,11 @@ deno run --allow-env examples/config_usage.ts
 deno run --allow-env examples/custom_variable_options_usage.ts
 deno run --allow-env examples/extended_params_usage.ts
 deno run --allow-env examples/error_handling.ts
+
+# カスタム設定の例
+deno run --allow-env examples/custom_config_usage.ts
+deno run --allow-env examples/project_management_usage.ts
+deno run --allow-env examples/ai_processing_usage.ts
 ```
 
 ## テスト方法
