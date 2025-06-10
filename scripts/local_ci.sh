@@ -337,7 +337,7 @@ process_test_directory() {
     
     # First run architecture tests in current directory and subdirectories
     echo "Running architecture tests in $dir and subdirectories..."
-    for test_file in $(find "$dir" -name "*.architecture_test.ts" | sort); do
+    for test_file in $(find "$dir" -name "*_architecture_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -349,7 +349,7 @@ process_test_directory() {
     
     # Then run structure tests in current directory and subdirectories
     echo "Running structure tests in $dir and subdirectories..."
-    for test_file in $(find "$dir" -name "*.structure_test.ts" | sort); do
+    for test_file in $(find "$dir" -name "*_structure_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -361,7 +361,7 @@ process_test_directory() {
     
     # Finally process regular test files in current directory and subdirectories
     echo "Running regular tests in $dir and subdirectories..."
-    for test_file in $(find "$dir" -name "*_test.ts" -not -name "*.architecture_test.ts" -not -name "*.structure_test.ts" | sort); do
+    for test_file in $(find "$dir" -name "*_test.ts" -not -name "*_architecture_test.ts" -not -name "*_structure_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -376,6 +376,12 @@ process_test_directory() {
 
 # Main execution flow
 echo "Starting test execution..."
+
+# Process tests in src directory first
+if ! process_test_directory "src" "${DEBUG:-false}"; then
+    echo "Test execution stopped due to failure."
+    exit 1
+fi
 
 # Process all tests hierarchically
 if ! process_test_directory "tests" "${DEBUG:-false}"; then
