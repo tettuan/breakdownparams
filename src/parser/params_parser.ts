@@ -7,8 +7,8 @@ import {
 } from '../types/params_result.ts';
 import { SecurityValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
-import { DEFAULT_OPTION_COMBINATION_RULES } from '../validator/options/option_combination_rule.ts';
 import { DEFAULT_TWO_PARAMS_CONFIG, TwoParamsConfig } from '../types/params_config.ts';
+import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../types/custom_config.ts';
 import { ZeroParamsValidator } from '../validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/params/two_params_validator.ts';
@@ -35,6 +35,7 @@ export interface ParamsParser {
 export class ParamsParser {
   private readonly optionRule: OptionRule;
   private readonly config: TwoParamsConfig;
+  private readonly customConfig: CustomConfig;
   private readonly logger: BreakdownLogger;
   /**
    * セキュリティバリデーター
@@ -47,22 +48,26 @@ export class ParamsParser {
   protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
   protected readonly twoOptionCombinationValidator: OptionCombinationValidator;
 
-  constructor(optionRule?: OptionRule, config?: TwoParamsConfig) {
+  constructor(optionRule?: OptionRule, config?: TwoParamsConfig, customConfig?: CustomConfig) {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
+    this.customConfig = customConfig || DEFAULT_CUSTOM_CONFIG;
     this.logger = new BreakdownLogger();
 
     this.securityValidator = new SecurityValidator();
     this.optionFactory = new CommandLineOptionFactory();
-    this.zeroOptionCombinationValidator = new OptionCombinationValidator(
-      DEFAULT_OPTION_COMBINATION_RULES.zero,
-    );
-    this.oneOptionCombinationValidator = new OptionCombinationValidator(
-      DEFAULT_OPTION_COMBINATION_RULES.one,
-    );
-    this.twoOptionCombinationValidator = new OptionCombinationValidator(
-      DEFAULT_OPTION_COMBINATION_RULES.two,
-    );
+
+    // Use custom config for option combination rules
+    const validationRules = this.customConfig.validation;
+    this.zeroOptionCombinationValidator = new OptionCombinationValidator({
+      allowedOptions: validationRules.zero.allowedOptions,
+    });
+    this.oneOptionCombinationValidator = new OptionCombinationValidator({
+      allowedOptions: validationRules.one.allowedOptions,
+    });
+    this.twoOptionCombinationValidator = new OptionCombinationValidator({
+      allowedOptions: validationRules.two.allowedOptions,
+    });
   }
 
   /**
@@ -157,7 +162,10 @@ export class ParamsParser {
     // 3つ同時にバリデーションを行い、それぞれの結果を判定する
     const zeroValidator = new ZeroParamsValidator();
     const oneValidator = new OneParamValidator();
-    const twoValidator = new TwoParamsValidator(this.config);
+    const twoValidator = new TwoParamsValidator({
+      demonstrativeType: this.customConfig.params.two.demonstrativeType,
+      layerType: this.customConfig.params.two.layerType,
+    });
 
     const zeroResult = zeroValidator.validate(params);
     const oneResult = oneValidator.validate(params);

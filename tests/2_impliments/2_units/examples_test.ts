@@ -2,6 +2,7 @@ import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert
 import { ParamsParser } from '../../../src/mod.ts';
 import { OptionRule } from '../../../src/types/option_rule.ts';
 import { TwoParamsResult } from '../../../src/types/params_result.ts';
+import { DEFAULT_CUSTOM_CONFIG } from '../../../src/types/custom_config.ts';
 
 Deno.test('test_examples_execution', async (t) => {
   await t.step('basic_usage example', () => {
@@ -179,7 +180,12 @@ Deno.test('test_examples_execution', async (t) => {
       },
     };
 
-    const parser = new ParamsParser(customConfig, customParamsConfig);
+    const parser = new ParamsParser(customConfig, customParamsConfig, {
+      ...DEFAULT_CUSTOM_CONFIG,
+      params: {
+        two: customParamsConfig,
+      },
+    });
     const result = parser.parse([
       'custom',
       'custom',
