@@ -53,12 +53,10 @@ interface CustomConfig {
       demonstrativeType: {
         pattern: string;
         errorMessage: string;
-        allowedValues?: string[];
       };
       layerType: {
         pattern: string;
         errorMessage: string;
-        allowedValues?: string[];
       };
     };
   };
@@ -105,12 +103,10 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       demonstrativeType: {
         pattern: '^(to|summary|defect)$',
         errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
-        allowedValues: ['to', 'summary', 'defect'],
       },
       layerType: {
         pattern: '^(project|issue|task)$',
         errorMessage: 'Invalid layer type. Must be one of: project, issue, task',
-        allowedValues: ['project', 'issue', 'task'],
       },
     },
   },
@@ -167,12 +163,10 @@ const customConfig: CustomConfig = {
       demonstrativeType: {
         pattern: '^(to|from|for)$',  // カスタムな値を許可
         errorMessage: 'Invalid demonstrative type. Must be one of: to, from, for',
-        allowedValues: ['to', 'from', 'for'],
       },
       layerType: {
         pattern: '^(module|component|service)$',  // カスタムな値を許可
         errorMessage: 'Invalid layer type. Must be one of: module, component, service',
-        allowedValues: ['module', 'component', 'service'],
       },
     },
   },

@@ -87,7 +87,7 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(invalidResult.type, 'error', 'Invalid arguments should be error type');
   assertEquals(invalidResult.params, [], 'Params should be empty for invalid input');
   assertEquals(invalidResult.options, {}, 'Options should be empty for invalid input');
-  assertEquals(invalidResult.error?.code, 'INVALID_PARAMS', 'Error code should match');
+  assertEquals(invalidResult.error?.code, 'INVALID_COMMAND', 'Error code should match');
 
   // Test short form options - ZeroParams
   logger.debug('=== Testing short form options for ZeroParams ===');

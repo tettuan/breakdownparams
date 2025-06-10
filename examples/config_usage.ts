@@ -17,14 +17,11 @@ for (const args of testArgs) {
   const parser = new ParamsParser();
   const result = parser.parse(args);
 
+  // Process valid command
   if (result.type === 'error') {
     console.error(`Error: ${result.error?.message}`);
     console.log('\nFor usage information, run: config_usage --help');
-    continue;
-  }
-
-  // Process valid command
-  if (result.type === 'two') {
+  } else if (result.type === 'two') {
     const twoResult = result as TwoParamsResult;
     const { demonstrativeType, layerType, options = {} } = twoResult;
 
@@ -53,18 +50,19 @@ for (const args of testArgs) {
     }
   } else if (result.type === 'one') {
     const oneResult = result as OneParamsResult;
-    console.log('Single param mode');
-    console.log(`Command: ${oneResult.demonstrativeType}`);
 
-    const typedOptions = oneResult.options as { config?: string };
-    if (typedOptions.config) {
-      console.log('Note: Config option is ignored in single param mode');
-    }
-    
     // Handle the error case
     if (oneResult.error) {
-      console.log(`Note: ${oneResult.error.message}`);
-      console.log('Config option is only available with TwoParams');
+      console.error(`Error: ${oneResult.error.message}`);
+      console.log('\nFor usage information, run: config_usage --help');
+    } else {
+      console.log('Single param mode');
+      console.log(`Command: ${oneResult.demonstrativeType}`);
+
+      const typedOptions = oneResult.options as { config?: string };
+      if (typedOptions.config) {
+        console.log('Note: Config option is ignored in single param mode');
+      }
     }
   } else if (result.type === 'zero') {
     const zeroResult = result as ZeroParamsResult;

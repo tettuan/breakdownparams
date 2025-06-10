@@ -43,7 +43,7 @@ export interface OptionCombinationResult {
  * 3. オプション間の依存関係（組み合わせルール）が満たされているか
  */
 export class OptionCombinationValidator {
-  private readonly customVariablePattern = /^uv-[a-zA-Z][a-zA-Z0-9_]*$/; // Normalized form
+  private readonly customVariablePattern = /^uv-[a-zA-Z][a-zA-Z0-9_-]*$/;
 
   /**
    * @param rule - オプションの組み合わせルールを定義するオブジェクト
@@ -64,42 +64,23 @@ export class OptionCombinationValidator {
   validate(options: Record<string, unknown>): OptionCombinationResult {
     debug('OptionCombinationValidator', 'Start validating options', options);
 
-    // オプションを標準オプションとカスタム変数に分類
-    const standardOptions: Record<string, unknown> = {};
-    const customOptions: Record<string, unknown> = {};
-
-    for (const [key, value] of Object.entries(options)) {
-      if (key.startsWith('--uv-')) {
-        customOptions[key] = value;
-      } else {
-        standardOptions[key] = value;
-      }
-    }
-
-    debug('OptionCombinationValidator', 'Separated options', { standardOptions, customOptions });
-
-    // 標準オプションの検証
-    const standardResult = this.validateStandardOptions(standardOptions);
-    if (!standardResult.isValid) {
-      debug('OptionCombinationValidator', 'Standard options validation failed', standardResult);
-      return standardResult;
-    }
-
-    // カスタム変数の検証
-    const customResult = this.validateCustomOptions(customOptions);
-    if (!customResult.isValid) {
-      debug('OptionCombinationValidator', 'Custom options validation failed', customResult);
-      return customResult;
-    }
-
-    debug('OptionCombinationValidator', 'All validations passed');
-    return { isValid: true };
-  }
-
-  private validateStandardOptions(options: Record<string, unknown>): OptionCombinationResult {
     // 許可されていないoptionが含まれていないか
     for (const key of Object.keys(options)) {
-      if (key.startsWith('uv-')) continue; // Skip user variables (normalized form)
+      // カスタム変数（uv-*）は特別扱い - TwoParamsモードでのみ許可
+      if (key.startsWith('uv-')) {
+        // カスタム変数の形式チェック
+        if (!this.isValidCustomVariableName(key)) {
+          return {
+            isValid: false,
+            errorMessage: `Invalid custom variable format: ${key}`,
+            errorCode: 'INVALID_CUSTOM_VARIABLE',
+            errorCategory: 'validation',
+          };
+        }
+        // カスタム変数はallowedOptionsのチェックをスキップ
+        continue;
+      }
+
       if (!this.rule.allowedOptions.includes(key)) {
         return {
           isValid: false,
@@ -142,23 +123,17 @@ export class OptionCombinationValidator {
       }
     }
 
+    debug('OptionCombinationValidator', 'All validations passed');
     return { isValid: true };
   }
 
-  private validateCustomOptions(options: Record<string, unknown>): OptionCombinationResult {
-    // カスタム変数の形式チェック
-    for (const key of Object.keys(options)) {
-      if (!this.customVariablePattern.test(key)) {
-        return {
-          isValid: false,
-          errorMessage: `Invalid custom variable format: ${key}`,
-          errorCode: 'INVALID_CUSTOM_VARIABLE',
-          errorCategory: 'validation',
-        };
-      }
-    }
-
-    return { isValid: true };
+  /**
+   * カスタム変数名の形式をチェックする
+   * @param name - チェックする変数名
+   * @returns 有効な形式の場合はtrue
+   */
+  private isValidCustomVariableName(name: string): boolean {
+    return this.customVariablePattern.test(name);
   }
 
   /**

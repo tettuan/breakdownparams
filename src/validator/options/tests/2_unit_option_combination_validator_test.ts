@@ -108,16 +108,13 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
 
     const validator = new OptionCombinationValidator(rule);
 
-    // カスタム変数は特別扱いされるべき
+    // カスタム変数は特別扱いされ、TwoParamsモードでは許可される
     const customVarResult = validator.validate({
       'uv-project': 'myproject',
       'uv-version': '1.0.0',
     });
     console.log('Custom variable result:', customVarResult);
-    // 現在はuv-*が許可リストにないためエラーになる
-    assert(!customVarResult.isValid);
-    assert(customVarResult.errorMessage?.includes('uv-project'));
-    assert(customVarResult.errorCode === 'INVALID_OPTION');
+    assert(customVarResult.isValid);
 
     // 標準オプションとカスタム変数の混在
     const mixedResult = validator.validate({
@@ -125,7 +122,14 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
       'uv-project': 'myproject',
     });
     console.log('Mixed options result:', mixedResult);
-    assert(!mixedResult.isValid);
-    assert(mixedResult.errorMessage?.includes('uv-project'));
+    assert(mixedResult.isValid);
+
+    // 無効なカスタム変数名
+    const invalidCustomVarResult = validator.validate({
+      'uv-': 'invalid',
+      'uv-123': 'invalid',
+    });
+    assert(!invalidCustomVarResult.isValid);
+    assert(invalidCustomVarResult.errorCode === 'INVALID_CUSTOM_VARIABLE');
   });
 });

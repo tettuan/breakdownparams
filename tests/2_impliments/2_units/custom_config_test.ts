@@ -21,12 +21,10 @@ Deno.test('CustomConfig functionality', async (t) => {
           demonstrativeType: {
             pattern: '^(from|to|for)$',
             errorMessage: 'Invalid demonstrative type. Must be one of: from, to, for',
-            allowedValues: ['from', 'to', 'for'],
           },
           layerType: {
             pattern: '^(module|component|service)$',
             errorMessage: 'Invalid layer type. Must be one of: module, component, service',
-            allowedValues: ['module', 'component', 'service'],
           },
         },
       },

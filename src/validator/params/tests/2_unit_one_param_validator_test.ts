@@ -15,8 +15,8 @@ Deno.test('test_one_param_validator_unit', () => {
   assertEquals(invalidResult.isValid, false, 'Non-init param should be invalid');
   assertEquals(
     invalidResult.errorMessage,
-    'Invalid parameter. Only "init" is allowed',
+    'Invalid command: invalid. Only "init" is allowed',
     'Should return correct error message',
   );
-  assertEquals(invalidResult.errorCode, 'INVALID_PARAM', 'Should return correct error code');
+  assertEquals(invalidResult.errorCode, 'INVALID_COMMAND', 'Should return correct error code');
 });

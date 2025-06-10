@@ -111,7 +111,10 @@ export class CommandLineOptionFactory implements OptionFactory {
           `-${optionConfig.shortname}`,
         );
       case 'value':
-        // Value options don't require a value at creation time
+        // Value options require a value (= must be present)
+        if (!optionInput.includes('=')) {
+          throw new Error(`Option ${name} requires a value`);
+        }
         return new ValueOption(
           `--${optionConfig.longname}`,
           [`-${optionConfig.shortname}`],

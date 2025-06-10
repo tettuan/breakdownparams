@@ -52,14 +52,14 @@ Try these invalid commands to see error handling in action:
     // If we get here, the command was valid
     console.log('Command processed successfully:');
     console.log('Type:', result.type);
-    
+
     if (result.type === 'one' && 'demonstrativeType' in result) {
       console.log('Command:', result.demonstrativeType);
     } else if (result.type === 'two' && 'demonstrativeType' in result && 'layerType' in result) {
       console.log('Demonstrative Type:', result.demonstrativeType);
       console.log('Layer Type:', result.layerType);
     }
-    
+
     console.log('Options:', result.options || {});
   }
 }

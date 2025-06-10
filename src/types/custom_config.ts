@@ -8,7 +8,6 @@
 export interface DemonstrativeTypeConfig {
   pattern: string;
   errorMessage: string;
-  allowedValues?: string[];
 }
 
 /**
@@ -17,7 +16,6 @@ export interface DemonstrativeTypeConfig {
 export interface LayerTypeConfig {
   pattern: string;
   errorMessage: string;
-  allowedValues?: string[];
 }
 
 /**
@@ -97,12 +95,10 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       demonstrativeType: {
         pattern: '^(to|summary|defect)$',
         errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
-        allowedValues: ['to', 'summary', 'defect'],
       },
       layerType: {
         pattern: '^(project|issue|task)$',
         errorMessage: 'Invalid layer type. Must be one of: project, issue, task',
-        allowedValues: ['project', 'issue', 'task'],
       },
     },
   },
