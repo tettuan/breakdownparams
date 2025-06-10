@@ -26,13 +26,13 @@
 export { ParamsParser } from './src/parser/params_parser.ts';
 export type {
   ErrorInfo,
-  OneParamResult,
-  OptionRule,
+  OneParamsResult,
   ParamsResult,
-  TwoParamResult,
-  ValidationResult,
+  TwoParamsResult,
   ZeroParamsResult,
-} from './src/result/types.ts';
+} from './src/types/params_result.ts';
+export type { OptionRule } from './src/types/option_rule.ts';
+export type { ValidationResult } from './src/types/validation_result.ts';
 
 /**
  * @module breakdownparams

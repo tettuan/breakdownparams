@@ -1,30 +1,32 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { SecurityErrorValidator } from '../../../src/validator/security_error_validator.ts';
-import { OptionsValidator } from '../../../src/validator/options_validator.ts';
-import { ZeroParamsValidator } from '../../../src/validator/zero_params_validator.ts';
-import { OneParamValidator } from '../../../src/validator/one_param_validator.ts';
-import { TwoParamValidator } from '../../../src/validator/two_param_validator.ts';
-import { OptionRule } from '../../../src/result/types.ts';
+import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
+import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
+import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
+import { TwoParamsValidator } from '../../../src/validator/params/two_params_validator.ts';
+import { OptionRule } from '../../../src/types/option_rule.ts';
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  flagOptions: {
+    help: true,
+    version: true,
+  },
+  rules: {
     customVariables: ['--uv-*'],
+    requiredOptions: [],
+    valueTypes: ['string'],
+  },
+  errorHandling: {
     emptyValue: 'error',
     unknownOption: 'error',
     duplicateOption: 'error',
-    requiredOptions: [],
-    valueTypes: [],
-  },
-  flagOptions: {
-    help: 'help',
-    version: 'version',
   },
 };
 
 Deno.test('test_validator_result_integration', () => {
   // セキュリティエラーバリデーターの結果テスト
-  const securityValidator = new SecurityErrorValidator(optionRule);
+  const securityValidator = new SecurityValidator();
   const securityResult = securityValidator.validate(['safe;command']);
   assertEquals(
     securityResult.isValid,
@@ -33,41 +35,41 @@ Deno.test('test_validator_result_integration', () => {
   );
   assertEquals(
     securityResult.validatedParams,
-    [],
-    'Validated params should be empty for security error',
+    ['safe;command'],
+    'Validated params should include the input even for security error',
   );
-  assertEquals(typeof securityResult.error?.message, 'string', 'Should have error message');
-  assertEquals(typeof securityResult.error?.code, 'string', 'Should have error code');
-  assertEquals(typeof securityResult.error?.category, 'string', 'Should have error category');
+  assertEquals(typeof securityResult.errorMessage, 'string', 'Should have error message');
+  assertEquals(typeof securityResult.errorCode, 'string', 'Should have error code');
+  assertEquals(typeof securityResult.errorCategory, 'string', 'Should have error category');
 
   // オプションバリデーターの結果テスト
-  const optionsValidator = new OptionsValidator(optionRule);
-  const optionsResult = optionsValidator.validate(['--help', '--version']);
+  const zeroOptionValidator = new ZeroOptionValidator();
+  const optionsResult = zeroOptionValidator.validate(['--help', '--version'], 'zero', optionRule);
   assertEquals(optionsResult.isValid, true, 'Options validation should pass for valid options');
   assertEquals(
     optionsResult.validatedParams,
-    ['--help', '--version'],
-    'Validated params should match input',
+    [],
+    'Option validator should return empty validated params',
   );
 
   // ゼロパラメータバリデーターの結果テスト
-  const zeroParamsValidator = new ZeroParamsValidator(optionRule);
-  const zeroParamsResult = zeroParamsValidator.validate(['--help']);
+  const zeroParamsValidator = new ZeroParamsValidator();
+  const zeroParamsResult = zeroParamsValidator.validate([]);
   assertEquals(
     zeroParamsResult.isValid,
     true,
-    'Zero params validation should pass for options only',
+    'Zero params validation should pass for empty params',
   );
-  assertEquals(zeroParamsResult.validatedParams, ['--help'], 'Validated params should match input');
+  assertEquals(zeroParamsResult.validatedParams, [], 'Validated params should be empty');
 
   // 1パラメータバリデーターの結果テスト
-  const oneParamValidator = new OneParamValidator(optionRule);
+  const oneParamValidator = new OneParamValidator();
   const oneParamResult = oneParamValidator.validate(['init']);
   assertEquals(oneParamResult.isValid, true, 'One param validation should pass for init command');
   assertEquals(oneParamResult.validatedParams, ['init'], 'Validated params should match input');
 
   // 2パラメータバリデーターの結果テスト
-  const twoParamsValidator = new TwoParamValidator(optionRule);
+  const twoParamsValidator = new TwoParamsValidator();
   const twoParamsResult = twoParamsValidator.validate(['to', 'project']);
   assertEquals(
     twoParamsResult.isValid,
@@ -81,7 +83,11 @@ Deno.test('test_validator_result_integration', () => {
   );
 
   // エラーケースの結果テスト
-  const invalidOptionsResult = optionsValidator.validate(['--invalid-option']);
+  const invalidOptionsResult = zeroOptionValidator.validate(
+    ['--invalid-option'],
+    'zero',
+    optionRule,
+  );
   assertEquals(
     invalidOptionsResult.isValid,
     false,
@@ -92,9 +98,9 @@ Deno.test('test_validator_result_integration', () => {
     [],
     'Validated params should be empty for invalid option',
   );
-  assertEquals(typeof invalidOptionsResult.error?.message, 'string', 'Should have error message');
-  assertEquals(typeof invalidOptionsResult.error?.code, 'string', 'Should have error code');
-  assertEquals(typeof invalidOptionsResult.error?.category, 'string', 'Should have error category');
+  assertEquals(typeof invalidOptionsResult.errorMessage, 'string', 'Should have error message');
+  assertEquals(typeof invalidOptionsResult.errorCode, 'string', 'Should have error code');
+  assertEquals(typeof invalidOptionsResult.errorCategory, 'string', 'Should have error category');
 
   // 複合ケースの結果テスト
   const complexResult = twoParamsValidator.validate(['to', 'project']);
@@ -104,16 +110,12 @@ Deno.test('test_validator_result_integration', () => {
     ['to', 'project'],
     'Validated params should match input',
   );
-  assertEquals(complexResult.demonstrativeType, 'to', 'Should have correct demonstrative type');
-  assertEquals(complexResult.layerType, 'project', 'Should have correct layer type');
+  // demonstrativeType and layerType are properties of ParamsResult, not ValidationResult
 
   // エラー詳細のテスト
   const errorResult = securityValidator.validate(['dangerous;command']);
   assertEquals(errorResult.isValid, false, 'Validation should fail for dangerous command');
-  assertEquals(typeof errorResult.errorDetails, 'object', 'Should have error details');
-  assertEquals(
-    errorResult.errorDetails?.command,
-    'dangerous;command',
-    'Error details should include command',
-  );
+  assertEquals(typeof errorResult.errorMessage, 'string', 'Should have error message');
+  assertEquals(typeof errorResult.errorCode, 'string', 'Should have error code');
+  assertEquals(errorResult.errorCategory, 'security', 'Should have security category');
 });

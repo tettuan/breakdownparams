@@ -1,13 +1,13 @@
-import { assertEquals } from 'https://deno.land/std/testing/asserts.ts';
+import { assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
   ErrorInfo,
-  OneParamResult,
-  OptionRule,
+  OneParamsResult,
   ParamsResult,
-  TwoParamResult,
-  ValidationResult,
+  TwoParamsResult,
   ZeroParamsResult,
-} from '../../src/result/types.ts';
+} from '../../src/types/params_result.ts';
+import { OptionRule } from '../../src/types/option_rule.ts';
+import { ValidationResult } from '../../src/types/validation_result.ts';
 
 Deno.test('test_params_result_interface', () => {
   const result: ParamsResult = {
@@ -32,7 +32,7 @@ Deno.test('test_zero_params_result_interface', () => {
 });
 
 Deno.test('test_one_param_result_interface', () => {
-  const result: OneParamResult = {
+  const result: OneParamsResult = {
     type: 'one',
     params: [],
     options: {},
@@ -45,7 +45,7 @@ Deno.test('test_one_param_result_interface', () => {
 });
 
 Deno.test('test_two_param_result_interface', () => {
-  const result: TwoParamResult = {
+  const result: TwoParamsResult = {
     type: 'two',
     params: [],
     options: {},
@@ -82,25 +82,28 @@ Deno.test('test_validation_result_interface', () => {
 Deno.test('test_option_rule_interface', async (t) => {
   const rule: OptionRule = {
     format: '--key=value',
-    validation: {
+    flagOptions: {
+      help: true,
+      version: true,
+    },
+    rules: {
       customVariables: ['uv-project', 'uv-version', 'uv-environment'],
-      emptyValue: 'error',
-      unknownOption: 'error',
-      duplicateOption: 'error',
       requiredOptions: [],
       valueTypes: ['string'],
     },
-    flagOptions: {
-      help: 'help',
-      version: 'version',
+    errorHandling: {
+      emptyValue: 'error',
+      unknownOption: 'error',
+      duplicateOption: 'error',
     },
   };
 
   await t.step('should have correct flag options structure', () => {
     assertEquals(typeof rule.format, 'string');
-    assertEquals(typeof rule.validation, 'object');
     assertEquals(typeof rule.flagOptions, 'object');
-    assertEquals(typeof rule.flagOptions.help, 'string');
-    assertEquals(typeof rule.flagOptions.version, 'string');
+    assertEquals(typeof rule.rules, 'object');
+    assertEquals(typeof rule.errorHandling, 'object');
+    assertEquals(typeof rule.flagOptions.help, 'boolean');
+    assertEquals(typeof rule.flagOptions.version, 'boolean');
   });
 });

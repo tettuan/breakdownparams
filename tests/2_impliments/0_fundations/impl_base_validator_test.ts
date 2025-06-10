@@ -1,98 +1,40 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { BaseValidator } from '../../../src/validator/base_validator.ts';
-import { OptionRule, ValidationResult } from '../../../src/result/types.ts';
+import { SecurityValidator } from '../../../src/validator/security_validator.ts';
 
-// BaseValidatorのテスト用サブクラス
-class TestValidator extends BaseValidator {
-  validate(args: string[]): ValidationResult {
-    return {
-      isValid: true,
-      validatedParams: args,
-    };
-  }
-}
+Deno.test('test_security_validator_implementation', () => {
+  const validator = new SecurityValidator();
 
-const optionRule: OptionRule = {
-  format: '--key=value',
-  validation: {
-    customVariables: ['--demonstrative-type', '--layer-type'],
-    emptyValue: 'error',
-    unknownOption: 'error',
-    duplicateOption: 'error',
-    requiredOptions: [],
-    valueTypes: ['string'],
-  },
-  flagOptions: {
-    help: 'help',
-    version: 'version',
-  },
-};
-
-Deno.test('test_base_validator_implementation', () => {
-  const validator = new TestValidator(optionRule);
-
-  // バリデーションの実行
+  // 正常系のバリデーション
   const result = validator.validate(['test']);
-  assertEquals(result.isValid, true, 'Validation should be successful');
+  assertEquals(result.isValid, true, 'Normal validation should succeed');
   assertEquals(result.validatedParams, ['test'], 'Validated params should match input');
+  assertEquals(result.errorMessage, undefined, 'Should have no error message');
 
-  // エラーコードの検証
-  const validCode = 'VALID_CODE';
-  const invalidCode = '';
+  // シェルコマンド実行の試み
+  const shellCommandResult = validator.validate(['test; ls']);
+  assertEquals(shellCommandResult.isValid, false, 'Shell command attempt should fail');
+  assertEquals(shellCommandResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
+  assertEquals(shellCommandResult.errorCategory, 'security', 'Should have security category');
   assertEquals(
-    validator['validateErrorCode'](validCode),
-    true,
-    'Valid error code should pass validation',
-  );
-  assertEquals(
-    validator['validateErrorCode'](invalidCode),
-    false,
-    'Invalid error code should fail validation',
+    shellCommandResult.errorMessage,
+    'Security error: Shell command execution or redirection attempt detected',
+    'Should have correct error message',
   );
 
-  // エラーカテゴリの検証
-  const validCategory = 'VALID_CATEGORY';
-  const invalidCategory = '';
+  // パストラバーサルの試み
+  const pathTraversalResult = validator.validate(['test', '../file']);
+  assertEquals(pathTraversalResult.isValid, false, 'Path traversal attempt should fail');
+  assertEquals(pathTraversalResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
+  assertEquals(pathTraversalResult.errorCategory, 'security', 'Should have security category');
   assertEquals(
-    validator['validateErrorCategory'](validCategory),
-    true,
-    'Valid error category should pass validation',
-  );
-  assertEquals(
-    validator['validateErrorCategory'](invalidCategory),
-    false,
-    'Invalid error category should fail validation',
+    pathTraversalResult.errorMessage,
+    'Security error: Path traversal attempt detected',
+    'Should have correct error message',
   );
 
-  // エラー結果の生成
-  const errorResult = validator['createErrorResult'](
-    'Test error',
-    'TEST_ERROR',
-    'test_category',
-  );
-  assertEquals(errorResult.isValid, false, 'Error result should indicate failure');
-  assertEquals(errorResult.errorMessage, 'Test error', 'Error message should match');
-  assertEquals(errorResult.errorCode, 'TEST_ERROR', 'Error code should match');
-  assertEquals(errorResult.errorCategory, 'test_category', 'Error category should match');
-
-  // 成功結果の生成
-  const successResult = validator['createSuccessResult'](['test']);
-  assertEquals(successResult.isValid, true, 'Success result should indicate success');
-  assertEquals(successResult.validatedParams, ['test'], 'Validated params should match');
-
-  // 結果の検証
-  assertEquals(validator['isValid'](successResult), true, 'Valid result should pass validation');
-  assertEquals(validator['isValid'](errorResult), false, 'Invalid result should fail validation');
-
-  // 検証済みパラメータの取得
-  assertEquals(
-    validator['getValidatedParams'](successResult),
-    ['test'],
-    'Should return validated params',
-  );
-  assertEquals(
-    validator['getValidatedParams'](errorResult),
-    [],
-    'Should return empty array for invalid result',
-  );
+  // 複数のセキュリティチェック
+  const multipleChecksResult = validator.validate(['test; ls', '../file']);
+  assertEquals(multipleChecksResult.isValid, false, 'Multiple security violations should fail');
+  assertEquals(multipleChecksResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
+  assertEquals(multipleChecksResult.errorCategory, 'security', 'Should have security category');
 });

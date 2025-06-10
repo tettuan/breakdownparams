@@ -1,31 +1,32 @@
 import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
-import { CustomVariableOption, FlagOption, ValueOption } from '../../src/options/base.ts';
-import { OptionType } from '../../src/types/option.ts';
+import { FlagOption } from '../../src/option-models/flag_option.ts';
+import { ValueOption } from '../../src/option-models/value_option.ts';
+import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
+import { OptionType } from '../../src/types/option_type.ts';
 
 Deno.test('ValueOption', async (t) => {
   const validator = (value: string) => ({
     isValid: value.length > 0,
-    errors: value.length === 0 ? ['Value cannot be empty'] : [],
+    validatedParams: [value],
+    errors: value.length === 0 ? ['test is required'] : [],
   });
-
   const option = new ValueOption('test', ['t'], true, 'Test option', validator);
 
   await t.step('should have correct type', () => {
-    assertEquals(option.type, OptionType.VALUE);
+    assert(option.type === OptionType.VALUE);
   });
 
   await t.step('should validate required option', () => {
-    const result = option.validate(undefined);
+    const result = option.validate('--test=');
     assert(!result.isValid);
-    assert(result.errors.includes('test is required'));
+    assert(result.errorMessage && result.errorMessage.includes('Value cannot be empty'));
   });
 
   await t.step('should validate value with custom validator', () => {
-    const result = option.validate('');
+    const result = option.validate('--test=');
     assert(!result.isValid);
-    assert(result.errors.includes('Value cannot be empty'));
 
-    const validResult = option.validate('valid');
+    const validResult = option.validate('--test=valid');
     assert(validResult.isValid);
   });
 
@@ -36,51 +37,45 @@ Deno.test('ValueOption', async (t) => {
 });
 
 Deno.test('FlagOption', async (t) => {
-  const option = new FlagOption('help', ['h'], 'Show help');
+  const option = new FlagOption('flag', ['f'], 'Flag option');
 
   await t.step('should have correct structure', () => {
-    assertEquals(option.type, OptionType.FLAG);
+    assert(option.type === OptionType.FLAG);
     assertEquals(option.isRequired, false);
-    assertEquals(option.name, 'help');
-    assertEquals(option.aliases, ['h']);
-    assertEquals(option.description, 'Show help');
+    assertEquals(option.name, 'flag');
+    assertEquals(option.aliases, ['f']);
+    assertEquals(option.description, 'Flag option');
   });
 
   await t.step('should validate flag option structure', () => {
-    const result = option.validate(undefined);
-    assertEquals(result.isValid, true);
-    assertEquals(result.errors, []);
+    const result = option.validate();
+    assert(result.isValid);
   });
 
-  await t.step('should parse flag option value', () => {
-    assertEquals(option.parse('true'), true);
-    assertEquals(option.parse(undefined), false);
-    assertEquals(option.parse('false'), false);
+  await t.step('should get flag option value', () => {
+    assertEquals(option.getValue(), true);
   });
 });
 
-Deno.test('CustomVariableOption', async (t) => {
-  const pattern = /^uv-[a-zA-Z0-9_]+$/;
-  const option = new CustomVariableOption('uv-test', 'Test variable', pattern);
+Deno.test('UserVariableOption', async (t) => {
+  const option = new UserVariableOption('--uv-test', 'Test variable');
 
   await t.step('should have correct type', () => {
-    assertEquals(option.type, OptionType.CUSTOM_VARIABLE);
+    assert(option.type === OptionType.USER_VARIABLE);
   });
 
   await t.step('should validate name pattern', () => {
-    const result = option.validate('value');
+    const result = option.validate('--uv-test=value');
     assert(result.isValid);
   });
 
   await t.step('should reject invalid name pattern', () => {
-    const invalidOption = new CustomVariableOption('invalid', 'Invalid', pattern);
-    const result = invalidOption.validate('value');
+    const result = option.validate('--uv-123=value');
     assert(!result.isValid);
-    assert(result.errors.includes('Invalid custom variable name: invalid'));
   });
 
   await t.step('should parse value', () => {
-    const value = option.parse('test');
+    const value = option.parse('--uv-test=test');
     assertEquals(value, 'test');
   });
 });

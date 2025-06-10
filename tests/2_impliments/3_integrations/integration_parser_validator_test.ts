@@ -1,25 +1,31 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { SecurityErrorValidator } from '../../../src/validator/security_error_validator.ts';
-import { OptionsValidator } from '../../../src/validator/options_validator.ts';
-import { ZeroParamsValidator } from '../../../src/validator/zero_params_validator.ts';
-import { OneParamValidator } from '../../../src/validator/one_param_validator.ts';
-import { TwoParamValidator } from '../../../src/validator/two_param_validator.ts';
-import { OptionRule } from '../../../src/result/types.ts';
+import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+import {
+  OneOptionValidator,
+  TwoOptionValidator,
+  ZeroOptionValidator,
+} from '../../../src/validator/options/option_validator.ts';
+import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
+import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
+import { TwoParamsValidator } from '../../../src/validator/params/two_params_validator.ts';
+import { OptionRule } from '../../../src/types/option_rule.ts';
 
 const optionRule: OptionRule = {
   format: '--key=value',
-  validation: {
+  flagOptions: {
+    help: true,
+    version: true,
+  },
+  rules: {
     customVariables: ['--uv-*'],
+    requiredOptions: [],
+    valueTypes: ['string'],
+  },
+  errorHandling: {
     emptyValue: 'error',
     unknownOption: 'error',
     duplicateOption: 'error',
-    requiredOptions: [],
-    valueTypes: [],
-  },
-  flagOptions: {
-    help: 'help',
-    version: 'version',
   },
 };
 
@@ -27,43 +33,43 @@ Deno.test('test_parser_validator_integration', () => {
   const parser = new ParamsParser(optionRule);
 
   // バリデーターの作成と検証
-  const validators = [
-    new SecurityErrorValidator(optionRule),
-    new OptionsValidator(optionRule),
-    new ZeroParamsValidator(optionRule),
-    new OneParamValidator(optionRule),
-    new TwoParamValidator(optionRule),
+  const paramValidators = [
+    new ZeroParamsValidator(),
+    new OneParamValidator(),
+    new TwoParamsValidator(),
   ];
-  assertEquals(validators.length, 5, 'Should create 5 validators');
+  const optionValidators = [
+    new ZeroOptionValidator(),
+    new OneOptionValidator(),
+    new TwoOptionValidator(),
+  ];
+  const securityValidator = new SecurityValidator();
+  assertEquals(paramValidators.length, 3, 'Should create 3 param validators');
+  assertEquals(optionValidators.length, 3, 'Should create 3 option validators');
   assertEquals(
-    validators[0] instanceof SecurityErrorValidator,
+    securityValidator instanceof SecurityValidator,
     true,
-    'First validator should be SecurityErrorValidator',
+    'Should create SecurityValidator',
   );
   assertEquals(
-    validators[1] instanceof OptionsValidator,
+    paramValidators[0] instanceof ZeroParamsValidator,
     true,
-    'Second validator should be OptionsValidator',
+    'First param validator should be ZeroParamsValidator',
   );
   assertEquals(
-    validators[2] instanceof ZeroParamsValidator,
+    paramValidators[1] instanceof OneParamValidator,
     true,
-    'Third validator should be ZeroParamsValidator',
+    'Second param validator should be OneParamValidator',
   );
   assertEquals(
-    validators[3] instanceof OneParamValidator,
+    paramValidators[2] instanceof TwoParamsValidator,
     true,
-    'Fourth validator should be OneParamValidator',
-  );
-  assertEquals(
-    validators[4] instanceof TwoParamValidator,
-    true,
-    'Fifth validator should be TwoParamValidator',
+    'Third param validator should be TwoParamsValidator',
   );
 
   // 各バリデーターの統合テスト
   // 1. セキュリティエラーバリデーター
-  const securityResult = validators[0].validate(['safe;command']);
+  const securityResult = securityValidator.validate(['safe;command']);
   assertEquals(
     securityResult.isValid,
     false,
@@ -71,19 +77,19 @@ Deno.test('test_parser_validator_integration', () => {
   );
 
   // 2. オプションバリデーター
-  const optionsResult = validators[1].validate(['--help', '--version']);
+  const optionsResult = optionValidators[0].validate(['--help', '--version'], 'zero', optionRule);
   assertEquals(optionsResult.isValid, true, 'Options validator should accept valid options');
 
   // 3. ゼロパラメータバリデーター
-  const zeroParamsResult = validators[2].validate(['--help']);
-  assertEquals(zeroParamsResult.isValid, true, 'Zero params validator should accept options only');
+  const zeroParamsResult = paramValidators[0].validate([]);
+  assertEquals(zeroParamsResult.isValid, true, 'Zero params validator should accept empty params');
 
   // 4. 1パラメータバリデーター
-  const oneParamResult = validators[3].validate(['init']);
+  const oneParamResult = paramValidators[1].validate(['init']);
   assertEquals(oneParamResult.isValid, true, 'One param validator should accept init command');
 
   // 5. 2パラメータバリデーター
-  const twoParamsResult = validators[4].validate(['to', 'project']);
+  const twoParamsResult = paramValidators[2].validate(['to', 'project']);
   assertEquals(
     twoParamsResult.isValid,
     true,
@@ -97,8 +103,8 @@ Deno.test('test_parser_validator_integration', () => {
   assertEquals(zeroParamsParseResult.params, [], 'Should have empty params');
   assertEquals(
     zeroParamsParseResult.options.help,
-    undefined,
-    'Should have help option without value',
+    true,
+    'Should have help option as true',
   );
 
   // 2. 1パラメータケース
@@ -117,15 +123,20 @@ Deno.test('test_parser_validator_integration', () => {
   assertEquals(errorParseResult.params, [], 'Should have empty params for error');
   assertEquals(typeof errorParseResult.error, 'object', 'Should have error object');
 
-  // 5. 複合ケース
-  const complexParseResult = parser.parse(['to', 'project', '--help', '--version']);
+  // 5. 複合ケース - two params with valid options
+  const complexParseResult = parser.parse([
+    'to',
+    'project',
+    '--from=input.md',
+    '--config=test.json',
+  ]);
   assertEquals(complexParseResult.type, 'two', 'Should parse as two params with options');
   assertEquals(complexParseResult.params.length, 2, 'Should include only parameters');
-  assertEquals(complexParseResult.options.help, undefined, 'Should have help option without value');
+  assertEquals(complexParseResult.options.from, 'input.md', 'Should have from option');
   assertEquals(
-    complexParseResult.options.version,
-    undefined,
-    'Should have version option without value',
+    complexParseResult.options.config,
+    'test.json',
+    'Should have config option',
   );
 });
 
@@ -135,7 +146,7 @@ Deno.test('flag option with value should return error (--help=true)', () => {
   assertEquals(result.type, 'error');
   assertEquals(
     result.error?.message,
-    'Invalid option format: --help=true, Unknown option: help=true',
+    'Flag option --help should not have a value',
   );
   assertEquals(result.error?.category, 'invalid_format');
 });
@@ -146,7 +157,7 @@ Deno.test('flag option with value should return error (--version=true)', () => {
   assertEquals(result.type, 'error');
   assertEquals(
     result.error?.message,
-    'Invalid option format: --version=true, Unknown option: version=true',
+    'Flag option --version should not have a value',
   );
   assertEquals(result.error?.category, 'invalid_format');
 });

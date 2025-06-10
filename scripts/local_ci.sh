@@ -273,26 +273,32 @@ if ! deno cache --reload mod.ts; then
     handle_error "mod.ts" "Failed to regenerate deno.lock" "false"
 fi
 
-# Comprehensive type checking
+# Comprehensive type checking (matching GitHub Actions CI)
 echo "Running comprehensive type checks..."
 
-# Check main entry points
-echo "Checking entry points..."
-for entry_point in mod.ts cli.ts main.ts; do
-    if [ -f "$entry_point" ]; then
-        if ! deno check "$entry_point"; then
-            handle_error "$entry_point" "Type check failed" "false"
-        fi
-    fi
-done
+# Check main entry point
+echo "Checking main entry point..."
+if ! deno check mod.ts; then
+    handle_type_error "mod.ts" "$(deno check mod.ts 2>&1)"
+fi
 
-# Check all TypeScript files in lib directory
-echo "Checking library files..."
-find lib -name "*.ts" -not -name "*.test.ts" | while read -r file; do
-    if ! deno check "$file"; then
-        handle_error "$file" "Type check failed" "false"
-    fi
-done
+# Check all TypeScript files in src directory
+echo "Checking src directory..."
+if ! deno check "src/**/*.ts"; then
+    handle_type_error "src/**/*.ts" "$(deno check 'src/**/*.ts' 2>&1)"
+fi
+
+# Check all TypeScript files in tests directory  
+echo "Checking tests directory..."
+if ! deno check "tests/**/*.ts"; then
+    handle_type_error "tests/**/*.ts" "$(deno check 'tests/**/*.ts' 2>&1)"
+fi
+
+# Check all TypeScript files in examples directory
+echo "Checking examples directory..."
+if ! deno check "examples/**/*.ts"; then
+    handle_type_error "examples/**/*.ts" "$(deno check 'examples/**/*.ts' 2>&1)"
+fi
 
 # Try JSR type check with --allow-dirty if available
 echo "Running JSR type check..."
@@ -337,7 +343,7 @@ process_test_directory() {
     
     # First run architecture tests in current directory and subdirectories
     echo "Running architecture tests in $dir and subdirectories..."
-    for test_file in $(find "$dir" -name "*.architecture_test.ts" | sort); do
+    for test_file in $(find "$dir" -name "*_architecture_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -349,7 +355,7 @@ process_test_directory() {
     
     # Then run structure tests in current directory and subdirectories
     echo "Running structure tests in $dir and subdirectories..."
-    for test_file in $(find "$dir" -name "*.structure_test.ts" | sort); do
+    for test_file in $(find "$dir" -name "*_structure_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -361,7 +367,7 @@ process_test_directory() {
     
     # Finally process regular test files in current directory and subdirectories
     echo "Running regular tests in $dir and subdirectories..."
-    for test_file in $(find "$dir" -name "*_test.ts" -not -name "*.architecture_test.ts" -not -name "*.structure_test.ts" | sort); do
+    for test_file in $(find "$dir" \( -name "*_test.ts" -o -name "*.test.ts" -o -name "*tests.ts" \) -not -name "*_architecture_test.ts" -not -name "*_structure_test.ts" | sort); do
         if [ -f "$test_file" ]; then
             ((test_count++))
             if ! run_single_test "$test_file" "$is_debug"; then
@@ -377,20 +383,61 @@ process_test_directory() {
 # Main execution flow
 echo "Starting test execution..."
 
+# Process tests in src directory first
+if ! process_test_directory "src" "${DEBUG:-false}"; then
+    echo "Test execution stopped due to failure."
+    exit 1
+fi
+
 # Process all tests hierarchically
 if ! process_test_directory "tests" "${DEBUG:-false}"; then
     echo "Test execution stopped due to failure."
     exit 1
 fi
 
-echo "All tests passed. Running type check..."
+echo "All tests passed. Running final type checks..."
+
+# Re-run comprehensive type checks after tests
+echo "Checking mod.ts..."
 if ! deno check mod.ts; then
     handle_type_error "mod.ts" "$(deno check mod.ts 2>&1)"
+fi
+
+echo "Checking src/**/*.ts..."
+if ! deno check "src/**/*.ts"; then
+    handle_type_error "src/**/*.ts" "$(deno check 'src/**/*.ts' 2>&1)"
+fi
+
+echo "Checking tests/**/*.ts..."
+if ! deno check "tests/**/*.ts"; then
+    handle_type_error "tests/**/*.ts" "$(deno check 'tests/**/*.ts' 2>&1)"
+fi
+
+echo "Checking examples/**/*.ts..."
+if ! deno check "examples/**/*.ts"; then
+    handle_type_error "examples/**/*.ts" "$(deno check 'examples/**/*.ts' 2>&1)"
 fi
 
 echo "Running JSR type check..."
 if ! error_output=$(npx jsr publish --dry-run --allow-dirty 2>&1); then
     handle_jsr_error "$error_output"
+fi
+
+echo "Running comprehensive test suite..."
+if ! deno test --allow-env --allow-write --allow-read --allow-run; then
+    echo "
+===============================================================================
+>>> COMPREHENSIVE TEST FAILED <<<
+===============================================================================
+Error: Full test suite failed
+This may indicate issues with test interactions or dependencies
+
+Next steps:
+1. Run individual test files to isolate the failure
+2. Check for test side effects or order dependencies
+3. Review test setup and teardown procedures
+==============================================================================="
+    exit 1
 fi
 
 echo "Running format check..."

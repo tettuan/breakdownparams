@@ -53,6 +53,15 @@
 
 ## オプション関連
 
+### オプションの正規化
+
+すべてのオプションは統一された正規化ルールに従い、正規形式では先頭のハイフンを除去します：
+- ロングオプション：`--help` → `help`
+- ショートオプション：`-h` → `help`（主要名に解決）
+- ユーザー変数：`--uv-config` → `uv-config`
+
+この正規化はオプションクラス中心設計に従い、Optionクラス自身が処理を担当します。
+
 ### 標準オプション
 
 | オプション    | エイリアス | 説明                                                                                 | 参照仕様ファイル               |
@@ -65,13 +74,13 @@
 | --adaptation  | -a         | プロンプト適応タイプ。処理の挙動を調整するために使用。カスタマイズ可能な動作を指定。 | [options.ja.md](options.ja.md) |
 | --config      | -c         | 設定ファイル名。TwoParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
 
-### カスタム変数オプション
+### ユーザー変数オプション
 
 | 用語           | 説明                                                                                                                 | 参照仕様ファイル                           |
 | -------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| カスタム変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数。TwoParamsモードでのみ使用可能で、任意の値を保持できる。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
-| カスタム変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字と最小限の特殊文字のみを許可し、大文字小文字を区別する。               | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
-| CustomVariables | カスタム変数オプションを保持する型。キーと値のペアで構成され、コマンドラインから受け取った値をそのまま保持する。              | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| ユーザー変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数（`uv`は"user variable"の略）。TwoParamsモードでのみ使用可能。内部的に`uv-*`形式に正規化。 | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| ユーザー変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字、アンダースコア、ハイフンを許可し、大文字小文字を区別する。                    | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| UserVariables | ユーザー変数オプションを保持する型。`uv-*`形式のキーと値のペアで構成され、コマンドラインから受け取った値を保持する。          | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
 
 ## バリデーション関連
 
@@ -102,8 +111,8 @@
 |------|------|------|
 | ParamPatternResult | パラメータパターン結果の基本型。パラメータの組み合わせパターンに基づく結果を型安全に扱うためのインターフェース。エラー情報も含む。 | [params_type.ja.md](params_type.ja.md) |
 | ZeroParamResult | パラメータなしの結果型。help/versionコマンド用。 | [params_type.ja.md](params_type.ja.md) |
-| OneParamResult | 単一パラメータの結果型。layerコマンド用。 | [params_type.ja.md](params_type.ja.md) |
-| TwoParamResult | 二重パラメータの結果型。breakコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| OneParamsResult | 単一パラメータの結果型。layerコマンド用。 | [params_type.ja.md](params_type.ja.md) |
+| TwoParamsResult | 二重パラメータの結果型。breakコマンド用。 | [params_type.ja.md](params_type.ja.md) |
 
 ---
 

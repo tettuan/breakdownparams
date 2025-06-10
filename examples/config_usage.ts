@@ -1,12 +1,76 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import type { OneParamsResult, TwoParamsResult, ZeroParamsResult } from '../src/mod.ts';
 
-const parser = new ParamsParser();
-const result = parser.parse(Deno.args);
+// Example arguments for testing
+const testArgs = [
+  ['to', 'project', '--config=test'],
+  ['to', 'project', '-c=test'],
+  ['to', 'project', '--from=input.md', '--destination=output.md', '--config=prod'],
+  ['init', '--config=test'], // Config should be ignored for single param
+  ['--help'],
+];
 
-// Helper function to display usage
-function showUsage() {
-  console.log(`
+// Run tests for each argument set
+for (const args of testArgs) {
+  console.log(`\n=== Testing: ${args.join(' ')} ===`);
+
+  const parser = new ParamsParser();
+  const result = parser.parse(args);
+
+  // Process valid command
+  if (result.type === 'error') {
+    console.error(`Error: ${result.error?.message}`);
+    console.log('\nFor usage information, run: config_usage --help');
+  } else if (result.type === 'two') {
+    const twoResult = result as TwoParamsResult;
+    const { demonstrativeType, layerType, options = {} } = twoResult;
+
+    console.log('Command processed successfully:');
+    console.log('----------------------------');
+    console.log(`Action: ${demonstrativeType} ${layerType}`);
+
+    const typedOptions = options as {
+      from?: string;
+      destination?: string;
+      input?: string;
+      config?: string;
+    };
+
+    if (typedOptions.from) {
+      console.log(`Input file: ${typedOptions.from}`);
+    }
+    if (typedOptions.destination) {
+      console.log(`Output file: ${typedOptions.destination}`);
+    }
+    if (typedOptions.input) {
+      console.log(`Converting from layer: ${typedOptions.input}`);
+    }
+    if (typedOptions.config) {
+      console.log(`Using config: ${typedOptions.config}`);
+    }
+  } else if (result.type === 'one') {
+    const oneResult = result as OneParamsResult;
+
+    // Handle the error case
+    if (oneResult.error) {
+      console.error(`Error: ${oneResult.error.message}`);
+      console.log('\nFor usage information, run: config_usage --help');
+    } else {
+      console.log('Single param mode');
+      console.log(`Command: ${oneResult.demonstrativeType}`);
+
+      const typedOptions = oneResult.options as { config?: string };
+      if (typedOptions.config) {
+        console.log('Note: Config option is ignored in single param mode');
+      }
+    }
+  } else if (result.type === 'zero') {
+    const zeroResult = result as ZeroParamsResult;
+    const typedOptions = zeroResult.options as { help?: boolean; version?: boolean };
+
+    console.log('No params mode');
+    if (typedOptions.help) {
+      console.log(`
 Usage: config_usage <command> <layer> [options]
 
 Commands:
@@ -16,79 +80,28 @@ Layers:
   project, issue, task
 
 Options:
-  --from FILE, -f FILE       Input file path
-  --destination FILE, -o FILE Output file path
-  --input TYPE, -i TYPE     Input layer type
-  --config NAME, -c NAME    Configuration file name
+  --from=FILE, -f=FILE       Input file path
+  --destination=FILE, -o=FILE Output file path
+  --input=TYPE, -i=TYPE     Input layer type
+  --config=NAME, -c=NAME    Configuration file name (TwoParams only)
 
 Examples:
-  # Using standard options
-  config_usage to project --from input.md --destination output.md
-
-  # Using short form options
-  config_usage to project -f input.md -o output.md
-
-  # Mixed options
-  config_usage to project --from input.md -o output.md
-
   # Using config option
-  config_usage to project --config test
-  config_usage to project -c test
+  config_usage to project --config=test
+  config_usage to project -c=test
 
-  # Single param mode
-  config_usage init
+  # With other options
+  config_usage to project --from=input.md --destination=output.md --config=prod
+
+  # Single param mode (config ignored)
+  config_usage init --config=test
 
   # No params mode
   config_usage --help
 `);
-}
-
-if (!result.success) {
-  console.error(`Error: ${result.error?.message}`);
-  console.log('\nFor usage information, run: config_usage --help');
-  Deno.exit(1);
-}
-
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
-  showUsage();
-  Deno.exit(0);
-}
-
-// Process valid command
-if (data.type === 'two') {
-  const { demonstrativeType, layerType, options = {} } = data;
-
-  console.log('Command processed successfully:');
-  console.log('----------------------------');
-  console.log(`Action: ${demonstrativeType} ${layerType}`);
-
-  if (options?.fromFile) {
-    console.log(`Input file: ${options.fromFile}`);
+    }
+    if (typedOptions.version) {
+      console.log('Version requested');
+    }
   }
-  if (options?.destinationFile) {
-    console.log(`Output file: ${options.destinationFile}`);
-  }
-  if (options?.fromLayerType) {
-    console.log(`Converting from layer: ${options.fromLayerType}`);
-  }
-  if (options?.configFile) {
-    console.log(`Using config: ${options.configFile}`);
-  }
-} else if (data.type === 'one') {
-  console.log('Single param mode');
-  console.log(`Command: ${data.command}`);
-} else if (data.type === 'zero') {
-  console.log('No params mode');
-  if (data.help) {
-    console.log('Help requested');
-  }
-  if (data.version) {
-    console.log('Version requested');
-  }
-} else {
-  console.log('Please provide both command and layer type.');
-  console.log('\nFor usage information, run: config_usage --help');
-  Deno.exit(1);
 }

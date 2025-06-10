@@ -2,6 +2,15 @@
 
 This document defines the specification for options (hyphenated arguments) in the breakdownparams library.
 
+## Option Class Architecture
+
+The library adopts an option-class-centered design where each option instance holds its own normalization, validation, and transformation logic. This design promotes:
+
+- **Single Responsibility**: Each option class manages its own behavior
+- **Consistency**: Unified normalization rules across the system
+- **Extensibility**: Easy addition of new option types
+- **Encapsulation**: Internal representation separated from external interface
+
 ## Argument Format
 
 Option arguments must follow the format below:
@@ -42,28 +51,28 @@ To specify an empty value for an option, use one of the following methods:
 | --input       | -i    | Input layer type     | enum       | No       | `--input=project`          |
 | --adaptation  | -a    | Prompt adaptation type | string  | No       | `--adaptation=strict`      |
 | --config      | -c    | Configuration file   | string     | No       | `--config=test`            |
-| --uv-*        | None  | Custom variable option | string   | No       | `--uv-project=myproject`   |
+| --uv-*        | None  | User variable option | string   | No       | `--uv-project=myproject`   |
 
 ## Option Constraints
 
 1. **Long and Short Forms**
    - When both forms are provided (e.g., `--from` and `-f`), the long form takes precedence
    - Long form is primary, and short form is considered an alias
-   - Custom variable options (`--uv-*`) do not support short forms
+   - User variable options (`--uv-*`) do not support short forms
 
 2. **Case Sensitivity**
    - All options and aliases must be lowercase
    - Uppercase variants are ignored without error
-   - Custom variable option names are case sensitive and must be used as specified
+   - User variable option names are case sensitive and must be used as specified
 
 3. **Invalid Options**
    - Undefined options are ignored without error
    - No validation is performed on file paths
-   - Invalid syntax for custom variable options (e.g., missing `=`) results in an error
+   - Invalid syntax for user variable options (e.g., missing `=`) results in an error
 
 4. **Parameter Type Constraints**
    - `--config` / `-c` option is only available in TwoParams mode
-   - Custom variable options (`--uv-*`) are also only available in TwoParams mode
+   - User variable options (`--uv-*`) are also only available in TwoParams mode
    - Ignored in other parameter types (ZeroParams, OneParam, TwoParams)
 
 ## Input Layer Type Values
@@ -115,7 +124,7 @@ breakdown summary task --adaptation=
 breakdown summary task -a=''
 ```
 
-### Custom Variable Options
+### User Variable Options
 
 ```bash
 # Correct format
@@ -140,6 +149,14 @@ breakdown to issue --from= -o="" -i=project -a=
 breakdown to project --config= --uv-environment="" --uv-version=
 ```
 
+## Option Normalization
+
+The library uses a unified normalization approach:
+- Short options (`-h`) are internally normalized to their canonical names (`help`)
+- Long options (`--help`) are also normalized to canonical names (`help`)
+- User variable options (`--uv-config`) are normalized to `uv-config` (removing leading hyphens)
+- Each option class handles its own normalization logic
+
 ## Return Type
 
 The option parsing result is included in the parameter type:
@@ -151,7 +168,7 @@ type OptionParams = {
   fromLayerType?: LayerType;
   adaptationType?: string;
   configFile?: string;
-  customVariables?: Record<string, string>;
+  [key: `uv-${string}`]: string; // User variables normalized without leading hyphens
 };
 ```
 

@@ -10,7 +10,7 @@ This specification defines the type definitions and parsing flow of the paramete
 ### 1. Basic Types
 
 ```typescript
-type ParamsResult = ZeroParamsResult | OneParamResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult;
 
 // Error information type
 type ErrorResult = {
@@ -32,7 +32,7 @@ type ZeroParamsResult = {
 };
 
 // One argument
-type OneParamResult = {
+type OneParamsResult = {
   type: 'one';
   command: 'init';
   options: OptionParams;
@@ -57,7 +57,7 @@ type OptionParams = {
   fromLayerType?: LayerType;
   adaptationType?: string;
   configFile?: string;
-  customVariables?: Record<string, string>;
+  [key: `uv-${string}`]?: string;  // User variables in normalized form
 };
 ```
 
@@ -82,7 +82,7 @@ type OptionParams = {
          }
        };
      }
-     // Return OneParamResult
+     // Return OneParamsResult
    } else if (nonOptionArgs.length === 2) {
      // Parameter validation
      if (!isValidDemonstrativeType(nonOptionArgs[0])) {
@@ -125,7 +125,7 @@ type OptionParams = {
 
 2. **Option Types**
    - Standard options (--from, --destination, etc.)
-   - Custom variable options (--uv-*)
+   - User variable options (--uv-*) normalized to uv-* format
 
 ### 3. Return Type Determination
 
@@ -195,21 +195,21 @@ When an error occurs in parameters or options, the error information is set in t
   }
 }
 
-// Example 3: Option error (custom variable naming rule violation)
+// Example 3: Option error (user variable naming rule violation)
 {
   type: 'one',
   command: 'init',
   options: {},
   error: {
-    message: 'Invalid custom variable name: invalid@name',
-    code: 'INVALID_CUSTOM_VARIABLE'
+    message: 'Invalid user variable name: invalid@name',
+    code: 'INVALID_USER_VARIABLE'
   }
 }
 ```
 
 ### 3. Type Consistency
 
-- Maintain parameter types (ZeroParamsResult, OneParamResult, TwoParamsResult)
+- Maintain parameter types (ZeroParamsResult, OneParamsResult, TwoParamsResult)
 - Error information is kept as error property of each parameter type
 - No type conversion is performed
 

@@ -1,12 +1,29 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import type { ParamsResult } from '../src/mod.ts';
 
-const parser = new ParamsParser();
-const result = parser.parse(Deno.args);
+// Example arguments for testing error cases
+const testArgs = [
+  ['unknown'], // Invalid command
+  ['to', 'issue', 'extra'], // Too many arguments
+  ['invalid', 'issue'], // Invalid demonstrative type
+  ['to', 'invalid'], // Invalid layer type
+  ['to', 'project', '--unknown=value'], // Unknown option
+  ['--help'], // Help
+];
 
-// Helper function to display usage
-function showUsage() {
-  console.log(`
+// Run tests for each argument set
+for (const args of testArgs) {
+  console.log(`\n=== Testing: ${args.join(' ')} ===`);
+
+  const parser = new ParamsParser();
+  const result = parser.parse(args) as ParamsResult;
+
+  if (result.error) {
+    console.error(`Error: ${result.error?.message}`);
+    console.error(`Error Code: ${result.error?.code}`);
+    console.error(`Error Category: ${result.error?.category}`);
+  } else if (result.type === 'zero' && (result.options as { help?: boolean }).help) {
+    console.log(`
 Usage: error_handling [command] [options]
 
 This example demonstrates error handling in the CLI parser.
@@ -31,21 +48,18 @@ Try these invalid commands to see error handling in action:
 6. Help and usage:
    error_handling --help
 `);
+  } else {
+    // If we get here, the command was valid
+    console.log('Command processed successfully:');
+    console.log('Type:', result.type);
+
+    if (result.type === 'one' && 'demonstrativeType' in result) {
+      console.log('Command:', result.demonstrativeType);
+    } else if (result.type === 'two' && 'demonstrativeType' in result && 'layerType' in result) {
+      console.log('Demonstrative Type:', result.demonstrativeType);
+      console.log('Layer Type:', result.layerType);
+    }
+
+    console.log('Options:', result.options || {});
+  }
 }
-
-if (!result.success) {
-  console.error(`Error: ${result.error?.message}`);
-  console.log('\nFor usage information, run: error_handling --help');
-  Deno.exit(1);
-}
-
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
-  showUsage();
-  Deno.exit(0);
-}
-
-// If we get here, the command was valid
-console.log('Command processed successfully:');
-console.log(JSON.stringify(data, null, 2));

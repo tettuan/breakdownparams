@@ -32,7 +32,7 @@
 | --input        | -i             | 入力レイヤー指定         |
 | --adaptation   | -a             | プロンプト適応タイプ指定 |
 | --config       | -c             | 設定ファイル名指定       |
-| --uv-*         | なし           | カスタム変数オプション指定 |
+| --uv-*         | なし           | ユーザー変数オプション指定 |
 
 ## 3. バリデーション規則
 
@@ -60,9 +60,9 @@
 
 - レイヤータイプのエイリアスは小文字のみ有効
 - 大文字を含むエイリアスは無効として扱う
-- カスタム変数オプション名は大文字小文字を区別し、指定された通りに使用
+- ユーザー変数オプション名は大文字小文字を区別し、指定された通りに使用
 
-### 3.5 カスタム変数オプションの制約
+### 3.5 ユーザー変数オプションの制約
 
 - TwoParamsモードでのみ使用可能
 - 構文は`--uv-<name>=<value>`の形式を厳守
@@ -140,7 +140,7 @@ interface ErrorInfo {
 | 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
 | 不正な値           | "Invalid demonstrative type. Must be one of: to, summary, defect" |
 | 必須パラメータ不足 | "Missing required parameter: {param}"                  |
-| カスタム変数オプション構文エラー | "Invalid custom variable option syntax: {value}"  |
+| ユーザー変数オプション構文エラー | "Invalid user variable option syntax: {value}"  |
 | 設定エラー         | "Invalid configuration: pattern is required"           |
 
 ## 6. 実装詳細
@@ -151,56 +151,45 @@ interface ErrorInfo {
 class ParamsParser {
   private config: ParserConfig;
   private validators: ParamsValidator[];
-  private optionRegistry: OptionRegistry;
+  private optionFactory: OptionFactory;
 
   constructor(config?: ParserConfig) {
     this.config = config || DEFAULT_CONFIG;
     this.validators = this.createValidators();
-    this.optionRegistry = new OptionRegistry();
-    this.registerDefaultOptions();
-  }
-
-  private registerDefaultOptions(): void {
-    // 標準オプションの登録
-    this.optionRegistry.register(new ValueOption(
-      'from',
-      ['f'],
-      false,
-      'Input file path',
-      (v) => ({ isValid: v.length > 0, errors: [] })
-    ));
-
-    this.optionRegistry.register(new ValueOption(
-      'destination',
-      ['o'],
-      false,
-      'Output file path',
-      (v) => ({ isValid: v.length > 0, errors: [] })
-    ));
-
-    this.optionRegistry.register(new FlagOption(
-      'help',
-      ['h'],
-      'Show help message'
-    ));
-
-    this.optionRegistry.register(new FlagOption(
-      'version',
-      ['v'],
-      'Show version information'
-    ));
+    this.optionFactory = new OptionFactory(this.config);
   }
 
   public parse(args: string[]): ParamsResult {
-    const results = this.validators.map(v => v.validate(args));
-    return this.determineResult(results);
+    // OptionFactoryでOptionインスタンスを生成
+    const options = this.optionFactory.createOptions(args);
+    
+    // Optionインスタンスから正規化された値を取得
+    const normalizedArgs = this.extractNormalizedArgs(options);
+    
+    // パラメータ検証
+    const results = this.validators.map(v => v.validate(normalizedArgs));
+    
+    // オプション検証
+    const optionResults = this.validateOptions(options);
+    
+    return this.determineResult(results, optionResults);
+  }
+
+  private extractNormalizedArgs(options: Option[]): string[] {
+    return options.filter(opt => !opt.isOption())
+      .map(opt => opt.getValue() as string);
+  }
+
+  private validateOptions(options: Option[]): ValidationResult[] {
+    return options.filter(opt => opt.isOption())
+      .map(opt => opt.validate());
   }
 
   private createValidators(): ParamsValidator[] {
     return [
-      new ZeroParamValidator(this.config, this.optionRegistry),
-      new OneParamValidator(this.config, this.optionRegistry),
-      new TwoParamValidator(this.config, this.optionRegistry)
+      new ZeroParamValidator(this.config),
+      new OneParamValidator(this.config),
+      new TwoParamValidator(this.config)
     ];
   }
 }
@@ -398,7 +387,7 @@ parser.optionRegistry.register(new ValueOption(
   (v) => ({ isValid: v.endsWith('.md'), errors: [] })
 ));
 
-// カスタム変数の使用
+// ユーザー変数の使用
 const result = parser.parse([
   "to",
   "project",
@@ -408,7 +397,7 @@ const result = parser.parse([
 
 if (result.type === "break") {
   console.log(`Template: ${result.options.template}`);
-  console.log(`Custom Variable: ${result.options['uv-name']}`);
+  console.log(`User Variable: ${result.options['uv-name']}`); // 正規化後: uv-name
 }
 ```
 

@@ -19,6 +19,12 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
    - エラー：明確なエラーメッセージ
    - バリデーション失敗時は該当パラメータを含まないエラー結果を返す
 
+3. **オプションクラス中心設計**
+   - 各オプションインスタンスが自身の正規化ロジックを保持
+   - Optionクラスが自身のバリデーションを管理
+   - システム全体で統一された正規化ルール
+   - OptionFactoryがCLI引数から適切なOptionインスタンスを生成
+
 ## 実装仕様
 
 ### 1. 型定義
@@ -46,16 +52,26 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 
 オプションは、ハイフン付きの引数として指定されます。各オプションは長形式と短縮形の両方をサポートします：
 
-| ロングフォーム | ショートハンド | 説明                     |
-| -------------- | -------------- | ------------------------ |
-| --help         | -h             | ヘルプ表示               |
-| --version      | -v             | バージョン表示           |
-| --from         | -f             | 入力ファイル指定         |
-| --destination  | -o             | 出力ファイル指定         |
-| --input        | -i             | 入力レイヤー指定         |
-| --adaptation   | -a             | プロンプト適応タイプ指定 |
-| --config       | -c             | 設定ファイル名指定       |
-| --uv-*         | なし           | カスタム変数オプション指定 |
+| ロングフォーム | ショートハンド | 説明                     | 正規化形式 |
+| -------------- | -------------- | ------------------------ | ------------ |
+| --help         | -h             | ヘルプ表示               | `help`       |
+| --version      | -v             | バージョン表示           | `version`    |
+| --from         | -f             | 入力ファイル指定         | `from`       |
+| --destination  | -o             | 出力ファイル指定         | `destination`|
+| --input        | -i             | 入力レイヤー指定         | `input`      |
+| --adaptation   | -a             | プロンプト適応タイプ指定 | `adaptation` |
+| --config       | -c             | 設定ファイル名指定       | `config`     |
+| --uv-*         | なし           | ユーザー変数オプション指定 | `uv-*`       |
+
+### オプションの正規化
+
+すべてのオプションは統一された正規化ルールに従います：
+- 正規形式では先頭のハイフンを除去
+- エイリアスは主要名に解決
+- 例：
+  - `--help` → `help`
+  - `-h` → `help`
+  - `--uv-config` → `uv-config`
 
 ### 3. バリデーション規則
 
@@ -79,13 +95,14 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 4. **大文字小文字の扱い**
    - レイヤータイプのエイリアスは小文字のみ有効
    - 大文字を含むエイリアスは無効として扱う
-   - カスタム変数オプション名は大文字小文字を区別し、指定された通りに使用
+   - ユーザー変数オプション名は大文字小文字を区別し、指定された通りに使用
 
-5. **カスタム変数オプションの制約**
+5. **ユーザー変数オプションの制約**
    - TwoParamsモードでのみ使用可能
    - 構文は`--uv-<name>=<value>`の形式を厳守
    - 変数名は英数字と最小限の特殊文字のみ許可
    - 値は文字列として扱い、検証は行わない
+   - 内部的に`uv-*`形式に正規化（先頭のハイフンを除去）
 
 ### 4. エラー定義
 
@@ -96,7 +113,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 | 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
 | 不正な値           | "Invalid demonstrative type. Must be one of: to, summary, defect" |
 | 必須パラメータ不足 | "Missing required parameter: {param}"                  |
-| カスタム変数オプション構文エラー | "Invalid custom variable option syntax: {value}"  |
+| ユーザー変数オプション構文エラー | "Invalid user variable option syntax: {value}"    |
 
 ## 使用例
 
@@ -166,20 +183,18 @@ customParser.parse(['custom', 'layer', '--from', './input.md']);
 // }
 ```
 
-### カスタム変数オプションを含む2パラメータ
+### ユーザー変数オプションを含む2パラメータ
 
 ```typescript
-// カスタム変数オプションを含む2パラメータ
+// ユーザー変数オプションを含む2パラメータ（正規化済み）
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
 //   type: "two",
 //   demonstrativeType: "to",
 //   layerType: "project",
 //   options: {
-//     customVariables: {
-//       "project": "myproject",
-//       "version": "1.0.0"
-//     }
+//     "uv-project": "myproject",  // --uv-projectから正規化
+//     "uv-version": "1.0.0"       // --uv-versionから正規化
 //   }
 // }
 ```
@@ -190,14 +205,40 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
    - パラメータの意味解釈
    - パスの検証・正規化
    - 大文字小文字の正規化（レイヤータイプのエイリアスを除く）
-   - カスタム変数オプションの値の検証（構文チェックのみ）
+   - ユーザー変数オプションの値の検証（構文チェックのみ）
 
 2. **制限事項**
    - パラメータは最大2個まで
    - エイリアスは小文字のみ
    - パス文字列の加工なし
    - オプションの重複時は最後の指定が有効
-   - カスタム変数オプションはTwoParamsモードでのみ使用可能
+   - ユーザー変数オプションはTwoParamsモードでのみ使用可能
+
+## アーキテクチャ概要
+
+### 主要コンポーネント
+
+1. **OptionFactory**
+   - コマンドライン引数からOptionインスタンスを生成
+   - オプションタイプ（ValueOption、FlagOption、CustomVariableOption）を判定
+   - 標準オプション定義とエイリアス管理
+
+2. **Optionクラス**
+   - `ValueOption`: 値を受け取るオプション
+   - `FlagOption`: 値を持たないブールオプション
+   - `CustomVariableOption`: `--uv-*`プレフィックスのユーザー定義変数
+   - 各クラスがOptionインターフェースを実装し、正規化とバリデーションを実装
+
+3. **ParamsParser**
+   - OptionFactoryを使用してOptionインスタンスを生成
+   - Optionインスタンスから正規化された値を抽出
+   - バリデーションをOptionインスタンスに委譲
+   - 構造化されたパラメータ結果を返却
+
+4. **Validators**
+   - 正規化されたOptionインスタンスを扱う
+   - 正規化処理を持たない（Optionクラスに委譲）
+   - 純粋なバリデーションロジックに集中
 
 ## テスト戦略
 

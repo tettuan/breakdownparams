@@ -10,17 +10,38 @@
 class ParamsParser {
   private config: ParserConfig;
   private validators: ParamsValidator[];
-  private optionRegistry: OptionRegistry;
+  private optionFactory: OptionFactory;
 
   constructor(config?: ParserConfig) {
     this.config = config || DEFAULT_CONFIG;
     this.validators = this.createValidators();
-    this.optionRegistry = new OptionRegistry();
+    this.optionFactory = new OptionFactory(this.config);
   }
 
   public parse(args: string[]): ParamsResult {
-    const results = this.validators.map(v => v.validate(args));
-    return this.determineResult(results);
+    // OptionFactoryでOptionインスタンスを生成
+    const options = this.optionFactory.createOptions(args);
+    
+    // Optionインスタンスから正規化された値を取得
+    const normalizedArgs = this.extractNormalizedArgs(options);
+    
+    // パラメータ検証
+    const results = this.validators.map(v => v.validate(normalizedArgs));
+    
+    // オプション検証
+    const optionResults = this.validateOptions(options);
+    
+    return this.determineResult(results, optionResults);
+  }
+
+  private extractNormalizedArgs(options: Option[]): string[] {
+    return options.filter(opt => !opt.isOption())
+      .map(opt => opt.getValue());
+  }
+
+  private validateOptions(options: Option[]): ValidationResult[] {
+    return options.filter(opt => opt.isOption())
+      .map(opt => opt.validate());
   }
 
   private createValidators(): ParamsValidator[] {
@@ -31,17 +52,17 @@ class ParamsParser {
     ];
   }
 
-  private determineResult(results: ValidationResult[]): ParamsResult {
+  private determineResult(results: ValidationResult[], optionResults: ValidationResult[]): ParamsResult {
     // 成功・失敗の組み合わせに基づいて結果を判定
     const [zero, one, two] = results;
     if (zero.isValid() && !one.isValid() && !two.isValid()) {
-      return this.createZeroParamResult(zero);
+      return this.createZeroParamResult(zero, optionResults);
     }
     if (!zero.isValid() && one.isValid() && !two.isValid()) {
-      return this.createOneParamResult(one);
+      return this.createOneParamsResult(one, optionResults);
     }
     if (!zero.isValid() && !one.isValid() && two.isValid()) {
-      return this.createTwoParamResult(two);
+      return this.createTwoParamsResult(two, optionResults);
     }
     return this.createErrorResult();
   }
@@ -53,17 +74,14 @@ class ParamsParser {
 ```typescript
 abstract class BaseValidator implements ParamsValidator {
   protected config: ParserConfig;
-  protected optionRegistry: OptionRegistry;
 
-  constructor(config: ParserConfig, optionRegistry: OptionRegistry) {
+  constructor(config: ParserConfig) {
     this.config = config;
-    this.optionRegistry = optionRegistry;
   }
 
   public validate(args: string[]): ValidationResult {
     try {
       this.checkSecurity(args);
-      this.validateOptions(args);
       return this.validateParams(args);
     } catch (error) {
       return this.createErrorResult(error);
@@ -74,19 +92,6 @@ abstract class BaseValidator implements ParamsValidator {
 
   protected checkSecurity(args: string[]): void {
     // セキュリティチェックの実装
-  }
-
-  protected validateOptions(args: string[]): void {
-    const options = this.extractOptions(args);
-    for (const [name, value] of Object.entries(options)) {
-      const option = this.optionRegistry.get(name);
-      if (option) {
-        const result = option.validate(value);
-        if (!result.isValid) {
-          throw new Error(result.errors.join(", "));
-        }
-      }
-    }
   }
 
   protected createErrorResult(error: Error): ValidationResult {
@@ -120,8 +125,7 @@ class TwoParamValidator extends BaseValidator {
     return {
       isValid: true,
       demonstrativeType,
-      layerType,
-      options: this.parseOptions(args)
+      layerType
     };
   }
 
@@ -132,52 +136,66 @@ class TwoParamValidator extends BaseValidator {
   private validateLayerType(value: string): boolean {
     return new RegExp(this.config.layerType.pattern).test(value);
   }
-
-  private parseOptions(args: string[]): OptionParams {
-    const options = this.extractOptions(args);
-    const result: OptionParams = {};
-    
-    for (const [name, value] of Object.entries(options)) {
-      const option = this.optionRegistry.get(name);
-      if (option) {
-        result[name] = option.parse(value);
-      }
-    }
-    
-    return result;
-  }
 }
 ```
 
-### 1.4 OptionRegistry
+### 1.4 OptionFactory
 
 ```typescript
-class OptionRegistry {
-  private options: Map<string, Option>;
-  private customVariablePattern: RegExp;
+class OptionFactory {
+  private config: ParserConfig;
+  private optionRules: Map<string, OptionRule>;
 
-  constructor() {
-    this.options = new Map();
-    this.customVariablePattern = /^uv-[a-zA-Z0-9_]+$/;
+  constructor(config: ParserConfig) {
+    this.config = config;
+    this.optionRules = this.initializeOptionRules();
   }
 
-  public register(option: Option): void {
-    this.options.set(option.name, option);
-    for (const alias of option.aliases) {
-      this.options.set(alias, option);
+  public createOptions(args: string[]): Option[] {
+    return args.map(arg => this.createOption(arg));
+  }
+
+  private createOption(rawInput: string): Option {
+    // パラメータの場合
+    if (!rawInput.startsWith('-')) {
+      return new ParameterOption(rawInput);
     }
+    
+    // ユーザー変数オプションの場合
+    if (rawInput.startsWith('--uv-')) {
+      return new CustomVariableOption(rawInput);
+    }
+    
+    // 標準オプションの場合
+    const optionName = this.extractOptionName(rawInput);
+    const rule = this.findOptionRule(optionName);
+    
+    if (rule) {
+      if (rule.type === 'flag') {
+        return new FlagOption(rule, rawInput);
+      } else {
+        return new ValueOption(rule, rawInput);
+      }
+    }
+    
+    // 未知のオプション
+    return new UnknownOption(rawInput);
   }
 
-  public get(name: string): Option | undefined {
-    return this.options.get(name);
+  private extractOptionName(input: string): string {
+    // --long-form または -s 形式から名前を抽出
+    const match = input.match(/^-{1,2}([^=]+)/);
+    return match ? match[1] : '';
   }
 
-  public validateCustomVariable(name: string): boolean {
-    return this.customVariablePattern.test(name);
-  }
-
-  public getAll(): Option[] {
-    return Array.from(this.options.values());
+  private findOptionRule(name: string): OptionRule | undefined {
+    // 直接マッチまたはエイリアスでマッチ
+    for (const [key, rule] of this.optionRules) {
+      if (rule.longname === name || rule.shortname === name) {
+        return rule;
+      }
+    }
+    return undefined;
   }
 }
 ```
@@ -186,26 +204,81 @@ class OptionRegistry {
 
 ```typescript
 class ValueOption implements Option {
-  constructor(
-    readonly name: string,
-    readonly aliases: string[],
-    readonly isRequired: boolean,
-    readonly description: string,
-    private validator: (value: string) => ValidationResult
-  ) {}
+  private readonly rule: OptionRule;
+  readonly rawInput: string;
+  readonly canonicalName: string;
+  readonly longForm: string;
+  readonly shortForm?: string;
+  private value?: string;
 
-  validate(value: string | undefined): ValidationResult {
-    if (this.isRequired && !value) {
-      return { isValid: false, errors: [`${this.name} is required`] };
+  constructor(rule: OptionRule, rawInput: string) {
+    this.rule = rule;
+    this.rawInput = rawInput;
+    this.canonicalName = rule.longname.replace(/^--/, '');
+    this.longForm = rule.longname;
+    this.shortForm = rule.shortname;
+    this.value = this.extractValue(rawInput);
+  }
+
+  isShorthand(): boolean {
+    return this.rawInput.startsWith('-') && !this.rawInput.startsWith('--');
+  }
+
+  isLongForm(): boolean {
+    return this.rawInput.startsWith('--');
+  }
+
+  isCustomVariable(): boolean {
+    return false;
+  }
+
+  isOption(): boolean {
+    return true;
+  }
+
+  matchesInput(input: string): boolean {
+    const normalized = this.normalizeInput(input);
+    return normalized === this.longForm || normalized === this.shortForm;
+  }
+
+  toNormalized(): string {
+    return this.canonicalName;
+  }
+
+  toLong(): string {
+    return this.longForm;
+  }
+
+  toShort(): string | undefined {
+    return this.shortForm;
+  }
+
+  validate(): ValidationResult {
+    if (this.rule.isRequired && !this.value) {
+      return { isValid: false, errors: [`Option ${this.longForm} requires a value`] };
     }
-    if (value) {
-      return this.validator(value);
+    
+    if (this.value && this.rule.validator) {
+      return this.rule.validator(this.value);
     }
+    
     return { isValid: true, errors: [] };
   }
 
-  parse(value: string | undefined): string | undefined {
-    return value;
+  getValue(): string {
+    return this.value || '';
+  }
+
+  private extractValue(input: string): string | undefined {
+    const equalIndex = input.indexOf('=');
+    if (equalIndex !== -1) {
+      return input.substring(equalIndex + 1);
+    }
+    return undefined;
+  }
+
+  private normalizeInput(input: string): string {
+    return input.split('=')[0];
   }
 }
 ```
@@ -214,18 +287,67 @@ class ValueOption implements Option {
 
 ```typescript
 class FlagOption implements Option {
-  constructor(
-    readonly name: string,
-    readonly aliases: string[],
-    readonly description: string
-  ) {}
+  private readonly rule: OptionRule;
+  readonly rawInput: string;
+  readonly canonicalName: string;
+  readonly longForm: string;
+  readonly shortForm?: string;
 
-  validate(value: string | undefined): ValidationResult {
+  constructor(rule: OptionRule, rawInput: string) {
+    this.rule = rule;
+    this.rawInput = rawInput;
+    this.canonicalName = rule.longname.replace(/^--/, '');
+    this.longForm = rule.longname;
+    this.shortForm = rule.shortname;
+  }
+
+  isShorthand(): boolean {
+    return this.rawInput.startsWith('-') && !this.rawInput.startsWith('--');
+  }
+
+  isLongForm(): boolean {
+    return this.rawInput.startsWith('--');
+  }
+
+  isCustomVariable(): boolean {
+    return false;
+  }
+
+  isOption(): boolean {
+    return true;
+  }
+
+  matchesInput(input: string): boolean {
+    const normalized = this.normalizeInput(input);
+    return normalized === this.longForm || normalized === this.shortForm;
+  }
+
+  toNormalized(): string {
+    return this.canonicalName;
+  }
+
+  toLong(): string {
+    return this.longForm;
+  }
+
+  toShort(): string | undefined {
+    return this.shortForm;
+  }
+
+  validate(): ValidationResult {
+    // フラグオプションは値を持たない
+    if (this.rawInput.includes('=')) {
+      return { isValid: false, errors: [`Flag option ${this.longForm} should not have a value`] };
+    }
     return { isValid: true, errors: [] };
   }
 
-  parse(value: string | undefined): boolean {
-    return value !== undefined;
+  getValue(): boolean {
+    return true;
+  }
+
+  private normalizeInput(input: string): string {
+    return input.split('=')[0];
   }
 }
 ```
@@ -234,24 +356,88 @@ class FlagOption implements Option {
 
 ```typescript
 class CustomVariableOption implements Option {
-  constructor(
-    readonly name: string,
-    readonly description: string,
-    private pattern: RegExp
-  ) {}
+  readonly rawInput: string;
+  readonly canonicalName: string;
+  readonly longForm: string;
+  readonly shortForm?: string;
+  private value: string;
+  private variableName: string;
 
-  validate(value: string | undefined): ValidationResult {
-    if (!this.pattern.test(this.name)) {
+  constructor(rawInput: string) {
+    this.rawInput = rawInput;
+    const parts = this.extractParts(rawInput);
+    this.variableName = parts.name;
+    this.value = parts.value;
+    this.longForm = `--uv-${this.variableName}`;
+    this.canonicalName = `uv-${this.variableName}`; // 先頭のハイフンを除去した正規化
+    this.shortForm = undefined; // ユーザー変数にショートフォームはない
+  }
+
+  isShorthand(): boolean {
+    return false;
+  }
+
+  isLongForm(): boolean {
+    return true;
+  }
+
+  isCustomVariable(): boolean {
+    return true;
+  }
+
+  isOption(): boolean {
+    return true;
+  }
+
+  matchesInput(input: string): boolean {
+    return input.startsWith(this.longForm);
+  }
+
+  toNormalized(): string {
+    return this.canonicalName; // ハイフンを除去した正規形式
+  }
+
+  toLong(): string {
+    return this.longForm;
+  }
+
+  toShort(): string | undefined {
+    return undefined;
+  }
+
+  validate(): ValidationResult {
+    // 変数名の形式チェック
+    if (!/^[a-zA-Z0-9_-]+$/.test(this.variableName)) {
       return { 
         isValid: false, 
-        errors: [`Invalid custom variable name: ${this.name}`] 
+        errors: [`Invalid user variable name: ${this.variableName}. Must match [a-zA-Z0-9_-]+`] 
       };
     }
+    
+    // 値の存在チェック
+    if (!this.value) {
+      return { 
+        isValid: false, 
+        errors: [`User variable ${this.longForm} requires a value`] 
+      };
+    }
+    
     return { isValid: true, errors: [] };
   }
 
-  parse(value: string | undefined): string | undefined {
-    return value;
+  getValue(): string {
+    return this.value;
+  }
+
+  private extractParts(input: string): { name: string; value: string } {
+    const match = input.match(/^--uv-([^=]+)(?:=(.*))?$/);
+    if (!match) {
+      return { name: '', value: '' };
+    }
+    return {
+      name: match[1],
+      value: match[2] || ''
+    };
   }
 }
 ```
@@ -297,23 +483,30 @@ interface ParserConfig {
 
 ```typescript
 interface Option {
-  readonly name: string;
-  readonly aliases: string[];
-  readonly type: OptionType;
-  readonly isRequired: boolean;
-  readonly description: string;
-
-  validate(value: string | undefined): ValidationResult;
-  parse(value: string | undefined): OptionValue;
+  // 基本プロパティ
+  readonly rawInput: string;
+  readonly canonicalName: string;
+  readonly longForm: string;
+  readonly shortForm?: string;
+  
+  // 判定メソッド
+  isShorthand(): boolean;
+  isLongForm(): boolean;
+  isCustomVariable(): boolean;
+  isOption(): boolean;
+  matchesInput(input: string): boolean;
+  
+  // 変換メソッド
+  toNormalized(): string;
+  toLong(): string;
+  toShort(): string | undefined;
+  
+  // バリデーション
+  validate(): ValidationResult;
+  getValue(): string | boolean;
 }
 
-enum OptionType {
-  VALUE,
-  FLAG,
-  CUSTOM_VARIABLE
-}
-
-type OptionValue = string | boolean | undefined;
+type OptionValue = string | boolean;
 ```
 
 ### 2.5 オプション結果の評価
@@ -378,9 +571,9 @@ const valueResult: ValidationResult = {
 - 値の形式チェック
 - カスタムバリデーションの実行
 
-3. **CustomVariableOption（カスタム変数オプション）**
+3. **CustomVariableOption（ユーザー変数オプション）**
 ```typescript
-// カスタム変数オプションの評価結果
+// ユーザー変数オプションの評価結果
 const customResult: ValidationResult = {
   isValid: true,  // 変数名が正しい形式
   errors: []      // エラーなし

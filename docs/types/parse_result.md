@@ -11,8 +11,8 @@
 ```typescript
 type ParamPatternResult =
   | ZeroParamResult
-  | OneParamResult
-  | TwoParamResult;
+  | OneParamsResult
+  | TwoParamsResult;
 ```
 
 各型の特徴：
@@ -21,11 +21,11 @@ type ParamPatternResult =
    - パラメータなしのコマンド（help/version）用
    - シンプルな構造で、help/versionフラグを持つ
 
-2. `OneParamResult`
+2. `OneParamsResult`
    - 単一パラメータのコマンド（layer）用
    - コマンド名とオプションを持つ
 
-3. `TwoParamResult`
+3. `TwoParamsResult`
    - 二重パラメータのコマンド（break）用
    - 2つのパラメータとオプションを持つ
 

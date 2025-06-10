@@ -63,8 +63,8 @@ Main class for parsing command-line arguments.
 Based on command-line arguments, the following result types are available. For details about available options for each type, please refer to the [Options Documentation](docs/options.md).
 
 - `ZeroParamResult`: For commands without parameters or help/version flags
-- `OneParamResult`: For single commands like "init"
-- `TwoParamResult`: For commands with demonstrative type and layer type
+- `OneParamsResult`: For single commands like "init"
+- `TwoParamsResult`: For commands with demonstrative type and layer type
 
 ### Options
 

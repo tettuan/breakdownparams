@@ -1,9 +1,19 @@
 # パラメータの仕様
 
+## オプションの正規化ルール
+
+ライブラリはすべてのオプションに対して一貫した正規化ルールを適用します：
+- 正規形式では先頭のハイフンを除去
+- エイリアスは主要名に解決
+- 例：
+  - `--help` → `help`
+  - `-h` → `help`
+  - `--uv-config` → `uv-config`
+
 ## パラメータの型定義
 
 ```typescript
-type ParamPatternResult = ZeroParamResult | OneParamResult | TwoParamResult;
+type ParamPatternResult = ZeroParamResult | OneParamsResult | TwoParamsResult;
 
 type ZeroParamResult = {
   type: 'help' | 'version';
@@ -12,14 +22,14 @@ type ZeroParamResult = {
   error?: ErrorInfo;
 };
 
-type OneParamResult = {
+type OneParamsResult = {
   type: 'layer';
   command: string;
   options: OptionParams;
   error?: ErrorInfo;
 };
 
-type TwoParamResult = {
+type TwoParamsResult = {
   type: 'break';
   demonstrativeType: string;
   layerType: string;
@@ -65,11 +75,11 @@ const DEFAULT_CONFIG: ParserConfig = {
    - helpコマンド
    - versionコマンド
 
-2. 単一パラメータ（OneParamResult）
+2. 単一パラメータ（OneParamsResult）
    - layerコマンド
    - コマンド名とオプション
 
-3. 二重パラメータ（TwoParamResult）
+3. 二重パラメータ（TwoParamsResult）
    - breakコマンド
    - DemonstrativeTypeとLayerTypeのバリデーション
    - オプション
@@ -83,7 +93,7 @@ type OptionParams = {
   fromLayerType?: string;  // LayerTypeのパターンでバリデーション
   adaptationType?: string;
   configFile?: string;
-  customVariables?: Record<string, string>;
+  [key: `uv-${string}`]?: string; // ユーザー変数は先頭のハイフンを除去して正規化
 };
 ```
 
@@ -110,7 +120,7 @@ const helpResult: ZeroParamResult = {
 };
 
 // 単一パラメータ
-const layerResult: OneParamResult = {
+const layerResult: OneParamsResult = {
   type: 'layer',
   command: 'create',
   options: {
@@ -119,7 +129,7 @@ const layerResult: OneParamResult = {
 };
 
 // 二重パラメータ（デフォルト設定値を使用）
-const breakResult: TwoParamResult = {
+const breakResult: TwoParamsResult = {
   type: 'break',
   demonstrativeType: 'to',      // パターン: ^(to|summary|defect)$
   layerType: 'project',         // パターン: ^(project|issue|task)$
@@ -296,9 +306,9 @@ const parser = new ParamsParser(customConfig);
 - `<config_file>`部分を取得
 - 例：`--config=test`の場合、`test`を保存
 
-#### カスタム変数オプション（`--uv-*`）
+#### ユーザー変数オプション（`--uv-*`）
 
-カスタム変数オプションは、ユーザー定義の変数を指定するためのオプションです。
+ユーザー変数オプションは、ユーザー定義の変数を指定するためのオプションです。
 TwoParamsモードでのみ使用可能で、以下の形式で指定します：
 
 ```bash
@@ -319,5 +329,5 @@ TwoParamsモードでのみ使用可能で、以下の形式で指定します�
 パラメータの解析結果は、以下の型で返却されます：
 
 ```typescript
-type ParamsResult = ZeroParamResult | OneParamResult | TwoParamResult;
+type ParamsResult = ZeroParamResult | OneParamsResult | TwoParamsResult;
 ```

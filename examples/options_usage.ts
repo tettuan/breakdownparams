@@ -1,12 +1,40 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import type { TwoParamsResult, ZeroParamsResult } from '../src/mod.ts';
 
-const parser = new ParamsParser();
-const result = parser.parse(Deno.args);
+// Example arguments for testing
+const testArgs = [
+  [
+    'to',
+    'issue',
+    '--from=input.md',
+    '--destination=output.md',
+    '--input=project',
+    '--adaptation=strict',
+  ],
+  ['to', 'issue', '-f=input.md', '-o=output.md', '-i=project', '-a=strict'],
+  ['to', 'issue', '--from=input.md', '-o=output.md', '--input=project', '-a=strict'],
+  ['summary', 'task', '--adaptation=strict'],
+];
 
-// Helper function to display usage
-function showUsage() {
-  console.log(`
+// Run tests for each argument set
+for (const args of testArgs) {
+  console.log(`\n=== Testing: ${args.join(' ')} ===`);
+
+  const parser = new ParamsParser();
+  const result = parser.parse(args);
+
+  if (result.type === 'error') {
+    console.error(`Error: ${result.error?.message}`);
+    console.log('\nFor usage information, run: options_usage --help');
+    continue;
+  }
+
+  if (result.type === 'zero') {
+    const zeroResult = result as ZeroParamsResult;
+    const options = zeroResult.options as { help?: boolean };
+
+    if (options.help) {
+      console.log(`
 Usage: options_usage <command> <layer> [options]
 
 Commands:
@@ -34,43 +62,36 @@ Examples:
   # Using adaptation option only
   options_usage summary task --adaptation=strict
 `);
-}
-
-if (!result.success) {
-  console.error(`Error: ${result.error?.message}`);
-  console.log('\nFor usage information, run: options_usage --help');
-  Deno.exit(1);
-}
-
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
-  showUsage();
-  Deno.exit(0);
-}
-
-// Process valid command
-if (data.type === 'two') {
-  const { demonstrativeType, layerType, options = {} } = data;
-
-  console.log('Command processed successfully:');
-  console.log('----------------------------');
-  console.log(`Action: ${demonstrativeType} ${layerType}`);
-
-  if (options?.fromFile) {
-    console.log(`Input file: ${options.fromFile}`);
+    }
   }
-  if (options?.destinationFile) {
-    console.log(`Output file: ${options.destinationFile}`);
+
+  // Process valid command
+  if (result.type === 'two') {
+    const twoResult = result as TwoParamsResult;
+    const { demonstrativeType, layerType, options = {} } = twoResult;
+
+    console.log('Command processed successfully:');
+    console.log('----------------------------');
+    console.log(`Action: ${demonstrativeType} ${layerType}`);
+
+    const typedOptions = options as {
+      from?: string;
+      destination?: string;
+      input?: string;
+      adaptation?: string;
+    };
+
+    if (typedOptions.from) {
+      console.log(`Input file: ${typedOptions.from}`);
+    }
+    if (typedOptions.destination) {
+      console.log(`Output file: ${typedOptions.destination}`);
+    }
+    if (typedOptions.input) {
+      console.log(`Converting from layer: ${typedOptions.input}`);
+    }
+    if (typedOptions.adaptation) {
+      console.log(`Prompt adaptation: ${typedOptions.adaptation}`);
+    }
   }
-  if (options?.fromLayerType) {
-    console.log(`Converting from layer: ${options.fromLayerType}`);
-  }
-  if (options?.adaptationType) {
-    console.log(`Prompt adaptation: ${options.adaptationType}`);
-  }
-} else {
-  console.log('Please provide both command and layer type.');
-  console.log('\nFor usage information, run: options_usage --help');
-  Deno.exit(1);
 }

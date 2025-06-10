@@ -1,13 +1,34 @@
 import { ParamsParser } from '../src/mod.ts';
-import { ParamPatternResult } from '../src/core/params/types.ts';
+import type { OneParamsResult, TwoParamsResult, ZeroParamsResult } from '../src/mod.ts';
 
-// Create parser instance
-const parser = new ParamsParser();
-const result = parser.parse(Deno.args);
+// Example arguments for testing
+const testArgs = [
+  ['to', 'project'],
+  ['to', 'project', '--from=input.md', '--destination=output.md'],
+  ['invalid', 'project'], // Invalid demonstrative type
+  ['to', 'invalid'], // Invalid layer type
+];
 
-// Helper function to display usage
-function showUsage() {
-  console.log(`
+// Run tests for each argument set
+for (const args of testArgs) {
+  console.log(`\n=== Testing: ${args.join(' ')} ===`);
+
+  const parser = new ParamsParser();
+  const result = parser.parse(args);
+
+  // Handle different result types
+  if (result.type === 'error') {
+    console.error('Error:', result.error?.message);
+    console.log('\nFor usage information, run: extended_params_usage --help');
+    continue;
+  }
+
+  if (result.type === 'zero') {
+    const zeroResult = result as ZeroParamsResult;
+    const options = zeroResult.options as { help?: boolean; version?: boolean };
+
+    if (options.help) {
+      console.log(`
 Usage: extended_params_usage <command> <layer> [options]
 
 This example demonstrates extended mode with custom validation.
@@ -39,41 +60,28 @@ Examples:
   # Invalid layer type
   extended_params_usage to invalid
 `);
-}
-
-// Handle different result types
-if (!result.success) {
-  console.error('Error:', result.error?.message);
-  console.log('\nFor usage information, run: extended_params_usage --help');
-  Deno.exit(1);
-}
-
-const data = result.data as ParamPatternResult;
-
-if (data.type === 'zero' && data.help) {
-  showUsage();
-  Deno.exit(0);
-}
-
-if (data.type === 'two') {
-  console.log('Command processed successfully:');
-  console.log('----------------------------');
-  console.log('Demonstrative Type:', data.demonstrativeType);
-  console.log('Layer Type:', data.layerType);
-  if (data.options) {
-    console.log('Options:', data.options);
+    } else {
+      console.log('No parameters provided');
+      if (options.version) {
+        console.log('Version requested');
+      }
+    }
   }
-} else if (data.type === 'one') {
-  console.log('Command:', data.command);
-  if (data.options) {
-    console.log('Options:', data.options);
-  }
-} else if (data.type === 'zero') {
-  console.log('No parameters provided');
-  if (data.help) {
-    console.log('Help requested');
-  }
-  if (data.version) {
-    console.log('Version requested');
+
+  if (result.type === 'two') {
+    const twoResult = result as TwoParamsResult;
+    console.log('Command processed successfully:');
+    console.log('----------------------------');
+    console.log('Demonstrative Type:', twoResult.demonstrativeType);
+    console.log('Layer Type:', twoResult.layerType);
+    if (twoResult.options) {
+      console.log('Options:', twoResult.options);
+    }
+  } else if (result.type === 'one') {
+    const oneResult = result as OneParamsResult;
+    console.log('Command:', oneResult.demonstrativeType);
+    if (oneResult.options) {
+      console.log('Options:', oneResult.options);
+    }
   }
 }

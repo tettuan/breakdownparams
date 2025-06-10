@@ -1,5 +1,5 @@
 import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
-import { ValidationResult } from '../../src/result/types.ts';
+import { ValidationResult } from '../../src/types/validation_result.ts';
 
 Deno.test('test_validation_result_structure', () => {
   const successResult: ValidationResult = {
@@ -19,10 +19,7 @@ Deno.test('test_validation_result_structure', () => {
     errorMessage: 'Validation error',
     errorCode: 'INVALID_PARAM',
     errorCategory: 'validation',
-    errorDetails: {
-      field: 'param1',
-      reason: 'Invalid value',
-    },
+    errors: ['error'],
   };
 
   // 成功ケースのテスト
@@ -50,5 +47,6 @@ Deno.test('test_validation_result_structure', () => {
   assertEquals(typeof errorResult.errorMessage, 'string', 'errorMessage should be a string');
   assertEquals(typeof errorResult.errorCode, 'string', 'errorCode should be a string');
   assertEquals(typeof errorResult.errorCategory, 'string', 'errorCategory should be a string');
-  assertEquals(typeof errorResult.errorDetails, 'object', 'errorDetails should be an object');
+  assertEquals(typeof errorResult.errors, 'object', 'errors should be an object');
+  assertEquals(Array.isArray(errorResult.errors), true, 'errors should be an array');
 });
