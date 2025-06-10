@@ -21,26 +21,68 @@ import { CommandLineOptionFactory } from '../factories/option_factory.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
- * パラメータパーサー
+ * Interface for parameter parser that processes command-line arguments.
+ *
+ * This interface defines the contract for parsing command-line arguments
+ * into structured parameter results with proper validation.
  */
 export interface ParamsParser {
   /**
-   * パラメータを解析する
-   * @param args - Command line arguments
-   * @returns ParamsResult containing the parsed parameters and options
+   * Parses command-line arguments into a structured result.
+   *
+   * This method processes the raw command-line arguments and returns
+   * a result object containing parsed parameters and options, or error
+   * information if validation fails.
+   *
+   * @param args - Array of command-line arguments to parse
+   * @returns Parsed result containing parameters, options, and validation status
+   *
+   * @example
+   * ```ts
+   * const parser = new ParamsParser();
+   * const result = parser.parse(["layer", "detail", "--verbose"]);
+   *
+   * if (result.type === "two") {
+   *   console.log(result.demonstrativeType); // "layer"
+   *   console.log(result.layerType); // "detail"
+   *   console.log(result.options.verbose); // true
+   * }
+   * ```
    */
   parse(args: string[]): ParamsResult;
 }
 
+/**
+ * Main parameter parser implementation that processes command-line arguments.
+ *
+ * This class handles the complete parsing workflow including:
+ * - Security validation to prevent malicious input
+ * - Parameter and option separation
+ * - Parameter count validation (0, 1, or 2 parameters)
+ * - Option validation based on parameter count
+ * - Option combination validation
+ *
+ * @example
+ * ```ts
+ * // Basic usage with default configuration
+ * const parser = new ParamsParser();
+ * const result = parser.parse(Deno.args);
+ *
+ * // Custom configuration
+ * const customParser = new ParamsParser(
+ *   { allowedOptions: ["verbose", "help"] },
+ *   { demonstrativeType: ["layer"], layerType: ["detail"] }
+ * );
+ * ```
+ */
 export class ParamsParser {
   private readonly optionRule: OptionRule;
   private readonly config: TwoParamsConfig;
   private readonly customConfig: CustomConfig;
   private readonly logger: BreakdownLogger;
   /**
-   * セキュリティバリデーター
-   * パラメータにシステムを壊す不正な文字列がないかをチェックする
-   * それ以上のチェックは不要
+   * Security validator that checks for potentially harmful strings in parameters.
+   * This validator ensures system safety by preventing injection attacks.
    */
   private readonly securityValidator: SecurityValidator;
   private readonly optionFactory: CommandLineOptionFactory;
@@ -48,6 +90,13 @@ export class ParamsParser {
   protected readonly oneOptionCombinationValidator: OptionCombinationValidator;
   protected readonly twoOptionCombinationValidator: OptionCombinationValidator;
 
+  /**
+   * Creates a new instance of ParamsParser with optional custom configuration.
+   *
+   * @param optionRule - Rules defining allowed options for different parameter counts
+   * @param config - Configuration for two-parameter validation
+   * @param customConfig - Custom configuration for validation rules and behavior
+   */
   constructor(optionRule?: OptionRule, config?: TwoParamsConfig, customConfig?: CustomConfig) {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
@@ -80,9 +129,21 @@ export class ParamsParser {
   }
 
   /**
-   * Factoryを使用してオプションを抽出する
-   * @param args - コマンドライン引数
-   * @returns 抽出されたオプション
+   * Extracts options from command-line arguments using the option factory.
+   *
+   * This method processes arguments starting with '--' or '-' and converts them
+   * into a normalized options object. It handles both flag options (boolean)
+   * and value options (with associated values).
+   *
+   * @param args - Raw command-line arguments
+   * @returns Object containing extracted options with normalized names
+   * @throws Error if a flag option is given a value
+   *
+   * @example
+   * ```ts
+   * // Input: ["--verbose", "--config=test.json", "-h"]
+   * // Output: { verbose: true, config: "test.json", help: true }
+   * ```
    */
   private extractOptionsUsingFactory(args: string[]): Record<string, unknown> {
     const options: Record<string, unknown> = {};
@@ -115,14 +176,34 @@ export class ParamsParser {
   }
 
   /**
-   * パラメータを解析する
-   * 処理の流れ:
-   * 1. セキュリティチェック
-   * 2. パラメータとオプションの分離
-   * 3. パラメータ数のバリデーション（0個、1個、2個）
-   * 4. パラメータ数に応じたオプションのバリデーション
-   *    - オプションの存在チェック
-   *    - オプションの組み合わせチェック
+   * Parses command-line arguments with comprehensive validation.
+   *
+   * Processing flow:
+   * 1. Security validation - Checks for potentially harmful strings
+   * 2. Parameter/option separation - Distinguishes between parameters and options
+   * 3. Parameter count validation - Validates 0, 1, or 2 parameters
+   * 4. Option validation based on parameter count:
+   *    - Option existence check
+   *    - Option combination validation
+   *
+   * @param args - Array of command-line arguments to parse
+   * @returns Structured result with parsed parameters and options or error information
+   *
+   * @example
+   * ```ts
+   * // Zero parameters with options
+   * parser.parse(["--help"]); // { type: "zero", params: [], options: { help: true } }
+   *
+   * // One parameter
+   * parser.parse(["init"]); // { type: "one", params: ["init"], demonstrativeType: "init" }
+   *
+   * // Two parameters
+   * parser.parse(["layer", "detail", "--verbose"]);
+   * // { type: "two", params: ["layer", "detail"], demonstrativeType: "layer", layerType: "detail" }
+   *
+   * // Error case
+   * parser.parse(["invalid", "too", "many"]); // { type: "error", error: {...} }
+   * ```
    */
   public parse(args: string[]): ParamsResult {
     // 1. セキュリティチェック

@@ -3,10 +3,44 @@ import { ValidationResult } from '../types/validation_result.ts';
 import { validateOptionName } from './format_utils.ts';
 import { BaseOption } from './base_option.ts';
 
+/**
+ * Represents a flag option (boolean option) for command-line arguments.
+ *
+ * Flag options are boolean options that are either present (true) or absent (false).
+ * They do not accept values and are typically used for enabling/disabling features
+ * or modes of operation.
+ *
+ * @extends BaseOption
+ *
+ * @example
+ * ```ts
+ * // Create a verbose flag option
+ * const verboseFlag = new FlagOption(
+ *   "verbose",
+ *   ["v"],
+ *   "Enable verbose output",
+ *   "--verbose"
+ * );
+ *
+ * // Usage: mycommand --verbose
+ * // or:    mycommand -v
+ * ```
+ */
 export class FlagOption extends BaseOption {
   readonly type = OptionType.FLAG;
   readonly isRequired = false;
 
+  /**
+   * Creates a new FlagOption instance.
+   *
+   * @param name - The primary name of the option (without dashes)
+   * @param aliases - Array of alternative names for this option
+   * @param description - Human-readable description of what this option does
+   * @param rawInput - The raw command-line input that created this option
+   * @param longname - The long form of the option (e.g., "--verbose")
+   * @param shortname - The short form of the option (e.g., "-v")
+   * @throws Error if the option name or any alias is invalid
+   */
   constructor(
     readonly name: string,
     readonly aliases: string[],
@@ -36,12 +70,31 @@ export class FlagOption extends BaseOption {
   }
 
   /**
-   * Get the value for flag options (always true when present)
+   * Gets the value for flag options.
+   *
+   * Flag options always return true when present, as they represent
+   * a boolean state that is enabled by their presence on the command line.
+   *
+   * @returns Always returns true for flag options
+   *
+   * @example
+   * ```ts
+   * const flag = new FlagOption("verbose", [], "Enable verbose mode");
+   * flag.getValue(); // true
+   * ```
    */
   getValue(): boolean {
     return true;
   }
 
+  /**
+   * Validates the flag option.
+   *
+   * Flag options are always valid when present, as they don't accept values.
+   * The validation was already performed during construction.
+   *
+   * @returns Always returns a valid result for flag options
+   */
   validate(): ValidationResult {
     return {
       isValid: true,

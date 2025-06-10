@@ -1,16 +1,32 @@
 /**
- * Format validation utilities for command line options
- * Based on options.ja.md specifications
+ * Format validation utilities for command line options.
+ *
+ * This module provides comprehensive validation functions for various
+ * command-line option formats, ensuring consistency and correctness
+ * according to the established specifications.
+ *
+ * @module format_utils
  */
 
 /**
- * Validates option name format
- * Following options.ja.md specifications:
+ * Validates the format of an option name.
+ *
+ * Option names must follow strict formatting rules:
  * - Only lowercase letters, numbers, and hyphens allowed
- * - Must start with a letter
- * - Must not be empty
- * @param name The option name to validate (without -- prefix)
- * @returns Object containing validation result and error message if invalid
+ * - Must start with a lowercase letter
+ * - Cannot be empty
+ * - Should not include the -- prefix
+ *
+ * @param name - The option name to validate (without -- prefix)
+ * @returns Validation result with optional error message
+ *
+ * @example
+ * ```ts
+ * validateOptionName("verbose"); // { isValid: true }
+ * validateOptionName("log-level"); // { isValid: true }
+ * validateOptionName("2fa"); // { isValid: false, error: "Option name must start with a letter" }
+ * validateOptionName("log_level"); // { isValid: false, error: "Option name can only contain..." }
+ * ```
  */
 export const validateOptionName = (name: string): { isValid: boolean; error?: string } => {
   if (!name) {
@@ -38,31 +54,68 @@ export const validateOptionName = (name: string): { isValid: boolean; error?: st
 };
 
 /**
- * Validates long form option format (--option=value)
- * @param option The option string to validate
- * @returns true if the format is valid
+ * Validates long form option format.
+ *
+ * Long form options start with double dashes and may include values
+ * using the equals syntax (--option=value).
+ *
+ * @param option - The option string to validate
+ * @returns True if the format is valid
+ *
+ * @example
+ * ```ts
+ * validateLongFormOption("--verbose"); // true
+ * validateLongFormOption("--config=app.json"); // true
+ * validateLongFormOption("-v"); // false
+ * validateLongFormOption("--invalid_option"); // false
+ * ```
  */
 export const validateLongFormOption = (option: string): boolean => {
   return /^--[a-z0-9-]+(?:=[^=]*)?$/.test(option);
 };
 
 /**
- * Validates short form option format (-o=value)
- * @param option The option string to validate
- * @returns true if the format is valid
+ * Validates short form option format.
+ *
+ * Short form options use a single dash followed by a single lowercase letter
+ * and may include values using the equals syntax (-o=value).
+ *
+ * @param option - The option string to validate
+ * @returns True if the format is valid
+ *
+ * @example
+ * ```ts
+ * validateShortFormOption("-v"); // true
+ * validateShortFormOption("-c=app.json"); // true
+ * validateShortFormOption("--verbose"); // false
+ * validateShortFormOption("-V"); // false (uppercase not allowed)
+ * ```
  */
 export const validateShortFormOption = (option: string): boolean => {
   return /^-[a-z](?:=[^=]*)?$/.test(option);
 };
 
 /**
- * Validates empty value format
- * Following options.ja.md specifications:
- * - --option=
- * - --option=""
- * - --option=''
- * @param value The value to validate
- * @returns true if the empty value format is valid
+ * Validates empty value format for options.
+ *
+ * Empty values are allowed in specific formats to explicitly set
+ * an option to an empty string. This is useful for clearing default values.
+ *
+ * Accepted formats:
+ * - --option= (bare empty value)
+ * - --option="" (empty double quotes)
+ * - --option='' (empty single quotes)
+ *
+ * @param value - The value to validate
+ * @returns True if the empty value format is valid
+ *
+ * @example
+ * ```ts
+ * validateEmptyValue(""); // true
+ * validateEmptyValue('""'); // true
+ * validateEmptyValue("''"); // true
+ * validateEmptyValue("some value"); // false
+ * ```
  */
 export const validateEmptyValue = (value: string | undefined): boolean => {
   if (value === undefined) return true;
@@ -70,15 +123,24 @@ export const validateEmptyValue = (value: string | undefined): boolean => {
 };
 
 /**
- * Validates custom variable option format (--uv-*)
- * Case-sensitive validation for custom variables
- * Following custom_variable_options.ja.md specifications:
- * - Only alphanumeric and underscore allowed
- * - Must start with a letter
- * - Case sensitive
- * - Must not be empty
- * @param option The option string to validate
- * @returns true if the format is valid
+ * Validates custom variable option format.
+ *
+ * Custom variable options use the --uv- prefix and follow strict naming rules:
+ * - Variable names can only contain letters, numbers, and underscores
+ * - Must start with a letter (uppercase or lowercase)
+ * - Case sensitive (myVar !== myvar)
+ * - Cannot be empty after the --uv- prefix
+ *
+ * @param option - The option string to validate (including --uv- prefix)
+ * @returns True if the format is valid
+ *
+ * @example
+ * ```ts
+ * validateCustomVariableOption("--uv-apiKey=value"); // true
+ * validateCustomVariableOption("--uv-max_retries=3"); // true
+ * validateCustomVariableOption("--uv-123invalid"); // false
+ * validateCustomVariableOption("--uv-_underscore"); // false
+ * ```
  */
 export const validateCustomVariableOption = (option: string): boolean => {
   if (!option.startsWith('--uv-')) {
@@ -87,7 +149,6 @@ export const validateCustomVariableOption = (option: string): boolean => {
   // Extract variable name from option format (remove --uv- prefix)
   const [variableName] = option.split('=');
   const cleanVariableName = variableName.replace('--uv-', '');
-  console.log('Extracted variable name:', cleanVariableName);
   if (!cleanVariableName) {
     return false;
   }
@@ -96,9 +157,20 @@ export const validateCustomVariableOption = (option: string): boolean => {
 };
 
 /**
- * Extracts key and value from an option string
- * @param option The option string to parse
- * @returns Object containing key and value
+ * Extracts key and value from an option string.
+ *
+ * Parses options in the format --key=value, returning the key without
+ * the -- prefix and the value after the equals sign.
+ *
+ * @param option - The option string to parse
+ * @returns Object containing the extracted key and value
+ *
+ * @example
+ * ```ts
+ * parseOption("--config=app.json"); // { key: "config", value: "app.json" }
+ * parseOption("--verbose"); // { key: "verbose", value: undefined }
+ * parseOption("--port=8080"); // { key: "port", value: "8080" }
+ * ```
  */
 export const parseOption = (option: string): { key: string; value: string | undefined } => {
   const [key, value] = option.slice(2).split('=');
@@ -106,9 +178,25 @@ export const parseOption = (option: string): { key: string; value: string | unde
 };
 
 /**
- * Validates option format according to options.ja.md specifications
- * @param option The option string to validate
- * @returns Object containing validation result and error message if invalid
+ * Validates complete option format according to specifications.
+ *
+ * This is a comprehensive validation function that checks:
+ * - Proper prefix (must start with --)
+ * - No space-separated values (must use = for values)
+ * - No multiple equals signs
+ * - Proper format for both standard and custom variable options
+ *
+ * @param option - The complete option string to validate
+ * @returns Validation result with optional error message
+ *
+ * @example
+ * ```ts
+ * validateOptionFormat("--verbose"); // { isValid: true }
+ * validateOptionFormat("--config=app.json"); // { isValid: true }
+ * validateOptionFormat("--uv-apiKey=abc123"); // { isValid: true }
+ * validateOptionFormat("verbose"); // { isValid: false, error: "Option must start with --" }
+ * validateOptionFormat("--config value"); // { isValid: false, error: "Space-separated format..." }
+ * ```
  */
 export const validateOptionFormat = (option: string): { isValid: boolean; error?: string } => {
   // Check if option starts with --

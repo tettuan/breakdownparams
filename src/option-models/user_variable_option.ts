@@ -4,12 +4,33 @@ import { UserVariableOptionValidator } from '../validator/options/user_variable_
 import { BaseOption } from './base_option.ts';
 
 /**
- * UserVariableOption class for handling user variable options (--uv-*)
- * Following user_variable_options specifications:
- * - Only alphanumeric and underscore allowed
- * - Must start with a letter
- * - Case sensitive
- * - Must not be empty
+ * Represents a user-defined variable option with the --uv- prefix.
+ *
+ * User variable options allow users to define custom variables on the command line
+ * that can be used for configuration or data passing. They follow strict naming rules
+ * to ensure consistency and prevent conflicts with standard options.
+ *
+ * Naming rules:
+ * - Variable names must contain only alphanumeric characters and underscores
+ * - Must start with a letter (not a number or underscore)
+ * - Case sensitive (myVar !== myvar)
+ * - Cannot be empty
+ * - Always prefixed with --uv- (e.g., --uv-myVariable=value)
+ *
+ * @extends BaseOption
+ *
+ * @example
+ * ```ts
+ * // Create a user variable option
+ * const userVar = new UserVariableOption(
+ *   "--uv-apiKey",
+ *   "API key for external service"
+ * );
+ *
+ * // Usage: mycommand --uv-apiKey=abc123
+ * // Valid: --uv-userName=john, --uv-max_retries=3
+ * // Invalid: --uv-123start, --uv-my-var, --uv-_underscore
+ * ```
  */
 export class UserVariableOption extends BaseOption {
   readonly type = OptionType.USER_VARIABLE;
@@ -18,6 +39,13 @@ export class UserVariableOption extends BaseOption {
   private readonly validator: UserVariableOptionValidator;
   private value?: string;
 
+  /**
+   * Creates a new UserVariableOption instance.
+   *
+   * @param name - The full option name including --uv- prefix (e.g., "--uv-apiKey")
+   * @param description - Human-readable description of what this variable does
+   * @param rawInput - The raw command-line input that created this option
+   */
   constructor(
     readonly name: string,
     readonly description: string,
@@ -34,12 +62,39 @@ export class UserVariableOption extends BaseOption {
   }
 
   /**
-   * Get the value for this user variable
+   * Gets the value associated with this user variable.
+   *
+   * @returns The variable's value, or an empty string if no value is set
+   *
+   * @example
+   * ```ts
+   * const userVar = new UserVariableOption("--uv-apiKey", "API key");
+   * // After parsing "--uv-apiKey=abc123"
+   * userVar.getValue(); // "abc123"
+   * ```
    */
   getValue(): string {
     return this.value || '';
   }
 
+  /**
+   * Validates the user variable option format and name.
+   *
+   * Performs comprehensive validation including:
+   * - Checking for required --uv- prefix
+   * - Ensuring proper format (--uv-name=value)
+   * - Validating variable name against naming rules
+   *
+   * @param value - The value to validate (expected format: "--uv-name=value")
+   * @returns Validation result with success status and any error messages
+   *
+   * @example
+   * ```ts
+   * userVar.validate("--uv-apiKey=abc123"); // { isValid: true }
+   * userVar.validate("--uv-123invalid"); // { isValid: false, errorMessage: "..." }
+   * userVar.validate("--config=value"); // { isValid: false, errorMessage: "Option must start with --uv-" }
+   * ```
+   */
   validate(value: unknown): ValidationResult {
     // Handle undefined value
     if (value === undefined) {
@@ -76,6 +131,22 @@ export class UserVariableOption extends BaseOption {
     return this.validator.validateVariableName(cleanVariableName);
   }
 
+  /**
+   * Parses the value from a user variable option string.
+   *
+   * Extracts the value portion after the equals sign in --uv-name=value format.
+   *
+   * @param value - The raw option string to parse
+   * @returns The extracted value or undefined if no value is provided
+   *
+   * @example
+   * ```ts
+   * userVar.parse("--uv-apiKey=abc123"); // "abc123"
+   * userVar.parse("--uv-config=server.json"); // "server.json"
+   * userVar.parse("--uv-empty="); // ""
+   * userVar.parse(undefined); // undefined
+   * ```
+   */
   parse(value: unknown): string | undefined {
     if (value === undefined) {
       return undefined;
