@@ -273,26 +273,32 @@ if ! deno cache --reload mod.ts; then
     handle_error "mod.ts" "Failed to regenerate deno.lock" "false"
 fi
 
-# Comprehensive type checking
+# Comprehensive type checking (matching GitHub Actions CI)
 echo "Running comprehensive type checks..."
 
-# Check main entry points
-echo "Checking entry points..."
-for entry_point in mod.ts cli.ts main.ts; do
-    if [ -f "$entry_point" ]; then
-        if ! deno check "$entry_point"; then
-            handle_error "$entry_point" "Type check failed" "false"
-        fi
-    fi
-done
+# Check main entry point
+echo "Checking main entry point..."
+if ! deno check mod.ts; then
+    handle_type_error "mod.ts" "$(deno check mod.ts 2>&1)"
+fi
 
-# Check all TypeScript files in lib directory
-echo "Checking library files..."
-find lib -name "*.ts" -not -name "*.test.ts" | while read -r file; do
-    if ! deno check "$file"; then
-        handle_error "$file" "Type check failed" "false"
-    fi
-done
+# Check all TypeScript files in src directory
+echo "Checking src directory..."
+if ! deno check "src/**/*.ts"; then
+    handle_type_error "src/**/*.ts" "$(deno check 'src/**/*.ts' 2>&1)"
+fi
+
+# Check all TypeScript files in tests directory  
+echo "Checking tests directory..."
+if ! deno check "tests/**/*.ts"; then
+    handle_type_error "tests/**/*.ts" "$(deno check 'tests/**/*.ts' 2>&1)"
+fi
+
+# Check all TypeScript files in examples directory
+echo "Checking examples directory..."
+if ! deno check "examples/**/*.ts"; then
+    handle_type_error "examples/**/*.ts" "$(deno check 'examples/**/*.ts' 2>&1)"
+fi
 
 # Try JSR type check with --allow-dirty if available
 echo "Running JSR type check..."
@@ -389,9 +395,27 @@ if ! process_test_directory "tests" "${DEBUG:-false}"; then
     exit 1
 fi
 
-echo "All tests passed. Running type check..."
+echo "All tests passed. Running final type checks..."
+
+# Re-run comprehensive type checks after tests
+echo "Checking mod.ts..."
 if ! deno check mod.ts; then
     handle_type_error "mod.ts" "$(deno check mod.ts 2>&1)"
+fi
+
+echo "Checking src/**/*.ts..."
+if ! deno check "src/**/*.ts"; then
+    handle_type_error "src/**/*.ts" "$(deno check 'src/**/*.ts' 2>&1)"
+fi
+
+echo "Checking tests/**/*.ts..."
+if ! deno check "tests/**/*.ts"; then
+    handle_type_error "tests/**/*.ts" "$(deno check 'tests/**/*.ts' 2>&1)"
+fi
+
+echo "Checking examples/**/*.ts..."
+if ! deno check "examples/**/*.ts"; then
+    handle_type_error "examples/**/*.ts" "$(deno check 'examples/**/*.ts' 2>&1)"
 fi
 
 echo "Running JSR type check..."
