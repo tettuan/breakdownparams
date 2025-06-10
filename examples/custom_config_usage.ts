@@ -15,7 +15,8 @@ const customConfig: CustomConfig = {
       // Allow descriptive layer types
       layerType: {
         pattern: '^(simple|detailed|atomic|manageable|smaller|pieces|steps|chunks)$',
-        errorMessage: 'Invalid target. Must be one of: simple, detailed, atomic, manageable, smaller, pieces, steps, chunks',
+        errorMessage:
+          'Invalid target. Must be one of: simple, detailed, atomic, manageable, smaller, pieces, steps, chunks',
       },
     },
   },
@@ -31,19 +32,19 @@ const examples = [
   ['breakdown', 'manageable', '--from=big-project.md', '--destination=tasks/'],
   ['split', 'smaller', '--from=monolith.ts', '--config=split-rules.json'],
   ['divide', 'pieces', '--from=large-file.txt', '--adaptation=context-aware'],
-  
+
   // Analysis examples
   ['analyze', 'detailed', '--from=codebase/', '--input=directory'],
   ['analyze', 'atomic', '--from=requirements.doc', '--destination=analysis.md'],
-  
+
   // Conversion examples
   ['convert', 'simple', '--from=technical-spec.md', '--adaptation=non-technical'],
   ['convert', 'steps', '--from=algorithm.py', '--destination=tutorial.md'],
-  
+
   // With custom variables
   ['breakdown', 'chunks', '--from=dataset.csv', '--uv-size=1000', '--uv-format=json'],
   ['split', 'pieces', '--from=video.mp4', '--uv-duration=5min', '--uv-quality=high'],
-  
+
   // Invalid examples
   ['destroy', 'simple'], // Invalid demonstrative type
   ['breakdown', 'tiny'], // Invalid layer type
@@ -55,7 +56,7 @@ console.log('This example demonstrates a task breakdown tool with natural Englis
 for (const args of examples) {
   console.log(`Command: ${args.join(' ')}`);
   const result = parser.parse(args);
-  
+
   if (result.type === 'error') {
     console.log(`❌ Error: ${result.error?.message}`);
   } else if (result.type === 'two') {

@@ -10,12 +10,14 @@ const projectConfig: CustomConfig = {
       // Project management actions
       demonstrativeType: {
         pattern: '^(create|update|close|assign|prioritize|estimate|track|review)$',
-        errorMessage: 'Invalid action. Available: create, update, close, assign, prioritize, estimate, track, review',
+        errorMessage:
+          'Invalid action. Available: create, update, close, assign, prioritize, estimate, track, review',
       },
       // Project entities
       layerType: {
         pattern: '^(ticket|epic|milestone|sprint|backlog|roadmap|release|feature)$',
-        errorMessage: 'Invalid entity. Available: ticket, epic, milestone, sprint, backlog, roadmap, release, feature',
+        errorMessage:
+          'Invalid entity. Available: ticket, epic, milestone, sprint, backlog, roadmap, release, feature',
       },
     },
   },
@@ -37,31 +39,31 @@ const commands = [
   ['create', 'ticket', '--from=bug-report.md', '--uv-priority=high', '--uv-assignee=john'],
   ['create', 'epic', '--from=feature-proposal.md', '--uv-quarter=Q2', '--uv-team=backend'],
   ['create', 'milestone', '--from=release-plan.md', '--destination=milestones/v2.0.md'],
-  
+
   // Updating items
   ['update', 'sprint', '--from=sprint-23.json', '--uv-status=in-progress'],
   ['update', 'backlog', '--from=new-items.csv', '--adaptation=priority-based'],
-  
+
   // Closing items
   ['close', 'ticket', '--from=completed-tasks.txt', '--uv-resolution=fixed'],
   ['close', 'milestone', '--from=v1.5-summary.md', '--destination=archive/'],
-  
+
   // Assignment operations
   ['assign', 'feature', '--from=unassigned.json', '--uv-team=frontend', '--uv-sprint=24'],
   ['assign', 'ticket', '--from=bug-list.md', '--config=assignment-rules.json'],
-  
+
   // Prioritization
   ['prioritize', 'backlog', '--from=all-items.csv', '--adaptation=business-value'],
   ['prioritize', 'sprint', '--from=sprint-backlog.json', '--uv-method=weighted-shortest-job'],
-  
+
   // Estimation
   ['estimate', 'epic', '--from=requirements.md', '--uv-method=story-points'],
   ['estimate', 'release', '--from=feature-list.json', '--destination=estimates.md'],
-  
+
   // Tracking
   ['track', 'sprint', '--from=current-sprint.json', '--uv-metric=velocity'],
   ['track', 'milestone', '--from=q1-goals.md', '--destination=progress-report.html'],
-  
+
   // Review
   ['review', 'roadmap', '--from=annual-plan.md', '--uv-period=quarterly'],
   ['review', 'release', '--from=v2.0-plan.json', '--adaptation=stakeholder-view'],
@@ -73,11 +75,11 @@ console.log('Demonstrating a project management system with natural command synt
 for (const args of commands) {
   console.log(`$ pm ${args.join(' ')}`);
   const result = parser.parse(args);
-  
+
   if (result.type === 'two') {
     const twoResult = result as TwoParamsResult;
     console.log(`✅ Executing: ${twoResult.demonstrativeType} ${twoResult.layerType}`);
-    
+
     // Show relevant options
     const options = twoResult.options;
     if (options.from) {
@@ -92,12 +94,12 @@ for (const args of commands) {
     if (options.adaptation) {
       console.log(`   Mode: ${options.adaptation}`);
     }
-    
+
     // Show custom variables
     const customVars = Object.entries(options)
       .filter(([key]) => key.startsWith('uv-'))
       .map(([key, value]) => `${key.substring(3)}=${value}`);
-    
+
     if (customVars.length > 0) {
       console.log(`   Parameters: ${customVars.join(', ')}`);
     }
