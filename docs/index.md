@@ -1,6 +1,6 @@
 # Library Overview
 
-This library is registered at https://jsr.io and is used by https://jsr.io/@tettuan/breakdown.
+This library is registered at https://jsr.io and published at https://jsr.io/@tettuan/breakdownparams.
 In the use case, this library's scope focuses on parameter parsing and storage.
 
 This library parses runtime parameters and stores their values.
@@ -43,7 +43,6 @@ Each pattern corresponds to a specific data structure. These patterns are mutual
   - Main application execution
   - Hyphenated parameters function as additional options
 - 3 or more parameters result in an error
-- No parameters returns an empty parameter result
 
 # Processing for Each Parameter Pattern
 
@@ -60,6 +59,7 @@ Usage example:
 - -h, --help
 - -v, --version
 
+Aliases are supported.
 Indicates the presence of arguments. Multiple options can be specified simultaneously.
 
 ## Single Parameter
@@ -94,14 +94,16 @@ Example:
 The first option ($1) is called `DemonstrativeType`.
 The second option ($2) is called `LayerType`.
 
-### Possible DemonstrativeType Values
+### Default Validation Rules
 
+#### DemonstrativeType
+Default regex pattern: `^(to|summary|defect)$`
 - to
 - summary
 - defect
 
-### Possible LayerType Values
-
+#### LayerType
+Default regex pattern: `^(project|issue|task)$`
 - project
 - issue
 - task
@@ -115,14 +117,14 @@ Alias: `-f`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from <file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f <file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
 ```
 
 ##### FromFile Values
 
 - Gets the `<file>` part
-- Example: For `--from ./.agent/breakdown/issues/issue_summary.md`, stores `./.agent/breakdown/issues/issue_summary.md`
+- Example: For `--from=./.agent/breakdown/issues/issue_summary.md`, stores `./.agent/breakdown/issues/issue_summary.md`
 
 #### --destination `<output_file>`
 
@@ -131,14 +133,14 @@ Alias: `-o`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination <output_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o <output_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
 ```
 
 ##### DestinationFile Values
 
 - Gets the `<output_file>` part
-- Example: For `--destination ./.agent/breakdown/issues/issue_summary.md`, stores `./.agent/breakdown/issues/issue_summary.md`
+- Example: For `--destination=./.agent/breakdown/issues/issue_summary.md`, stores `./.agent/breakdown/issues/issue_summary.md`
 
 #### --input `<from_layer_type>`
 
@@ -147,18 +149,15 @@ Alias: `-i`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input <from_layer_type>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i <from_layer_type>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
 ```
 
 ##### from_layer_type Values
 
 - Gets the `<from_layer_type>` part
-- Example: For `--input issue`, stores `issue`
-- Allowed values:
-  - project
-  - issue
-  - task
+- Example: For `--input=issue`, stores `issue`
+- Default regex pattern: `^(project|issue|task)$`
 
 #### --config `<config_file>`
 
@@ -167,14 +166,14 @@ Alias: `-c`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config <config_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c <config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
 ```
 
 ##### ConfigFile Values
 
 - Gets the `<config_file>` part
-- Example: For `--config test`, stores `test`
+- Example: For `--config=test`, stores `test`
 
 #### Custom Variable Options (`--uv-*`)
 
@@ -197,6 +196,8 @@ For detailed specifications, please refer to the [Custom Variable Options Specif
 
 - When both short and long form options are specified, the long form takes precedence. The long form is primary, and the short form is considered an alias.
 - No path processing is performed (values are used as is)
+- Aliases must be lowercase (uppercase variants are not processed and are ignored without error)
+- Undefined aliases are treated as unspecified (ignored without error)
 
 # Option Normalization
 

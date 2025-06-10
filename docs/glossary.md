@@ -45,8 +45,8 @@ This glossary is created for the following purposes:
 
 | Term              | Description                                                                                                                                    | Reference Specification    |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| DemonstrativeType | Type of first positional argument (`to`, `summary`, `defect`). Specifies the type of operation to execute. Each value represents specific processing and ensures type safety. | [params.md](params.md)     |
-| LayerType         | Type of second positional argument (`project`, `issue`, `task`). Specifies the target layer for operation. Represents hierarchical structure and defines processing scope. | [params.md](params.md)     |
+| DemonstrativeType | Type of first positional argument. Default allows `to`, `summary`, `defect`. Validated with regex pattern.                                     | [params.md](params.md)     |
+| LayerType         | Type of second positional argument. Default allows `project`, `issue`, `task`. Validated with regex pattern.                                   | [params.md](params.md)     |
 | ParamsResult      | Basic type for parameter parsing results. Interface for handling parsing results with type safety. Includes error information.                  | [params_type.md](params_type.md) |
 | OptionParams      | Type for option parameters. Interface for handling option values with type safety. Holds values for each option.                               | [params_type.md](params_type.md) |
 | ErrorResult       | Type that holds error information. Includes error message and error code.                                                                      | [params_type.md](params_type.md) |
@@ -82,20 +82,20 @@ This normalization is handled by the Option classes themselves, following the op
 | User Variable Name      | Variable name following the `--uv-` prefix. Only allows alphanumeric, underscore, and hyphen characters, case-sensitive.                       | [custom_variable_options.md](custom_variable_options.md) |
 | UserVariables           | Type that holds user variable options. Consists of key-value pairs with keys in `uv-*` format, maintains values as received from command line. | [custom_variable_options.md](custom_variable_options.md) |
 
-## Extension Related
+## Validation Related
 
 | Term          | Description                                                                                                                                    | Reference Specification    |
 |---------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| Extended Mode | Mode that applies custom validation rules. Enables flexible usage beyond standard constraints, addresses specific use cases.                   | [custom_params.md](custom_params.md) |
-| Standard Mode | Mode that uses default validation rules. Suitable for basic usage, ensures type safety and consistency.                                        | [custom_params.md](custom_params.md) |
-| ParserConfig  | Interface that defines parser settings. Controls behavior in extended mode, used to specify custom rules.                                       | [custom_params.md](custom_params.md) |
+| Default Configuration | Validation configuration that supports standard usage patterns. Allows basic values for DemonstrativeType and LayerType.                    | [custom_params.md](custom_params.md) |
+| Custom Configuration | User-defined validation configuration. Allows custom values with regex patterns.                                                              | [custom_params.md](custom_params.md) |
+| ParserConfig  | Interface that defines parser configuration. Used to specify validation rules.                                                                  | [custom_params.md](custom_params.md) |
 
 ## Error Related
 
 | Term              | Description                                                                                                                                    | Reference Specification    |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
 | Validation Error  | Error when parameter values don't meet constraints. Used to ensure type safety and prevent invalid usage.                                       | [custom_params.md](custom_params.md) |
-| Configuration Error | Error when parser settings are invalid. Detects configuration mistakes in extended mode, promotes proper usage.                                | [custom_params.md](custom_params.md) |
+| Configuration Error | Error when parser settings are invalid. Detects configuration mistakes, promotes proper usage.                                                 | [custom_params.md](custom_params.md) |
 
 ## Testing Related
 
@@ -104,6 +104,15 @@ This normalization is handled by the Option classes themselves, following the op
 | BreakdownLogger     | Logging utility for testing. Manages debug information collection, facilitates test tracking.                                                   | [testing.md](testing.md)   |
 | Debug Log          | Log that records detailed debug information. Assists in problem identification and resolution, improves development process efficiency.        | [testing.md](testing.md)   |
 | Pre-test Failure   | Failure occurring in pre-processing not intended for testing. Clarifies test intentions, promotes proper test design.                          | [testing.md](testing.md)   |
+
+## Types
+
+| Term | Description | Reference |
+|------|------|------|
+| ParamsResult | Unified type for parameter parsing results. Returns one of ZeroParamsResult, OneParamsResult, TwoParamsResult, or ErrorResult. | [params_type.md](params_type.md) |
+| ZeroParamsResult | Result type for no parameters. Result when only options are specified. | [params_type.md](params_type.md) |
+| OneParamsResult | Result type for single parameter. For init command. Options are ignored. | [params_type.md](params_type.md) |
+| TwoParamsResult | Result type for two parameters. Contains DemonstrativeType and LayerType. Includes options and user variables. | [params_type.md](params_type.md) |
 
 ---
 

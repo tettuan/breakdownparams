@@ -1,107 +1,341 @@
-# Parameters Specification
-
-This document defines the specification for parameters (positional arguments) in the breakdownparams library.
+# Parameter Specification
 
 ## Option Normalization Rules
 
-The library applies consistent normalization rules for all options:
+The library applies consistent normalization rules to all options:
 - Leading hyphens are removed from the canonical form
-- Aliases are resolved to their primary names
+- Aliases are resolved to primary names
 - Examples:
   - `--help` → `help`
-  - `-h` → `help` 
+  - `-h` → `help`
   - `--uv-config` → `uv-config`
 
-## Parameter Types
+## Parameter Type Definitions
 
-Parameters are classified into three types based on the number of positional arguments:
+```typescript
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult | ErrorResult;
+
+type ZeroParamsResult = {
+  type: 'zero';
+  options: OptionParams;
+};
+
+type OneParamsResult = {
+  type: 'one';
+  demonstrativeType: string;
+};
+
+type TwoParamsResult = {
+  type: 'two';
+  demonstrativeType: string;
+  layerType: string;
+  options: OptionParams;
+  userVariables?: UserVariables;
+};
+
+type ErrorResult = {
+  type: 'error';
+  error: ErrorInfo;
+};
+
+type ErrorInfo = {
+  message: string;
+  code: string;
+  details?: Record<string, unknown>;
+};
+
+// Parser configuration type definition
+interface ParserConfig {
+  // DemonstrativeType configuration
+  demonstrativeType: {
+    // Pattern for allowed values (regex)
+    pattern: string;
+    // Custom error message
+    errorMessage?: string;
+  };
+
+  // LayerType configuration
+  layerType: {
+    // Pattern for allowed values (regex)
+    pattern: string;
+    // Custom error message
+    errorMessage?: string;
+  };
+}
+
+// Default configuration values
+const DEFAULT_CONFIG: ParserConfig = {
+  demonstrativeType: {
+    pattern: '^(to|summary|defect)$',
+    errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect'
+  },
+  layerType: {
+    pattern: '^(project|issue|task)$',
+    errorMessage: 'Invalid layer type. Must be one of: project, issue, task'
+  }
+};
+```
+
+## Parameter Patterns
 
 1. **ZeroParams**
-   - No positional arguments
-   - Only options can be specified
-   - Example: `breakdown --help`
+   - No parameters
+   - Options only (--help, --version, etc.)
 
-2. **OneParam**
-   - One positional argument
-   - Valid value: `init`
-   - Example: `breakdown init`
+2. Single Parameter (OneParamsResult)
+   - init command
+   - demonstrativeType only (options are ignored)
 
-3. **TwoParams**
-   - Two positional arguments
-   - Format: `<demonstrativeType> <layerType>`
-   - Example: `breakdown to project`
+3. Two Parameters (TwoParamsResult)
+   - Main application execution
+   - DemonstrativeType and LayerType validation
+   - Options and user variables
 
-## DemonstrativeType
+## Option Parameters
 
-Values that can be specified as the first parameter:
+```typescript
+type OptionParams = {
+  fromFile?: string;
+  destinationFile?: string;
+  fromLayerType?: string;  // Validated with LayerType pattern
+  adaptationType?: string;
+  configFile?: string;
+  [key: `uv-${string}`]?: string; // User variables are normalized by removing leading hyphens
+};
+```
 
-| Value   | Description      |
-| ------- | ---------------- |
-| to      | Convert to target |
-| summary | Generate summary  |
-| defect  | Report defect     |
+## Error Handling
 
-## LayerType
+Each parameter type has an `error` property that can contain error information:
 
-Values that can be specified as the second parameter:
-
-| Value   | Description |
-| ------- | ----------- |
-| project | Project     |
-| issue   | Issue       |
-| task    | Task        |
-
-## Parameter Constraints
-
-1. **Number of Arguments**
-   - 0: Only options allowed
-   - 1: Only `init` command allowed
-   - 2: Combination of demonstrativeType and layerType
-   - 3 or more: Error
+```typescript
+type ErrorInfo = {
+  message: string;
+  code: string;
+  details?: Record<string, unknown>;
+};
+```
 
 ## Usage Examples
 
-### ZeroParams
+```typescript
+// No parameters
+const zeroResult: ZeroParamsResult = {
+  type: 'zero',
+  options: {
+    help: true
+  }
+};
 
-```bash
-breakdown
+// Single parameter
+const oneResult: OneParamsResult = {
+  type: 'one',
+  demonstrativeType: 'init'
+};
+
+// Two parameters (using default configuration values)
+const twoResult: TwoParamsResult = {
+  type: 'two',
+  demonstrativeType: 'to',      // Pattern: ^(to|summary|defect)$
+  layerType: 'project',         // Pattern: ^(project|issue|task)$
+  options: {
+    fromFile: 'input.json',
+    destinationFile: 'output.json',
+    fromLayerType: 'issue'      // Pattern: ^(project|issue|task)$
+  }
+};
+
+// Custom configuration values usage example
+const customConfig: ParserConfig = {
+  demonstrativeType: {
+    pattern: '^[a-z]+$',  // Allow only lowercase alphabets
+    errorMessage: 'Invalid demonstrative type'
+  },
+  layerType: {
+    pattern: '^[a-z]+$',  // Allow only lowercase alphabets
+    errorMessage: 'Invalid layer type'
+  }
+};
+
+const parser = new ParamsParser(customConfig);
 ```
 
-### OneParam
+# Parameter Specification
+
+This document defines the specification for parameters without hyphens (positional arguments).
+
+# Parameter Patterns
+
+Processing branches based on the number of parameters without hyphens.
+Each pattern corresponds to a specific data structure. These patterns are mutually exclusive.
+
+- Hyphenated options only (0 parameters)
+  - Special handling for application help and version display
+- Single parameter only
+  - Special handling for application initialization
+- 2 parameters
+  - Main application execution
+  - DemonstrativeType and LayerType validation
+  - Hyphenated parameters function as additional options
+- 3 or more parameters result in an error
+
+# Processing for Each Parameter Pattern
+
+## Hyphenated Options Only (0 Parameters)
+
+Usage example:
 
 ```bash
-breakdown init
+./.deno/bin/breakdown -h
 ```
 
-### TwoParams
+### Possible Values
+
+- -h, --help
+- -v, --version
+
+Aliases are supported.
+Indicates the presence of arguments. Multiple options can be specified simultaneously.
+
+## Single Parameter
+
+Usage example:
 
 ```bash
-breakdown to project
-breakdown summary issue
-breakdown defect task
-breakdown to project --config test
-breakdown summary task -c test
+./.deno/bin/breakdown init
+```
+
+### Possible Values
+
+- `init`
+
+Indicates what the argument represents.
+For example, you can verify that the parameter is `init` during initialization.
+
+## 2 Parameters
+
+Usage pattern:
+
+```bash
+./.deno/bin/breakdown $1 $2
+```
+
+Example:
+
+```bash
+./.deno/bin/breakdown to issue
+```
+
+The first option ($1) is called `DemonstrativeType` and is validated with a regex pattern.
+The second option ($2) is called `LayerType` and is validated with a regex pattern.
+
+### Default Validation Rules
+
+#### DemonstrativeType
+Default regex pattern: `^(to|summary|defect)$`
+- to
+- summary
+- defect
+
+#### LayerType
+Default regex pattern: `^(project|issue|task)$`
+- project
+- issue
+- task
+
+### Hyphenated Option Values
+
+#### --from `<file>`
+
+Option name: FromFile
+Alias: `-f`
+The following are equivalent:
+
+```bash
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
+```
+
+##### FromFile Values
+
+- Gets the `<file>` part
+- Example: For `--from=./.agent/breakdown/issues/issue_summary.md`, stores `./.agent/breakdown/issues/issue_summary.md`
+
+#### --destination `<output_file>`
+
+Option name: DestinationFile
+Alias: `-o`
+The following are equivalent:
+
+```bash
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
+```
+
+##### DestinationFile Values
+
+- Gets the `<output_file>` part
+- Example: For `--destination=./.agent/breakdown/issues/issue_summary.md`, stores `./.agent/breakdown/issues/issue_summary.md`
+
+#### --input `<from_layer_type>`
+
+Option name: FromLayerType
+Alias: `-i`
+The following are equivalent:
+
+```bash
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
+```
+
+##### from_layer_type Values
+
+- Gets the `<from_layer_type>` part
+- Example: For `--input=issue`, stores `issue`
+- Default regex pattern: `^(project|issue|task)$`
+
+#### --config `<config_file>`
+
+Option name: ConfigFile
+Alias: `-c`
+The following are equivalent:
+
+```bash
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
+```
+
+##### ConfigFile Values
+
+- Gets the `<config_file>` part
+- Example: For `--config=test`, stores `test`
+
+#### User Variable Options (`--uv-*`)
+
+User variable options are used to specify user-defined variables.
+Only available in TwoParams mode, specified in the following format:
+
+```bash
+./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
 ```
 
 ## Error Cases
 
-| Error Case           | Example Message                                    |
-| -------------------- | -------------------------------------------------- |
-| Too many arguments   | "Too many arguments. Maximum 2 arguments are allowed." |
-| Invalid DemonstrativeType | "Invalid value for demonstrativeType: {value}"     |
-| Invalid LayerType    | "Invalid value for layerType: {value}"             |
-| Invalid Config usage | "Config option is only available with TwoParams" |
+| Error Case              | Example Message                                           |
+| ----------------------- | --------------------------------------------------------- |
+| Too many arguments      | "Too many arguments. Maximum 2 arguments are allowed."    |
+| Invalid DemonstrativeType | "Invalid demonstrative type. Must be one of: to, summary, defect" |
+| Invalid LayerType       | "Invalid layer type. Must be one of: project, issue, task" |
+| Invalid Config usage    | "Config option is only available with TwoParams"          |
 
 ## Return Type
 
 The parameter parsing result is returned with the following type:
 
 ```typescript
-type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult;
+type ParamsResult = ZeroParamsResult | OneParamsResult | TwoParamsResult | ErrorResult;
 ```
-
-For detailed type definitions and usage, please refer to the [Parameter Parser Type Definition Specification](params_type.md).
 
 ---
 
-[日本語版](params.ja.md) | [English Version](params.md) 
+[日本語版](params.ja.md) | [English Version](params.md)
