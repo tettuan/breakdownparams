@@ -10,7 +10,7 @@ Deno.test('test_type_definitions_design', async (t) => {
   await t.step('should maintain option type enum', () => {
     assertEquals(OptionType.VALUE, 'value');
     assertEquals(OptionType.FLAG, 'flag');
-    assertEquals(OptionType.CUSTOM_VARIABLE, 'custom_variable');
+    assertEquals(OptionType.USER_VARIABLE, 'user_variable');
   });
 
   await t.step('should maintain validation result type', () => {
@@ -41,14 +41,14 @@ Deno.test('test_type_consistency', async (t) => {
   await t.step('should maintain consistent option type values', () => {
     const valueType = OptionType.VALUE;
     const flagType = OptionType.FLAG;
-    const customVarType = OptionType.CUSTOM_VARIABLE;
+    const customVarType = OptionType.USER_VARIABLE;
 
     assertEquals(typeof valueType, 'string');
     assertEquals(typeof flagType, 'string');
     assertEquals(typeof customVarType, 'string');
     assertEquals(valueType, 'value');
     assertEquals(flagType, 'flag');
-    assertEquals(customVarType, 'custom_variable');
+    assertEquals(customVarType, 'user_variable');
   });
 
   await t.step('should maintain consistent validation result structure', () => {
@@ -77,11 +77,11 @@ Deno.test('test_type_safety', async (t) => {
   await t.step('should enforce option type constraints', () => {
     const valueType = OptionType.VALUE;
     const flagType = OptionType.FLAG;
-    const customVarType = OptionType.CUSTOM_VARIABLE;
+    const customVarType = OptionType.USER_VARIABLE;
 
     assertEquals(valueType, 'value');
     assertEquals(flagType, 'flag');
-    assertEquals(customVarType, 'custom_variable');
+    assertEquals(customVarType, 'user_variable');
   });
 
   await t.step('should enforce validation result constraints', () => {
