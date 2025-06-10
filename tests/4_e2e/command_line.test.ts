@@ -1,6 +1,5 @@
 import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
 import { ParamsParser } from '../../src/mod.ts';
-import { OptionParams } from '../../src/types/option_type.ts';
 
 Deno.test('Command Line E2E Tests', async (t) => {
   const parser = new ParamsParser();
@@ -14,44 +13,43 @@ Deno.test('Command Line E2E Tests', async (t) => {
   });
 
   await t.step('should handle file conversion with one parameter', () => {
-    const args = ['input.txt', '--output', 'output.txt', '--format', 'json'];
+    const args = ['init', '--from=input.txt', '--destination=output.txt'];
     const result = parser.parse(args);
 
     assertEquals(result.type, 'one');
-    assertEquals(result.params[0], 'input.txt');
-    assertExists(result.options.output);
-    assertExists(result.options.format);
+    assertEquals(result.params[0], 'init');
+    assertEquals(result.options.from, 'input.txt');
+    assertEquals(result.options.destination, 'output.txt');
   });
 
   await t.step('should handle file comparison with two parameters', () => {
-    const args = ['file1.txt', 'file2.txt', '--diff', '--ignore-case'];
+    const args = ['defect', 'issue', '--from=file1.txt', '--destination=file2.txt'];
     const result = parser.parse(args);
 
     assertEquals(result.type, 'two');
-    assertEquals(result.params[0], 'file1.txt');
-    assertEquals(result.params[1], 'file2.txt');
-    assertExists(result.options.diff);
-    assertExists(result.options.ignoreCase);
+    assertEquals(result.params[0], 'defect');
+    assertEquals(result.params[1], 'issue');
+    assertEquals(result.options.from, 'file1.txt');
+    assertEquals(result.options.destination, 'file2.txt');
   });
 
   await t.step('should handle custom variables', () => {
-    const args = ['--var', 'key1=value1', '--var', 'key2=value2'];
+    const args = ['to', 'task', '--uv-key1=value1', '--uv-key2=value2'];
     const result = parser.parse(args);
 
-    assertEquals(result.type, 'zero');
-    const options = result.options as OptionParams;
-    assertExists(options.customVariables);
-    assertEquals(options.customVariables?.key1, 'value1');
-    assertEquals(options.customVariables?.key2, 'value2');
+    assertEquals(result.type, 'two');
+    assertEquals(result.params[0], 'to');
+    assertEquals(result.params[1], 'task');
+    assertEquals(result.options['uv-key1'], 'value1');
+    assertEquals(result.options['uv-key2'], 'value2');
   });
 
   await t.step('should handle configuration file', () => {
-    const args = ['--config', 'config.json'];
+    const args = ['init', '--config=config.json'];
     const result = parser.parse(args);
 
-    assertEquals(result.type, 'zero');
-    const options = result.options as OptionParams;
-    assertExists(options.configFile);
-    assertEquals(options.configFile, 'config.json');
+    assertEquals(result.type, 'one');
+    assertEquals(result.params[0], 'init');
+    assertEquals(result.options.config, 'config.json');
   });
 });

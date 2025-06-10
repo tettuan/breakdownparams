@@ -177,6 +177,7 @@ export class OneOptionValidator extends BaseOptionValidator {
     'destination',
     'input',
     'adaptation',
+    'config',
   ];
   protected readonly allowCustomVariables = false;
 }

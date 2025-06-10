@@ -14,26 +14,32 @@ Deno.test('ParamsParser Integration Tests', async (t) => {
   });
 
   await t.step('should parse one parameter with valid options', () => {
-    const args = ['input.txt', '--output', 'output.txt'];
+    const args = ['init', '--from=input.txt', '--destination=output.txt'];
     const result = parser.parse(args);
 
     assertEquals(result.type, 'one');
     assertExists(result.options);
     assertEquals(result.params.length, 1);
-    assertEquals(result.params[0], 'input.txt');
+    assertEquals(result.params[0], 'init');
+    assertEquals(result.options.from, 'input.txt');
+    assertEquals(result.options.destination, 'output.txt');
   });
 
   await t.step('should parse two parameters with valid options', () => {
-    const args = ['source.txt', 'target.txt', '--config', 'config.json'];
+    const args = ['to', 'project', '--from=source.txt', '--destination=target.txt'];
     const result = parser.parse(args);
 
     assertEquals(result.type, 'two');
     assertExists(result.options);
     assertEquals(result.params.length, 2);
+    assertEquals(result.params[0], 'to');
+    assertEquals(result.params[1], 'project');
+    assertEquals(result.options.from, 'source.txt');
+    assertEquals(result.options.destination, 'target.txt');
   });
 
   await t.step('should handle invalid option combinations', () => {
-    const args = ['--help', '--version']; // Assuming these are mutually exclusive
+    const args = ['--help', '--from=test.txt']; // from option not allowed for zero params
     const result = parser.parse(args);
 
     assertEquals(result.type, 'error');
