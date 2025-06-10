@@ -2,17 +2,50 @@ import { BaseValidator } from './params/base_validator.ts';
 import { ValidationResult } from '../types/validation_result.ts';
 
 /**
- * セキュリティバリデータ
- * パラメータにシステムを壊す不正な文字列がないかをチェックする
- * それ以上のチェックは不要
+ * Security validator for command-line arguments.
+ *
+ * This validator checks for potentially harmful strings in parameters
+ * that could compromise system security. It prevents command injection,
+ * path traversal, and other security vulnerabilities.
+ *
+ * @extends BaseValidator
+ *
+ * @example
+ * ```ts
+ * const validator = new SecurityValidator();
+ * const result = validator.validate(["normal", "args"]);
+ * // { isValid: true, validatedParams: ["normal", "args"] }
+ *
+ * const dangerous = validator.validate(["rm -rf /", "; cat /etc/passwd"]);
+ * // { isValid: false, errorMessage: "Security error..." }
+ * ```
  */
 export class SecurityValidator extends BaseValidator {
+  /**
+   * Creates a new SecurityValidator instance.
+   */
   constructor() {
     super();
   }
 
   /**
-   * バリデーションを実行する
+   * Validates command-line arguments for security threats.
+   *
+   * Checks for:
+   * - Shell command injection attempts (;, |, &, <, >)
+   * - Path traversal attempts (../, ..\, and direct concatenations)
+   *
+   * @param args - Array of command-line arguments to validate
+   * @returns Validation result with security check status
+   *
+   * @example
+   * ```ts
+   * validator.validate(["--file=../../../etc/passwd"]);
+   * // { isValid: false, errorCode: "SECURITY_ERROR" }
+   *
+   * validator.validate(["test.txt", "--verbose"]);
+   * // { isValid: true, validatedParams: [...] }
+   * ```
    */
   public validate(args: string[]): ValidationResult {
     // シェルコマンド実行の試みやリダイレクト記号の検出

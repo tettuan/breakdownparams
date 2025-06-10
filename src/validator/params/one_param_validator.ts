@@ -2,14 +2,42 @@ import { BaseValidator } from './base_validator.ts';
 import { ValidationResult } from '../../types/validation_result.ts';
 
 /**
- * 1パラメータバリデータ
- * パラメータの数が1個であることを検証する
- * init コマンドのみを許可する
+ * Validator for single-parameter commands.
+ *
+ * This validator ensures exactly one parameter is provided
+ * and currently only accepts the "init" command. This is used
+ * for initialization or setup commands that don't require additional arguments.
+ *
+ * @extends BaseValidator
+ *
+ * @example
+ * ```ts
+ * const validator = new OneParamValidator();
+ *
+ * // Valid: init command
+ * validator.validate(["init"]); // { isValid: true, demonstrativeType: "init" }
+ *
+ * // Invalid: wrong command
+ * validator.validate(["start"]); // { isValid: false, errorMessage: "Invalid command: start..." }
+ *
+ * // Invalid: wrong parameter count
+ * validator.validate(["init", "extra"]); // { isValid: false, errorMessage: "Expected exactly one parameter" }
+ * ```
  */
 export class OneParamValidator extends BaseValidator {
   /**
-   * パラメータを検証する
-   * @param params - 検証するパラメータ
+   * Validates that exactly one parameter is provided and it's "init".
+   *
+   * @param params - Array of parameters to validate
+   * @returns Validation result with demonstrativeType if valid
+   *
+   * @example
+   * ```ts
+   * const result = validator.validate(["init"]);
+   * if (result.isValid) {
+   *   // result.demonstrativeType === "init"
+   * }
+   * ```
    */
   override validate(params: string[]): ValidationResult {
     if (params.length !== 1) {

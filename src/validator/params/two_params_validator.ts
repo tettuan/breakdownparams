@@ -3,39 +3,77 @@ import { ValidationResult } from '../../types/validation_result.ts';
 import { DEFAULT_TWO_PARAMS_CONFIG, TwoParamsConfig } from '../../types/params_config.ts';
 
 /**
- * 2パラメータバリデータ
- * パラメータの数が2個であることを検証する
- * DemonstrativeTypeとLayerTypeのバリデーションを行う
+ * Validator for two-parameter commands.
  *
- * 実装の詳細:
- * 1. パラメータの数が2個であることを確認
- * 2. 1つ目のパラメータが DemonstrativeType (to|summary|defect) に一致することを確認
- * 3. 2つ目のパラメータが LayerType (project|issue|task) に一致することを確認
- * 4. バリデーション結果に demonstrativeType と layerType の値を含める
+ * This validator ensures exactly two parameters are provided and validates them
+ * against configurable patterns for DemonstrativeType and LayerType.
  *
- * 設定:
- * - config で DemonstrativeType と LayerType のパターンとエラーメッセージをカスタマイズ可能
- * - 設定がない場合は DEFAULT_TWO_PARAMS_CONFIG を使用
- * - デフォルトのパターン: "^(to|summary|defect)$" と "^(project|issue|task)$"
+ * Validation process:
+ * 1. Checks that exactly 2 parameters are provided
+ * 2. Validates first parameter against DemonstrativeType pattern (default: to|summary|defect)
+ * 3. Validates second parameter against LayerType pattern (default: project|issue|task)
+ * 4. Returns both demonstrativeType and layerType in the result
+ *
+ * Configuration:
+ * - Custom patterns and error messages can be provided via config
+ * - Falls back to DEFAULT_TWO_PARAMS_CONFIG if not provided
+ * - Default patterns: "^(to|summary|defect)$" and "^(project|issue|task)$"
+ *
+ * @extends BaseValidator
+ *
+ * @example
+ * ```ts
+ * const validator = new TwoParamsValidator();
+ *
+ * // Valid combination
+ * validator.validate(["to", "project"]);
+ * // { isValid: true, demonstrativeType: "to", layerType: "project" }
+ *
+ * // Invalid demonstrative type
+ * validator.validate(["invalid", "project"]);
+ * // { isValid: false, errorMessage: "Invalid demonstrative type: invalid" }
+ *
+ * // Custom configuration
+ * const customValidator = new TwoParamsValidator({
+ *   demonstrativeType: { pattern: "^(custom1|custom2)$" },
+ *   layerType: { pattern: "^(layer1|layer2)$" }
+ * });
+ * ```
  */
 export class TwoParamsValidator extends BaseValidator {
   private readonly config: TwoParamsConfig;
 
+  /**
+   * Creates a new TwoParamsValidator instance.
+   *
+   * @param config - Optional configuration for validation patterns and error messages
+   */
   constructor(config?: TwoParamsConfig) {
     super();
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
   }
 
   /**
-   * パラメータを検証する
-   * @param params - 検証するパラメータ
+   * Validates that exactly two parameters are provided and match configured patterns.
    *
-   * 検証の流れ:
-   * 1. パラメータの数が2個でない場合はエラー
-   * 2. 1つ目のパラメータが DemonstrativeType のパターンに一致するか確認
-   * 3. 2つ目のパラメータが LayerType のパターンに一致するか確認
-   * 4. どちらかが一致しない場合は、該当するエラーメッセージを返す
-   * 5. 両方一致する場合は、検証済みパラメータと型情報を返す
+   * Validation flow:
+   * 1. Ensures exactly 2 parameters are provided
+   * 2. Validates first parameter against DemonstrativeType pattern
+   * 3. Validates second parameter against LayerType pattern
+   * 4. Returns appropriate error message if validation fails
+   * 5. Returns validated parameters with type information on success
+   *
+   * @param params - Array of parameters to validate
+   * @returns Validation result with demonstrativeType and layerType if valid
+   *
+   * @example
+   * ```ts
+   * const result = validator.validate(["summary", "task"]);
+   * if (result.isValid) {
+   *   // result.demonstrativeType === "summary"
+   *   // result.layerType === "task"
+   * }
+   * ```
    */
   override validate(params: string[]): ValidationResult {
     // パラメータの数が2個でない場合はエラー
