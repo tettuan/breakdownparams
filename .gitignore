@@ -147,3 +147,4 @@ tmp/
 .claude.json
 .claude/*
 .claude.*
+.DS_Store
