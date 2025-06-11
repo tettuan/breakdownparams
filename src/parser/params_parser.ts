@@ -18,7 +18,6 @@ import {
   ZeroOptionValidator,
 } from '../validator/options/option_validator.ts';
 import { CommandLineOptionFactory } from '../factories/option_factory.ts';
-import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
  * Interface for parameter parser that processes command-line arguments.
@@ -79,7 +78,6 @@ export class ParamsParser {
   private readonly optionRule: OptionRule;
   private readonly config: TwoParamsConfig;
   private readonly customConfig: CustomConfig;
-  private readonly logger: BreakdownLogger;
   /**
    * Security validator that checks for potentially harmful strings in parameters.
    * This validator ensures system safety by preventing injection attacks.
@@ -101,7 +99,6 @@ export class ParamsParser {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
     this.customConfig = customConfig || DEFAULT_CUSTOM_CONFIG;
-    this.logger = new BreakdownLogger();
 
     this.securityValidator = new SecurityValidator();
     this.optionFactory = new CommandLineOptionFactory();
@@ -168,7 +165,6 @@ export class ParamsParser {
           throw error;
         }
         // その他の無効なオプションは無視
-        this.logger.debug(`Skipping invalid option: ${arg}`, error);
       }
     }
 
@@ -260,12 +256,6 @@ export class ParamsParser {
     const zeroResult = zeroValidator.validate(params);
     const oneResult = oneValidator.validate(params);
     const twoResult = twoValidator.validate(params);
-
-    this.logger.debug('Validation results:', {
-      zeroResult,
-      oneResult,
-      twoResult,
-    });
 
     /*
      * 4. パラメータ数に応じたオプションのバリデーション

@@ -1,6 +1,5 @@
 import { OptionRule } from '../../types/option_rule.ts';
 import { ValidationResult } from '../../types/validation_result.ts';
-import { debug } from '../../utils/logger.ts';
 
 /**
  * Predefined error messages for option validation.
@@ -137,14 +136,8 @@ abstract class BaseOptionValidator implements OptionValidator {
    * Validate the options
    */
   validate(args: string[], type: string, optionRule: OptionRule): ValidationResult {
-    debug('OptionValidator', 'Start validating options', { args, type, optionRule });
-
     // Type check
     if (type !== this.paramType) {
-      debug('OptionValidator', 'Invalid parameter type', {
-        expected: this.paramType,
-        actual: type,
-      });
       return this.createError(
         ERROR_MESSAGES.INVALID_TYPE(type),
         'INVALID_PARAMETER_TYPE',
@@ -152,11 +145,9 @@ abstract class BaseOptionValidator implements OptionValidator {
     }
 
     const options = args.filter((arg) => arg.startsWith('--'));
-    debug('OptionValidator', 'Filtered options', options);
 
     // オプションがない場合は成功とする
     if (options.length === 0) {
-      debug('OptionValidator', 'No options found, returning success');
       return this.createSuccess([], optionRule);
     }
 
@@ -167,7 +158,6 @@ abstract class BaseOptionValidator implements OptionValidator {
     });
 
     if (emptyValueOptions.length > 0) {
-      debug('OptionValidator', 'Empty value options found', emptyValueOptions);
       return this.createError(
         ERROR_MESSAGES.EMPTY_VALUE(emptyValueOptions[0]),
         'INVALID_OPTIONS',
@@ -180,17 +170,14 @@ abstract class BaseOptionValidator implements OptionValidator {
       optionRule.flagOptions,
       this.allowCustomVariables,
     );
-    debug('OptionValidator', 'Options validation result', { isValid, invalidOptions });
 
     if (!isValid) {
-      debug('OptionValidator', 'Invalid options found, returning error');
       return this.createError(
         ERROR_MESSAGES.INVALID_OPTIONS(this.paramType, invalidOptions),
         'INVALID_OPTIONS',
       );
     }
 
-    debug('OptionValidator', 'All options valid, returning success');
     return this.createSuccess(options, optionRule);
   }
 }
