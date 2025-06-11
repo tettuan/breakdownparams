@@ -1,6 +1,6 @@
 {
   "name": "@tettuan/breakdownparams",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "A utility to parse and validate command line arguments with type safety",
   "repository": "https://github.com/tettuan/breakdownparams",
   "keywords": [
@@ -26,8 +26,15 @@
     "ci": "bash scripts/local_ci.sh"
   },
   "fmt": {
-    "include": ["src/", "tests/", "mod.ts"],
-    "exclude": ["docs/", "drafts/"],
+    "include": [
+      "src/",
+      "tests/",
+      "mod.ts"
+    ],
+    "exclude": [
+      "docs/",
+      "drafts/"
+    ],
     "useTabs": false,
     "lineWidth": 100,
     "indentWidth": 2,
@@ -35,9 +42,14 @@
     "proseWrap": "preserve"
   },
   "lint": {
-    "include": ["src/", "tests/"],
+    "include": [
+      "src/",
+      "tests/"
+    ],
     "rules": {
-      "tags": ["recommended"]
+      "tags": [
+        "recommended"
+      ]
     }
   },
   "compilerOptions": {
