@@ -41,7 +41,7 @@ export abstract class BaseValidator {
    *   // Use result.validatedParams
    * } else {
    *   // Handle validation error
-   *   console.error(result.errorMessage);
+   *   // result.errorMessage contains the error details
    * }
    * ```
    */

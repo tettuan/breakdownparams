@@ -70,8 +70,8 @@ export class TwoParamsValidator extends BaseValidator {
    * ```ts
    * const result = validator.validate(["summary", "task"]);
    * if (result.isValid) {
-   *   console.log(result.demonstrativeType); // "summary"
-   *   console.log(result.layerType); // "task"
+   *   // result.demonstrativeType === "summary"
+   *   // result.layerType === "task"
    * }
    * ```
    */

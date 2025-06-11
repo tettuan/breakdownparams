@@ -42,9 +42,9 @@ export interface ParamsParser {
    * const result = parser.parse(["layer", "detail", "--verbose"]);
    *
    * if (result.type === "two") {
-   *   console.log(result.demonstrativeType); // "layer"
-   *   console.log(result.layerType); // "detail"
-   *   console.log(result.options.verbose); // true
+   *   // result.demonstrativeType === "layer"
+   *   // result.layerType === "detail"
+   *   // result.options.verbose === true
    * }
    * ```
    */
