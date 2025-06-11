@@ -2,7 +2,6 @@ import {
   DEFAULT_OPTION_COMBINATION_RULES,
   OptionCombinationRule,
 } from './option_combination_rule.ts';
-import { debug } from '../../utils/logger.ts';
 
 /**
  * Option組み合わせ検証の結果を表すインターフェース
@@ -62,8 +61,6 @@ export class OptionCombinationValidator {
    * @returns 検証結果（成功/失敗とエラー情報）
    */
   validate(options: Record<string, unknown>): OptionCombinationResult {
-    debug('OptionCombinationValidator', 'Start validating options', options);
-
     // 許可されていないoptionが含まれていないか
     for (const key of Object.keys(options)) {
       // カスタム変数（uv-*）は特別扱い - TwoParamsモードでのみ許可
@@ -123,7 +120,6 @@ export class OptionCombinationValidator {
       }
     }
 
-    debug('OptionCombinationValidator', 'All validations passed');
     return { isValid: true };
   }
 

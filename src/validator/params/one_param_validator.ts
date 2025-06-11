@@ -35,7 +35,7 @@ export class OneParamValidator extends BaseValidator {
    * ```ts
    * const result = validator.validate(["init"]);
    * if (result.isValid) {
-   *   console.log(result.demonstrativeType); // "init"
+   *   // result.demonstrativeType === "init"
    * }
    * ```
    */
