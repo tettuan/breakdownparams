@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals } from 'jsr:@std/assert@1';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
 
 Deno.test('test_security_validator_implementation', () => {

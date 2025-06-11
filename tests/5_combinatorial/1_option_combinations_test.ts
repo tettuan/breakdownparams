@@ -17,7 +17,7 @@
  * - --config / -c (configFile)
  */
 
-import { assertEquals } from 'https://deno.land/std@0.208.0/assert/mod.ts';
+import { assertEquals } from 'jsr:@std/assert@1';
 import { ParamsParser } from '../../src/mod.ts';
 import type { TwoParamsResult } from '../../src/mod.ts';
 

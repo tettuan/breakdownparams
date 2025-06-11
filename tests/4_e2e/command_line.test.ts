@@ -1,4 +1,4 @@
-import { assertEquals, assertExists } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals, assertExists } from 'jsr:@std/assert@1';
 import { ParamsParser } from '../../src/mod.ts';
 
 Deno.test('Command Line E2E Tests', async (t) => {
