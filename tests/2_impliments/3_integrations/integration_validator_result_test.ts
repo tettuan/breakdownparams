@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals } from 'jsr:@std/assert@1';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';

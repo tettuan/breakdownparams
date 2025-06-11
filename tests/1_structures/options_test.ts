@@ -1,4 +1,4 @@
-import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { FlagOption } from '../../src/option-models/flag_option.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';

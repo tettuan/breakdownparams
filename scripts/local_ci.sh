@@ -141,7 +141,7 @@ handle_type_error() {
 ===============================================================================
 Please review:
 1. Project rules and specifications in docs/ directory
-2. Deno's type system documentation at https://deno.land/manual/typescript
+2. Deno's type system documentation at https://docs.deno.com/runtime/fundamentals/typescript/
 3. External library documentation for any imported packages
 
 Remember to:
@@ -164,7 +164,7 @@ handle_format_error() {
 ===============================================================================
 Please review:
 1. Project formatting rules in docs/ directory
-2. Deno's style guide at https://deno.land/manual/tools/formatter
+2. Deno's style guide at https://docs.deno.com/runtime/manual/tools/formatter
 3. Format settings in deno.json
 
 To auto-fix formatting issues:
@@ -190,7 +190,7 @@ handle_lint_error() {
 ===============================================================================
 Please review:
 1. Project linting rules in docs/ directory
-2. Deno's linting rules at https://deno.land/manual/tools/linter
+2. Deno's linting rules at https://docs.deno.com/runtime/manual/tools/linter
 3. Lint configuration in deno.json
 
 Remember to:
@@ -448,7 +448,7 @@ if ! deno fmt --check "**/*.ts" "**/*.js" "**/*.jsx" "**/*.tsx"; then
 ===============================================================================
 Please review:
 1. Project formatting rules in docs/ directory
-2. Deno's style guide at https://deno.land/manual/tools/formatter
+2. Deno's style guide at https://docs.deno.com/runtime/manual/tools/formatter
 3. Format settings in deno.json
 
 To auto-fix formatting issues:

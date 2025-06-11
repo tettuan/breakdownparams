@@ -1,4 +1,4 @@
-import { assertEquals } from 'https://deno.land/std@0.220.1/assert/mod.ts';
+import { assertEquals } from 'jsr:@std/assert@1';
 import { ParamsParser } from './params_parser.ts';
 import { OptionRule } from '../types/option_rule.ts';
 import { ParamsResult } from '../types/params_result.ts';

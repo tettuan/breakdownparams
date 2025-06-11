@@ -16,7 +16,7 @@
  * - オプションエラー: 無効オプション、制約違反、形式エラー
  */
 
-import { assertEquals, assertStringIncludes } from 'https://deno.land/std@0.208.0/assert/mod.ts';
+import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@1';
 import { ParamsParser } from '../../src/mod.ts';
 import type { ParamsResult } from '../../src/mod.ts';
 
