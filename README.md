@@ -211,8 +211,14 @@ import { ParamsParser, CustomConfig } from 'jsr:@tettuan/breakdownparams@1.0.0';
 const customConfig: CustomConfig = {
   params: {
     two: {
-      demonstrativeType: ["to", "from", "via"],  // Custom demonstrative types
-      layerType: ["project", "issue", "task", "epic"]  // Custom layer types
+      demonstrativeType: {
+        pattern: "^(to|from|via)$",
+        errorMessage: "Invalid demonstrative type. Must be one of: to, from, via"
+      },
+      layerType: {
+        pattern: "^(project|issue|task|epic)$", 
+        errorMessage: "Invalid layer type. Must be one of: project, issue, task, epic"
+      }
     }
   },
   validation: {
