@@ -24,7 +24,7 @@ const aiConfig: CustomConfig = {
   },
 };
 
-const parser = new ParamsParser(undefined, undefined, aiConfig);
+const parser = new ParamsParser(undefined, aiConfig);
 
 // Realistic AI/ML commands
 const aiCommands = [

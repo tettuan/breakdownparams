@@ -25,7 +25,7 @@ const optionRule: OptionRule = {
 };
 
 Deno.test('test_validator_result_integration', () => {
-  // セキュリティエラーバリデーターの結果テスト
+  // Test: Security error validator results
   const securityValidator = new SecurityValidator();
   const securityResult = securityValidator.validate(['safe;command']);
   assertEquals(
@@ -42,7 +42,7 @@ Deno.test('test_validator_result_integration', () => {
   assertEquals(typeof securityResult.errorCode, 'string', 'Should have error code');
   assertEquals(typeof securityResult.errorCategory, 'string', 'Should have error category');
 
-  // オプションバリデーターの結果テスト
+  // Test: Option validator results
   const zeroOptionValidator = new ZeroOptionValidator();
   const optionsResult = zeroOptionValidator.validate(['--help', '--version'], 'zero', optionRule);
   assertEquals(optionsResult.isValid, true, 'Options validation should pass for valid options');
@@ -52,7 +52,7 @@ Deno.test('test_validator_result_integration', () => {
     'Option validator should return empty validated params',
   );
 
-  // ゼロパラメータバリデーターの結果テスト
+  // Test: Zero parameter validator results
   const zeroParamsValidator = new ZeroParamsValidator();
   const zeroParamsResult = zeroParamsValidator.validate([]);
   assertEquals(
@@ -62,13 +62,13 @@ Deno.test('test_validator_result_integration', () => {
   );
   assertEquals(zeroParamsResult.validatedParams, [], 'Validated params should be empty');
 
-  // 1パラメータバリデーターの結果テスト
+  // Test: One parameter validator results
   const oneParamValidator = new OneParamValidator();
   const oneParamResult = oneParamValidator.validate(['init']);
   assertEquals(oneParamResult.isValid, true, 'One param validation should pass for init command');
   assertEquals(oneParamResult.validatedParams, ['init'], 'Validated params should match input');
 
-  // 2パラメータバリデーターの結果テスト
+  // Test: Two parameter validator results
   const twoParamsValidator = new TwoParamsValidator();
   const twoParamsResult = twoParamsValidator.validate(['to', 'project']);
   assertEquals(
@@ -82,7 +82,7 @@ Deno.test('test_validator_result_integration', () => {
     'Validated params should match input',
   );
 
-  // エラーケースの結果テスト
+  // Test: Error case results
   const invalidOptionsResult = zeroOptionValidator.validate(
     ['--invalid-option'],
     'zero',
@@ -102,7 +102,7 @@ Deno.test('test_validator_result_integration', () => {
   assertEquals(typeof invalidOptionsResult.errorCode, 'string', 'Should have error code');
   assertEquals(typeof invalidOptionsResult.errorCategory, 'string', 'Should have error category');
 
-  // 複合ケースの結果テスト
+  // Test: Complex case results
   const complexResult = twoParamsValidator.validate(['to', 'project']);
   assertEquals(complexResult.isValid, true, 'Complex validation should pass for valid parameters');
   assertEquals(
@@ -112,7 +112,7 @@ Deno.test('test_validator_result_integration', () => {
   );
   // demonstrativeType and layerType are properties of ParamsResult, not ValidationResult
 
-  // エラー詳細のテスト
+  // Test: Error details
   const errorResult = securityValidator.validate(['dangerous;command']);
   assertEquals(errorResult.isValid, false, 'Validation should fail for dangerous command');
   assertEquals(typeof errorResult.errorMessage, 'string', 'Should have error message');

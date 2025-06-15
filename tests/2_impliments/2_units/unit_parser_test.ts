@@ -3,7 +3,22 @@ import { OptionRule } from '../../../src/types/option_rule.ts';
 import { ParamsResult } from '../../../src/types/params_result.ts';
 
 Deno.test('test_params_parser', () => {
-  // パラメータ結果のテスト
+  /**
+   * Test for parameter result object structure and initialization.
+   *
+   * Purpose: Validates that ParamsResult objects are correctly structured
+   * and initialized with appropriate default values for the 'zero' type case.
+   *
+   * Background: The parser must return well-formed result objects even when
+   * no parameters are provided. The 'zero' type represents commands that
+   * contain only options or no arguments at all. This is a fundamental
+   * edge case that must be handled correctly.
+   *
+   * Intent: This test ensures that ParamsResult objects for the 'zero' type
+   * are properly initialized with empty parameter arrays, empty option objects,
+   * and undefined error fields. This guarantees consistent behavior when
+   * processing commands without positional arguments.
+   */
   const result: ParamsResult = {
     type: 'zero',
     params: [],
@@ -14,7 +29,23 @@ Deno.test('test_params_parser', () => {
   assertEquals(result.options, {}, 'Options should be empty');
   assertEquals(result.error, undefined, 'Error should be undefined');
 
-  // オプションルールのテスト
+  /**
+   * Test for option rule object structure and validation.
+   *
+   * Purpose: Validates the complete structure of OptionRule configuration
+   * objects that control parser behavior for command-line options.
+   *
+   * Background: OptionRule objects encapsulate all configuration needed
+   * for option parsing including format specifications, validation rules,
+   * error handling policies, and flag option definitions. These rules
+   * must be properly structured to ensure reliable parsing behavior.
+   *
+   * Intent: This test verifies that all required properties of OptionRule
+   * are present and correctly typed. It ensures format is a string,
+   * rule arrays are properly initialized, error handling strategies are
+   * defined, and flag options are configured. This prevents configuration
+   * errors that could lead to parsing failures.
+   */
   const optionRule: OptionRule = {
     format: '--key=value',
     flagOptions: {

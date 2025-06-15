@@ -2,7 +2,23 @@ import { assertEquals } from 'jsr:@std/assert@1';
 import { OneParamsResult, ParamsResult, TwoParamsResult } from '../../src/types/params_result.ts';
 
 Deno.test('test_params_result_structure', () => {
-  // 基本構造のテスト
+  /**
+   * Test: Basic ParamsResult structure
+   *
+   * Purpose:
+   * Validates the fundamental structure of ParamsResult interface,
+   * which is the base for all parsing result types.
+   *
+   * Background:
+   * ParamsResult is the common interface that all specific result types
+   * extend from. It must contain type discriminator, params array, and
+   * options object.
+   *
+   * Intent:
+   * - Verify type field is a string
+   * - Ensure params is an array
+   * - Confirm options is an object
+   */
   const result: ParamsResult = {
     type: 'zero',
     params: [],
@@ -13,7 +29,22 @@ Deno.test('test_params_result_structure', () => {
   assertEquals(Array.isArray(result.params), true, 'params should be an array');
   assertEquals(typeof result.options, 'object', 'options should be an object');
 
-  // エラー情報のテスト
+  /**
+   * Test: Error information structure
+   *
+   * Purpose:
+   * Validates the structure of error information within ParamsResult
+   * when parsing fails.
+   *
+   * Background:
+   * When parsing fails, the result includes an error object with
+   * message, code, and category for proper error handling and debugging.
+   *
+   * Intent:
+   * - Verify error field is an object when present
+   * - Ensure error message, code, and category are strings
+   * - Validate complete error information structure
+   */
   const errorResult: ParamsResult = {
     type: 'error',
     params: [],

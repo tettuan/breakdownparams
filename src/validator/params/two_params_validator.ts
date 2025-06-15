@@ -1,6 +1,6 @@
 import { BaseValidator } from './base_validator.ts';
 import { ValidationResult } from '../../types/validation_result.ts';
-import { DEFAULT_TWO_PARAMS_CONFIG, TwoParamsConfig } from '../../types/params_config.ts';
+import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../types/custom_config.ts';
 
 /**
  * Validator for two-parameter commands.
@@ -15,8 +15,8 @@ import { DEFAULT_TWO_PARAMS_CONFIG, TwoParamsConfig } from '../../types/params_c
  * 4. Returns both demonstrativeType and layerType in the result
  *
  * Configuration:
- * - Custom patterns and error messages can be provided via config
- * - Falls back to DEFAULT_TWO_PARAMS_CONFIG if not provided
+ * - Custom patterns and error messages can be provided via CustomConfig
+ * - Falls back to DEFAULT_CUSTOM_CONFIG if not provided
  * - Default patterns: "^(to|summary|defect)$" and "^(project|issue|task)$"
  *
  * @extends BaseValidator
@@ -35,22 +35,26 @@ import { DEFAULT_TWO_PARAMS_CONFIG, TwoParamsConfig } from '../../types/params_c
  *
  * // Custom configuration
  * const customValidator = new TwoParamsValidator({
- *   demonstrativeType: { pattern: "^(custom1|custom2)$" },
- *   layerType: { pattern: "^(layer1|layer2)$" }
+ *   params: {
+ *     two: {
+ *       demonstrativeType: { pattern: "^(custom1|custom2)$", errorMessage: "Invalid custom type" },
+ *       layerType: { pattern: "^(layer1|layer2)$", errorMessage: "Invalid layer" }
+ *     }
+ *   }
  * });
  * ```
  */
 export class TwoParamsValidator extends BaseValidator {
-  private readonly config: TwoParamsConfig;
+  private readonly config: CustomConfig;
 
   /**
    * Creates a new TwoParamsValidator instance.
    *
    * @param config - Optional configuration for validation patterns and error messages
    */
-  constructor(config?: TwoParamsConfig) {
+  constructor(config?: CustomConfig) {
     super();
-    this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
+    this.config = config || DEFAULT_CUSTOM_CONFIG;
   }
 
   /**
@@ -89,10 +93,9 @@ export class TwoParamsValidator extends BaseValidator {
 
     // DemonstrativeType と LayerType のパターンを取得
     // 優先順位: 1. config の設定 2. デフォルト設定 3. ハードコードされたデフォルト値
-    const demonstrativePattern = this.config.demonstrativeType?.pattern ||
-      DEFAULT_TWO_PARAMS_CONFIG.demonstrativeType?.pattern || '^(to|summary|defect)$';
-    const layerPattern = this.config.layerType?.pattern ||
-      DEFAULT_TWO_PARAMS_CONFIG.layerType?.pattern || '^(project|issue|task)$';
+    const demonstrativePattern = this.config.params.two.demonstrativeType.pattern ||
+      '^(to|summary|defect)$';
+    const layerPattern = this.config.params.two.layerType.pattern || '^(project|issue|task)$';
 
     // パターンマッチングで検証
     const demonstrativeValid = new RegExp(demonstrativePattern).test(params[0]);
@@ -106,11 +109,9 @@ export class TwoParamsValidator extends BaseValidator {
         demonstrativeType: params[0],
         layerType: params[1],
         errorMessage: !demonstrativeValid
-          ? (this.config.demonstrativeType?.errorMessage ||
-            DEFAULT_TWO_PARAMS_CONFIG.demonstrativeType?.errorMessage ||
+          ? (this.config.params.two.demonstrativeType.errorMessage ||
             `Invalid demonstrative type: ${params[0]}`)
-          : (this.config.layerType?.errorMessage ||
-            DEFAULT_TWO_PARAMS_CONFIG.layerType?.errorMessage ||
+          : (this.config.params.two.layerType.errorMessage ||
             `Invalid layer type: ${params[1]}`),
         errorCode: !demonstrativeValid ? 'INVALID_DEMONSTRATIVE_TYPE' : 'INVALID_LAYER_TYPE',
         errorCategory: 'validation',

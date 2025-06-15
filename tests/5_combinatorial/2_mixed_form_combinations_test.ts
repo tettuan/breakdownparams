@@ -1,28 +1,80 @@
 /**
- * 複合的テスト: 長形式・短形式混合組み合わせテスト
+ * Combinatorial Test: Long Form and Short Form Mixed Combinations Test
  *
- * このテストファイルは、長形式と短形式オプションの混合使用と優先度をテストします。
+ * Purpose:
+ * This test file validates the mixed usage patterns of long-form (--option) and
+ * short-form (-o) options, ensuring proper parsing and priority resolution when
+ * both forms are used together. It verifies that the parser handles all possible
+ * combinations gracefully without conflicts or unexpected behavior.
  *
- * テスト対象:
- * - 長形式・短形式の混合使用パターン
- * - 同一オプションの長短形式競合時の優先度
- * - ランダムな混合パターンでの正常動作
- * - オプション順序の影響確認
+ * Background:
+ * Command-line interfaces often support both long and short forms for options to
+ * provide flexibility to users. Some users prefer short forms for quick typing,
+ * while others prefer long forms for clarity. Mixed usage is common in real-world
+ * scenarios, especially in scripts that evolve over time or when options are
+ * copied from different sources.
  *
- * 優先度ルール:
- * - 最後に指定されたオプションが有効（後勝ち）
- * - 長形式・短形式に関係なく、順序で決定される
+ * Intent:
+ * - Verify that long and short forms can be mixed freely
+ * - Ensure consistent priority resolution when the same option appears multiple times
+ * - Validate that the parser correctly handles edge cases in mixed scenarios
+ * - Guarantee predictable behavior regardless of form combination patterns
+ *
+ * Test Coverage:
+ * - Mixed long/short form usage patterns across multiple options
+ * - Priority resolution when the same option appears in both forms
+ * - Random mixed patterns to simulate real-world usage
+ * - Order dependency verification to ensure consistent parsing
+ *
+ * Priority Rules:
+ * - Last-specified option takes precedence (last-wins strategy)
+ * - Priority is determined by order only, regardless of form (long vs short)
+ * - This ensures predictable behavior when options are overridden
  */
 
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@1';
 import { ParamsParser } from '../../src/mod.ts';
 import type { ParamsResult, TwoParamsResult } from '../../src/mod.ts';
 
-// テスト用の共通パラメータ
+/**
+ * Common test parameters used throughout the test suite
+ *
+ * Purpose:
+ * Provides consistent parameter values to ensure all tests operate on the same
+ * baseline, making results comparable and reproducible.
+ *
+ * Background:
+ * Using fixed demonstrative and layer types allows tests to focus exclusively
+ * on option form mixing behavior without parameter variations affecting results.
+ *
+ * Intent:
+ * - Establish a standard two-parameter context (to project)
+ * - Eliminate parameter variation as a test variable
+ * - Enable focus on long/short form option parsing
+ */
 const DEMO_TYPE = 'to';
 const LAYER_TYPE = 'project';
 
-// ヘルパー関数: オプションの比較
+/**
+ * Helper function: Validates options by comparing actual vs expected values
+ *
+ * Purpose:
+ * Provides detailed option-by-option comparison to identify specific mismatches
+ * in complex mixed-form option scenarios.
+ *
+ * Background:
+ * When testing multiple option forms together, it's crucial to know exactly
+ * which option failed parsing or had incorrect priority resolution.
+ *
+ * Intent:
+ * - Check each expected option individually
+ * - Provide clear error messages for each mismatch
+ * - Support partial validation of option subsets
+ *
+ * @param actual - The actual parsed options object
+ * @param expected - The expected option values to validate
+ * @param testDescription - Context for error messages
+ */
 function assertOptionsMatch(
   actual: Record<string, unknown>,
   expected: Record<string, unknown>,
@@ -37,7 +89,26 @@ function assertOptionsMatch(
   }
 }
 
-// ヘルパー関数: 基本的な結果検証
+/**
+ * Helper function: Validates basic parsing result structure
+ *
+ * Purpose:
+ * Ensures that the fundamental parsing result is correct before checking
+ * specific option values in mixed-form tests.
+ *
+ * Background:
+ * Mixed-form tests can fail at different levels - basic parsing might fail,
+ * or parsing might succeed but with incorrect option interpretation. This
+ * helper validates the first level.
+ *
+ * Intent:
+ * - Verify the result is a valid two-parameter parse
+ * - Check that demonstrative and layer types are correct
+ * - Provide a foundation for subsequent option validation
+ *
+ * @param result - The parsed two-parameter result
+ * @param testDescription - Context for error messages
+ */
 function assertBasicResult(result: TwoParamsResult, testDescription: string) {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
   assertEquals(result.demonstrativeType, DEMO_TYPE, `${testDescription}: Wrong demonstrative type`);
@@ -47,21 +118,21 @@ function assertBasicResult(result: TwoParamsResult, testDescription: string) {
 Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
   const parser = new ParamsParser();
 
-  // 基本的な混合パターンテストデータ
+  // Test data: Basic mixed form patterns
   const combinations = [
-    // 短-長-短パターン
+    // Short-long-short pattern
     {
       args: [DEMO_TYPE, LAYER_TYPE, '-f=input.md', '--destination=output.md', '-i=task'],
       expected: { from: 'input.md', destination: 'output.md', input: 'task' },
       description: 'short-long-short pattern',
     },
-    // 長-短-長パターン
+    // Long-short-long pattern
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=input.md', '-o=output.md', '--adaptation=strict'],
       expected: { from: 'input.md', destination: 'output.md', adaptation: 'strict' },
       description: 'long-short-long pattern',
     },
-    // すべて短形式
+    // All short forms
     {
       args: [
         DEMO_TYPE,
@@ -81,7 +152,7 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
       },
       description: 'all short forms',
     },
-    // すべて長形式
+    // All long forms
     {
       args: [
         DEMO_TYPE,
@@ -101,7 +172,7 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
       },
       description: 'all long forms',
     },
-    // ランダム混合
+    // Random mix of forms
     {
       args: [
         DEMO_TYPE,
@@ -135,21 +206,21 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
 Deno.test('Mixed Form Combinations - Priority Tests', async (t) => {
   const parser = new ParamsParser();
 
-  // 優先度テストデータ
+  // Test data: Priority resolution scenarios
   const priorityTests = [
-    // 長形式が先、短形式が後 → 最後のオプション（短形式）が優先
+    // Long form first, short form later → Last option (short form) takes precedence
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=long.md', '-f=short.md'],
       expected: { from: 'short.md' },
       description: 'Long form first, short form second - last option should win',
     },
-    // 短形式が先、長形式が後 → 最後のオプション（長形式）が優先
+    // Short form first, long form later → Last option (long form) takes precedence
     {
       args: [DEMO_TYPE, LAYER_TYPE, '-f=short.md', '--from=long.md'],
       expected: { from: 'long.md' },
       description: 'Short form first, long form second - last option should win',
     },
-    // 複数オプションでの混合優先度テスト
+    // Mixed priority test with multiple options
     {
       args: [
         DEMO_TYPE,
@@ -162,7 +233,7 @@ Deno.test('Mixed Form Combinations - Priority Tests', async (t) => {
       expected: { from: 'long.md', destination: 'long_out.md' },
       description: 'Multiple options priority test - last options should win',
     },
-    // 同一形式の重複（後勝ち）
+    // Same form duplication (last wins)
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=first.md', '--from=second.md'],
       expected: { from: 'second.md' },
@@ -194,9 +265,9 @@ Deno.test('Mixed Form Combinations - Priority Tests', async (t) => {
 Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
   const parser = new ParamsParser();
 
-  // 複雑なシナリオテストデータ
+  // Test data: Complex scenario combinations
   const complexTests = [
-    // 長短混合 + 重複 + 複数オプション
+    // Mixed forms + duplicates + multiple options
     {
       args: [
         DEMO_TYPE,
@@ -216,7 +287,7 @@ Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
       },
       description: 'Complex mixed forms with duplicates and priorities',
     },
-    // 順序をランダム化
+    // Randomized order
     {
       args: [
         DEMO_TYPE,
@@ -236,7 +307,7 @@ Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
       },
       description: 'Random order mixed forms',
     },
-    // 極端な重複
+    // Extreme duplication
     {
       args: [DEMO_TYPE, LAYER_TYPE, '-f=1.md', '--from=2.md', '-f=3.md', '--from=4.md', '-f=5.md'],
       expected: { from: '5.md' },
@@ -263,7 +334,7 @@ Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
 Deno.test('Mixed Form Combinations - Order Independence', async (t) => {
   const parser = new ParamsParser();
 
-  // 順序独立性テスト：同じオプションセットを異なる順序で指定
+  // Order independence test: Same option set in different sequences
   const baseOptions = {
     from: 'input.md',
     destination: 'output.md',
@@ -272,13 +343,13 @@ Deno.test('Mixed Form Combinations - Order Independence', async (t) => {
   };
 
   const orderVariations = [
-    // 順序1: from, destination, input, adaptation
+    // Order 1: from, destination, input, adaptation
     ['-f=input.md', '--destination=output.md', '-i=task', '--adaptation=strict'],
-    // 順序2: adaptation, input, destination, from
+    // Order 2: adaptation, input, destination, from
     ['--adaptation=strict', '-i=task', '--destination=output.md', '-f=input.md'],
-    // 順序3: destination, adaptation, from, input
+    // Order 3: destination, adaptation, from, input
     ['--destination=output.md', '--adaptation=strict', '-f=input.md', '-i=task'],
-    // 順序4: input, from, adaptation, destination
+    // Order 4: input, from, adaptation, destination
     ['-i=task', '-f=input.md', '--adaptation=strict', '--destination=output.md'],
   ];
 
@@ -306,7 +377,7 @@ Deno.test('Mixed Form Combinations - Edge Cases', async (t) => {
     const args = [DEMO_TYPE, LAYER_TYPE, '-f=', '--destination=', '--input=task'];
     const result = parser.parse(args) as ParamsResult;
 
-    // 空値はエラーになることを確認
+    // Verify empty values result in errors
     assertEquals(result.type, 'error', 'Empty values should result in error');
     assertStringIncludes(
       result.error?.message || '',

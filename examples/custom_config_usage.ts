@@ -23,7 +23,7 @@ const customConfig: CustomConfig = {
 };
 
 // Create parser with custom configuration
-const parser = new ParamsParser(undefined, undefined, customConfig);
+const parser = new ParamsParser(undefined, customConfig);
 
 // Example commands to test
 const examples = [

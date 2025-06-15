@@ -3,7 +3,20 @@ import { OptionRule } from '../../../src/types/option_rule.ts';
 import { ErrorInfo } from '../../../src/types/params_result.ts';
 
 Deno.test('test_validation_error', () => {
-  // エラーオブジェクトのテスト
+  /**
+   * Test for error object structure and properties.
+   *
+   * Purpose: Validates that error objects contain the required properties
+   * and maintain the correct structure for consistent error handling.
+   *
+   * Background: Error objects are fundamental to the application's error
+   * handling system. They must contain message, code, and category fields
+   * to ensure errors can be properly identified and processed.
+   *
+   * Intent: This test ensures that error objects conform to the ErrorInfo
+   * interface, preventing runtime errors and maintaining type safety
+   * throughout the error handling pipeline.
+   */
   const error: ErrorInfo = {
     message: 'Test error',
     code: 'TEST_ERROR',
@@ -13,7 +26,21 @@ Deno.test('test_validation_error', () => {
   assertEquals(error.code, 'TEST_ERROR', 'Error code should match');
   assertEquals(error.category, 'test_category', 'Error category should match');
 
-  // オプションルールのテスト
+  /**
+   * Test for option rule configuration structure.
+   *
+   * Purpose: Validates the structure and properties of OptionRule objects
+   * that define how command-line options are parsed and validated.
+   *
+   * Background: OptionRule objects configure the parser's behavior for
+   * handling various command-line options, including format specifications,
+   * validation rules, error handling strategies, and flag options.
+   *
+   * Intent: This test ensures that OptionRule objects maintain the expected
+   * structure with all required properties properly typed. This is critical
+   * for the parser to correctly process command-line arguments according to
+   * the specified rules and handle edge cases appropriately.
+   */
   const optionRule: OptionRule = {
     format: '--key=value',
     rules: {

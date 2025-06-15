@@ -3,7 +3,22 @@ import { OptionRule } from '../../../src/types/option_rule.ts';
 import { ParamsResult } from '../../../src/types/params_result.ts';
 
 Deno.test('test_params_result', () => {
-  // パラメータ結果のテスト
+  /**
+   * Test for parameter result structure.
+   *
+   * Purpose: Validates the structure and properties of ParamsResult objects
+   * which represent the output of parameter parsing operations.
+   *
+   * Background: ParamsResult is the fundamental return type from the parser,
+   * containing the parsed type, parameters array, options object, and
+   * optional error information. This structure must be consistent across
+   * all parsing scenarios.
+   *
+   * Intent: This test ensures that ParamsResult objects maintain the expected
+   * structure with correct typing for all fields. It specifically validates
+   * the 'zero' type result case where no parameters are provided, ensuring
+   * the parser correctly initializes empty arrays and objects.
+   */
   const result: ParamsResult = {
     type: 'zero',
     params: [],
@@ -14,7 +29,22 @@ Deno.test('test_params_result', () => {
   assertEquals(result.options, {}, 'Options should be empty');
   assertEquals(result.error, undefined, 'Error should be undefined');
 
-  // オプションルールのテスト
+  /**
+   * Test for option rule configuration.
+   *
+   * Purpose: Validates the structure and typing of OptionRule objects
+   * that configure how the parser processes command-line options.
+   *
+   * Background: OptionRule objects define the complete specification for
+   * option parsing including format patterns, validation rules, error
+   * handling strategies, and flag option configurations. These rules
+   * ensure consistent and predictable option parsing behavior.
+   *
+   * Intent: This test verifies that OptionRule objects contain all required
+   * properties with correct types. It ensures the configuration structure
+   * supports proper type checking and prevents runtime errors during
+   * option parsing operations.
+   */
   const optionRule: OptionRule = {
     format: '--key=value',
     rules: {

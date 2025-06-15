@@ -4,7 +4,23 @@ import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
 import { OptionType } from '../../src/types/option_type.ts';
 
-// 1. オプションモデルの基本設計確認
+/**
+ * Test 1: Basic option model design verification
+ *
+ * Purpose:
+ * Validates the fundamental design of option model classes and their
+ * proper instantiation behavior.
+ *
+ * Background:
+ * The option model architecture consists of three main types: FlagOption,
+ * ValueOption, and UserVariableOption. Each must be properly instantiable
+ * and maintain correct inheritance relationships.
+ *
+ * Intent:
+ * - Verify all option types can be instantiated correctly
+ * - Ensure instanceof relationships work as expected
+ * - Validate basic object-oriented design principles
+ */
 Deno.test('test_option_model_design', async (t) => {
   await t.step('should maintain option model interfaces', () => {
     const flagOption = new FlagOption('--help', ['h'], 'Show help message');
@@ -23,7 +39,23 @@ Deno.test('test_option_model_design', async (t) => {
   });
 });
 
-// 2. フラグオプションの設計確認
+/**
+ * Test 2: Flag option design verification
+ *
+ * Purpose:
+ * Validates the complete design and behavior of FlagOption class,
+ * including structure, validation, and value handling.
+ *
+ * Background:
+ * Flag options represent boolean command-line options like --help or --version
+ * that don't take values. They should have consistent structure and behavior.
+ *
+ * Intent:
+ * - Verify flag option structure (name, aliases, description, type)
+ * - Test validation behavior (should always be valid)
+ * - Confirm getValue returns boolean true for flags
+ * - Ensure isRequired defaults to false for flags
+ */
 Deno.test('test_flag_option_design', async (t) => {
   await t.step('should maintain flag option structure', () => {
     const option = new FlagOption('--help', ['h'], 'Show help message');
@@ -48,7 +80,23 @@ Deno.test('test_flag_option_design', async (t) => {
   });
 });
 
-// 3. 値オプションの設計確認
+/**
+ * Test 3: Value option design verification
+ *
+ * Purpose:
+ * Validates the complete design and behavior of ValueOption class,
+ * including structure, validation, and value parsing.
+ *
+ * Background:
+ * Value options represent command-line options that take values, like
+ * --input=file.txt. They require custom validation logic and value parsing.
+ *
+ * Intent:
+ * - Verify value option structure and properties
+ * - Test validation with provided validator function
+ * - Confirm parse method returns the provided value
+ * - Ensure proper type assignment (OptionType.VALUE)
+ */
 Deno.test('test_value_option_design', async (t) => {
   await t.step('should maintain value option structure', () => {
     const option = new ValueOption(
@@ -91,7 +139,24 @@ Deno.test('test_value_option_design', async (t) => {
   });
 });
 
-// 4. ユーザー変数オプションの設計確認
+/**
+ * Test 4: User variable option design verification
+ *
+ * Purpose:
+ * Validates the design and behavior of UserVariableOption class for
+ * handling dynamic user-defined variables.
+ *
+ * Background:
+ * User variable options allow users to pass custom variables with the
+ * --uv- prefix. They have no aliases and extract values from the full
+ * option string.
+ *
+ * Intent:
+ * - Verify user variable option structure (no aliases)
+ * - Test validation with full option string format
+ * - Confirm parsing extracts value from --uv-key=value format
+ * - Ensure proper type assignment (OptionType.USER_VARIABLE)
+ */
 Deno.test('test_user_variable_option_design', async (t) => {
   await t.step('should maintain user variable option structure', () => {
     const option = new UserVariableOption('--uv-config', 'Configuration');
@@ -116,7 +181,24 @@ Deno.test('test_user_variable_option_design', async (t) => {
   });
 });
 
-// 5. オプションモデルの統合設計確認
+/**
+ * Test 5: Option model integration design verification
+ *
+ * Purpose:
+ * Validates the integration and consistency of all option models working
+ * together in a unified system.
+ *
+ * Background:
+ * All option types must work together seamlessly, maintaining consistent
+ * interfaces while providing type-specific behavior. The validation results
+ * should be consistent across all types.
+ *
+ * Intent:
+ * - Verify all option types have distinct type identifiers
+ * - Ensure consistent validation result structure across types
+ * - Test that different option types can coexist
+ * - Validate polymorphic behavior through common interfaces
+ */
 Deno.test('test_option_model_integration_design', async (t) => {
   await t.step('should handle multiple option types', () => {
     const flagOption = new FlagOption('--help', ['h'], 'Show help message');

@@ -4,7 +4,22 @@ import { FlagOption } from '../../../src/option-models/flag_option.ts';
 import { OptionType } from '../../../src/types/option_type.ts';
 
 Deno.test('test_option_rule', () => {
-  // オプションルールのテスト
+  /**
+   * Test for option rule structure and validation.
+   *
+   * Purpose: Validates that OptionRule objects maintain the correct structure
+   * and contain all required properties for parsing command-line options.
+   *
+   * Background: OptionRule defines how the parser should handle various
+   * command-line options, including format specifications, validation rules,
+   * error handling strategies, and flag options. This is a critical component
+   * for consistent option parsing behavior.
+   *
+   * Intent: This test ensures that OptionRule objects are properly structured
+   * with all required fields correctly typed. This prevents runtime errors
+   * and ensures the parser can reliably process command-line arguments
+   * according to the defined rules.
+   */
   const optionRule: OptionRule = {
     format: '--key=value',
     rules: {

@@ -22,7 +22,23 @@ Deno.test('test_validation_result_structure', () => {
     errors: ['error'],
   };
 
-  // 成功ケースのテスト
+  /**
+   * Test: Success case validation result structure
+   *
+   * Purpose:
+   * Validates the structure of ValidationResult when validation succeeds,
+   * ensuring all success-related fields are properly typed.
+   *
+   * Background:
+   * Successful validation results contain validated parameters and extracted
+   * metadata (demonstrativeType, layerType, options) without error fields.
+   *
+   * Intent:
+   * - Verify isValid is true for success cases
+   * - Ensure validatedParams is an array
+   * - Validate optional metadata fields are strings when present
+   * - Confirm options is an object when provided
+   */
   assertEquals(successResult.isValid, true, 'isValid should be true');
   assertEquals(
     Array.isArray(successResult.validatedParams),
@@ -37,7 +53,23 @@ Deno.test('test_validation_result_structure', () => {
   assertEquals(typeof successResult.layerType, 'string', 'layerType should be a string');
   assertEquals(typeof successResult.options, 'object', 'options should be an object');
 
-  // エラーケースのテスト
+  /**
+   * Test: Error case validation result structure
+   *
+   * Purpose:
+   * Validates the structure of ValidationResult when validation fails,
+   * ensuring all error-related fields are properly typed.
+   *
+   * Background:
+   * Failed validation results should have isValid=false, empty validatedParams,
+   * and populated error information fields for proper error handling.
+   *
+   * Intent:
+   * - Verify isValid is false for error cases
+   * - Ensure validatedParams is still an array (but empty)
+   * - Validate all error fields (message, code, category) are strings
+   * - Confirm errors array is properly structured
+   */
   assertEquals(errorResult.isValid, false, 'isValid should be false');
   assertEquals(
     Array.isArray(errorResult.validatedParams),

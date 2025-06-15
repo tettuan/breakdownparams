@@ -1,57 +1,201 @@
 import { ValidationResult } from './validation_result.ts';
 
 /**
- * オプションタイプ
+ * Defines the types of command-line options that the system can handle.
+ *
+ * This enum categorizes options based on their behavior and value requirements,
+ * enabling the parser to correctly interpret and validate different option patterns
+ * in command-line arguments.
+ *
+ * @enum {string}
  */
 export enum OptionType {
-  /** 値を持つオプション */
+  /**
+   * Options that require an associated value.
+   *
+   * These options expect a value to follow them in the command line.
+   * Examples: --output file.txt, -o file.txt
+   *
+   * The parser will look for the next argument as the value for this option.
+   */
   VALUE = 'value',
-  /** フラグオプション */
+  /**
+   * Boolean flag options that don't require a value.
+   *
+   * These options represent on/off switches and their presence alone
+   * indicates true/enabled state.
+   * Examples: --verbose, -v, --debug
+   *
+   * The parser treats these as boolean true when present, false when absent.
+   */
   FLAG = 'flag',
-  /** ユーザー変数オプション */
+  /**
+   * Custom user-defined variable options.
+   *
+   * These options allow users to define arbitrary key-value pairs
+   * for extended configuration or customization purposes.
+   * Examples: --var:theme=dark, --var:timeout=30
+   *
+   * The parser extracts both the variable name and value from the option string.
+   */
   USER_VARIABLE = 'user_variable',
 }
 
 /**
- * オプションの基本インターフェース
+ * Core interface defining the structure and behavior of command-line options.
+ *
+ * This interface serves as the contract for all option implementations,
+ * ensuring consistent behavior across different option types while providing
+ * flexibility for custom validation and parsing logic.
+ *
+ * The design follows the Strategy pattern, allowing each option to define
+ * its own validation and parsing behavior while maintaining a unified interface.
  */
 export interface Option {
-  /** オプションの種類 */
+  /**
+   * The type category of this option.
+   *
+   * Determines how the parser will handle this option's value requirements
+   * and parsing behavior.
+   */
   type: OptionType;
-  /** オプション名 */
+  /**
+   * The canonical name of the option.
+   *
+   * This is the primary identifier used internally and in documentation.
+   * Should be descriptive and follow consistent naming conventions.
+   * Example: 'output', 'verbose', 'config-file'
+   */
   name: string;
-  /** オプションの別名リスト */
+  /**
+   * Alternative names for this option.
+   *
+   * Provides flexibility in command-line usage by allowing multiple
+   * ways to specify the same option. Typically includes both long
+   * and short forms.
+   * Example: ['o'] for 'output', ['v', 'verb'] for 'verbose'
+   */
   aliases: string[];
-  /** オプションの説明 */
+  /**
+   * Human-readable description of the option's purpose.
+   *
+   * Used in help text and documentation generation. Should clearly
+   * explain what the option does and when to use it.
+   */
   description: string;
-  /** 必須オプションかどうか */
+  /**
+   * Indicates whether this option must be provided.
+   *
+   * When true, the parser will return a validation error if this
+   * option is not present in the command-line arguments.
+   */
   isRequired: boolean;
-  /** 値のバリデーション関数 */
+  /**
+   * Validates the option's value according to its specific rules.
+   *
+   * This method implements option-specific validation logic, checking
+   * constraints like format, range, or business rules.
+   *
+   * @param value - The raw value to validate (may be undefined for flag options)
+   * @returns ValidationResult containing success status and any error details
+   */
   validate(value?: unknown): ValidationResult;
-  /** 値のパース関数（オプション） */
+  /**
+   * Optional custom parser for transforming the raw string value.
+   *
+   * Allows options to convert string inputs into appropriate data types
+   * or structures (e.g., parsing JSON, converting to numbers, expanding paths).
+   *
+   * @param value - The raw string value from command line
+   * @returns The parsed/transformed value
+   */
   parse?(value: unknown): unknown;
 
-  // New methods for enhanced functionality
-  /** Check if the input is in shorthand form */
+  // Methods for enhanced option analysis and manipulation
+  /**
+   * Determines if the option is specified in shorthand form.
+   *
+   * Shorthand forms typically use a single dash followed by a single character.
+   * This method helps in parsing logic to handle different option formats.
+   *
+   * @returns true if the option is in shorthand form (e.g., -o), false otherwise
+   */
   isShorthand(): boolean;
-  /** Check if the input is in long form */
+  /**
+   * Determines if the option is specified in long form.
+   *
+   * Long forms typically use double dashes followed by a descriptive name.
+   * This distinction is important for proper parsing and validation.
+   *
+   * @returns true if the option is in long form (e.g., --output), false otherwise
+   */
   isLongForm(): boolean;
-  /** Check if this is a user variable option */
+  /**
+   * Checks if this option represents a custom user variable.
+   *
+   * User variables have special parsing rules and are typically used
+   * for extending configuration beyond predefined options.
+   *
+   * @returns true if this is a USER_VARIABLE type option, false otherwise
+   */
   isCustomVariable(): boolean;
-  /** Check if an input string matches this option */
+  /**
+   * Tests whether a given input string matches this option.
+   *
+   * Checks against the option's name and all aliases, supporting both
+   * long and short forms. This is the primary method used during parsing
+   * to identify which option an argument represents.
+   *
+   * @param input - The command-line argument to test
+   * @returns true if the input matches this option, false otherwise
+   */
   matchesInput(input: string): boolean;
-  /** Get the normalized (canonical) name */
+  /**
+   * Returns the normalized (canonical) form of the option name.
+   *
+   * Provides a consistent internal representation regardless of how
+   * the option was specified on the command line.
+   *
+   * @returns The canonical option name
+   */
   toNormalized(): string;
-  /** Get the long form representation */
+  /**
+   * Generates the long form representation of this option.
+   *
+   * Used for generating help text and converting between option formats.
+   *
+   * @returns The long form string (e.g., "--output")
+   */
   toLong(): string;
-  /** Get the short form representation (if available) */
+  /**
+   * Generates the short form representation if available.
+   *
+   * Not all options have short forms. This method returns undefined
+   * if no short alias is defined.
+   *
+   * @returns The short form string (e.g., "-o") or undefined if not available
+   */
   toShort(): string | undefined;
-  /** Get the value */
+  /**
+   * Retrieves the current value of this option.
+   *
+   * The return type depends on the option type:
+   * - VALUE options return their string value
+   * - FLAG options return boolean (true if set)
+   * - USER_VARIABLE options return their string value
+   *
+   * @returns The option's value as string or boolean
+   */
   getValue(): string | boolean;
 }
 
 /**
- * オプション値の型
+ * Represents the possible value types for command-line options.
+ *
+ * This union type covers all possible option values:
+ * - string: For VALUE and USER_VARIABLE option types
+ * - boolean: For FLAG option types (true when present)
+ * - undefined: For options that haven't been set or have no value
  */
 export type OptionValue = string | boolean | undefined;
 

@@ -32,7 +32,7 @@ const optionRule: OptionRule = {
 Deno.test('test_parser_validator_integration', () => {
   const parser = new ParamsParser(optionRule);
 
-  // バリデーターの作成と検証
+  // Create and verify validators
   const paramValidators = [
     new ZeroParamsValidator(),
     new OneParamValidator(),
@@ -67,8 +67,8 @@ Deno.test('test_parser_validator_integration', () => {
     'Third param validator should be TwoParamsValidator',
   );
 
-  // 各バリデーターの統合テスト
-  // 1. セキュリティエラーバリデーター
+  // Integration tests for each validator
+  // 1. Security error validator
   const securityResult = securityValidator.validate(['safe;command']);
   assertEquals(
     securityResult.isValid,
@@ -76,19 +76,19 @@ Deno.test('test_parser_validator_integration', () => {
     'Security validator should reject dangerous commands',
   );
 
-  // 2. オプションバリデーター
+  // 2. Option validator
   const optionsResult = optionValidators[0].validate(['--help', '--version'], 'zero', optionRule);
   assertEquals(optionsResult.isValid, true, 'Options validator should accept valid options');
 
-  // 3. ゼロパラメータバリデーター
+  // 3. Zero parameter validator
   const zeroParamsResult = paramValidators[0].validate([]);
   assertEquals(zeroParamsResult.isValid, true, 'Zero params validator should accept empty params');
 
-  // 4. 1パラメータバリデーター
+  // 4. One parameter validator
   const oneParamResult = paramValidators[1].validate(['init']);
   assertEquals(oneParamResult.isValid, true, 'One param validator should accept init command');
 
-  // 5. 2パラメータバリデーター
+  // 5. Two parameter validator
   const twoParamsResult = paramValidators[2].validate(['to', 'project']);
   assertEquals(
     twoParamsResult.isValid,
@@ -96,8 +96,8 @@ Deno.test('test_parser_validator_integration', () => {
     'Two params validator should accept valid parameters',
   );
 
-  // パーサーとバリデーターの統合テスト
-  // 1. ゼロパラメータケース
+  // Parser and validator integration tests
+  // 1. Zero parameter case
   const zeroParamsParseResult = parser.parse(['--help']);
   assertEquals(zeroParamsParseResult.type, 'zero', 'Should parse as zero params');
   assertEquals(zeroParamsParseResult.params, [], 'Should have empty params');
@@ -107,23 +107,23 @@ Deno.test('test_parser_validator_integration', () => {
     'Should have help option as true',
   );
 
-  // 2. 1パラメータケース
+  // 2. One parameter case
   const oneParamParseResult = parser.parse(['init']);
   assertEquals(oneParamParseResult.type, 'one', 'Should parse as one param');
   assertEquals(oneParamParseResult.params, ['init'], 'Should include init command');
 
-  // 3. 2パラメータケース
+  // 3. Two parameter case
   const twoParamsParseResult = parser.parse(['to', 'project']);
   assertEquals(twoParamsParseResult.type, 'two', 'Should parse as two params');
   assertEquals(twoParamsParseResult.params, ['to', 'project'], 'Should include both parameters');
 
-  // 4. エラーケース
+  // 4. Error case
   const errorParseResult = parser.parse(['invalid', 'command']);
   assertEquals(errorParseResult.type, 'error', 'Should parse as error');
   assertEquals(errorParseResult.params, [], 'Should have empty params for error');
   assertEquals(typeof errorParseResult.error, 'object', 'Should have error object');
 
-  // 5. 複合ケース - two params with valid options
+  // 5. Complex case - two params with valid options
   const complexParseResult = parser.parse([
     'to',
     'project',

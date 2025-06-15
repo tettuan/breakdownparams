@@ -30,7 +30,7 @@ Deno.test('CustomConfig functionality', async (t) => {
       },
     };
 
-    const parser = new ParamsParser(undefined, undefined, customConfig);
+    const parser = new ParamsParser(undefined, customConfig);
 
     // Test valid custom values
     const result1 = parser.parse(['from', 'module']) as TwoParamsResult;
@@ -62,7 +62,7 @@ Deno.test('CustomConfig functionality', async (t) => {
       },
     };
 
-    const parser = new ParamsParser(undefined, undefined, customConfig);
+    const parser = new ParamsParser(undefined, customConfig);
 
     // Test allowed options
     const result1 = parser.parse(['to', 'project', '--from=input.md', '--destination=output.md']);
@@ -112,7 +112,7 @@ Deno.test('CustomConfig functionality', async (t) => {
       },
     };
 
-    const parser = new ParamsParser(undefined, undefined, customConfig);
+    const parser = new ParamsParser(undefined, customConfig);
 
     // Test zero mode
     const result1 = parser.parse(['--help']);

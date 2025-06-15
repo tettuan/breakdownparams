@@ -7,7 +7,7 @@ import {
 } from '../types/params_result.ts';
 import { SecurityValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
-import { DEFAULT_TWO_PARAMS_CONFIG, TwoParamsConfig } from '../types/params_config.ts';
+// Parameter configuration is handled through CustomConfig
 import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../types/custom_config.ts';
 import { ZeroParamsValidator } from '../validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../validator/params/one_param_validator.ts';
@@ -76,7 +76,6 @@ export interface ParamsParser {
  */
 export class ParamsParser {
   private readonly optionRule: OptionRule;
-  private readonly config: TwoParamsConfig;
   private readonly customConfig: CustomConfig;
   /**
    * Security validator that checks for potentially harmful strings in parameters.
@@ -92,12 +91,10 @@ export class ParamsParser {
    * Creates a new instance of ParamsParser with optional custom configuration.
    *
    * @param optionRule - Rules defining allowed options for different parameter counts
-   * @param config - Configuration for two-parameter validation
    * @param customConfig - Custom configuration for validation rules and behavior
    */
-  constructor(optionRule?: OptionRule, config?: TwoParamsConfig, customConfig?: CustomConfig) {
+  constructor(optionRule?: OptionRule, customConfig?: CustomConfig) {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
-    this.config = config || DEFAULT_TWO_PARAMS_CONFIG;
     this.customConfig = customConfig || DEFAULT_CUSTOM_CONFIG;
 
     this.securityValidator = new SecurityValidator();
@@ -164,7 +161,7 @@ export class ParamsParser {
         ) {
           throw error;
         }
-        // その他の無効なオプションは無視
+        // Ignore other invalid options
       }
     }
 
@@ -202,9 +199,9 @@ export class ParamsParser {
    * ```
    */
   public parse(args: string[]): ParamsResult {
-    // 1. セキュリティチェック
-    // パラメータにシステムを壊す不正な文字列がないかをチェックする
-    // それ以上のチェックは不要
+    // 1. Security check
+    // Check for malicious strings that could compromise the system
+    // No additional checks are needed beyond security validation
     const securityResult = this.securityValidator.validate(args);
     if (!securityResult.isValid) {
       return {
@@ -219,9 +216,9 @@ export class ParamsParser {
       };
     }
 
-    // 2. パラメータとオプションを分離する
-    // パラメータは、オプションではないもの
-    // オプションは、-- または - から始まるもの
+    // 2. Separate parameters and options
+    // Parameters are arguments that are not options
+    // Options are arguments that start with -- or -
     const params = args.filter((arg) => !arg.startsWith('--') && !arg.startsWith('-'));
 
     let options: Record<string, unknown>;
@@ -243,26 +240,23 @@ export class ParamsParser {
       throw error;
     }
 
-    // 3. パラメータのバリデーション
-    // パラメータの数に応じて、バリデーションを行う
-    // 3つ同時にバリデーションを行い、それぞれの結果を判定する
+    // 3. Parameter validation
+    // Validate based on parameter count
+    // Run all three validations simultaneously and check each result
     const zeroValidator = new ZeroParamsValidator();
     const oneValidator = new OneParamValidator();
-    const twoValidator = new TwoParamsValidator({
-      demonstrativeType: this.customConfig.params.two.demonstrativeType,
-      layerType: this.customConfig.params.two.layerType,
-    });
+    const twoValidator = new TwoParamsValidator(this.customConfig);
 
     const zeroResult = zeroValidator.validate(params);
     const oneResult = oneValidator.validate(params);
     const twoResult = twoValidator.validate(params);
 
     /*
-     * 4. パラメータ数に応じたオプションのバリデーション
-     * 4.1. 0個の場合
+     * 4. Option validation based on parameter count
+     * 4.1. Zero parameters case
      */
     if (zeroResult.isValid && !oneResult.isValid && !twoResult.isValid) {
-      // 4.1.1. オプションの存在チェック
+      // 4.1.1. Check option existence
       const optionValidator = new ZeroOptionValidator();
       const optionResult = optionValidator.validate(args, 'zero', this.optionRule);
 
@@ -279,7 +273,7 @@ export class ParamsParser {
         };
       }
 
-      // 4.1.2. オプションの組み合わせチェック
+      // 4.1.2. Check option combinations
       const zeroOptionCombinationResult = this.zeroOptionCombinationValidator.validate(options);
 
       if (!zeroOptionCombinationResult.isValid) {
@@ -303,10 +297,10 @@ export class ParamsParser {
     }
 
     /*
-     * 4.2. 1個の場合
+     * 4.2. One parameter case
      */
     if (!zeroResult.isValid && oneResult.isValid && !twoResult.isValid) {
-      // 4.2.1. オプションの存在チェック
+      // 4.2.1. Check option existence
       const optionValidator = new OneOptionValidator();
       const optionResult = optionValidator.validate(args, 'one', this.optionRule);
 
@@ -323,7 +317,7 @@ export class ParamsParser {
         };
       }
 
-      // 4.2.2. オプションの組み合わせチェック
+      // 4.2.2. Check option combinations
       const oneOptionCombinationResult = this.oneOptionCombinationValidator.validate(options);
 
       if (!oneOptionCombinationResult.isValid) {
@@ -348,10 +342,10 @@ export class ParamsParser {
     }
 
     /*
-     * 4.3. 2個の場合
+     * 4.3. Two parameters case
      */
     if (!zeroResult.isValid && !oneResult.isValid && twoResult.isValid) {
-      // 4.3.1. オプションの存在チェック
+      // 4.3.1. Check option existence
       const optionValidator = new TwoOptionValidator();
       const optionResult = optionValidator.validate(args, 'two', this.optionRule);
 
@@ -368,7 +362,7 @@ export class ParamsParser {
         };
       }
 
-      // 4.3.2. オプションの組み合わせチェック
+      // 4.3.2. Check option combinations
       const twoOptionCombinationResult = this.twoOptionCombinationValidator.validate(options);
 
       if (!twoOptionCombinationResult.isValid) {
@@ -394,30 +388,30 @@ export class ParamsParser {
     }
 
     /*
-     * パラメータのバリデーションが失敗した場合は、パラメータ数に応じて適切なエラーを返却する
+     * If parameter validation fails, return appropriate error based on parameter count
      */
-    // パラメータ数に基づいて、どのバリデーターのエラーを使用するか決定
+    // Determine which validator's error to use based on parameter count
     let errorMessage: string | undefined;
     let errorCode: string | undefined;
     let errorCategory: string | undefined;
 
     if (params.length === 0) {
-      // 0個の場合は、オプションのみが許可される
+      // Zero parameters case - only options are allowed
       errorMessage = 'No command specified. Use --help for usage information';
       errorCode = 'NO_COMMAND';
       errorCategory = 'validation';
     } else if (params.length === 1) {
-      // 1個の場合は、OneParamValidatorのエラーを使用
+      // One parameter case - use OneParamValidator's error
       errorMessage = oneResult.errorMessage || 'Invalid command';
       errorCode = oneResult.errorCode || 'INVALID_COMMAND';
       errorCategory = oneResult.errorCategory || 'validation';
     } else if (params.length === 2) {
-      // 2個の場合は、TwoParamsValidatorのエラーを使用
+      // Two parameters case - use TwoParamsValidator's error
       errorMessage = twoResult.errorMessage || 'Invalid parameters';
       errorCode = twoResult.errorCode || 'INVALID_PARAMS';
       errorCategory = twoResult.errorCategory || 'validation';
     } else {
-      // 3個以上の場合は、引数が多すぎるエラー
+      // Three or more parameters case - too many arguments error
       errorMessage = 'Too many arguments. Maximum 2 arguments are allowed';
       errorCode = 'TOO_MANY_ARGS';
       errorCategory = 'validation';

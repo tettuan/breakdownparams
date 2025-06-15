@@ -1,31 +1,49 @@
 /**
- * 複合的テスト: 境界値テスト
+ * Combinatorial Test: Boundary Value Test
  *
- * このテストファイルは、極限値、境界値、エッジケースでの
- * 組み合わせパターンを網羅的にテストします。
+ * Purpose:
+ * This test file rigorously validates the parser's behavior at the boundaries and
+ * extreme limits of input values. It ensures robustness when handling edge cases
+ * that might occur in production environments, including extreme input sizes,
+ * special characters, and unusual but valid combinations.
  *
- * テスト対象:
- * - 空値・null値・特殊文字の組み合わせ
- * - 非常に長い値での組み合わせ
- * - Unicode・国際化文字での組み合わせ
- * - 特殊記号・制御文字での組み合わせ
- * - パフォーマンス境界値での組み合わせ
+ * Background:
+ * Boundary value analysis is a critical testing technique that focuses on values
+ * at the edges of input domains. Many software defects occur at boundaries where
+ * normal processing transitions to error handling or where buffer limits are
+ * reached. This comprehensive boundary testing ensures the parser remains stable
+ * and predictable under extreme conditions.
  *
- * 境界値の種類:
- * - 長さの境界値 (空文字、1文字、非常に長い文字列)
- * - 文字種の境界値 (ASCII、Unicode、制御文字)
- * - 数量の境界値 (0個、1個、大量のオプション)
+ * Intent:
+ * - Validate behavior with empty, minimal, and maximal input values
+ * - Test Unicode and internationalization support across all options
+ * - Ensure special characters and symbols are handled correctly
+ * - Verify performance and stability with extreme input quantities
+ * - Confirm graceful handling of edge cases without crashes or corruption
+ *
+ * Test Coverage:
+ * - Empty/null values and special character combinations
+ * - Extremely long values (up to 10,000 characters)
+ * - Unicode characters from multiple scripts and emoji
+ * - Special symbols, control characters, and complex structures
+ * - Performance boundaries with many simultaneous options
+ *
+ * Boundary Categories:
+ * - Length boundaries: empty strings, single characters, very long strings
+ * - Character type boundaries: ASCII, Unicode, control characters, emoji
+ * - Quantity boundaries: zero options, single option, maximum options
+ * - Value complexity: simple values, JSON-like structures, special formats
  */
 
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@1';
 import { ParamsParser } from '../../src/mod.ts';
 import type { ParamsResult, TwoParamsResult } from '../../src/mod.ts';
 
-// テスト用の共通パラメータ
+// Common test parameters
 const DEMO_TYPE = 'to';
 const LAYER_TYPE = 'project';
 
-// ヘルパー関数: オプションの比較
+// Helper function: Compare options
 function assertOptionsMatch(
   actual: Record<string, unknown>,
   expected: Record<string, unknown>,
@@ -40,7 +58,7 @@ function assertOptionsMatch(
   }
 }
 
-// ヘルパー関数: 基本的な結果検証
+// Helper function: Validate basic result
 function assertBasicResult(result: TwoParamsResult, testDescription: string) {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
   assertEquals(result.demonstrativeType, DEMO_TYPE, `${testDescription}: Wrong demonstrative type`);
@@ -50,7 +68,7 @@ function assertBasicResult(result: TwoParamsResult, testDescription: string) {
 Deno.test('Boundary Values - Empty and Null-like Values', async (t) => {
   const parser = new ParamsParser();
 
-  // 空値はエラーになることを確認するテスト
+  // Test that empty values result in errors
   await t.step('Empty values should result in errors', () => {
     const emptyValueTests = [
       { args: [DEMO_TYPE, LAYER_TYPE, '--from='], description: 'Single empty value' },
@@ -75,7 +93,7 @@ Deno.test('Boundary Values - Empty and Null-like Values', async (t) => {
     }
   });
 
-  // 有効な非空値のテスト
+  // Test valid non-empty values
   await t.step('Valid non-empty values', () => {
     const validTests = [
       {
@@ -105,7 +123,7 @@ Deno.test('Boundary Values - Empty and Null-like Values', async (t) => {
 Deno.test('Boundary Values - Very Long Values', async (t) => {
   const parser = new ParamsParser();
 
-  // 非常に長い値でのテスト
+  // Test with very long values
   await t.step('Single very long value (1000 chars)', () => {
     const longValue = 'x'.repeat(1000);
     const args = [DEMO_TYPE, LAYER_TYPE, `--from=${longValue}`];
@@ -163,39 +181,39 @@ Deno.test('Boundary Values - Very Long Values', async (t) => {
 Deno.test('Boundary Values - Unicode and International Characters', async (t) => {
   const parser = new ParamsParser();
 
-  // Unicode・国際化文字のテスト
+  // Test Unicode and international characters
   const unicodeTests = [
-    // 日本語
+    // Japanese
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=こんにちは世界.md', '--uv-project=プロジェクト名'],
       expected: { from: 'こんにちは世界.md', 'uv-project': 'プロジェクト名' },
       description: 'Japanese characters',
     },
-    // 中国語
+    // Chinese
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--destination=你好世界.md', '--uv-name=项目名称'],
       expected: { destination: '你好世界.md', 'uv-name': '项目名称' },
       description: 'Chinese characters',
     },
-    // アラビア語
+    // Arabic
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--uv-text=مرحبا بالعالم'],
       expected: { 'uv-text': 'مرحبا بالعالم' },
       description: 'Arabic characters',
     },
-    // 絵文字
+    // Emoji
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--uv-emoji=🚀🌟💻🎯', '--from=file_📁.md'],
       expected: { 'uv-emoji': '🚀🌟💻🎯', from: 'file_📁.md' },
       description: 'Emoji characters',
     },
-    // 混合Unicode
+    // Mixed Unicode
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--uv-mixed=Hello世界🌍Привет'],
       expected: { 'uv-mixed': 'Hello世界🌍Привет' },
       description: 'Mixed Unicode scripts',
     },
-    // 特殊Unicode文字
+    // Special Unicode characters
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--uv-special=\u200B\u200C\u200D\uFEFF'],
       expected: { 'uv-special': '\u200B\u200C\u200D\uFEFF' },
@@ -222,15 +240,15 @@ Deno.test('Boundary Values - Unicode and International Characters', async (t) =>
 Deno.test('Boundary Values - Special Characters and Symbols', async (t) => {
   const parser = new ParamsParser();
 
-  // 特殊文字・記号のテスト
+  // Test special characters and symbols
   const specialCharTests = [
-    // 一部の特殊文字（一部の特殊文字は問題を起こす可能性があるため安全なもののみ）
+    // Some special characters (only safe ones to avoid potential issues)
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=file_with-hyphens_and_underscores.md'],
       expected: { from: 'file_with-hyphens_and_underscores.md' },
       description: 'Safe special characters',
     },
-    // スペースと引用符
+    // Spaces and quotes
     {
       args: [
         DEMO_TYPE,
@@ -241,25 +259,25 @@ Deno.test('Boundary Values - Special Characters and Symbols', async (t) => {
       expected: { destination: 'file with spaces.md', 'uv-quote': '"quoted value"' },
       description: 'Spaces and quotes',
     },
-    // パス区切り文字
+    // Path separators
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=/path/to/file\\with\\backslashes.md'],
       expected: { from: '/path/to/file\\with\\backslashes.md' },
       description: 'Path separators',
     },
-    // 簡単なURL（複雑なURLはエラーになる可能性があるため）
+    // Simple URL (complex URLs may cause errors)
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--uv-url=https://example.com/api'],
       expected: { 'uv-url': 'https://example.com/api' },
       description: 'Simple URL',
     },
-    // 制御文字類似
+    // Control character representations
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--uv-control=\\n\\t\\r\\\\'],
       expected: { 'uv-control': '\\n\\t\\r\\\\' },
       description: 'Control character representations',
     },
-    // JSON類似構造
+    // JSON-like structure
     {
       args: [
         DEMO_TYPE,
@@ -291,7 +309,7 @@ Deno.test('Boundary Values - Quantity Boundaries', async (t) => {
   const parser = new ParamsParser();
 
   await t.step('Maximum user variables (50 variables)', () => {
-    // 50個のユーザー変数を作成
+    // Create 50 user variables
     const args = [DEMO_TYPE, LAYER_TYPE];
     const expected: Record<string, string> = {};
 
@@ -313,7 +331,7 @@ Deno.test('Boundary Values - Quantity Boundaries', async (t) => {
   });
 
   await t.step('All standard options + many user variables', () => {
-    // 全標準オプション + 20個のユーザー変数
+    // All standard options + 20 user variables
     const args = [
       DEMO_TYPE,
       LAYER_TYPE,
@@ -374,7 +392,7 @@ Deno.test('Boundary Values - Edge Case Combinations', async (t) => {
   });
 
   await t.step('Special characters in option names (boundary test)', () => {
-    // オプション名の境界テスト（有効な文字の境界）
+    // Boundary test for option names (valid character boundaries)
     const args = [DEMO_TYPE, LAYER_TYPE, '--uv-test_123=value', '--uv-with-hyphens=value2'];
     const expected = { 'uv-test_123': 'value', 'uv-with-hyphens': 'value2' };
 

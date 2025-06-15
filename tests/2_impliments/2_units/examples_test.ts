@@ -180,7 +180,7 @@ Deno.test('test_examples_execution', async (t) => {
       },
     };
 
-    const parser = new ParamsParser(customConfig, customParamsConfig, {
+    const parser = new ParamsParser(customConfig, {
       ...DEFAULT_CUSTOM_CONFIG,
       params: {
         two: customParamsConfig,

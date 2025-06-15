@@ -1,26 +1,66 @@
 /**
- * 複合的テスト: エラー組み合わせテスト
+ * Combinatorial Test: Error Combinations Test
  *
- * このテストファイルは、パラメータエラーとオプションエラーの組み合わせ、
- * および複合的なエラーケースを網羅的にテストします。
+ * Purpose:
+ * This test file comprehensively validates error handling scenarios when multiple
+ * error conditions occur simultaneously. It ensures that the parser provides
+ * consistent, predictable error reporting with proper prioritization when faced
+ * with complex invalid input combinations.
  *
- * テスト対象:
- * - パラメータエラー + 有効オプション
- * - パラメータエラー + 無効オプション
- * - オプション制約違反の組み合わせ
- * - 複数エラーの優先度
- * - エラーメッセージの一貫性
+ * Background:
+ * In real-world usage, users may provide multiple invalid inputs simultaneously.
+ * The parser must handle these gracefully, providing clear error messages that
+ * help users identify and fix the primary issue first. Proper error prioritization
+ * prevents confusion and guides users toward successful command construction.
  *
- * エラーの種類:
- * - パラメータエラー: 無効コマンド、引数過多、無効な型
- * - オプションエラー: 無効オプション、制約違反、形式エラー
+ * Intent:
+ * - Verify error prioritization when multiple errors exist
+ * - Ensure parameter errors take precedence over option errors
+ * - Validate consistent error messages across similar error types
+ * - Test edge cases with combined parameter and option errors
+ * - Confirm that error handling remains robust under complex scenarios
+ *
+ * Test Coverage:
+ * - Parameter errors combined with valid options
+ * - Parameter errors combined with invalid options
+ * - Option constraint violations in different modes
+ * - Multiple simultaneous error conditions
+ * - Error message consistency across similar scenarios
+ *
+ * Error Types:
+ * - Parameter errors: Invalid commands, too many arguments, invalid types
+ * - Option errors: Invalid options, constraint violations, format errors
+ * - Priority rule: Parameter validation occurs before option validation
  */
 
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@1';
 import { ParamsParser } from '../../src/mod.ts';
 import type { ParamsResult } from '../../src/mod.ts';
 
-// ヘルパー関数: エラー結果の検証
+/**
+ * Helper function: Validates error results for consistent error handling
+ *
+ * Purpose:
+ * Provides a centralized method to verify error results with consistent
+ * assertions across all error combination test cases. This ensures uniform
+ * error validation throughout the test suite.
+ *
+ * Background:
+ * Error validation requires checking multiple properties (type, message, code,
+ * category) consistently. This helper eliminates duplication and ensures all
+ * error tests follow the same validation pattern.
+ *
+ * Intent:
+ * - Verify the result is of error type
+ * - Check that error messages contain expected substrings
+ * - Validate error codes match expected values
+ * - Ensure error category is consistently 'validation'
+ *
+ * @param result - The parsed result to validate
+ * @param expectedErrorSubstring - Substring expected in the error message
+ * @param expectedCode - The expected error code (e.g., 'INVALID_COMMAND')
+ * @param testDescription - Description for assertion messages
+ */
 function assertErrorResult(
   result: ParamsResult,
   expectedErrorSubstring: string,
@@ -48,9 +88,9 @@ function assertErrorResult(
 Deno.test('Error Combinations - Parameter Errors with Valid Options', async (t) => {
   const parser = new ParamsParser();
 
-  // パラメータエラー + 有効オプション
+  // Test cases: Parameter errors combined with valid options
   const combinations = [
-    // 無効コマンド + 有効オプション
+    // Invalid command + valid options
     {
       args: ['unknown', '--from=input.md'],
       expectedError: 'Invalid command: unknown',
@@ -63,7 +103,7 @@ Deno.test('Error Combinations - Parameter Errors with Valid Options', async (t) 
       expectedCode: 'INVALID_COMMAND',
       description: 'Invalid command with multiple valid options',
     },
-    // 引数過多 + 有効オプション
+    // Too many arguments + valid options
     {
       args: ['to', 'project', 'extra', '--from=input.md'],
       expectedError: 'Too many arguments',
@@ -76,7 +116,7 @@ Deno.test('Error Combinations - Parameter Errors with Valid Options', async (t) 
       expectedCode: 'TOO_MANY_ARGS',
       description: 'Too many arguments with multiple valid options',
     },
-    // 無効 demonstrativeType + 有効オプション
+    // Invalid demonstrative type + valid options
     {
       args: ['invalid', 'project', '--from=input.md'],
       expectedError: 'Invalid demonstrative type',
@@ -89,7 +129,7 @@ Deno.test('Error Combinations - Parameter Errors with Valid Options', async (t) 
       expectedCode: 'INVALID_DEMONSTRATIVE_TYPE',
       description: 'Invalid demonstrative type with multiple valid options',
     },
-    // 無効 layerType + 有効オプション
+    // Invalid layer type + valid options
     {
       args: ['to', 'invalid', '--config=test'],
       expectedError: 'Invalid layer type',
@@ -123,23 +163,23 @@ Deno.test('Error Combinations - Parameter Errors with Valid Options', async (t) 
 Deno.test('Error Combinations - Parameter Errors with Invalid Options', async (t) => {
   const parser = new ParamsParser();
 
-  // パラメータエラー + 無効オプション（パラメータエラーが優先されるべき）
+  // Test cases: Parameter errors + invalid options (parameter errors should take precedence)
   const combinations = [
-    // 無効コマンド + 無効オプション
+    // Invalid command + invalid option
     {
       args: ['unknown', '--invalid=value'],
       expectedError: 'Invalid command: unknown',
       expectedCode: 'INVALID_COMMAND',
       description: 'Invalid command with invalid option - command error should take precedence',
     },
-    // 引数過多 + 無効オプション
+    // Too many arguments + invalid option
     {
       args: ['to', 'project', 'extra', '--unknown=value'],
       expectedError: 'Too many arguments',
       expectedCode: 'TOO_MANY_ARGS',
       description: 'Too many arguments with invalid option - args error should take precedence',
     },
-    // 無効 demonstrativeType + 無効オプション
+    // Invalid demonstrative type + invalid option
     {
       args: ['invalid', 'project', '--nonexistent=value'],
       expectedError: 'Invalid demonstrative type',
@@ -147,7 +187,7 @@ Deno.test('Error Combinations - Parameter Errors with Invalid Options', async (t
       description:
         'Invalid demonstrative type with invalid option - param error should take precedence',
     },
-    // 無効 layerType + 無効オプション
+    // Invalid layer type + invalid option
     {
       args: ['to', 'invalid', '--badoption=value'],
       expectedError: 'Invalid layer type',
@@ -175,9 +215,9 @@ Deno.test('Error Combinations - Parameter Errors with Invalid Options', async (t
 Deno.test('Error Combinations - Option Constraint Violations', async (t) => {
   const parser = new ParamsParser();
 
-  // オプション制約違反の組み合わせ
+  // Test cases: Option constraint violation combinations
   const combinations = [
-    // OneParam + 複数無効オプション
+    // OneParam + multiple invalid options
     {
       args: ['init', '--config=test', '--from=input.md'],
       expectedError: 'Invalid options for one parameters',
@@ -190,7 +230,7 @@ Deno.test('Error Combinations - Option Constraint Violations', async (t) => {
       expectedCode: 'INVALID_OPTIONS',
       description: 'OneParam with user variable and standard option',
     },
-    // ZeroParams + 複数無効オプション
+    // ZeroParams + multiple invalid options
     {
       args: ['--config=test', '--uv-test=value'],
       expectedError: 'Invalid options for zero parameters',
@@ -224,23 +264,23 @@ Deno.test('Error Combinations - Option Constraint Violations', async (t) => {
 Deno.test('Error Combinations - Multiple Error Scenarios', async (t) => {
   const parser = new ParamsParser();
 
-  // 複数のエラー要因が同時に存在する場合の優先度テスト
+  // Test cases: Priority testing when multiple error factors exist simultaneously
   const combinations = [
-    // 無効コマンド + 制約違反オプション
+    // Invalid command + constraint violation options
     {
       args: ['unknown', '--config=test'],
       expectedError: 'Invalid command: unknown',
       expectedCode: 'INVALID_COMMAND',
       description: 'Invalid command should take precedence over option constraint',
     },
-    // 引数過多 + 無効オプション + 制約違反
+    // Too many arguments + invalid option + constraint violation
     {
       args: ['to', 'project', 'extra', 'more', '--unknown=value', '--config=test'],
       expectedError: 'Too many arguments',
       expectedCode: 'TOO_MANY_ARGS',
       description: 'Parameter error should take precedence over option errors',
     },
-    // 無効な demonstrativeType + layerType + オプション
+    // Invalid demonstrative type + layer type + options
     {
       args: ['invalid', 'also_invalid', '--nonexistent=value'],
       expectedError: 'Invalid demonstrative type',
@@ -309,23 +349,23 @@ Deno.test('Error Combinations - Boundary Value Errors', async (t) => {
 Deno.test('Error Combinations - Mixed Form Errors', async (t) => {
   const parser = new ParamsParser();
 
-  // 長短形式混合でのエラーケース
+  // Test cases: Error scenarios with mixed long/short form options
   const combinations = [
-    // OneParam + 長短形式混合の無効オプション
+    // OneParam + mixed long/short form invalid options
     {
       args: ['init', '--config=test', '-f=input.md'],
       expectedError: 'Invalid options for one parameters',
       expectedCode: 'INVALID_OPTIONS',
       description: 'OneParam with mixed form invalid options',
     },
-    // 無効パラメータ + 長短形式混合
+    // Invalid parameter + mixed long/short forms
     {
       args: ['invalid', 'project', '--from=input.md', '-o=output.md'],
       expectedError: 'Invalid demonstrative type',
       expectedCode: 'INVALID_DEMONSTRATIVE_TYPE',
       description: 'Invalid parameter with mixed form options',
     },
-    // 引数過多 + ユーザー変数 + 長短形式
+    // Too many arguments + user variables + mixed forms
     {
       args: ['to', 'project', 'extra', '-f=input.md', '--uv-test=value'],
       expectedError: 'Too many arguments',
@@ -353,7 +393,7 @@ Deno.test('Error Combinations - Mixed Form Errors', async (t) => {
 Deno.test('Error Combinations - Error Message Consistency', async (t) => {
   const parser = new ParamsParser();
 
-  // 同じ種類のエラーが一貫したメッセージを返すことを確認
+  // Verify that similar error types return consistent messages
   await t.step('Consistent invalid command messages', () => {
     const invalidCommands = ['unknown', 'invalid', 'wrong', 'badcommand'];
 

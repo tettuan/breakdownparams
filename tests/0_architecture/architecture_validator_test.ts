@@ -11,7 +11,7 @@ import { OneParamValidator } from '../../src/validator/params/one_param_validato
 import { TwoParamsValidator } from '../../src/validator/params/two_params_validator.ts';
 import { DEFAULT_OPTION_RULE } from '../../src/types/option_rule.ts';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../../src/validator/options/option_combination_rule.ts';
-import { DEFAULT_TWO_PARAMS_CONFIG } from '../../src/types/params_config.ts';
+import { DEFAULT_CUSTOM_CONFIG } from '../../src/types/custom_config.ts';
 
 Deno.test('test_base_validator_interface', () => {
   assertEquals(
@@ -68,18 +68,30 @@ Deno.test('test_two_params_validator_interface', () => {
 });
 
 Deno.test('test_validation_rules_location', () => {
-  // オプションルールの定義場所
+  /**
+   * Verify option rule definition location
+   * Ensures DEFAULT_OPTION_RULE is properly exported and accessible
+   */
   assertEquals(typeof DEFAULT_OPTION_RULE, 'object');
 
-  // オプション組み合わせルールの定義場所
+  /**
+   * Verify option combination rules location
+   * Ensures DEFAULT_OPTION_COMBINATION_RULES is properly exported
+   */
   assertEquals(typeof DEFAULT_OPTION_COMBINATION_RULES, 'object');
 
-  // パラメータ設定の定義場所
-  assertEquals(typeof DEFAULT_TWO_PARAMS_CONFIG, 'object');
+  /**
+   * Verify parameter configuration location
+   * Ensures DEFAULT_CUSTOM_CONFIG is properly exported
+   */
+  assertEquals(typeof DEFAULT_CUSTOM_CONFIG, 'object');
 });
 
 Deno.test('test_validation_rules_structure', () => {
-  // オプションルールの構造
+  /**
+   * Test: Option rule structure validation
+   * Verifies DEFAULT_OPTION_RULE contains all required properties
+   */
   assertEquals(DEFAULT_OPTION_RULE.format, '--key=value');
   assertEquals(typeof DEFAULT_OPTION_RULE.flagOptions, 'object');
   assertEquals(Array.isArray(DEFAULT_OPTION_RULE.rules.customVariables), true);
@@ -87,25 +99,37 @@ Deno.test('test_validation_rules_structure', () => {
   assertEquals(Array.isArray(DEFAULT_OPTION_RULE.rules.valueTypes), true);
   assertEquals(typeof DEFAULT_OPTION_RULE.errorHandling, 'object');
 
-  // オプション組み合わせルールの構造
+  /**
+   * Test: Option combination rules structure
+   * Verifies rules exist for zero, one, and two parameter modes
+   */
   assertEquals(typeof DEFAULT_OPTION_COMBINATION_RULES.zero, 'object');
   assertEquals(typeof DEFAULT_OPTION_COMBINATION_RULES.one, 'object');
   assertEquals(typeof DEFAULT_OPTION_COMBINATION_RULES.two, 'object');
 
-  // パラメータ設定の構造
-  assertEquals(typeof DEFAULT_TWO_PARAMS_CONFIG.demonstrativeType, 'object');
-  assertEquals(typeof DEFAULT_TWO_PARAMS_CONFIG.layerType, 'object');
+  /**
+   * Test: Parameter configuration structure
+   * Verifies demonstrativeType and layerType configurations exist
+   */
+  assertEquals(typeof DEFAULT_CUSTOM_CONFIG.params.two.demonstrativeType, 'object');
+  assertEquals(typeof DEFAULT_CUSTOM_CONFIG.params.two.layerType, 'object');
 });
 
 Deno.test('test_validation_rules_default_values', () => {
-  // オプションルールのデフォルト値
+  /**
+   * Test: Option rule default values
+   * Verifies that DEFAULT_OPTION_RULE contains expected default settings
+   */
   assertEquals(DEFAULT_OPTION_RULE.flagOptions.help, true);
   assertEquals(DEFAULT_OPTION_RULE.flagOptions.version, true);
   assertEquals(DEFAULT_OPTION_RULE.errorHandling.emptyValue, 'error');
   assertEquals(DEFAULT_OPTION_RULE.errorHandling.unknownOption, 'error');
   assertEquals(DEFAULT_OPTION_RULE.errorHandling.duplicateOption, 'error');
 
-  // オプション組み合わせルールのデフォルト値
+  /**
+   * Test: Option combination rules default values
+   * Verifies expected allowed options for zero, one, and two parameter modes
+   */
   assertEquals(DEFAULT_OPTION_COMBINATION_RULES.zero.allowedOptions, ['help', 'version']);
   assertEquals(DEFAULT_OPTION_COMBINATION_RULES.one.allowedOptions, ['config']);
   assertEquals(DEFAULT_OPTION_COMBINATION_RULES.one.requiredOptions, undefined);
@@ -118,7 +142,10 @@ Deno.test('test_validation_rules_default_values', () => {
   ]);
   assertEquals(DEFAULT_OPTION_COMBINATION_RULES.two.requiredOptions, undefined);
 
-  // パラメータ設定のデフォルト値
-  assertEquals(DEFAULT_TWO_PARAMS_CONFIG.demonstrativeType?.pattern, '^(to|summary|defect)$');
-  assertEquals(DEFAULT_TWO_PARAMS_CONFIG.layerType?.pattern, '^(project|issue|task)$');
+  /**
+   * Test: Parameter configuration default values
+   * Verifies regex patterns for demonstrativeType and layerType validation
+   */
+  assertEquals(DEFAULT_CUSTOM_CONFIG.params.two.demonstrativeType.pattern, '^(to|summary|defect)$');
+  assertEquals(DEFAULT_CUSTOM_CONFIG.params.two.layerType.pattern, '^(project|issue|task)$');
 });

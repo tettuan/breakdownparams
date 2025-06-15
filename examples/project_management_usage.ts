@@ -31,7 +31,7 @@ const projectConfig: CustomConfig = {
   },
 };
 
-const parser = new ParamsParser(undefined, undefined, projectConfig);
+const parser = new ParamsParser(undefined, projectConfig);
 
 // Realistic project management commands
 const commands = [

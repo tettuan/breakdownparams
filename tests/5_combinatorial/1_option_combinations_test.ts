@@ -1,31 +1,83 @@
 /**
- * 複合的テスト: 標準オプション組み合わせテスト
+ * Combinatorial Test: Standard Option Combinations Test
  *
- * このテストファイルは、すべての標準オプションの組み合わせを網羅的にテストします。
+ * Purpose:
+ * This test file exhaustively tests all possible combinations of standard options
+ * to ensure that the parameter parser correctly handles multiple option scenarios.
+ * It validates that options can be combined without interfering with each other
+ * and that all combinations produce the expected parsing results.
  *
- * テスト対象:
- * - 2つのオプション組み合わせ (C(5,2) = 10パターン)
- * - 3つのオプション組み合わせ (C(5,3) = 10パターン)
- * - 4つのオプション組み合わせ (C(5,4) = 5パターン)
- * - すべてのオプション組み合わせ (C(5,5) = 1パターン)
+ * Background:
+ * In complex CLI applications, users often combine multiple options to customize
+ * behavior. This combinatorial testing approach ensures robustness by verifying
+ * that all mathematically possible combinations work correctly, preventing
+ * regression when new options are added or existing ones are modified.
  *
- * 標準オプション:
- * - --from / -f (fromFile)
- * - --destination / -o (destinationFile)
- * - --input / -i (fromLayerType)
- * - --adaptation / -a (adaptationType)
- * - --config / -c (configFile)
+ * Intent:
+ * - Verify that option parsing is order-independent
+ * - Ensure no option conflicts or unexpected interactions
+ * - Validate that all combinations maintain type safety
+ * - Provide comprehensive coverage for production use cases
+ *
+ * Test Coverage:
+ * - 2-option combinations (C(5,2) = 10 patterns)
+ * - 3-option combinations (C(5,3) = 10 patterns)
+ * - 4-option combinations (C(5,4) = 5 patterns)
+ * - All options combined (C(5,5) = 1 pattern)
+ *
+ * Standard Options Under Test:
+ * - --from / -f: Specifies the input file path (fromFile)
+ * - --destination / -o: Specifies the output file path (destinationFile)
+ * - --input / -i: Defines the source layer type (fromLayerType)
+ * - --adaptation / -a: Sets the adaptation strategy (adaptationType)
+ * - --config / -c: Points to the configuration file (configFile)
  */
 
 import { assertEquals } from 'jsr:@std/assert@1';
 import { ParamsParser } from '../../src/mod.ts';
 import type { TwoParamsResult } from '../../src/mod.ts';
 
-// テスト用の共通パラメータ
+/**
+ * Common test parameters used throughout the test suite
+ *
+ * Purpose:
+ * Provides consistent demonstrative and layer type values across all
+ * combination tests to ensure uniform testing conditions.
+ *
+ * Background:
+ * Using fixed parameter values allows the tests to focus purely on option
+ * combination behavior without parameter variation affecting results.
+ *
+ * Intent:
+ * - Establish a standard two-parameter baseline (to project)
+ * - Eliminate parameter variation as a confounding factor
+ * - Enable focused testing of option combinations
+ */
 const DEMO_TYPE = 'to';
 const LAYER_TYPE = 'project';
 
-// ヘルパー関数: オプションの比較
+/**
+ * Helper function: Compares actual and expected option values
+ *
+ * Purpose:
+ * Provides comprehensive option validation by checking both the presence
+ * and values of expected options, as well as the absence of unexpected ones.
+ *
+ * Background:
+ * When testing multiple option combinations, it's critical to ensure not only
+ * that expected options are parsed correctly, but also that no additional
+ * options appear unexpectedly due to parsing errors or cross-contamination.
+ *
+ * Intent:
+ * - Validate each expected option's value precisely
+ * - Ensure no unexpected options are present
+ * - Provide detailed error messages for debugging
+ * - Support comprehensive combinatorial validation
+ *
+ * @param actual - The actual options object from parsing
+ * @param expected - The expected options to validate against
+ * @param testDescription - Context for error messages
+ */
 function assertOptionsMatch(
   actual: Record<string, unknown>,
   expected: Record<string, unknown>,
@@ -39,7 +91,7 @@ function assertOptionsMatch(
     );
   }
 
-  // 期待されていないオプションが含まれていないことを確認
+  // Verify no unexpected options are present
   const expectedKeys = new Set(Object.keys(expected));
   const actualKeys = Object.keys(actual);
   const unexpectedKeys = actualKeys.filter((key) => !expectedKeys.has(key));
@@ -51,7 +103,25 @@ function assertOptionsMatch(
   );
 }
 
-// ヘルパー関数: 基本的な結果検証
+/**
+ * Helper function: Validates basic parsing result structure
+ *
+ * Purpose:
+ * Ensures the fundamental parsing result is correct before validating
+ * specific option combinations.
+ *
+ * Background:
+ * Combinatorial tests can fail at multiple levels. This helper ensures
+ * that basic parsing succeeds before checking option-specific behavior.
+ *
+ * Intent:
+ * - Verify successful two-parameter parsing
+ * - Validate correct demonstrative and layer types
+ * - Provide foundation for option-specific validation
+ *
+ * @param result - The parsed two-parameter result
+ * @param testDescription - Context for error messages
+ */
 function assertBasicResult(result: TwoParamsResult, testDescription: string) {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
   assertEquals(result.demonstrativeType, DEMO_TYPE, `${testDescription}: Wrong demonstrative type`);
@@ -61,7 +131,7 @@ function assertBasicResult(result: TwoParamsResult, testDescription: string) {
 Deno.test('Standard Option Combinations - 2 Options', async (t) => {
   const parser = new ParamsParser();
 
-  // 2つのオプション組み合わせテストデータ
+  // Test data: 2-option combination patterns
   const combinations = [
     // from + destination
     {
@@ -144,7 +214,7 @@ Deno.test('Standard Option Combinations - 2 Options', async (t) => {
 Deno.test('Standard Option Combinations - 3 Options', async (t) => {
   const parser = new ParamsParser();
 
-  // 3つのオプション組み合わせテストデータ
+  // Test data: 3-option combination patterns
   const combinations = [
     // from + destination + input
     {
@@ -245,7 +315,7 @@ Deno.test('Standard Option Combinations - 3 Options', async (t) => {
 Deno.test('Standard Option Combinations - 4 Options', async (t) => {
   const parser = new ParamsParser();
 
-  // 4つのオプション組み合わせテストデータ
+  // Test data: 4-option combination patterns
   const combinations = [
     // from + destination + input + adaptation
     {

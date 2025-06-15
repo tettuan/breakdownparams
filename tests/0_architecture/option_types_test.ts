@@ -4,14 +4,45 @@ import { OptionType } from '../../src/types/option_type.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
 
-// 1. 基本的な型の定義と値の確認
+/**
+ * Test 1: Basic type definitions and value verification
+ *
+ * Purpose:
+ * Validates that the OptionType enum contains the expected string values
+ * for all supported option types.
+ *
+ * Background:
+ * The OptionType enum serves as the discriminator for different option
+ * implementations. Consistent enum values are critical for type safety.
+ *
+ * Intent:
+ * - Verify VALUE enum equals 'value'
+ * - Verify FLAG enum equals 'flag'
+ * - Verify USER_VARIABLE enum equals 'user_variable'
+ */
 Deno.test('test_option_type_enum', () => {
   assertEquals(OptionType.VALUE, 'value');
   assertEquals(OptionType.FLAG, 'flag');
   assertEquals(OptionType.USER_VARIABLE, 'user_variable');
 });
 
-// 2. インターフェースの実装確認
+/**
+ * Test 2: Interface implementation verification
+ *
+ * Purpose:
+ * Ensures all option classes properly implement the Option interface
+ * with required properties and methods.
+ *
+ * Background:
+ * All option types (Flag, Value, UserVariable) must implement a common
+ * Option interface to ensure polymorphic behavior and type safety.
+ *
+ * Intent:
+ * - Verify FlagOption implements all Option interface members
+ * - Verify ValueOption implements all Option interface members
+ * - Verify UserVariableOption implements all Option interface members
+ * - Ensure consistent interface implementation across all types
+ */
 Deno.test('test_option_interface_implementation', async (t) => {
   await t.step('FlagOption should implement Option interface', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
@@ -52,7 +83,23 @@ Deno.test('test_option_interface_implementation', async (t) => {
   });
 });
 
-// 3. 命名規則と設計原則の確認
+/**
+ * Test 3: Naming conventions and design principles verification
+ *
+ * Purpose:
+ * Validates that all option types follow consistent naming conventions
+ * and adhere to established design principles.
+ *
+ * Background:
+ * Consistent naming helps maintainability and reduces cognitive load.
+ * Options should have clear names, appropriate aliases, and correct types.
+ *
+ * Intent:
+ * - Verify flag options follow naming patterns (name, single-char alias)
+ * - Verify value options follow naming patterns
+ * - Verify user variable options use the --uv- prefix convention
+ * - Ensure type assignments match the option class
+ */
 Deno.test('test_option_naming_conventions', async (t) => {
   await t.step('should follow naming conventions for flag options', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
@@ -81,7 +128,24 @@ Deno.test('test_option_naming_conventions', async (t) => {
   });
 });
 
-// 4. 設計の一貫性確認
+/**
+ * Test 4: Design consistency verification
+ *
+ * Purpose:
+ * Ensures consistent property types and method signatures across all
+ * option implementations.
+ *
+ * Background:
+ * Consistency in design reduces bugs and makes the codebase more
+ * predictable. All options should have the same property types and
+ * method return types.
+ *
+ * Intent:
+ * - Verify all properties have consistent types (string name, array aliases)
+ * - Verify validate() method returns consistent result structure
+ * - Ensure boolean properties are actually booleans
+ * - Validate method signatures match interface contracts
+ */
 Deno.test('test_option_design_consistency', async (t) => {
   await t.step('should maintain consistent property types', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
@@ -99,7 +163,24 @@ Deno.test('test_option_design_consistency', async (t) => {
   });
 });
 
-// 5. コンポーネント間の関係確認
+/**
+ * Test 5: Component relationship verification
+ *
+ * Purpose:
+ * Validates the relationships between different option components and
+ * ensures proper type hierarchies.
+ *
+ * Background:
+ * Option components must maintain proper relationships for the type
+ * system to work correctly. Each option class should correctly identify
+ * its type and maintain distinct identities.
+ *
+ * Intent:
+ * - Verify instanceof relationships are correct
+ * - Ensure type property matches the option class
+ * - Validate that different option types maintain distinct properties
+ * - Confirm polymorphic behavior works as expected
+ */
 Deno.test('test_option_component_relationships', async (t) => {
   await t.step('should maintain correct type relationships', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
@@ -117,7 +198,7 @@ Deno.test('test_option_component_relationships', async (t) => {
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
 
-    // 両方のオプションが同じインターフェースを実装していることを確認
+    // Verify both options implement the same interface but maintain distinct identities
     assert(flagOption.type === OptionType.FLAG);
     assert(valueOption.type === OptionType.VALUE);
     assert(flagOption.name !== valueOption.name);

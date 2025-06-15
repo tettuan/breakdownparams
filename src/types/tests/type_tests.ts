@@ -3,7 +3,7 @@ import { OptionType } from '../option_type.ts';
 import { ValidationResult } from '../validation_result.ts';
 import { ParamsResult } from '../params_result.ts';
 import { OptionRule } from '../option_rule.ts';
-import { TwoParamsConfig } from '../params_config.ts';
+import { CustomConfig } from '../custom_config.ts';
 
 // 1. 型定義の基本設計確認
 Deno.test('test_type_definitions_design', async (t) => {
@@ -158,35 +158,92 @@ Deno.test('test_option_rule_structure', () => {
   assertEquals(typeof rule.flagOptions, 'object', 'flagOptions should be an object');
 });
 
-// 5. パラメータ設定のテスト
-Deno.test('test_params_config_structure', () => {
-  const config: TwoParamsConfig = {
-    demonstrativeType: {
-      pattern: '^(to|summary|defect)$',
-      errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
+// 5. カスタム設定のテスト
+Deno.test('test_custom_config_structure', () => {
+  const config: CustomConfig = {
+    params: {
+      two: {
+        demonstrativeType: {
+          pattern: '^(to|summary|defect)$',
+          errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
+        },
+        layerType: {
+          pattern: '^(project|issue|task)$',
+          errorMessage: 'Invalid layer type. Must be one of: project, issue, task',
+        },
+      },
     },
-    layerType: {
-      pattern: '^(project|issue|task)$',
-      errorMessage: 'Invalid layer type. Must be one of: project, issue, task',
+    options: {
+      flags: {
+        help: {
+          shortForm: 'h',
+          description: 'Display help information',
+        },
+      },
+      values: {
+        from: {
+          description: 'Source file path',
+          valueRequired: true,
+        },
+      },
+      customVariables: {
+        pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
+        description: 'User-defined variables (--uv-*)',
+      },
+    },
+    validation: {
+      zero: {
+        allowedOptions: ['help', 'version'],
+        allowedValueOptions: [],
+        allowCustomVariables: false,
+      },
+      one: {
+        allowedOptions: ['config'],
+        allowedValueOptions: ['from', 'destination'],
+        allowCustomVariables: false,
+      },
+      two: {
+        allowedOptions: ['from', 'destination', 'config'],
+        allowedValueOptions: ['from', 'destination', 'config'],
+        allowCustomVariables: true,
+      },
+    },
+    errorHandling: {
+      unknownOption: 'error',
+      duplicateOption: 'error',
+      emptyValue: 'error',
     },
   };
 
-  assertEquals(typeof config.demonstrativeType, 'object', 'demonstrativeType should be an object');
-  assertEquals(typeof config.layerType, 'object', 'layerType should be an object');
+  assertEquals(typeof config.params, 'object', 'params should be an object');
+  assertEquals(typeof config.params.two, 'object', 'params.two should be an object');
   assertEquals(
-    typeof config.demonstrativeType?.pattern,
+    typeof config.params.two.demonstrativeType,
+    'object',
+    'demonstrativeType should be an object',
+  );
+  assertEquals(typeof config.params.two.layerType, 'object', 'layerType should be an object');
+  assertEquals(
+    typeof config.params.two.demonstrativeType?.pattern,
     'string',
     'demonstrativeType.pattern should be string',
   );
   assertEquals(
-    typeof config.demonstrativeType?.errorMessage,
+    typeof config.params.two.demonstrativeType?.errorMessage,
     'string',
     'demonstrativeType.errorMessage should be string',
   );
-  assertEquals(typeof config.layerType?.pattern, 'string', 'layerType.pattern should be string');
   assertEquals(
-    typeof config.layerType?.errorMessage,
+    typeof config.params.two.layerType?.pattern,
+    'string',
+    'layerType.pattern should be string',
+  );
+  assertEquals(
+    typeof config.params.two.layerType?.errorMessage,
     'string',
     'layerType.errorMessage should be string',
   );
+  assertEquals(typeof config.options, 'object', 'options should be an object');
+  assertEquals(typeof config.validation, 'object', 'validation should be an object');
+  assertEquals(typeof config.errorHandling, 'object', 'errorHandling should be an object');
 });

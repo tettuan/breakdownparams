@@ -24,7 +24,20 @@ const optionRule: OptionRule = {
 Deno.test('test_params_parser_unit', () => {
   const parser = new ParamsParser(optionRule);
 
-  // オプションのみのテスト
+  /**
+   * Test for parsing options only (zero parameters case).
+   *
+   * Purpose: Validates that the parser correctly identifies and processes
+   * commands containing only options without any positional parameters.
+   *
+   * Background: Users may invoke commands with only flag options like
+   * --help or --version without providing any positional arguments.
+   * The parser must correctly classify these as 'zero' type results.
+   *
+   * Intent: This test ensures that option-only commands are properly
+   * parsed and categorized, with all flag values correctly captured
+   * and no parameters included in the result.
+   */
   const optionsOnlyResult = parser.parse(['--help', '--version']);
   console.log('[DEBUG] optionsOnlyResult:', optionsOnlyResult);
   assertEquals(optionsOnlyResult.type, 'zero', 'Options only should be zero type');
@@ -35,7 +48,20 @@ Deno.test('test_params_parser_unit', () => {
     'Options should match',
   );
 
-  // 1つの引数のテスト
+  /**
+   * Test for parsing single parameter commands.
+   *
+   * Purpose: Validates parsing of commands with exactly one positional
+   * parameter, which represents a demonstrative type.
+   *
+   * Background: Single parameter commands are used for actions that
+   * don't require a target specification, such as 'init' or 'status'.
+   * These are classified as 'one' type results.
+   *
+   * Intent: This test ensures that single parameter commands are
+   * correctly parsed with the parameter value assigned to the
+   * demonstrativeType field and the result properly typed as 'one'.
+   */
   const oneParamResult = parser.parse(['init']) as OneParamsResult;
   console.log('[DEBUG] oneParamResult:', oneParamResult);
   assertEquals(oneParamResult.type, 'one', 'One parameter should be one type');
@@ -43,7 +69,20 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(oneParamResult.options, {}, 'Options should be empty');
   assertEquals(oneParamResult.demonstrativeType, 'init', 'Demonstrative type should match');
 
-  // 2つの引数のテスト
+  /**
+   * Test for parsing two parameter commands.
+   *
+   * Purpose: Validates parsing of commands with exactly two positional
+   * parameters representing demonstrative type and layer type.
+   *
+   * Background: Two parameter commands are the primary use case,
+   * specifying both an action (demonstrative) and a target (layer).
+   * Examples include 'to project' or 'from issue'.
+   *
+   * Intent: This test ensures that two parameter commands are correctly
+   * parsed with parameters assigned to demonstrativeType and layerType
+   * fields respectively, and the result properly typed as 'two'.
+   */
   const twoParamResult = parser.parse(['to', 'project']) as TwoParamsResult;
   console.log('[DEBUG] twoParamResult:', twoParamResult);
   assertEquals(twoParamResult.type, 'two', 'Two parameters should be two type');
@@ -52,7 +91,21 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(twoParamResult.demonstrativeType, 'to', 'Demonstrative type should match');
   assertEquals(twoParamResult.layerType, 'project', 'Layer type should match');
 
-  // オプション付きの2つの引数のテスト
+  /**
+   * Test for parsing two parameter commands with options.
+   *
+   * Purpose: Validates parsing of commands that combine two positional
+   * parameters with key-value options.
+   *
+   * Background: Real-world usage often combines positional parameters
+   * with options to provide additional configuration. For example,
+   * 'to project --from=source --destination=target' specifies both
+   * the command structure and additional metadata.
+   *
+   * Intent: This test ensures that the parser correctly handles mixed
+   * input, properly separating positional parameters from options while
+   * maintaining the correct typing and structure of the result.
+   */
   const twoParamWithOptionsResult = parser.parse([
     'to',
     'project',
@@ -78,7 +131,20 @@ Deno.test('test_params_parser_unit', () => {
   );
   assertEquals(twoParamWithOptionsResult.layerType, 'project', 'Layer type should match');
 
-  // 無効な引数のテスト
+  /**
+   * Test for handling invalid arguments.
+   *
+   * Purpose: Validates that the parser correctly identifies and handles
+   * invalid input that doesn't match any expected parameter patterns.
+   *
+   * Background: Users may provide invalid commands that don't match
+   * the expected demonstrative types or layer types. The parser must
+   * gracefully handle these cases by returning an error result.
+   *
+   * Intent: This test ensures that invalid input is properly classified
+   * as 'error' type with empty parameters and options, preventing
+   * downstream processing of malformed commands.
+   */
   const invalidResult = parser.parse(['invalid']);
   console.log('[DEBUG] invalidResult:', invalidResult);
   assertEquals(invalidResult.type, 'error', 'Invalid arguments should be error type');

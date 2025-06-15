@@ -24,26 +24,26 @@ const optionRule: OptionRule = {
 Deno.test('test_params_parser_e2e', () => {
   const parser = new ParamsParser(optionRule);
 
-  // ヘルプコマンドのテスト
+  // Test: Help command
   const helpResult = parser.parse(['--help']);
   assertEquals(helpResult.type, 'zero', 'Help command should return zero params result');
   assertEquals(helpResult.params, [], 'Help command should be empty params');
   assertEquals(helpResult.options.help, true, 'Help option should be true');
 
-  // バージョンコマンドのテスト
+  // Test: Version command
   const versionResult = parser.parse(['--version']);
   assertEquals(versionResult.type, 'zero', 'Version command should return zero params result');
   assertEquals(versionResult.params, [], 'Version command should be empty params');
   assertEquals(versionResult.options.version, true, 'Version option should be true');
 
-  // initコマンドのテスト
+  // Test: Init command
   const initResult = parser.parse(['init']) as OneParamsResult;
   assertEquals(initResult.type, 'one', 'Init command should return one param result');
   assertEquals(initResult.params, ['init'], 'Init command should be included in params');
   assertEquals(Object.keys(initResult.options).length, 0, 'Init command should have no options');
   assertEquals(initResult.demonstrativeType, 'init', 'Demonstrative type should be init');
 
-  // toコマンドのテスト
+  // Test: To command
   const toResult = parser.parse(['to', 'project']) as TwoParamsResult;
   assertEquals(toResult.type, 'two', 'To command should return two params result');
   assertEquals(toResult.params, ['to', 'project'], 'To command should be included in params');
@@ -51,7 +51,7 @@ Deno.test('test_params_parser_e2e', () => {
   assertEquals(toResult.demonstrativeType, 'to', 'Demonstrative type should be to');
   assertEquals(toResult.layerType, 'project', 'Layer type should be project');
 
-  // オプション付きコマンドのテスト
+  // Test: Command with options
   const optionsResult = parser.parse([
     'to',
     'project',
@@ -70,7 +70,7 @@ Deno.test('test_params_parser_e2e', () => {
     'Error category should be validation',
   );
 
-  // エラーケースのテスト
+  // Test: Error cases
   const errorResult = parser.parse(['invalid;command']);
   assertEquals(errorResult.type, 'error', 'Invalid command should return error result');
   assertEquals(errorResult.error?.code, 'SECURITY_ERROR', 'Error should be security error');
@@ -80,7 +80,7 @@ Deno.test('test_params_parser_e2e', () => {
     'Error category should be security',
   );
 
-  // 複合ケースのテスト
+  // Test: Complex cases
   const complexResult = parser.parse([
     'to',
     'project',
