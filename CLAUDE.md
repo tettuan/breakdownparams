@@ -62,6 +62,9 @@
 - run `scripts/bump_version.sh` when ordered.
   - do not speculate if it will release.
 
+# Claude Code Compay
+`start company`: 「tmuxを使った相互通信によるClaude Code Company管理方法」の「基本セットアップ」を実施する。
+
 # tmuxを使った相互通信によるClaude Code Company管理方法
 
 ## 概要
