@@ -17,13 +17,13 @@
 ## インストール
 
 ```ts
-import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.0';
+import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.3';
 ```
 
 ## 使用方法
 
 ```ts
-import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.0';
+import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.3';
 
 const parser = new ParamsParser();
 
@@ -206,7 +206,7 @@ if (result.type === 'two') {
 カスタム設定でパーサーの動作を拡張します：
 
 ```ts
-import { ParamsParser, CustomConfig } from 'jsr:@tettuan/breakdownparams@1.0.0';
+import { ParamsParser, CustomConfig } from 'jsr:@tettuan/breakdownparams@1.0.3';
 
 const customConfig: CustomConfig = {
   params: {
@@ -290,7 +290,7 @@ import type {
   TwoParamsResult,
   ErrorResult,
   ErrorInfo 
-} from 'jsr:@tettuan/breakdownparams@1.0.0';
+} from 'jsr:@tettuan/breakdownparams@1.0.3';
 
 // 判別共用体により型安全性を確保
 function handleResult(result: ParamsResult) {

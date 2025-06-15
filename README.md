@@ -17,13 +17,13 @@ For detailed information about parameter patterns and usage, please refer to the
 ## Installation
 
 ```ts
-import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.0';
+import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.3';
 ```
 
 ## Usage
 
 ```ts
-import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.0';
+import { ParamsParser } from 'jsr:@tettuan/breakdownparams@1.0.3';
 
 const parser = new ParamsParser();
 
@@ -206,7 +206,7 @@ The library implements a comprehensive three-tier validation system:
 Extend the parser's behavior with custom configuration:
 
 ```ts
-import { ParamsParser, CustomConfig } from 'jsr:@tettuan/breakdownparams@1.0.0';
+import { ParamsParser, CustomConfig } from 'jsr:@tettuan/breakdownparams@1.0.3';
 
 const customConfig: CustomConfig = {
   params: {
@@ -290,7 +290,7 @@ import type {
   TwoParamsResult,
   ErrorResult,
   ErrorInfo 
-} from 'jsr:@tettuan/breakdownparams@1.0.0';
+} from 'jsr:@tettuan/breakdownparams@1.0.3';
 
 // The discriminated union ensures type safety
 function handleResult(result: ParamsResult) {
