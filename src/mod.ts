@@ -9,3 +9,5 @@ export type {
   TwoParamsResult,
   ZeroParamsResult,
 } from './types/params_result.ts';
+
+export type { CustomConfig } from './types/custom_config.ts';
