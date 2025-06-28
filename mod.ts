@@ -33,6 +33,7 @@ export type {
 } from './src/types/params_result.ts';
 export type { OptionRule } from './src/types/option_rule.ts';
 export type { ValidationResult } from './src/types/validation_result.ts';
+export type { CustomConfig } from './src/types/custom_config.ts';
 
 /**
  * @module breakdownparams
