@@ -22,7 +22,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: '2.1.9'
+          deno-version: '2.3.3'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
