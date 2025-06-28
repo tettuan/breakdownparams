@@ -20,7 +20,13 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: '2.1.9'
+          deno-version: '2.3.3'
+
+      - name: Cache Dependencies
+        run: |
+          rm -f deno.lock
+          git clean -fdx
+          deno cache --reload mod.ts
 
       - name: Get tag version
         id: get_tag
@@ -37,6 +43,12 @@ jobs:
             echo "Error: Version mismatch between tag ($TAG_VERSION) and deno.json ($DENO_VERSION)"
             exit 1
           fi
+
+      - name: Type Check
+        run: |
+          deno check mod.ts
+          deno check "src/**/*.ts"
+          deno check "tests/**/*.ts"
 
       - name: Run tests
         run: deno test --allow-env --allow-write --allow-read
