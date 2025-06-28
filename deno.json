@@ -12,7 +12,7 @@
   ],
   "license": "MIT",
   "author": "tettuan",
-  "exports": "./src/mod.ts",
+  "exports": "./mod.ts",
   "imports": {
     "@": "./src/",
     "@tettuan/breakdownlogger": "jsr:@tettuan/breakdownlogger@^0.1.0",
