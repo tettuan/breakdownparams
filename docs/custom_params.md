@@ -237,6 +237,65 @@ if (customResult.type === 'two') {
 }
 ```
 
+### 5.3 Configuration Best Practices
+
+#### ❌ Incorrect: Partial Configuration (Will Cause Runtime Error)
+
+```typescript
+// DON'T DO THIS - Missing required properties
+const partialConfig = {
+  params: {
+    two: {
+      demonstrativeType: { 
+        pattern: '^(custom)$', 
+        errorMessage: 'Custom error' 
+      }
+      // Missing layerType, validation, options, errorHandling
+    }
+  }
+};
+
+const parser = new ParamsParser(undefined, partialConfig); // Runtime Error!
+// TypeError: Cannot read properties of undefined (reading 'zero')
+```
+
+#### ✅ Correct: Using DEFAULT_CUSTOM_CONFIG Spread
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+// Merge with default configuration for safe partial override
+const safeConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,  // Include all default settings
+  params: {
+    two: {
+      demonstrativeType: {
+        pattern: '^(create|update|delete)$',
+        errorMessage: 'Invalid action. Must be one of: create, update, delete'
+      },
+      layerType: {
+        pattern: '^(user|product|order)$', 
+        errorMessage: 'Invalid entity. Must be one of: user, product, order'
+      }
+    }
+  }
+};
+
+const parser = new ParamsParser(undefined, safeConfig); // Works perfectly!
+
+// Custom parameters work as expected
+const result = parser.parse(['create', 'user']);
+// Default validation rules and options are preserved
+const resultWithOptions = parser.parse(['update', 'product', '--from=data.json']);
+```
+
+#### Key Points:
+
+- **Always use `...DEFAULT_CUSTOM_CONFIG`** when creating custom configurations
+- **Partial configurations without defaults will cause runtime errors**
+- **Only override the specific parts you need to customize**
+- **All other settings (validation, options, errorHandling) inherit from defaults**
+
 ## 6. Error Handling
 
 ### 6.1 Error Types

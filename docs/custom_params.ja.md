@@ -237,6 +237,65 @@ if (customResult.type === 'two') {
 }
 ```
 
+### 5.3 設定のベストプラクティス
+
+#### ❌ 誤った方法: パーシャル設定（実行時エラーが発生）
+
+```typescript
+// これはやってはいけません - 必要なプロパティが欠けています
+const partialConfig = {
+  params: {
+    two: {
+      demonstrativeType: { 
+        pattern: '^(custom)$', 
+        errorMessage: 'カスタムエラー' 
+      }
+      // layerType、validation、options、errorHandlingが欠けている
+    }
+  }
+};
+
+const parser = new ParamsParser(undefined, partialConfig); // 実行時エラー！
+// TypeError: Cannot read properties of undefined (reading 'zero')
+```
+
+#### ✅ 正しい方法: DEFAULT_CUSTOM_CONFIGのスプレッドを使用
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+// 安全な部分的オーバーライドのためにデフォルト設定とマージ
+const safeConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,  // すべてのデフォルト設定を含める
+  params: {
+    two: {
+      demonstrativeType: {
+        pattern: '^(作成|更新|削除)$',
+        errorMessage: '無効なアクション。作成、更新、削除のいずれかを指定してください'
+      },
+      layerType: {
+        pattern: '^(ユーザー|商品|注文)$', 
+        errorMessage: '無効なエンティティ。ユーザー、商品、注文のいずれかを指定してください'
+      }
+    }
+  }
+};
+
+const parser = new ParamsParser(undefined, safeConfig); // 完璧に動作！
+
+// カスタムパラメータが期待通りに動作
+const result = parser.parse(['作成', 'ユーザー']);
+// デフォルトのバリデーションルールとオプションが保持される
+const resultWithOptions = parser.parse(['更新', '商品', '--from=data.json']);
+```
+
+#### 重要なポイント:
+
+- **カスタム設定を作成する際は常に `...DEFAULT_CUSTOM_CONFIG` を使用する**
+- **デフォルト値なしのパーシャル設定は実行時エラーを引き起こす**
+- **カスタマイズが必要な特定の部分のみをオーバーライドする**
+- **その他すべての設定（validation、options、errorHandling）はデフォルトから継承される**
+
 ## 6. エラー処理
 
 ### 6.1 エラーの種類
