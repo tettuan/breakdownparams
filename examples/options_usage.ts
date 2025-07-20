@@ -68,11 +68,11 @@ Examples:
   // Process valid command
   if (result.type === 'two') {
     const twoResult = result as TwoParamsResult;
-    const { demonstrativeType, layerType, options = {} } = twoResult;
+    const { directiveType, layerType, options = {} } = twoResult;
 
     console.log('Command processed successfully:');
     console.log('----------------------------');
-    console.log(`Action: ${demonstrativeType} ${layerType}`);
+    console.log(`Action: ${directiveType} ${layerType}`);
 
     const typedOptions = options as {
       from?: string;

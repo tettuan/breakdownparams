@@ -36,12 +36,12 @@ Deno.test('test_one_param_result_interface', () => {
     type: 'one',
     params: [],
     options: {},
-    demonstrativeType: 'init',
+    directiveType: 'init',
   };
   assertEquals(result.type, 'one');
   assertEquals(Array.isArray(result.params), true);
   assertEquals(typeof result.options, 'object');
-  assertEquals(typeof result.demonstrativeType, 'string');
+  assertEquals(typeof result.directiveType, 'string');
 });
 
 Deno.test('test_two_param_result_interface', () => {
@@ -49,13 +49,13 @@ Deno.test('test_two_param_result_interface', () => {
     type: 'two',
     params: [],
     options: {},
-    demonstrativeType: 'to',
+    directiveType: 'to',
     layerType: 'project',
   };
   assertEquals(result.type, 'two');
   assertEquals(Array.isArray(result.params), true);
   assertEquals(typeof result.options, 'object');
-  assertEquals(typeof result.demonstrativeType, 'string');
+  assertEquals(typeof result.directiveType, 'string');
   assertEquals(typeof result.layerType, 'string');
 });
 

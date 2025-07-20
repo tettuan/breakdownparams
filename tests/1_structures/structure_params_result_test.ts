@@ -79,13 +79,13 @@ Deno.test('test_one_param_result_structure', () => {
     type: 'one',
     params: ['init'],
     options: {},
-    demonstrativeType: 'init',
+    directiveType: 'init',
   };
 
   assertEquals(result.type, 'one', 'type should be one');
   assertEquals(Array.isArray(result.params), true, 'params should be an array');
   assertEquals(typeof result.options, 'object', 'options should be an object');
-  assertEquals(typeof result.demonstrativeType, 'string', 'demonstrativeType should be a string');
+  assertEquals(typeof result.directiveType, 'string', 'directiveType should be a string');
 });
 
 Deno.test('test_two_param_result_structure', () => {
@@ -93,13 +93,13 @@ Deno.test('test_two_param_result_structure', () => {
     type: 'two',
     params: ['to', 'project'],
     options: {},
-    demonstrativeType: 'to',
+    directiveType: 'to',
     layerType: 'project',
   };
 
   assertEquals(result.type, 'two', 'type should be two');
   assertEquals(Array.isArray(result.params), true, 'params should be an array');
   assertEquals(typeof result.options, 'object', 'options should be an object');
-  assertEquals(typeof result.demonstrativeType, 'string', 'demonstrativeType should be a string');
+  assertEquals(typeof result.directiveType, 'string', 'directiveType should be a string');
   assertEquals(typeof result.layerType, 'string', 'layerType should be a string');
 });

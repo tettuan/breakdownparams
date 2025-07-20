@@ -10,14 +10,14 @@ import { TwoParamsValidator } from '../../../src/validator/params/two_params_val
  * Two-parameter commands represent the core transformation syntax of the system.
  *
  * Background:
- * The breakdown parameter system uses a demonstrative-layer pattern where commands
- * consist of a demonstrative type (e.g., 'to', 'from', 'for') followed by a layer type
+ * The breakdown parameter system uses a directive-layer pattern where commands
+ * consist of a directive type (e.g., 'to', 'from', 'for') followed by a layer type
  * (e.g., 'project', 'issue', 'task'). This validator ensures both parameters are present
  * and follow the expected patterns.
  *
  * Intent:
  * - Validate that exactly two parameters are provided
- * - Ensure the first parameter is a valid demonstrative type
+ * - Ensure the first parameter is a valid directive type
  * - Verify the second parameter is a recognized layer type
  * - Provide appropriate error codes for different failure scenarios
  *
@@ -34,13 +34,13 @@ Deno.test('test_two_param_validator_implementation', () => {
    *
    * Purpose: Verify that properly structured two-parameter commands pass validation
    * Expected: Validator returns isValid=true for 'to project' pattern
-   * Intent: Confirm the validator recognizes valid demonstrative-layer combinations
+   * Intent: Confirm the validator recognizes valid directive-layer combinations
    *
    * Background: The 'to project' pattern represents a transformation directive,
    * indicating conversion or mapping to project-level representation. This is
    * a fundamental pattern in the breakdown system.
    *
-   * @param twoParams - Array containing demonstrative ('to') and layer ('project')
+   * @param twoParams - Array containing directive ('to') and layer ('project')
    * @returns Validation result with isValid=true and params matching input
    */
   const twoParams = ['to', 'project'];

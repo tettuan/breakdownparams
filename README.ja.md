@@ -44,15 +44,15 @@ switch (result.type) {
 
   case 'one':
     // 指示タイプ付きの単一パラメータ
-    console.log(`コマンド: ${result.demonstrativeType}`);
-    if (result.demonstrativeType === 'init') {
+    console.log(`コマンド: ${result.directiveType}`);
+    if (result.directiveType === 'init') {
       console.log('プロジェクトの初期化');
     }
     break;
 
   case 'two':
     // 完全なセマンティック情報を持つ2つのパラメータ
-    console.log(`指示タイプ: ${result.demonstrativeType}`);
+    console.log(`指示タイプ: ${result.directiveType}`);
     console.log(`レイヤータイプ: ${result.layerType}`);
     if (result.options.from) {
       console.log(`入力ファイル: ${result.options.from}`);
@@ -115,13 +115,13 @@ const parser = new ParamsParser(optionRule?, customConfig?);
 
 #### `OneParamsResult`
 - **いつ**: 正確に1つの位置パラメータ
-- **プロパティ**: `demonstrativeType` - パラメータのセマンティックカテゴリ
+- **プロパティ**: `directiveType` - パラメータのセマンティックカテゴリ
 - **例**: `command init`、`command status`
 
 #### `TwoParamsResult`
 - **いつ**: 正確に2つの位置パラメータ
 - **プロパティ**: 
-  - `demonstrativeType` - 最初のパラメータのセマンティックカテゴリ
+  - `directiveType` - 最初のパラメータのセマンティックカテゴリ
   - `layerType` - 2番目のパラメータのセマンティックカテゴリ
 - **例**: `command to project`、`command from issue`
 
@@ -211,9 +211,9 @@ import { ParamsParser, CustomConfig } from 'jsr:@tettuan/breakdownparams@1.0.3';
 const customConfig: CustomConfig = {
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(to|from|via)$',
-        errorMessage: 'Invalid demonstrative type. Must be one of: to, from, via'
+        errorMessage: 'Invalid directive type. Must be one of: to, from, via'
       },  // カスタム指示タイプ
       layerType: {
         pattern: '^(project|issue|task|epic)$',
@@ -296,7 +296,7 @@ import type {
 function handleResult(result: ParamsResult) {
   if (result.type === 'two') {
     // TypeScriptはこれらのプロパティが存在することを知っている
-    console.log(result.demonstrativeType);
+    console.log(result.directiveType);
     console.log(result.layerType);
   }
   

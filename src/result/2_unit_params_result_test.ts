@@ -22,23 +22,23 @@ Deno.test('test_type_conversion', () => {
     type: 'one',
     params: ['init'],
     options: {},
-    demonstrativeType: 'init',
+    directiveType: 'init',
   };
   const oneParamResult = oneResult as OneParamsResult;
   assertEquals(oneParamResult.type, 'one');
-  assertEquals(oneParamResult.demonstrativeType, 'init');
+  assertEquals(oneParamResult.directiveType, 'init');
 
   // TwoParamsResult への変換
   const twoResult: TwoParamsResult = {
     type: 'two',
     params: ['to', 'project'],
     options: {},
-    demonstrativeType: 'to',
+    directiveType: 'to',
     layerType: 'project',
   };
   const twoParamResult = twoResult as TwoParamsResult;
   assertEquals(twoParamResult.type, 'two');
-  assertEquals(twoParamResult.demonstrativeType, 'to');
+  assertEquals(twoParamResult.directiveType, 'to');
   assertEquals(twoParamResult.layerType, 'project');
 });
 

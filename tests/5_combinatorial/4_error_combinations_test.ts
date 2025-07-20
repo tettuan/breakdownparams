@@ -116,18 +116,18 @@ Deno.test('Error Combinations - Parameter Errors with Valid Options', async (t) 
       expectedCode: 'TOO_MANY_ARGS',
       description: 'Too many arguments with multiple valid options',
     },
-    // Invalid demonstrative type + valid options
+    // Invalid directive type + valid options
     {
       args: ['invalid', 'project', '--from=input.md'],
-      expectedError: 'Invalid demonstrative type',
-      expectedCode: 'INVALID_DEMONSTRATIVE_TYPE',
-      description: 'Invalid demonstrative type with valid option',
+      expectedError: 'Invalid directive type',
+      expectedCode: 'INVALID_DIRECTIVE_TYPE',
+      description: 'Invalid directive type with valid option',
     },
     {
       args: ['wrong_demo', 'issue', '--destination=output.md', '--input=task'],
-      expectedError: 'Invalid demonstrative type',
-      expectedCode: 'INVALID_DEMONSTRATIVE_TYPE',
-      description: 'Invalid demonstrative type with multiple valid options',
+      expectedError: 'Invalid directive type',
+      expectedCode: 'INVALID_DIRECTIVE_TYPE',
+      description: 'Invalid directive type with multiple valid options',
     },
     // Invalid layer type + valid options
     {
@@ -179,13 +179,13 @@ Deno.test('Error Combinations - Parameter Errors with Invalid Options', async (t
       expectedCode: 'TOO_MANY_ARGS',
       description: 'Too many arguments with invalid option - args error should take precedence',
     },
-    // Invalid demonstrative type + invalid option
+    // Invalid directive type + invalid option
     {
       args: ['invalid', 'project', '--nonexistent=value'],
-      expectedError: 'Invalid demonstrative type',
-      expectedCode: 'INVALID_DEMONSTRATIVE_TYPE',
+      expectedError: 'Invalid directive type',
+      expectedCode: 'INVALID_DIRECTIVE_TYPE',
       description:
-        'Invalid demonstrative type with invalid option - param error should take precedence',
+        'Invalid directive type with invalid option - param error should take precedence',
     },
     // Invalid layer type + invalid option
     {
@@ -280,11 +280,11 @@ Deno.test('Error Combinations - Multiple Error Scenarios', async (t) => {
       expectedCode: 'TOO_MANY_ARGS',
       description: 'Parameter error should take precedence over option errors',
     },
-    // Invalid demonstrative type + layer type + options
+    // Invalid directive type + layer type + options
     {
       args: ['invalid', 'also_invalid', '--nonexistent=value'],
-      expectedError: 'Invalid demonstrative type',
-      expectedCode: 'INVALID_DEMONSTRATIVE_TYPE',
+      expectedError: 'Invalid directive type',
+      expectedCode: 'INVALID_DIRECTIVE_TYPE',
       description: 'First parameter error should take precedence',
     },
   ];
@@ -314,8 +314,8 @@ Deno.test('Error Combinations - Boundary Value Errors', async (t) => {
 
     assertErrorResult(
       result,
-      'Invalid demonstrative type',
-      'INVALID_DEMONSTRATIVE_TYPE',
+      'Invalid directive type',
+      'INVALID_DIRECTIVE_TYPE',
       'Empty option values with parameter error',
     );
   });
@@ -326,8 +326,8 @@ Deno.test('Error Combinations - Boundary Value Errors', async (t) => {
 
     assertErrorResult(
       result,
-      'Invalid demonstrative type',
-      'INVALID_DEMONSTRATIVE_TYPE',
+      'Invalid directive type',
+      'INVALID_DIRECTIVE_TYPE',
       'Special characters with parameter error',
     );
   });
@@ -339,8 +339,8 @@ Deno.test('Error Combinations - Boundary Value Errors', async (t) => {
 
     assertErrorResult(
       result,
-      'Invalid demonstrative type',
-      'INVALID_DEMONSTRATIVE_TYPE',
+      'Invalid directive type',
+      'INVALID_DIRECTIVE_TYPE',
       'Long parameter with option error',
     );
   });
@@ -361,8 +361,8 @@ Deno.test('Error Combinations - Mixed Form Errors', async (t) => {
     // Invalid parameter + mixed long/short forms
     {
       args: ['invalid', 'project', '--from=input.md', '-o=output.md'],
-      expectedError: 'Invalid demonstrative type',
-      expectedCode: 'INVALID_DEMONSTRATIVE_TYPE',
+      expectedError: 'Invalid directive type',
+      expectedCode: 'INVALID_DIRECTIVE_TYPE',
       description: 'Invalid parameter with mixed form options',
     },
     // Too many arguments + user variables + mixed forms
@@ -407,15 +407,15 @@ Deno.test('Error Combinations - Error Message Consistency', async (t) => {
     }
   });
 
-  await t.step('Consistent invalid demonstrative type messages', () => {
+  await t.step('Consistent invalid directive type messages', () => {
     const invalidDemoTypes = ['invalid', 'wrong', 'bad', 'unknown'];
 
     for (const demoType of invalidDemoTypes) {
       const result = parser.parse([demoType, 'project']) as ParamsResult;
 
       assertEquals(result.type, 'error');
-      assertStringIncludes(result.error?.message || '', 'Invalid demonstrative type');
-      assertEquals(result.error?.code, 'INVALID_DEMONSTRATIVE_TYPE');
+      assertStringIncludes(result.error?.message || '', 'Invalid directive type');
+      assertEquals(result.error?.code, 'INVALID_DIRECTIVE_TYPE');
     }
   });
 

@@ -112,10 +112,10 @@ class TwoParamValidator extends BaseValidator {
       return this.createErrorResult(new Error("Invalid number of arguments"));
     }
 
-    const [demonstrativeType, layerType] = args;
+    const [directiveType, layerType] = args;
     
-    if (!this.validateDemonstrativeType(demonstrativeType)) {
-      return this.createErrorResult(new Error("Invalid demonstrative type"));
+    if (!this.validateDirectiveType(directiveType)) {
+      return this.createErrorResult(new Error("Invalid directive type"));
     }
 
     if (!this.validateLayerType(layerType)) {
@@ -124,13 +124,13 @@ class TwoParamValidator extends BaseValidator {
 
     return {
       isValid: true,
-      demonstrativeType,
+      directiveType,
       layerType
     };
   }
 
-  private validateDemonstrativeType(value: string): boolean {
-    return new RegExp(this.config.demonstrativeType.pattern).test(value);
+  private validateDirectiveType(value: string): boolean {
+    return new RegExp(this.config.directiveType.pattern).test(value);
   }
 
   private validateLayerType(value: string): boolean {
@@ -458,7 +458,7 @@ interface ParamsValidator {
 interface ValidationResult {
   isValid: boolean;
   error?: ErrorInfo;
-  demonstrativeType?: string;
+  directiveType?: string;
   layerType?: string;
   options?: OptionParams;
 }
@@ -468,7 +468,7 @@ interface ValidationResult {
 
 ```typescript
 interface ParserConfig {
-  demonstrativeType: {
+  directiveType: {
     pattern: string;
     errorMessage?: string;
   };
@@ -750,9 +750,9 @@ class OptionsValidator {
 
 ```typescript
 const DEFAULT_CONFIG: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: "^(to|summary|defect)$",
-    errorMessage: "Invalid demonstrative type. Must be one of: to, summary, defect"
+    errorMessage: "Invalid directive type. Must be one of: to, summary, defect"
   },
   layerType: {
     pattern: "^(project|issue|task)$",
@@ -765,9 +765,9 @@ const DEFAULT_CONFIG: ParserConfig = {
 
 ```typescript
 const customConfig: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: "^[a-z]+$",
-    errorMessage: "Invalid demonstrative type"
+    errorMessage: "Invalid directive type"
   },
   layerType: {
     pattern: "^[a-z]+$",
@@ -785,7 +785,7 @@ const parser = new ParamsParser();
 const result = parser.parse(["to", "project", "--from=input.md"]);
 
 if (result.type === "break") {
-  console.log(`Demonstrative Type: ${result.demonstrativeType}`);
+  console.log(`Directive Type: ${result.directiveType}`);
   console.log(`Layer Type: ${result.layerType}`);
   console.log(`From File: ${result.options.fromFile}`);
 }
@@ -795,9 +795,9 @@ if (result.type === "break") {
 
 ```typescript
 const customConfig: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: "^[a-z]+$",
-    errorMessage: "Invalid demonstrative type"
+    errorMessage: "Invalid directive type"
   },
   layerType: {
     pattern: "^[a-z]+$",

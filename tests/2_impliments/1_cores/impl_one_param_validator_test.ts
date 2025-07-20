@@ -12,7 +12,7 @@ import { OneParamValidator } from '../../../src/validator/params/one_param_valid
  * Background:
  * In the breakdown parameter architecture, commands can have different parameter counts.
  * Single-parameter commands (like 'init') are special cases that trigger specific workflows
- * without requiring demonstrative types or layer specifications. This validator ensures
+ * without requiring directive types or layer specifications. This validator ensures
  * that only valid single-parameter commands are accepted.
  *
  * Intent:

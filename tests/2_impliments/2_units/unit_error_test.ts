@@ -44,7 +44,7 @@ Deno.test('test_validation_error', () => {
   const optionRule: OptionRule = {
     format: '--key=value',
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },

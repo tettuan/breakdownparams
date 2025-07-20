@@ -44,7 +44,7 @@ import type { ParamsResult, TwoParamsResult } from '../../src/mod.ts';
  * baseline, making results comparable and reproducible.
  *
  * Background:
- * Using fixed demonstrative and layer types allows tests to focus exclusively
+ * Using fixed directive and layer types allows tests to focus exclusively
  * on option form mixing behavior without parameter variations affecting results.
  *
  * Intent:
@@ -103,7 +103,7 @@ function assertOptionsMatch(
  *
  * Intent:
  * - Verify the result is a valid two-parameter parse
- * - Check that demonstrative and layer types are correct
+ * - Check that directive and layer types are correct
  * - Provide a foundation for subsequent option validation
  *
  * @param result - The parsed two-parameter result
@@ -111,7 +111,7 @@ function assertOptionsMatch(
  */
 function assertBasicResult(result: TwoParamsResult, testDescription: string) {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
-  assertEquals(result.demonstrativeType, DEMO_TYPE, `${testDescription}: Wrong demonstrative type`);
+  assertEquals(result.directiveType, DEMO_TYPE, `${testDescription}: Wrong directive type`);
   assertEquals(result.layerType, LAYER_TYPE, `${testDescription}: Wrong layer type`);
 }
 

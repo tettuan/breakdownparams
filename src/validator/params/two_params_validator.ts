@@ -6,13 +6,13 @@ import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../types/custom_config.t
  * Validator for two-parameter commands.
  *
  * This validator ensures exactly two parameters are provided and validates them
- * against configurable patterns for DemonstrativeType and LayerType.
+ * against configurable patterns for DirectiveType and LayerType.
  *
  * Validation process:
  * 1. Checks that exactly 2 parameters are provided
- * 2. Validates first parameter against DemonstrativeType pattern (default: to|summary|defect)
+ * 2. Validates first parameter against DirectiveType pattern (default: to|summary|defect)
  * 3. Validates second parameter against LayerType pattern (default: project|issue|task)
- * 4. Returns both demonstrativeType and layerType in the result
+ * 4. Returns both directiveType and layerType in the result
  *
  * Configuration:
  * - Custom patterns and error messages can be provided via CustomConfig
@@ -27,17 +27,17 @@ import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../types/custom_config.t
  *
  * // Valid combination
  * validator.validate(["to", "project"]);
- * // { isValid: true, demonstrativeType: "to", layerType: "project" }
+ * // { isValid: true, directiveType: "to", layerType: "project" }
  *
- * // Invalid demonstrative type
+ * // Invalid directive type
  * validator.validate(["invalid", "project"]);
- * // { isValid: false, errorMessage: "Invalid demonstrative type: invalid" }
+ * // { isValid: false, errorMessage: "Invalid directive type: invalid" }
  *
  * // Custom configuration
  * const customValidator = new TwoParamsValidator({
  *   params: {
  *     two: {
- *       demonstrativeType: { pattern: "^(custom1|custom2)$", errorMessage: "Invalid custom type" },
+ *       directiveType: { pattern: "^(custom1|custom2)$", errorMessage: "Invalid custom type" },
  *       layerType: { pattern: "^(layer1|layer2)$", errorMessage: "Invalid layer" }
  *     }
  *   }
@@ -62,19 +62,19 @@ export class TwoParamsValidator extends BaseValidator {
    *
    * Validation flow:
    * 1. Ensures exactly 2 parameters are provided
-   * 2. Validates first parameter against DemonstrativeType pattern
+   * 2. Validates first parameter against DirectiveType pattern
    * 3. Validates second parameter against LayerType pattern
    * 4. Returns appropriate error message if validation fails
    * 5. Returns validated parameters with type information on success
    *
    * @param params - Array of parameters to validate
-   * @returns Validation result with demonstrativeType and layerType if valid
+   * @returns Validation result with directiveType and layerType if valid
    *
    * @example
    * ```ts
    * const result = validator.validate(["summary", "task"]);
    * if (result.isValid) {
-   *   // result.demonstrativeType === "summary"
+   *   // result.directiveType === "summary"
    *   // result.layerType === "task"
    * }
    * ```
@@ -91,29 +91,29 @@ export class TwoParamsValidator extends BaseValidator {
       };
     }
 
-    // DemonstrativeType と LayerType のパターンを取得
+    // DirectiveType と LayerType のパターンを取得
     // 優先順位: 1. config の設定 2. デフォルト設定 3. ハードコードされたデフォルト値
-    const demonstrativePattern = this.config.params.two.demonstrativeType.pattern ||
+    const directivePattern = this.config.params.two.directiveType.pattern ||
       '^(to|summary|defect)$';
     const layerPattern = this.config.params.two.layerType.pattern || '^(project|issue|task)$';
 
     // パターンマッチングで検証
-    const demonstrativeValid = new RegExp(demonstrativePattern).test(params[0]);
+    const directiveValid = new RegExp(directivePattern).test(params[0]);
     const layerValid = new RegExp(layerPattern).test(params[1]);
 
     // どちらかが一致しない場合はエラー
-    if (!demonstrativeValid || !layerValid) {
+    if (!directiveValid || !layerValid) {
       return {
         isValid: false,
         validatedParams: params,
-        demonstrativeType: params[0],
+        directiveType: params[0],
         layerType: params[1],
-        errorMessage: !demonstrativeValid
-          ? (this.config.params.two.demonstrativeType.errorMessage ||
-            `Invalid demonstrative type: ${params[0]}`)
+        errorMessage: !directiveValid
+          ? (this.config.params.two.directiveType.errorMessage ||
+            `Invalid directive type: ${params[0]}`)
           : (this.config.params.two.layerType.errorMessage ||
             `Invalid layer type: ${params[1]}`),
-        errorCode: !demonstrativeValid ? 'INVALID_DEMONSTRATIVE_TYPE' : 'INVALID_LAYER_TYPE',
+        errorCode: !directiveValid ? 'INVALID_DIRECTIVE_TYPE' : 'INVALID_LAYER_TYPE',
         errorCategory: 'validation',
       };
     }
@@ -122,7 +122,7 @@ export class TwoParamsValidator extends BaseValidator {
     return {
       isValid: true,
       validatedParams: params,
-      demonstrativeType: params[0],
+      directiveType: params[0],
       layerType: params[1],
     };
   }

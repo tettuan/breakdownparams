@@ -117,7 +117,7 @@ Deno.test('test_option_rule_structure', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -163,9 +163,9 @@ Deno.test('test_custom_config_structure', () => {
   const config: CustomConfig = {
     params: {
       two: {
-        demonstrativeType: {
+        directiveType: {
           pattern: '^(to|summary|defect)$',
-          errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
+          errorMessage: 'Invalid directive type. Must be one of: to, summary, defect',
         },
         layerType: {
           pattern: '^(project|issue|task)$',
@@ -218,20 +218,20 @@ Deno.test('test_custom_config_structure', () => {
   assertEquals(typeof config.params, 'object', 'params should be an object');
   assertEquals(typeof config.params.two, 'object', 'params.two should be an object');
   assertEquals(
-    typeof config.params.two.demonstrativeType,
+    typeof config.params.two.directiveType,
     'object',
-    'demonstrativeType should be an object',
+    'directiveType should be an object',
   );
   assertEquals(typeof config.params.two.layerType, 'object', 'layerType should be an object');
   assertEquals(
-    typeof config.params.two.demonstrativeType?.pattern,
+    typeof config.params.two.directiveType?.pattern,
     'string',
-    'demonstrativeType.pattern should be string',
+    'directiveType.pattern should be string',
   );
   assertEquals(
-    typeof config.params.two.demonstrativeType?.errorMessage,
+    typeof config.params.two.directiveType?.errorMessage,
     'string',
-    'demonstrativeType.errorMessage should be string',
+    'directiveType.errorMessage should be string',
   );
   assertEquals(
     typeof config.params.two.layerType?.pattern,

@@ -91,12 +91,12 @@
 ./.deno/bin/breakdown to issue
 ```
 
-最初のオプション（$1）は`DemonstrativeType`と呼ばれます。
+最初のオプション（$1）は`DirectiveType`と呼ばれます。
 2番目のオプション（$2）は`LayerType`と呼ばれます。
 
 ### デフォルトのバリデーションルール
 
-#### DemonstrativeType
+#### DirectiveType
 デフォルトの正規表現パターン：`^(to|summary|defect)$`
 - to
 - summary
@@ -117,8 +117,8 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -f=<file>
 ```
 
 ##### FromFile値
@@ -133,8 +133,8 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -o=<output_file>
 ```
 
 ##### DestinationFile値
@@ -149,8 +149,8 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -i=<from_layer_type>
 ```
 
 ##### from_layer_type値
@@ -166,8 +166,8 @@
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -c=<config_file>
 ```
 
 ##### ConfigFile値
@@ -181,7 +181,7 @@
 TwoParamsモードでのみ使用可能で、以下の形式で指定します：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --uv-<name>=<value>
 ```
 
 例：

@@ -109,9 +109,9 @@ Deno.test('test_validation_rules_structure', () => {
 
   /**
    * Test: Parameter configuration structure
-   * Verifies demonstrativeType and layerType configurations exist
+   * Verifies directiveType and layerType configurations exist
    */
-  assertEquals(typeof DEFAULT_CUSTOM_CONFIG.params.two.demonstrativeType, 'object');
+  assertEquals(typeof DEFAULT_CUSTOM_CONFIG.params.two.directiveType, 'object');
   assertEquals(typeof DEFAULT_CUSTOM_CONFIG.params.two.layerType, 'object');
 });
 
@@ -144,8 +144,8 @@ Deno.test('test_validation_rules_default_values', () => {
 
   /**
    * Test: Parameter configuration default values
-   * Verifies regex patterns for demonstrativeType and layerType validation
+   * Verifies regex patterns for directiveType and layerType validation
    */
-  assertEquals(DEFAULT_CUSTOM_CONFIG.params.two.demonstrativeType.pattern, '^(to|summary|defect)$');
+  assertEquals(DEFAULT_CUSTOM_CONFIG.params.two.directiveType.pattern, '^(to|summary|defect)$');
   assertEquals(DEFAULT_CUSTOM_CONFIG.params.two.layerType.pattern, '^(project|issue|task)$');
 });

@@ -91,12 +91,12 @@ Example:
 ./.deno/bin/breakdown to issue
 ```
 
-The first option ($1) is called `DemonstrativeType`.
+The first option ($1) is called `DirectiveType`.
 The second option ($2) is called `LayerType`.
 
 ### Default Validation Rules
 
-#### DemonstrativeType
+#### DirectiveType
 Default regex pattern: `^(to|summary|defect)$`
 - to
 - summary
@@ -117,8 +117,8 @@ Alias: `-f`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -f=<file>
 ```
 
 ##### FromFile Values
@@ -133,8 +133,8 @@ Alias: `-o`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -o=<output_file>
 ```
 
 ##### DestinationFile Values
@@ -149,8 +149,8 @@ Alias: `-i`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -i=<from_layer_type>
 ```
 
 ##### from_layer_type Values
@@ -166,8 +166,8 @@ Alias: `-c`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -c=<config_file>
 ```
 
 ##### ConfigFile Values
@@ -181,7 +181,7 @@ Custom variable options are used to specify user-defined variables.
 Only available in TwoParams mode, specified in the following format:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --uv-<name>=<value>
 ```
 
 Examples:

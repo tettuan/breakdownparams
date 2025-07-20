@@ -3,9 +3,9 @@
  */
 
 /**
- * Demonstrative type configuration
+ * Directive type configuration
  */
-export interface DemonstrativeTypeConfig {
+export interface DirectiveTypeConfig {
   pattern: string;
   errorMessage: string;
 }
@@ -22,7 +22,7 @@ export interface LayerTypeConfig {
  * Parameter configuration for two-parameter mode
  */
 export interface ParamsConfig {
-  demonstrativeType: DemonstrativeTypeConfig;
+  directiveType: DirectiveTypeConfig;
   layerType: LayerTypeConfig;
 }
 
@@ -92,9 +92,9 @@ export interface CustomConfig {
 export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(to|summary|defect)$',
-        errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
+        errorMessage: 'Invalid directive type. Must be one of: to, summary, defect',
       },
       layerType: {
         pattern: '^(project|issue|task)$',

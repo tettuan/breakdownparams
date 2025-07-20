@@ -8,7 +8,7 @@ Deno.test('test_two_params_validator_unit', () => {
   const validResult = validator.validate(['to', 'project']);
   assertEquals(validResult.isValid, true, 'Valid params should be accepted');
   assertEquals(validResult.validatedParams, ['to', 'project'], 'Should return correct params');
-  assertEquals(validResult.demonstrativeType, 'to', 'Should set demonstrative type');
+  assertEquals(validResult.directiveType, 'to', 'Should set directive type');
   assertEquals(validResult.layerType, 'project', 'Should set layer type');
 
   // 異常系テスト - パラメータ数
@@ -21,16 +21,16 @@ Deno.test('test_two_params_validator_unit', () => {
   );
   assertEquals(invalidCountResult.errorCode, 'INVALID_PARAMS', 'Should return correct error code');
 
-  // 異常系テスト - 不正な DemonstrativeType
-  const invalidDemonstrativeResult = validator.validate(['invalid', 'project']);
+  // 異常系テスト - 不正な DirectiveType
+  const invalidDirectiveResult = validator.validate(['invalid', 'project']);
   assertEquals(
-    invalidDemonstrativeResult.isValid,
+    invalidDirectiveResult.isValid,
     false,
-    'Invalid demonstrative type should be rejected',
+    'Invalid directive type should be rejected',
   );
   assertEquals(
-    invalidDemonstrativeResult.errorCode,
-    'INVALID_DEMONSTRATIVE_TYPE',
+    invalidDirectiveResult.errorCode,
+    'INVALID_DIRECTIVE_TYPE',
     'Should return correct error code',
   );
 

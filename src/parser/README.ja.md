@@ -21,12 +21,12 @@
 2. **パラメータの分類**
    - ZeroParams: 位置引数なし（オプションのみ）
    - OneParam: 1つの位置引数（`init` コマンド）
-   - TwoParams: 2つの位置引数（`<demonstrativeType> <layerType>`）
+   - TwoParams: 2つの位置引数（`<directiveType> <layerType>`）
 
 3. **バリデーションの統合**
    - Optionインスタンスからバリデーション結果を取得
    - パラメータ数の制約チェック
-   - DemonstrativeType と LayerType の有効性チェック
+   - DirectiveType と LayerType の有効性チェック
 
 4. **統一された結果返却**
    - パラメータエラーとオプションエラーの統合
@@ -49,7 +49,7 @@ const parser = new ParamsParser();
 const result = parser.parse(['to', 'project', '--uv-name=test']);
 
 if (result.type === 'break') {
-  console.log(result.demonstrativeType); // 'to'
+  console.log(result.directiveType); // 'to'
   console.log(result.layerType); // 'project'
   console.log(result.options['uv-name']); // 'test' (正規化後: uv-name)
 }

@@ -87,7 +87,7 @@ interface TestCase {
   input: string[];
   expected: {
     type: 'zero' | 'one' | 'two';
-    demonstrativeType?: string;
+    directiveType?: string;
     layerType?: string;
     options?: Record<string, string>;
     error?: ErrorInfo;
@@ -116,14 +116,14 @@ const testCases: TestCase[] = [
     input: ['init'],
     expected: {
       type: 'one',
-      demonstrativeType: 'init'
+      directiveType: 'init'
     }
   },
   {
     input: ['to', 'project', '--uv-name=test'],
     expected: {
       type: 'two',
-      demonstrativeType: 'to',
+      directiveType: 'to',
       layerType: 'project',
       options: { 'uv-name': 'test' }
     }
@@ -197,15 +197,15 @@ Deno.test('TwoParamValidator', async (t) => {
     const validator = new TwoParamValidator(DEFAULT_CONFIG);
     const result = validator.validate(['to', 'project']);
     assert(result.isValid);
-    assertEquals(result.demonstrativeType, 'to');
+    assertEquals(result.directiveType, 'to');
     assertEquals(result.layerType, 'project');
   });
 
   await t.step('should validate custom values', () => {
     const customConfig = {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^[a-z]+$',
-        errorMessage: 'Invalid demonstrative type'
+        errorMessage: 'Invalid directive type'
       },
       layerType: {
         pattern: '^[a-z]+$',
@@ -215,7 +215,7 @@ Deno.test('TwoParamValidator', async (t) => {
     const validator = new TwoParamValidator(customConfig);
     const result = validator.validate(['custom', 'layer']);
     assert(result.isValid);
-    assertEquals(result.demonstrativeType, 'custom');
+    assertEquals(result.directiveType, 'custom');
     assertEquals(result.layerType, 'layer');
   });
 });

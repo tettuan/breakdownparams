@@ -26,7 +26,7 @@
 
 | エラーコード | メッセージ | 説明 |
 |------------|------------|------|
-| INVALID_DEMONSTRATIVE_TYPE | "Invalid demonstrative type. Must be one of: to, summary, defect" | DemonstrativeTypeの値が制約を満たさない |
+| INVALID_DIRECTIVE_TYPE | "Invalid directive type. Must be one of: to, summary, defect" | DirectiveTypeの値が制約を満たさない |
 | INVALID_LAYER_TYPE | "Invalid layer type. Must be one of: project, issue, task" | LayerTypeの値が制約を満たさない |
 | INVALID_OPTION_FORMAT | "Invalid option format. Must be in the form: --key=value" | オプションの形式が不正 |
 | INVALID_CUSTOM_VARIABLE | "Invalid custom variable option syntax: {value}" | カスタム変数オプションの構文が不正 |
@@ -88,12 +88,12 @@ interface ErrorResult {
 ### 5.1 バリデーションエラー
 
 ```typescript
-// 不正なDemonstrativeType
+// 不正なDirectiveType
 {
   type: "error",
   error: {
-    code: "INVALID_DEMONSTRATIVE_TYPE",
-    message: "Invalid demonstrative type. Must be one of: to, summary, defect",
+    code: "INVALID_DIRECTIVE_TYPE",
+    message: "Invalid directive type. Must be one of: to, summary, defect",
     details: {
       value: "invalid"
     }
@@ -133,9 +133,9 @@ interface ErrorResult {
   type: "error",
   error: {
     code: "MISSING_PATTERN",
-    message: "Pattern is required for demonstrativeType",
+    message: "Pattern is required for directiveType",
     details: {
-      type: "demonstrativeType"
+      type: "directiveType"
     }
   }
 }

@@ -43,7 +43,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 
 3. **TwoParams**
    - 位置引数2つ
-   - 形式：`<demonstrativeType> <layerType>`
+   - 形式：`<directiveType> <layerType>`
    - 例：`breakdown to project`
 
 各タイプの詳細な型定義と使用方法については、[パラメータパーサーの型定義仕様](params_type.ja.md)を参照してください。
@@ -78,7 +78,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 1. **引数の数**
    - 0個：オプションのみ許可
    - 1個：`init`コマンドのみ許可
-   - 2個：demonstrativeTypeとlayerTypeの組み合わせ
+   - 2個：directiveTypeとlayerTypeの組み合わせ
    - 3個以上：エラー
 
 2. **値の制約**
@@ -111,7 +111,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 | エラーケース       | メッセージ例                                           |
 | ------------------ | ------------------------------------------------------ |
 | 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正な値           | "Invalid demonstrative type. Must be one of: to, summary, defect" |
+| 不正な値           | "Invalid directive type. Must be one of: to, summary, defect" |
 | 必須パラメータ不足 | "Missing required parameter: {param}"                  |
 | ユーザー変数オプション構文エラー | "Invalid user variable option syntax: {value}"    |
 
@@ -141,7 +141,7 @@ parser.parse(['init']);
 parser.parse(['to', 'issue', '--from', './input.md']);
 // {
 //   type: "two",
-//   demonstrativeType: "to",
+//   directiveType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
 // }
@@ -150,7 +150,7 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // {
 //   type: "two",
-//   demonstrativeType: "summary",
+//   directiveType: "summary",
 //   layerType: "task",
 //   options: { fromFile: "./tasks.md", adaptation: "strict" }
 // }
@@ -161,9 +161,9 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 ```typescript
 // カスタム設定値でパーサーを初期化
 const customConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
-    errorMessage: 'Invalid demonstrative type'
+    errorMessage: 'Invalid directive type'
   },
   layerType: {
     pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
@@ -177,7 +177,7 @@ const customParser = new ParamsParser(customConfig);
 customParser.parse(['custom', 'layer', '--from', './input.md']);
 // {
 //   type: "two",
-//   demonstrativeType: "custom",
+//   directiveType: "custom",
 //   layerType: "layer",
 //   options: { fromFile: "./input.md" }
 // }
@@ -190,7 +190,7 @@ customParser.parse(['custom', 'layer', '--from', './input.md']);
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
 //   type: "two",
-//   demonstrativeType: "to",
+//   directiveType: "to",
 //   layerType: "project",
 //   options: {
 //     "uv-project": "myproject",  // --uv-projectから正規化

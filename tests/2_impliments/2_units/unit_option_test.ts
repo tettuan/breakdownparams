@@ -23,7 +23,7 @@ Deno.test('test_option_rule', () => {
   const optionRule: OptionRule = {
     format: '--key=value',
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },

@@ -40,6 +40,6 @@ export interface OneParamsResult extends ParamsResult {
  */
 export interface TwoParamsResult extends ParamsResult {
   type: 'two';
-  demonstrativeType: string;
+  directiveType: string;
   layerType: string;
 }

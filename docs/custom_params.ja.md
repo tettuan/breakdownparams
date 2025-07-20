@@ -11,7 +11,7 @@
 
 ### 2.1 パラメータ設定
 
-1. **DemonstrativeType**
+1. **DirectiveType**
    - デフォルトパターン：`^(to|summary|defect)$`
    - カスタムパターン：設定値で指定
    - 許可される値のリスト
@@ -50,7 +50,7 @@ interface CustomConfig {
   // パラメータ設定
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: string;
         errorMessage: string;
       };
@@ -100,9 +100,9 @@ interface CustomConfig {
 const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(to|summary|defect)$',
-        errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
+        errorMessage: 'Invalid directive type. Must be one of: to, summary, defect',
       },
       layerType: {
         pattern: '^(project|issue|task)$',
@@ -160,9 +160,9 @@ const customConfig: CustomConfig = {
   ...DEFAULT_CUSTOM_CONFIG,
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(to|from|for)$',  // カスタムな値を許可
-        errorMessage: 'Invalid demonstrative type. Must be one of: to, from, for',
+        errorMessage: 'Invalid directive type. Must be one of: to, from, for',
       },
       layerType: {
         pattern: '^(module|component|service)$',  // カスタムな値を許可
@@ -186,14 +186,14 @@ const customConfig: CustomConfig = {
 
 デフォルト設定値では、以下の値のみを許可します：
 
-- DemonstrativeType: `to`, `summary`, `defect`
+- DirectiveType: `to`, `summary`, `defect`
 - LayerType: `project`, `issue`, `task`
 
 ### 4.2 カスタム設定値でのバリデーション
 
 カスタム設定値では、設定値で指定されたパターンに一致する値を許可します：
 
-1. **DemonstrativeTypeのバリデーション**
+1. **DirectiveTypeのバリデーション**
    - 設定値のパターンに一致するかチェック
    - 不一致の場合はカスタムエラーメッセージを返却
 
@@ -222,7 +222,7 @@ const customParser = new ParamsParser(undefined, undefined, customConfig);
 const result = parser.parse(['to', 'project', '--from=input.md']);
 
 if (result.type === 'two') {
-  console.log(result.params.demonstrativeType); // "to"
+  console.log(result.params.directiveType); // "to"
   console.log(result.params.layerType); // "project"
   console.log(result.options.from); // "input.md"
 }
@@ -231,7 +231,7 @@ if (result.type === 'two') {
 const customResult = customParser.parse(['from', 'module', '--from=src/']);
 
 if (customResult.type === 'two') {
-  console.log(customResult.params.demonstrativeType); // "from"
+  console.log(customResult.params.directiveType); // "from"
   console.log(customResult.params.layerType); // "module"
   console.log(customResult.options.from); // "src/"
 }
@@ -246,7 +246,7 @@ if (customResult.type === 'two') {
 const partialConfig = {
   params: {
     two: {
-      demonstrativeType: { 
+      directiveType: { 
         pattern: '^(custom)$', 
         errorMessage: 'カスタムエラー' 
       }
@@ -269,7 +269,7 @@ const safeConfig: CustomConfig = {
   ...DEFAULT_CUSTOM_CONFIG,  // すべてのデフォルト設定を含める
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(作成|更新|削除)$',
         errorMessage: '無効なアクション。作成、更新、削除のいずれかを指定してください'
       },
@@ -317,8 +317,8 @@ const resultWithOptions = parser.parse(['更新', '商品', '--from=data.json'])
   params: [],
   options: {},
   error: {
-    message: "Invalid demonstrative type. Must be one of: to, summary, defect",
-    code: "INVALID_DEMONSTRATIVE_TYPE",
+    message: "Invalid directive type. Must be one of: to, summary, defect",
+    code: "INVALID_DIRECTIVE_TYPE",
     category: "validation"
   }
 }

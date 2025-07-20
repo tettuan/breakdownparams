@@ -5,7 +5,7 @@ import type { ParamsResult } from '../src/mod.ts';
 const testArgs = [
   ['unknown'], // Invalid command
   ['to', 'issue', 'extra'], // Too many arguments
-  ['invalid', 'issue'], // Invalid demonstrative type
+  ['invalid', 'issue'], // Invalid directive type
   ['to', 'invalid'], // Invalid layer type
   ['to', 'project', '--unknown=value'], // Unknown option
   ['--help'], // Help
@@ -35,7 +35,7 @@ Try these invalid commands to see error handling in action:
 2. Too many arguments:
    error_handling to issue extra
 
-3. Invalid demonstrative type:
+3. Invalid directive type:
    error_handling invalid issue
 
 4. Invalid layer type:
@@ -53,10 +53,10 @@ Try these invalid commands to see error handling in action:
     console.log('Command processed successfully:');
     console.log('Type:', result.type);
 
-    if (result.type === 'one' && 'demonstrativeType' in result) {
-      console.log('Command:', result.demonstrativeType);
-    } else if (result.type === 'two' && 'demonstrativeType' in result && 'layerType' in result) {
-      console.log('Demonstrative Type:', result.demonstrativeType);
+    if (result.type === 'one' && 'directiveType' in result) {
+      console.log('Command:', result.directiveType);
+    } else if (result.type === 'two' && 'directiveType' in result && 'layerType' in result) {
+      console.log('Directive Type:', result.directiveType);
       console.log('Layer Type:', result.layerType);
     }
 

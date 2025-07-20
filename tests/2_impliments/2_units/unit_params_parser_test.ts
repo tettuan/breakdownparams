@@ -6,7 +6,7 @@ import { OneParamsResult, TwoParamsResult } from '../../../src/types/params_resu
 const optionRule: OptionRule = {
   format: '--key=value',
   rules: {
-    customVariables: ['--demonstrative-type', '--layer-type'],
+    customVariables: ['--directive-type', '--layer-type'],
     requiredOptions: [],
     valueTypes: ['string'],
   },
@@ -52,7 +52,7 @@ Deno.test('test_params_parser_unit', () => {
    * Test for parsing single parameter commands.
    *
    * Purpose: Validates parsing of commands with exactly one positional
-   * parameter, which represents a demonstrative type.
+   * parameter, which represents a directive type.
    *
    * Background: Single parameter commands are used for actions that
    * don't require a target specification, such as 'init' or 'status'.
@@ -60,27 +60,27 @@ Deno.test('test_params_parser_unit', () => {
    *
    * Intent: This test ensures that single parameter commands are
    * correctly parsed with the parameter value assigned to the
-   * demonstrativeType field and the result properly typed as 'one'.
+   * directiveType field and the result properly typed as 'one'.
    */
   const oneParamResult = parser.parse(['init']) as OneParamsResult;
   console.log('[DEBUG] oneParamResult:', oneParamResult);
   assertEquals(oneParamResult.type, 'one', 'One parameter should be one type');
   assertEquals(oneParamResult.params, ['init'], 'Params should match input');
   assertEquals(oneParamResult.options, {}, 'Options should be empty');
-  assertEquals(oneParamResult.demonstrativeType, 'init', 'Demonstrative type should match');
+  assertEquals(oneParamResult.directiveType, 'init', 'Directive type should match');
 
   /**
    * Test for parsing two parameter commands.
    *
    * Purpose: Validates parsing of commands with exactly two positional
-   * parameters representing demonstrative type and layer type.
+   * parameters representing directive type and layer type.
    *
    * Background: Two parameter commands are the primary use case,
-   * specifying both an action (demonstrative) and a target (layer).
+   * specifying both an action (directive) and a target (layer).
    * Examples include 'to project' or 'from issue'.
    *
    * Intent: This test ensures that two parameter commands are correctly
-   * parsed with parameters assigned to demonstrativeType and layerType
+   * parsed with parameters assigned to directiveType and layerType
    * fields respectively, and the result properly typed as 'two'.
    */
   const twoParamResult = parser.parse(['to', 'project']) as TwoParamsResult;
@@ -88,7 +88,7 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(twoParamResult.type, 'two', 'Two parameters should be two type');
   assertEquals(twoParamResult.params, ['to', 'project'], 'Params should match input');
   assertEquals(twoParamResult.options, {}, 'Options should be empty');
-  assertEquals(twoParamResult.demonstrativeType, 'to', 'Demonstrative type should match');
+  assertEquals(twoParamResult.directiveType, 'to', 'Directive type should match');
   assertEquals(twoParamResult.layerType, 'project', 'Layer type should match');
 
   /**
@@ -125,9 +125,9 @@ Deno.test('test_params_parser_unit', () => {
     'Options should match',
   );
   assertEquals(
-    twoParamWithOptionsResult.demonstrativeType,
+    twoParamWithOptionsResult.directiveType,
     'to',
-    'Demonstrative type should match',
+    'Directive type should match',
   );
   assertEquals(twoParamWithOptionsResult.layerType, 'project', 'Layer type should match');
 
@@ -138,7 +138,7 @@ Deno.test('test_params_parser_unit', () => {
    * invalid input that doesn't match any expected parameter patterns.
    *
    * Background: Users may provide invalid commands that don't match
-   * the expected demonstrative types or layer types. The parser must
+   * the expected directive types or layer types. The parser must
    * gracefully handle these cases by returning an error result.
    *
    * Intent: This test ensures that invalid input is properly classified

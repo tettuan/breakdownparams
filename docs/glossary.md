@@ -39,13 +39,13 @@ This glossary is created for the following purposes:
 |---------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
 | ZeroParams    | Parameter type with no positional arguments. Used for help and version commands.                                                                 | [params.md](params.md)     |
 | OneParam   | Parameter type with one positional argument. Used to execute one operations like initialization. Currently only supports `init` command.     | [params.md](params.md)     |
-| TwoParams     | Parameter type with two positional arguments. Used to execute main functionality. Specifies operation through combination of DemonstrativeType and LayerType. | [params.md](params.md)     |
+| TwoParams     | Parameter type with two positional arguments. Used to execute main functionality. Specifies operation through combination of DirectiveType and LayerType. | [params.md](params.md)     |
 
 ### Main Types
 
 | Term              | Description                                                                                                                                    | Reference Specification    |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| DemonstrativeType | Type of first positional argument. Default allows `to`, `summary`, `defect`. Validated with regex pattern.                                     | [params.md](params.md)     |
+| DirectiveType | Type of first positional argument. Default allows `to`, `summary`, `defect`. Validated with regex pattern.                                     | [params.md](params.md)     |
 | LayerType         | Type of second positional argument. Default allows `project`, `issue`, `task`. Validated with regex pattern.                                   | [params.md](params.md)     |
 | ParamsResult      | Basic type for parameter parsing results. Interface for handling parsing results with type safety. Includes error information.                  | [params_type.md](params_type.md) |
 | OptionParams      | Type for option parameters. Interface for handling option values with type safety. Holds values for each option.                               | [params_type.md](params_type.md) |
@@ -86,7 +86,7 @@ This normalization is handled by the Option classes themselves, following the op
 
 | Term          | Description                                                                                                                                    | Reference Specification    |
 |---------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| Default Configuration | Validation configuration that supports standard usage patterns. Allows basic values for DemonstrativeType and LayerType.                    | [custom_params.md](custom_params.md) |
+| Default Configuration | Validation configuration that supports standard usage patterns. Allows basic values for DirectiveType and LayerType.                    | [custom_params.md](custom_params.md) |
 | Custom Configuration | User-defined validation configuration. Allows custom values with regex patterns.                                                              | [custom_params.md](custom_params.md) |
 | ParserConfig  | Interface that defines parser configuration. Used to specify validation rules.                                                                  | [custom_params.md](custom_params.md) |
 
@@ -112,7 +112,7 @@ This normalization is handled by the Option classes themselves, following the op
 | ParamsResult | Unified type for parameter parsing results. Returns one of ZeroParamsResult, OneParamsResult, TwoParamsResult, or ErrorResult. | [params_type.md](params_type.md) |
 | ZeroParamsResult | Result type for no parameters. Result when only options are specified. | [params_type.md](params_type.md) |
 | OneParamsResult | Result type for single parameter. For init command. Options are ignored. | [params_type.md](params_type.md) |
-| TwoParamsResult | Result type for two parameters. Contains DemonstrativeType and LayerType. Includes options and user variables. | [params_type.md](params_type.md) |
+| TwoParamsResult | Result type for two parameters. Contains DirectiveType and LayerType. Includes options and user variables. | [params_type.md](params_type.md) |
 
 ---
 

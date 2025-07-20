@@ -61,7 +61,7 @@ function assertOptionsMatch(
 // Helper function: Validate basic result
 function assertBasicResult(result: TwoParamsResult, testDescription: string) {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
-  assertEquals(result.demonstrativeType, DEMO_TYPE, `${testDescription}: Wrong demonstrative type`);
+  assertEquals(result.directiveType, DEMO_TYPE, `${testDescription}: Wrong directive type`);
   assertEquals(result.layerType, LAYER_TYPE, `${testDescription}: Wrong layer type`);
 }
 

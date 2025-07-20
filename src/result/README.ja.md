@@ -18,7 +18,7 @@
 
 3. **TwoParamsResult**
    - 二重パラメータ（メイン機能用）
-   - DemonstrativeTypeとLayerTypeの組み合わせ
+   - DirectiveTypeとLayerTypeの組み合わせ
    - オプションを持つ
 
 ## 型定義
@@ -41,7 +41,7 @@ interface OneParamsResult extends ParamsResult {
 
 interface TwoParamsResult extends ParamsResult {
   type: 'two';
-  demonstrativeType: string;
+  directiveType: string;
   layerType: string;
 }
 ```
@@ -87,7 +87,7 @@ const initResult: OneParamsResult = {
 const toResult: TwoParamsResult = {
   type: 'two',
   isValid: true,
-  demonstrativeType: 'to',
+  directiveType: 'to',
   layerType: 'project',
   options: {
     fromFile: 'input.json',

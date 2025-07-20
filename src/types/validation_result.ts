@@ -71,15 +71,15 @@ export interface ValidationResult {
   /**
    * Semantic type classification of the first parameter.
    *
-   * Validators may determine the demonstrative type during validation
+   * Validators may determine the directive type during validation
    * (e.g., recognizing a parameter as a 'file', 'url', or 'identifier').
    * This information enriches the parsing result for type-aware processing.
    */
-  demonstrativeType?: string;
+  directiveType?: string;
   /**
    * Semantic type classification of the second parameter.
    *
-   * Similar to demonstrativeType but for the second parameter in two-parameter
+   * Similar to directiveType but for the second parameter in two-parameter
    * commands. Helps establish the relationship between parameters
    * (e.g., 'source' and 'destination').
    */

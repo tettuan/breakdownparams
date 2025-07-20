@@ -9,7 +9,7 @@ Deno.test('CustomConfig functionality', async (t) => {
     const result = parser.parse(['to', 'project']) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
-    assertEquals(result.demonstrativeType, 'to');
+    assertEquals(result.directiveType, 'to');
     assertEquals(result.layerType, 'project');
   });
 
@@ -18,9 +18,9 @@ Deno.test('CustomConfig functionality', async (t) => {
       ...DEFAULT_CUSTOM_CONFIG,
       params: {
         two: {
-          demonstrativeType: {
+          directiveType: {
             pattern: '^(from|to|for)$',
-            errorMessage: 'Invalid demonstrative type. Must be one of: from, to, for',
+            errorMessage: 'Invalid directive type. Must be one of: from, to, for',
           },
           layerType: {
             pattern: '^(module|component|service)$',
@@ -35,7 +35,7 @@ Deno.test('CustomConfig functionality', async (t) => {
     // Test valid custom values
     const result1 = parser.parse(['from', 'module']) as TwoParamsResult;
     assertEquals(result1.type, 'two');
-    assertEquals(result1.demonstrativeType, 'from');
+    assertEquals(result1.directiveType, 'from');
     assertEquals(result1.layerType, 'module');
 
     // Test invalid values
@@ -44,7 +44,7 @@ Deno.test('CustomConfig functionality', async (t) => {
     if (result2.type === 'error' && result2.error) {
       assertEquals(
         result2.error.message,
-        'Invalid demonstrative type. Must be one of: from, to, for',
+        'Invalid directive type. Must be one of: from, to, for',
       );
     }
   });
@@ -141,9 +141,9 @@ Deno.test('CustomConfig functionality', async (t) => {
     const partialConfig = {
       params: {
         two: {
-          demonstrativeType: {
+          directiveType: {
             pattern: '^(partial1|partial2)$',
-            errorMessage: 'Partial demonstrative type error',
+            errorMessage: 'Partial directive type error',
           },
           layerType: {
             pattern: '^(partialLayer1|partialLayer2)$',
@@ -179,9 +179,9 @@ Deno.test('CustomConfig functionality', async (t) => {
         ...DEFAULT_CUSTOM_CONFIG,
         params: {
           two: {
-            demonstrativeType: {
+            directiveType: {
               pattern: '^(spread1|spread2)$',
-              errorMessage: 'Spread demonstrative type error',
+              errorMessage: 'Spread directive type error',
             },
             layerType: {
               pattern: '^(spreadLayer1|spreadLayer2)$',
@@ -196,14 +196,14 @@ Deno.test('CustomConfig functionality', async (t) => {
       // カスタムパラメータが正常に動作することを確認
       const result1 = parser.parse(['spread1', 'spreadLayer1']) as TwoParamsResult;
       assertEquals(result1.type, 'two');
-      assertEquals(result1.demonstrativeType, 'spread1');
+      assertEquals(result1.directiveType, 'spread1');
       assertEquals(result1.layerType, 'spreadLayer1');
 
       // デフォルトパラメータはエラーになることを確認（カスタムパターンに合わない）
       const result2 = parser.parse(['to', 'project']);
       assertEquals(result2.type, 'error');
       if (result2.type === 'error' && result2.error) {
-        assertEquals(result2.error.message, 'Spread demonstrative type error');
+        assertEquals(result2.error.message, 'Spread directive type error');
       }
 
       // デフォルトのvalidationルールとoptionsが使われることを確認

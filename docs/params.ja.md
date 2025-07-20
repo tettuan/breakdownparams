@@ -22,12 +22,12 @@ type ZeroParamsResult = {
 
 type OneParamsResult = {
   type: 'one';
-  demonstrativeType: string;
+  directiveType: string;
 };
 
 type TwoParamsResult = {
   type: 'two';
-  demonstrativeType: string;
+  directiveType: string;
   layerType: string;
   options: OptionParams;
   userVariables?: UserVariables;
@@ -35,8 +35,8 @@ type TwoParamsResult = {
 
 // パーサー設定の型定義
 interface ParserConfig {
-  // DemonstrativeTypeの設定
-  demonstrativeType: {
+  // DirectiveTypeの設定
+  directiveType: {
     // 許可する値のパターン（正規表現）
     pattern: string;
     // カスタムエラーメッセージ
@@ -54,9 +54,9 @@ interface ParserConfig {
 
 // デフォルト設定値
 const DEFAULT_CONFIG: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: '^(to|summary|defect)$',
-    errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect'
+    errorMessage: 'Invalid directive type. Must be one of: to, summary, defect'
   },
   layerType: {
     pattern: '^(project|issue|task)$',
@@ -73,11 +73,11 @@ const DEFAULT_CONFIG: ParserConfig = {
 
 2. 単一パラメータ（OneParamsResult）
    - initコマンド
-   - demonstrativeTypeのみ（オプションは無視）
+   - directiveTypeのみ（オプションは無視）
 
 3. 二重パラメータ（TwoParamsResult）
    - メインアプリケーション実行
-   - DemonstrativeTypeとLayerTypeのバリデーション
+   - DirectiveTypeとLayerTypeのバリデーション
    - オプションとユーザー変数
 
 ## オプションパラメータ
@@ -124,13 +124,13 @@ const zeroResult: ZeroParamsResult = {
 // 単一パラメータ
 const oneResult: OneParamsResult = {
   type: 'one',
-  demonstrativeType: 'init'
+  directiveType: 'init'
 };
 
 // 二重パラメータ（デフォルト設定値を使用）
 const twoResult: TwoParamsResult = {
   type: 'two',
-  demonstrativeType: 'to',      // パターン: ^(to|summary|defect)$
+  directiveType: 'to',      // パターン: ^(to|summary|defect)$
   layerType: 'project',         // パターン: ^(project|issue|task)$
   options: {
     fromFile: 'input.json',
@@ -141,9 +141,9 @@ const twoResult: TwoParamsResult = {
 
 // カスタム設定値での使用例
 const customConfig: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
-    errorMessage: 'Invalid demonstrative type'
+    errorMessage: 'Invalid directive type'
   },
   layerType: {
     pattern: '^[a-z]+$',  // 小文字のアルファベットのみ許可
@@ -169,7 +169,7 @@ const parser = new ParamsParser(customConfig);
   - アプリケーション初期化の特別処理
 - 2パラメータ
   - メインアプリケーション実行
-  - DemonstrativeTypeとLayerTypeのバリデーション
+  - DirectiveTypeとLayerTypeのバリデーション
   - ハイフン付きパラメータは追加オプションとして機能
 - 3つ以上のパラメータはエラー
 
@@ -220,12 +220,12 @@ const parser = new ParamsParser(customConfig);
 ./.deno/bin/breakdown to issue
 ```
 
-最初のオプション（$1）は`DemonstrativeType`と呼ばれ、正規表現パターンでバリデーションされます。
+最初のオプション（$1）は`DirectiveType`と呼ばれ、正規表現パターンでバリデーションされます。
 2番目のオプション（$2）は`LayerType`と呼ばれ、正規表現パターンでバリデーションされます。
 
 ### デフォルトのバリデーションルール
 
-#### DemonstrativeType
+#### DirectiveType
 デフォルトの正規表現パターン：`^(to|summary|defect)$`
 - to
 - summary
@@ -246,8 +246,8 @@ const parser = new ParamsParser(customConfig);
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -f=<file>
 ```
 
 ##### FromFile値
@@ -262,8 +262,8 @@ const parser = new ParamsParser(customConfig);
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -o=<output_file>
 ```
 
 ##### DestinationFile値
@@ -278,8 +278,8 @@ const parser = new ParamsParser(customConfig);
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -i=<from_layer_type>
 ```
 
 ##### from_layer_type値
@@ -295,8 +295,8 @@ const parser = new ParamsParser(customConfig);
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -c=<config_file>
 ```
 
 ##### ConfigFile値
@@ -310,7 +310,7 @@ const parser = new ParamsParser(customConfig);
 TwoParamsモードでのみ使用可能で、以下の形式で指定します：
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --uv-<name>=<value>
 ```
 
 ## エラーケース
@@ -318,7 +318,7 @@ TwoParamsモードでのみ使用可能で、以下の形式で指定します�
 | エラーケース            | メッセージ例                                           |
 | ----------------------- | ------------------------------------------------------ |
 | 引数過多                | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正なDemonstrativeType | "Invalid demonstrative type. Must be one of: to, summary, defect" |
+| 不正なDirectiveType | "Invalid directive type. Must be one of: to, summary, defect" |
 | 不正なLayerType         | "Invalid layer type. Must be one of: project, issue, task" |
 | 不正なConfig使用        | "Config option is only available with TwoParams"       |
 

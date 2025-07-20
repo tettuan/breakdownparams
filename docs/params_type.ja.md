@@ -12,12 +12,12 @@ type ZeroParamsResult = {
 
 type OneParamsResult = {
   type: 'one';
-  demonstrativeType: string;
+  directiveType: string;
 };
 
 type TwoParamsResult = {
   type: 'two';
-  demonstrativeType: string;
+  directiveType: string;
   layerType: string;
   options: OptionParams;
   userVariables?: UserVariables;
@@ -63,13 +63,13 @@ const zeroResult: ZeroParamsResult = {
 // OneParamsResult を返す
 const oneResult: OneParamsResult = {
   type: 'one',
-  demonstrativeType: 'init'
+  directiveType: 'init'
 };
 
 // TwoParamsResult を返す
 const twoResult: TwoParamsResult = {
   type: 'two',
-  demonstrativeType: 'to',
+  directiveType: 'to',
   layerType: 'project',
   options: {
     fromFile: 'input.json',
@@ -85,8 +85,8 @@ const twoResult: TwoParamsResult = {
 const errorResult: ErrorResult = {
   type: 'error',
   error: {
-    message: 'Invalid demonstrative type: invalid-type',
-    code: 'INVALID_DEMONSTRATIVE_TYPE',
+    message: 'Invalid directive type: invalid-type',
+    code: 'INVALID_DIRECTIVE_TYPE',
     details: {
       value: 'invalid-type',
       expected: 'to, summary, or defect'
@@ -127,7 +127,7 @@ const errorResult: ErrorResult = {
 単一パラメータで実行された場合の結果型。現在は `init` コマンドのみサポート。
 
 - `type`: 常に `'one'`
-- `demonstrativeType`: 指定されたコマンド（通常は `'init'`）
+- `directiveType`: 指定されたコマンド（通常は `'init'`）
 
 **注意**: OneParamsResult ではオプションは無視されます。
 
@@ -136,7 +136,7 @@ const errorResult: ErrorResult = {
 二重パラメータで実行された場合の結果型。メインアプリケーションの実行で使用。
 
 - `type`: 常に `'two'`
-- `demonstrativeType`: 最初のパラメータ（例: `'to'`, `'summary'`, `'defect'`）
+- `directiveType`: 最初のパラメータ（例: `'to'`, `'summary'`, `'defect'`）
 - `layerType`: 二番目のパラメータ（例: `'project'`, `'issue'`, `'task'`）
 - `options`: 指定されたオプション
 - `userVariables`: ユーザー変数オプション（`--uv-*` 形式）
@@ -164,7 +164,7 @@ const errorResult: ErrorResult = {
 
 主なエラーコード：
 
-- `INVALID_DEMONSTRATIVE_TYPE`: 不正な demonstrativeType
+- `INVALID_DIRECTIVE_TYPE`: 不正な directiveType
 - `INVALID_LAYER_TYPE`: 不正な layerType
 - `INVALID_OPTION`: 不正なオプション
 - `INVALID_CUSTOM_VARIABLE`: 不正なユーザー変数

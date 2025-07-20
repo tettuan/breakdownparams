@@ -21,8 +21,8 @@ ParamsParser:
       - オプション値の型チェック
       - 必須オプションの検証
       - オプション間の依存関係チェック
-  - DemonstrativeTypeValidator:
-      - demonstrative type の検証
+  - DirectiveTypeValidator:
+      - directive type の検証
       - 正規表現パターンによる値の検証
       - デフォルトパターン: ^(to|summary|defect)$
   - LayerTypeValidator:
@@ -37,13 +37,13 @@ ParamsParser:
       - init コマンドの処理
   - TwoParamValidator:
       - 2つのパラメータの検証
-      - demonstrative type と layer type の検証
+      - directive type と layer type の検証
       - カスタム変数オプションの検証
 
 # バリデーション設定
 
 ParserConfig:
-  demonstrativeType:
+  directiveType:
     pattern: string  # 正規表現パターン
     errorMessage?: string  # カスタムエラーメッセージ
   layerType:
@@ -53,9 +53,9 @@ ParserConfig:
 # デフォルト設定値
 
 DEFAULT_CONFIG:
-  demonstrativeType:
+  directiveType:
     pattern: "^(to|summary|defect)$"
-    errorMessage: "Invalid demonstrative type. Must be one of: to, summary, defect"
+    errorMessage: "Invalid directive type. Must be one of: to, summary, defect"
   layerType:
     pattern: "^(project|issue|task)$"
     errorMessage: "Invalid layer type. Must be one of: project, issue, task"
@@ -102,8 +102,8 @@ validation:
 
 errors:
   validation:
-    - code: "INVALID_DEMONSTRATIVE_TYPE"
-      message: "Invalid demonstrative type. Must be one of: to, summary, defect"
+    - code: "INVALID_DIRECTIVE_TYPE"
+      message: "Invalid directive type. Must be one of: to, summary, defect"
     - code: "INVALID_LAYER_TYPE"
       message: "Invalid layer type. Must be one of: project, issue, task"
     - code: "INVALID_OPTION_FORMAT"

@@ -23,11 +23,11 @@ for (const args of testArgs) {
     console.log('\nFor usage information, run: config_usage --help');
   } else if (result.type === 'two') {
     const twoResult = result as TwoParamsResult;
-    const { demonstrativeType, layerType, options = {} } = twoResult;
+    const { directiveType, layerType, options = {} } = twoResult;
 
     console.log('Command processed successfully:');
     console.log('----------------------------');
-    console.log(`Action: ${demonstrativeType} ${layerType}`);
+    console.log(`Action: ${directiveType} ${layerType}`);
 
     const typedOptions = options as {
       from?: string;
@@ -57,7 +57,7 @@ for (const args of testArgs) {
       console.log('\nFor usage information, run: config_usage --help');
     } else {
       console.log('Single param mode');
-      console.log(`Command: ${oneResult.demonstrativeType}`);
+      console.log(`Command: ${oneResult.directiveType}`);
 
       const typedOptions = oneResult.options as { config?: string };
       if (typedOptions.config) {

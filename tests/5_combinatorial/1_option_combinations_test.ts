@@ -41,7 +41,7 @@ import type { TwoParamsResult } from '../../src/mod.ts';
  * Common test parameters used throughout the test suite
  *
  * Purpose:
- * Provides consistent demonstrative and layer type values across all
+ * Provides consistent directive and layer type values across all
  * combination tests to ensure uniform testing conditions.
  *
  * Background:
@@ -116,7 +116,7 @@ function assertOptionsMatch(
  *
  * Intent:
  * - Verify successful two-parameter parsing
- * - Validate correct demonstrative and layer types
+ * - Validate correct directive and layer types
  * - Provide foundation for option-specific validation
  *
  * @param result - The parsed two-parameter result
@@ -124,7 +124,7 @@ function assertOptionsMatch(
  */
 function assertBasicResult(result: TwoParamsResult, testDescription: string) {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
-  assertEquals(result.demonstrativeType, DEMO_TYPE, `${testDescription}: Wrong demonstrative type`);
+  assertEquals(result.directiveType, DEMO_TYPE, `${testDescription}: Wrong directive type`);
   assertEquals(result.layerType, LAYER_TYPE, `${testDescription}: Wrong layer type`);
 }
 
@@ -437,7 +437,7 @@ Deno.test('Standard Option Combinations - All Options', async (t) => {
   });
 });
 
-Deno.test('Standard Option Combinations - Different DemonstrativeTypes', async (t) => {
+Deno.test('Standard Option Combinations - Different DirectiveTypes', async (t) => {
   const parser = new ParamsParser();
 
   const demoTypes = ['to', 'summary', 'defect'];
@@ -462,7 +462,7 @@ Deno.test('Standard Option Combinations - Different DemonstrativeTypes', async (
         const result = parser.parse(args) as TwoParamsResult;
 
         assertEquals(result.type, 'two');
-        assertEquals(result.demonstrativeType, demoType);
+        assertEquals(result.directiveType, demoType);
         assertEquals(result.layerType, layerType);
         assertOptionsMatch(
           result.options as Record<string, unknown>,

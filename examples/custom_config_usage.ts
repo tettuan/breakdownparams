@@ -7,8 +7,8 @@ const customConfig: CustomConfig = {
   ...DEFAULT_CUSTOM_CONFIG,
   params: {
     two: {
-      // Allow natural English demonstrative types
-      demonstrativeType: {
+      // Allow natural English directive types
+      directiveType: {
         pattern: '^(breakdown|split|divide|analyze|convert)$',
         errorMessage: 'Invalid action. Must be one of: breakdown, split, divide, analyze, convert',
       },
@@ -46,7 +46,7 @@ const examples = [
   ['split', 'pieces', '--from=video.mp4', '--uv-duration=5min', '--uv-quality=high'],
 
   // Invalid examples
-  ['destroy', 'simple'], // Invalid demonstrative type
+  ['destroy', 'simple'], // Invalid directive type
   ['breakdown', 'tiny'], // Invalid layer type
 ];
 
@@ -62,7 +62,7 @@ for (const args of examples) {
   } else if (result.type === 'two') {
     const twoResult = result as TwoParamsResult;
     console.log(`✅ Valid command:`);
-    console.log(`   Action: ${twoResult.demonstrativeType}`);
+    console.log(`   Action: ${twoResult.directiveType}`);
     console.log(`   Target: ${twoResult.layerType}`);
     if (Object.keys(twoResult.options).length > 0) {
       console.log(`   Options:`);

@@ -16,7 +16,7 @@ Deno.test('test_params_parser_unit', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -49,15 +49,15 @@ Deno.test('test_params_parser_unit', () => {
   assertEquals(oneParamResult.type, 'one', 'One parameter should be one type');
   assertEquals(oneParamResult.params, ['init'], 'Params should match');
   assertEquals(oneParamResult.options, {}, 'Options should be empty');
-  assertEquals(oneParamResult.demonstrativeType, 'init', 'Demonstrative type should match');
+  assertEquals(oneParamResult.directiveType, 'init', 'Directive type should match');
 
-  // Test two params functionality with valid demonstrative and layer types
+  // Test two params functionality with valid directive and layer types
   const twoParamArgs = ['summary', 'task'];
   const twoParamResult = parser.parse(twoParamArgs) as TwoParamsResult;
   assertEquals(twoParamResult.type, 'two', 'Two parameters should be two type');
   assertEquals(twoParamResult.params, ['summary', 'task'], 'Params should match');
   assertEquals(twoParamResult.options, {}, 'Options should be empty');
-  assertEquals(twoParamResult.demonstrativeType, 'summary', 'Demonstrative type should match');
+  assertEquals(twoParamResult.directiveType, 'summary', 'Directive type should match');
   assertEquals(twoParamResult.layerType, 'task', 'Layer type should match');
 
   // Test two params with options functionality
@@ -75,9 +75,9 @@ Deno.test('test_params_parser_unit', () => {
     'Options should match',
   );
   assertEquals(
-    twoParamWithOptionsResult.demonstrativeType,
+    twoParamWithOptionsResult.directiveType,
     'summary',
-    'Demonstrative type should match',
+    'Directive type should match',
   );
   assertEquals(twoParamWithOptionsResult.layerType, 'task', 'Layer type should match');
 

@@ -48,7 +48,7 @@ Deno.test('test_params_result', () => {
   const optionRule: OptionRule = {
     format: '--key=value',
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },

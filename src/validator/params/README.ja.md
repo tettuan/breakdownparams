@@ -34,7 +34,7 @@
 
 - **役割**: パラメータが2個であることを検証
 - **主な機能**:
-  - DemonstrativeType と LayerType のバリデーション
+  - DirectiveType と LayerType のバリデーション
   - カスタマイズ可能な設定（CustomConfig）
   - デフォルトパターン: "^(to|summary|defect)$" と "^(project|issue|task)$"
   - 詳細なエラーメッセージとエラーコードの提供

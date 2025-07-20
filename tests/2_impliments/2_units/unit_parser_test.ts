@@ -53,7 +53,7 @@ Deno.test('test_params_parser', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },

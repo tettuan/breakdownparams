@@ -39,13 +39,13 @@
 | ------------ | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
 | ZeroParams   | 位置引数なしのパラメータタイプ。helpコマンドとversionコマンドに使用。 | [params.ja.md](params.ja.md) |
 | OneParam     | 位置引数1つのパラメータタイプ。初期化などの単一の操作を実行するために使用。現在は`init`コマンドのみをサポート。         | [params.ja.md](params.ja.md) |
-| TwoParams    | 位置引数2つのパラメータタイプ。メインの機能を実行するために使用。DemonstrativeTypeとLayerTypeの組み合わせで操作を指定。 | [params.ja.md](params.ja.md) |
+| TwoParams    | 位置引数2つのパラメータタイプ。メインの機能を実行するために使用。DirectiveTypeとLayerTypeの組み合わせで操作を指定。 | [params.ja.md](params.ja.md) |
 
 ### 主要な型
 
 | 用語              | 説明                                                                                                                | 参照仕様ファイル                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| DemonstrativeType | 最初の位置引数の型。デフォルトでは`to`, `summary`, `defect`を許可。正規表現パターンでバリデーション。 | [params.ja.md](params.ja.md)           |
+| DirectiveType | 最初の位置引数の型。デフォルトでは`to`, `summary`, `defect`を許可。正規表現パターンでバリデーション。 | [params.ja.md](params.ja.md)           |
 | LayerType         | 2番目の位置引数の型。デフォルトでは`project`, `issue`, `task`を許可。正規表現パターンでバリデーション。   | [params.ja.md](params.ja.md)           |
 | ParamsResult      | パラメータ解析結果の基本型。解析結果を型安全に扱うためのインターフェース。エラー情報も含む。                        | [params_type.ja.md](params_type.ja.md) |
 | OptionParams      | オプションパラメータの型。オプションの値を型安全に扱うためのインターフェース。各オプションの値を保持。              | [params_type.ja.md](params_type.ja.md) |
@@ -86,7 +86,7 @@
 
 | 用語         | 説明                                                                                                               | 参照仕様ファイル                           |
 | ------------ | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
-| デフォルト設定値   | 標準的な使用パターンをサポートするバリデーション設定。DemonstrativeTypeとLayerTypeの基本的な値を許可。 | [custom_params.ja.md](custom_params.ja.md) |
+| デフォルト設定値   | 標準的な使用パターンをサポートするバリデーション設定。DirectiveTypeとLayerTypeの基本的な値を許可。 | [custom_params.ja.md](custom_params.ja.md) |
 | カスタム設定値   | ユーザー定義のバリデーション設定。正規表現パターンでカスタムな値を許可。                     | [custom_params.ja.md](custom_params.ja.md) |
 | ParserConfig | パーサーの設定を定義するインターフェース。バリデーションルールを指定するために使用。         | [custom_params.ja.md](custom_params.ja.md) |
 
@@ -112,7 +112,7 @@
 | ParamsResult | パラメータ解析結果の統合型。ZeroParamsResult、OneParamsResult、TwoParamsResult、ErrorResultのいずれかを返す。 | [params_type.ja.md](params_type.ja.md) |
 | ZeroParamsResult | パラメータなしの結果型。オプションのみが指定された場合の結果。 | [params_type.ja.md](params_type.ja.md) |
 | OneParamsResult | 単一パラメータの結果型。initコマンド用。オプションは無視される。 | [params_type.ja.md](params_type.ja.md) |
-| TwoParamsResult | 二重パラメータの結果型。DemonstrativeTypeとLayerTypeを含む。オプションとユーザー変数を含む。 | [params_type.ja.md](params_type.ja.md) |
+| TwoParamsResult | 二重パラメータの結果型。DirectiveTypeとLayerTypeを含む。オプションとユーザー変数を含む。 | [params_type.ja.md](params_type.ja.md) |
 
 ---
 

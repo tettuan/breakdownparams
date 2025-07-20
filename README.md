@@ -43,16 +43,16 @@ switch (result.type) {
     break;
 
   case 'one':
-    // Single parameter with demonstrative type
-    console.log(`Command: ${result.demonstrativeType}`);
-    if (result.demonstrativeType === 'init') {
+    // Single parameter with directive type
+    console.log(`Command: ${result.directiveType}`);
+    if (result.directiveType === 'init') {
       console.log('Initialize project');
     }
     break;
 
   case 'two':
     // Two parameters with full semantic information
-    console.log(`Demonstrative Type: ${result.demonstrativeType}`);
+    console.log(`Directive Type: ${result.directiveType}`);
     console.log(`Layer Type: ${result.layerType}`);
     if (result.options.from) {
       console.log(`Input file: ${result.options.from}`);
@@ -115,13 +115,13 @@ The parser returns a discriminated union type `ParamsResult` with four possible 
 
 #### `OneParamsResult`
 - **When**: Exactly one positional parameter
-- **Properties**: `demonstrativeType` - semantic category of the parameter
+- **Properties**: `directiveType` - semantic category of the parameter
 - **Example**: `command init`, `command status`
 
 #### `TwoParamsResult`
 - **When**: Exactly two positional parameters
 - **Properties**: 
-  - `demonstrativeType` - first parameter's semantic category
+  - `directiveType` - first parameter's semantic category
   - `layerType` - second parameter's semantic category
 - **Example**: `command to project`, `command from issue`
 
@@ -191,8 +191,8 @@ The library implements a comprehensive three-tier validation system:
 
 #### 2. Parameter Validation
 - **Zero parameters**: Ensures no positional arguments
-- **One parameter**: Validates demonstrative type format
-- **Two parameters**: Validates both demonstrative and layer types
+- **One parameter**: Validates directive type format
+- **Two parameters**: Validates both directive and layer types
 - Configurable patterns via `CustomConfig`
 
 #### 3. Option Validation
@@ -211,9 +211,9 @@ import { ParamsParser, CustomConfig } from 'jsr:@tettuan/breakdownparams@1.0.3';
 const customConfig: CustomConfig = {
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: "^(to|from|via)$",
-        errorMessage: "Invalid demonstrative type. Must be one of: to, from, via"
+        errorMessage: "Invalid directive type. Must be one of: to, from, via"
       },
       layerType: {
         pattern: "^(project|issue|task|epic)$", 
@@ -296,7 +296,7 @@ import type {
 function handleResult(result: ParamsResult) {
   if (result.type === 'two') {
     // TypeScript knows these properties exist
-    console.log(result.demonstrativeType);
+    console.log(result.directiveType);
     console.log(result.layerType);
   }
   

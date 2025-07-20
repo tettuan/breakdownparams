@@ -11,7 +11,7 @@ By using default configuration values, it supports standard usage patterns while
 
 ### 2.1 Parameter Configuration
 
-1. **DemonstrativeType**
+1. **DirectiveType**
    - Default pattern: `^(to|summary|defect)$`
    - Custom pattern: Specified in configuration values
    - List of allowed values
@@ -50,7 +50,7 @@ interface CustomConfig {
   // Parameter configuration
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: string;
         errorMessage: string;
       };
@@ -100,9 +100,9 @@ interface CustomConfig {
 const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(to|summary|defect)$',
-        errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect',
+        errorMessage: 'Invalid directive type. Must be one of: to, summary, defect',
       },
       layerType: {
         pattern: '^(project|issue|task)$',
@@ -160,9 +160,9 @@ const customConfig: CustomConfig = {
   ...DEFAULT_CUSTOM_CONFIG,
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(to|from|for)$',  // Allow custom values
-        errorMessage: 'Invalid demonstrative type. Must be one of: to, from, for',
+        errorMessage: 'Invalid directive type. Must be one of: to, from, for',
       },
       layerType: {
         pattern: '^(module|component|service)$',  // Allow custom values
@@ -186,14 +186,14 @@ const customConfig: CustomConfig = {
 
 With default configuration values, only the following values are allowed:
 
-- DemonstrativeType: `to`, `summary`, `defect`
+- DirectiveType: `to`, `summary`, `defect`
 - LayerType: `project`, `issue`, `task`
 
 ### 4.2 Validation with Custom Configuration
 
 With custom configuration values, values matching the pattern specified in configuration are allowed:
 
-1. **DemonstrativeType Validation**
+1. **DirectiveType Validation**
    - Check if value matches configured pattern
    - Return custom error message if no match
 
@@ -222,7 +222,7 @@ const customParser = new ParamsParser(undefined, undefined, customConfig);
 const result = parser.parse(['to', 'project', '--from=input.md']);
 
 if (result.type === 'two') {
-  console.log(result.params.demonstrativeType); // "to"
+  console.log(result.params.directiveType); // "to"
   console.log(result.params.layerType); // "project"
   console.log(result.options.from); // "input.md"
 }
@@ -231,7 +231,7 @@ if (result.type === 'two') {
 const customResult = customParser.parse(['from', 'module', '--from=src/']);
 
 if (customResult.type === 'two') {
-  console.log(customResult.params.demonstrativeType); // "from"
+  console.log(customResult.params.directiveType); // "from"
   console.log(customResult.params.layerType); // "module"
   console.log(customResult.options.from); // "src/"
 }
@@ -246,7 +246,7 @@ if (customResult.type === 'two') {
 const partialConfig = {
   params: {
     two: {
-      demonstrativeType: { 
+      directiveType: { 
         pattern: '^(custom)$', 
         errorMessage: 'Custom error' 
       }
@@ -269,7 +269,7 @@ const safeConfig: CustomConfig = {
   ...DEFAULT_CUSTOM_CONFIG,  // Include all default settings
   params: {
     two: {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(create|update|delete)$',
         errorMessage: 'Invalid action. Must be one of: create, update, delete'
       },
@@ -317,8 +317,8 @@ const resultWithOptions = parser.parse(['update', 'product', '--from=data.json']
   params: [],
   options: {},
   error: {
-    message: "Invalid demonstrative type. Must be one of: to, summary, defect",
-    code: "INVALID_DEMONSTRATIVE_TYPE",
+    message: "Invalid directive type. Must be one of: to, summary, defect",
+    code: "INVALID_DIRECTIVE_TYPE",
     category: "validation"
   }
 }

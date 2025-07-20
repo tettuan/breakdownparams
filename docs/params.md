@@ -22,12 +22,12 @@ type ZeroParamsResult = {
 
 type OneParamsResult = {
   type: 'one';
-  demonstrativeType: string;
+  directiveType: string;
 };
 
 type TwoParamsResult = {
   type: 'two';
-  demonstrativeType: string;
+  directiveType: string;
   layerType: string;
   options: OptionParams;
   userVariables?: UserVariables;
@@ -46,8 +46,8 @@ type ErrorInfo = {
 
 // Parser configuration type definition
 interface ParserConfig {
-  // DemonstrativeType configuration
-  demonstrativeType: {
+  // DirectiveType configuration
+  directiveType: {
     // Pattern for allowed values (regex)
     pattern: string;
     // Custom error message
@@ -65,9 +65,9 @@ interface ParserConfig {
 
 // Default configuration values
 const DEFAULT_CONFIG: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: '^(to|summary|defect)$',
-    errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect'
+    errorMessage: 'Invalid directive type. Must be one of: to, summary, defect'
   },
   layerType: {
     pattern: '^(project|issue|task)$',
@@ -84,11 +84,11 @@ const DEFAULT_CONFIG: ParserConfig = {
 
 2. Single Parameter (OneParamsResult)
    - init command
-   - demonstrativeType only (options are ignored)
+   - directiveType only (options are ignored)
 
 3. Two Parameters (TwoParamsResult)
    - Main application execution
-   - DemonstrativeType and LayerType validation
+   - DirectiveType and LayerType validation
    - Options and user variables
 
 ## Option Parameters
@@ -130,13 +130,13 @@ const zeroResult: ZeroParamsResult = {
 // Single parameter
 const oneResult: OneParamsResult = {
   type: 'one',
-  demonstrativeType: 'init'
+  directiveType: 'init'
 };
 
 // Two parameters (using default configuration values)
 const twoResult: TwoParamsResult = {
   type: 'two',
-  demonstrativeType: 'to',      // Pattern: ^(to|summary|defect)$
+  directiveType: 'to',      // Pattern: ^(to|summary|defect)$
   layerType: 'project',         // Pattern: ^(project|issue|task)$
   options: {
     fromFile: 'input.json',
@@ -147,9 +147,9 @@ const twoResult: TwoParamsResult = {
 
 // Custom configuration values usage example
 const customConfig: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: '^[a-z]+$',  // Allow only lowercase alphabets
-    errorMessage: 'Invalid demonstrative type'
+    errorMessage: 'Invalid directive type'
   },
   layerType: {
     pattern: '^[a-z]+$',  // Allow only lowercase alphabets
@@ -175,7 +175,7 @@ Each pattern corresponds to a specific data structure. These patterns are mutual
   - Special handling for application initialization
 - 2 parameters
   - Main application execution
-  - DemonstrativeType and LayerType validation
+  - DirectiveType and LayerType validation
   - Hyphenated parameters function as additional options
 - 3 or more parameters result in an error
 
@@ -226,12 +226,12 @@ Example:
 ./.deno/bin/breakdown to issue
 ```
 
-The first option ($1) is called `DemonstrativeType` and is validated with a regex pattern.
+The first option ($1) is called `DirectiveType` and is validated with a regex pattern.
 The second option ($2) is called `LayerType` and is validated with a regex pattern.
 
 ### Default Validation Rules
 
-#### DemonstrativeType
+#### DirectiveType
 Default regex pattern: `^(to|summary|defect)$`
 - to
 - summary
@@ -252,8 +252,8 @@ Alias: `-f`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --from=<file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -f=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --from=<file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -f=<file>
 ```
 
 ##### FromFile Values
@@ -268,8 +268,8 @@ Alias: `-o`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --destination=<output_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -o=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --destination=<output_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -o=<output_file>
 ```
 
 ##### DestinationFile Values
@@ -284,8 +284,8 @@ Alias: `-i`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --input=<from_layer_type>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -i=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --input=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -i=<from_layer_type>
 ```
 
 ##### from_layer_type Values
@@ -301,8 +301,8 @@ Alias: `-c`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --config=<config_file>
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> -c=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --config=<config_file>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -c=<config_file>
 ```
 
 ##### ConfigFile Values
@@ -316,7 +316,7 @@ User variable options are used to specify user-defined variables.
 Only available in TwoParams mode, specified in the following format:
 
 ```bash
-./.deno/bin/breakdown <DemonstrativeType> <LayerType> --uv-<name>=<value>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --uv-<name>=<value>
 ```
 
 ## Error Cases
@@ -324,7 +324,7 @@ Only available in TwoParams mode, specified in the following format:
 | Error Case              | Example Message                                           |
 | ----------------------- | --------------------------------------------------------- |
 | Too many arguments      | "Too many arguments. Maximum 2 arguments are allowed."    |
-| Invalid DemonstrativeType | "Invalid demonstrative type. Must be one of: to, summary, defect" |
+| Invalid DirectiveType | "Invalid directive type. Must be one of: to, summary, defect" |
 | Invalid LayerType       | "Invalid layer type. Must be one of: project, issue, task" |
 | Invalid Config usage    | "Config option is only available with TwoParams"          |
 

@@ -11,9 +11,9 @@ Deno.test('test_two_params_validator_structure', () => {
     'Two params validator should return correct params',
   );
   assertEquals(
-    result.demonstrativeType,
+    result.directiveType,
     'to',
-    'Two params validator should set demonstrative type',
+    'Two params validator should set directive type',
   );
   assertEquals(result.layerType, 'project', 'Two params validator should set layer type');
 });

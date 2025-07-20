@@ -8,7 +8,7 @@ Deno.test('test_one_param_validator_unit', () => {
   const validResult = validator.validate(['init']);
   assertEquals(validResult.isValid, true, 'init param should be valid');
   assertEquals(validResult.validatedParams, ['init'], 'Should return correct param');
-  assertEquals(validResult.demonstrativeType, 'init', 'Should set demonstrative type');
+  assertEquals(validResult.directiveType, 'init', 'Should set directive type');
 
   // 異常系テスト
   const invalidResult = validator.validate(['invalid']);

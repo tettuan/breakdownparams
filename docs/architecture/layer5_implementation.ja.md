@@ -16,7 +16,7 @@
 
 3. **TwoParams**
    - 位置引数2つ
-   - 形式：`<demonstrativeType> <layerType>`
+   - 形式：`<directiveType> <layerType>`
    - 例：`breakdown to project`
 
 ## 2. オプション定義
@@ -40,7 +40,7 @@
 
 - 0個：オプションのみ許可
 - 1個：`init`コマンドのみ許可
-- 2個：demonstrativeTypeとlayerTypeの組み合わせ
+- 2個：directiveTypeとlayerTypeの組み合わせ
 - 3個以上：エラー
 
 ### 3.2 値の制約
@@ -75,7 +75,7 @@
 
 ```typescript
 interface ParserConfig {
-  demonstrativeType: {
+  directiveType: {
     pattern: string;
     errorMessage?: string;
   };
@@ -90,9 +90,9 @@ interface ParserConfig {
 
 ```typescript
 const DEFAULT_CONFIG: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: "^(to|summary|defect)$",
-    errorMessage: "Invalid demonstrative type. Must be one of: to, summary, defect"
+    errorMessage: "Invalid directive type. Must be one of: to, summary, defect"
   },
   layerType: {
     pattern: "^(project|issue|task)$",
@@ -105,9 +105,9 @@ const DEFAULT_CONFIG: ParserConfig = {
 
 ```typescript
 const customConfig: ParserConfig = {
-  demonstrativeType: {
+  directiveType: {
     pattern: "^[a-z]+$",
-    errorMessage: "Invalid demonstrative type"
+    errorMessage: "Invalid directive type"
   },
   layerType: {
     pattern: "^[a-z]+$",
@@ -138,7 +138,7 @@ interface ErrorInfo {
 | エラーケース       | メッセージ例                                           |
 | ------------------ | ------------------------------------------------------ |
 | 引数過多           | "Too many arguments. Maximum 2 arguments are allowed." |
-| 不正な値           | "Invalid demonstrative type. Must be one of: to, summary, defect" |
+| 不正な値           | "Invalid directive type. Must be one of: to, summary, defect" |
 | 必須パラメータ不足 | "Missing required parameter: {param}"                  |
 | ユーザー変数オプション構文エラー | "Invalid user variable option syntax: {value}"  |
 | 設定エラー         | "Invalid configuration: pattern is required"           |
@@ -367,7 +367,7 @@ const parser = new ParamsParser();
 const result = parser.parse(["to", "project", "--from=input.md"]);
 
 if (result.type === "break") {
-  console.log(`Demonstrative Type: ${result.demonstrativeType}`);
+  console.log(`Directive Type: ${result.directiveType}`);
   console.log(`Layer Type: ${result.layerType}`);
   console.log(`From File: ${result.options.fromFile}`);
 }

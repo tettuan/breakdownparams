@@ -42,7 +42,7 @@ export interface ParamsParser {
    * const result = parser.parse(["layer", "detail", "--verbose"]);
    *
    * if (result.type === "two") {
-   *   // result.demonstrativeType === "layer"
+   *   // result.directiveType === "layer"
    *   // result.layerType === "detail"
    *   // result.options.verbose === true
    * }
@@ -70,7 +70,7 @@ export interface ParamsParser {
  * // Custom configuration
  * const customParser = new ParamsParser(
  *   { allowedOptions: ["verbose", "help"] },
- *   { demonstrativeType: ["layer"], layerType: ["detail"] }
+ *   { directiveType: ["layer"], layerType: ["detail"] }
  * );
  * ```
  */
@@ -188,11 +188,11 @@ export class ParamsParser {
    * parser.parse(["--help"]); // { type: "zero", params: [], options: { help: true } }
    *
    * // One parameter
-   * parser.parse(["init"]); // { type: "one", params: ["init"], demonstrativeType: "init" }
+   * parser.parse(["init"]); // { type: "one", params: ["init"], directiveType: "init" }
    *
    * // Two parameters
    * parser.parse(["layer", "detail", "--verbose"]);
-   * // { type: "two", params: ["layer", "detail"], demonstrativeType: "layer", layerType: "detail" }
+   * // { type: "two", params: ["layer", "detail"], directiveType: "layer", layerType: "detail" }
    *
    * // Error case
    * parser.parse(["invalid", "too", "many"]); // { type: "error", error: {...} }
@@ -337,7 +337,7 @@ export class ParamsParser {
         type: 'one',
         params: oneResult.validatedParams,
         options,
-        demonstrativeType: oneResult.validatedParams[0],
+        directiveType: oneResult.validatedParams[0],
       } as OneParamsResult;
     }
 
@@ -382,7 +382,7 @@ export class ParamsParser {
         type: 'two',
         params: twoResult.validatedParams,
         options,
-        demonstrativeType: twoResult.validatedParams[0],
+        directiveType: twoResult.validatedParams[0],
         layerType: twoResult.validatedParams[1],
       } as TwoParamsResult;
     }

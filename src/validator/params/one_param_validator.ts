@@ -15,7 +15,7 @@ import { ValidationResult } from '../../types/validation_result.ts';
  * const validator = new OneParamValidator();
  *
  * // Valid: init command
- * validator.validate(["init"]); // { isValid: true, demonstrativeType: "init" }
+ * validator.validate(["init"]); // { isValid: true, directiveType: "init" }
  *
  * // Invalid: wrong command
  * validator.validate(["start"]); // { isValid: false, errorMessage: "Invalid command: start..." }
@@ -29,13 +29,13 @@ export class OneParamValidator extends BaseValidator {
    * Validates that exactly one parameter is provided and it's "init".
    *
    * @param params - Array of parameters to validate
-   * @returns Validation result with demonstrativeType if valid
+   * @returns Validation result with directiveType if valid
    *
    * @example
    * ```ts
    * const result = validator.validate(["init"]);
    * if (result.isValid) {
-   *   // result.demonstrativeType === "init"
+   *   // result.directiveType === "init"
    * }
    * ```
    */
@@ -54,7 +54,7 @@ export class OneParamValidator extends BaseValidator {
     return {
       isValid,
       validatedParams: params,
-      demonstrativeType: params[0],
+      directiveType: params[0],
       errorMessage: isValid ? undefined : `Invalid command: ${params[0]}. Only "init" is allowed`,
       errorCode: isValid ? undefined : 'INVALID_COMMAND',
       errorCategory: isValid ? undefined : 'validation',

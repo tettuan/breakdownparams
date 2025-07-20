@@ -15,8 +15,8 @@ export interface ParamsResult {
    * This field enables TypeScript's discriminated union feature, allowing
    * type-safe access to result-specific properties based on the type value.
    * - 'zero': No parameters provided (command only)
-   * - 'one': Single parameter with demonstrative type
-   * - 'two': Two parameters with demonstrative and layer types
+   * - 'one': Single parameter with directive type
+   * - 'two': Two parameters with directive and layer types
    * - 'error': Parsing or validation error occurred
    */
   type: 'zero' | 'one' | 'two' | 'error';
@@ -71,7 +71,7 @@ export interface ZeroParamsResult extends ParamsResult {
  * Result type for commands with a single parameter.
  *
  * Represents the successful parsing of a command that expects exactly one
- * positional argument. The parameter is categorized by its demonstrative type,
+ * positional argument. The parameter is categorized by its directive type,
  * which indicates the parameter's role or meaning in the command context.
  *
  * Example usage: command <target> --options
@@ -81,7 +81,7 @@ export interface OneParamsResult extends ParamsResult {
    * Type discriminator indicating single parameter.
    *
    * When this type is 'one', the params array will contain exactly
-   * one element, and demonstrativeType will be populated.
+   * one element, and directiveType will be populated.
    */
   type: 'one';
   /**
@@ -92,7 +92,7 @@ export interface OneParamsResult extends ParamsResult {
    * helps in understanding the parameter's intended use and may
    * influence subsequent processing or validation.
    */
-  demonstrativeType: string;
+  directiveType: string;
 }
 
 /**
@@ -100,7 +100,7 @@ export interface OneParamsResult extends ParamsResult {
  *
  * Represents the successful parsing of a command that expects exactly two
  * positional arguments. Both parameters are categorized: the first by its
- * demonstrative type and the second by its layer type, enabling rich
+ * directive type and the second by its layer type, enabling rich
  * semantic understanding of the command structure.
  *
  * Example usage: command <source> <destination> --options
@@ -110,7 +110,7 @@ export interface TwoParamsResult extends ParamsResult {
    * Type discriminator indicating two parameters.
    *
    * When this type is 'two', the params array will contain exactly
-   * two elements, with both demonstrativeType and layerType populated.
+   * two elements, with both directiveType and layerType populated.
    */
   type: 'two';
   /**
@@ -119,7 +119,7 @@ export interface TwoParamsResult extends ParamsResult {
    * Similar to OneParamsResult, indicates what the first parameter
    * represents (e.g., 'source', 'input', 'from').
    */
-  demonstrativeType: string;
+  directiveType: string;
   /**
    * The semantic category of the second parameter.
    *

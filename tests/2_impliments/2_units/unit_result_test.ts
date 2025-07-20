@@ -60,36 +60,36 @@ Deno.test('test_result_unit', () => {
    * Test for OneParamsResult type structure.
    *
    * Purpose: Validates the structure of results for single parameter commands
-   * with the additional demonstrativeType field.
+   * with the additional directiveType field.
    *
    * Background: OneParamsResult represents commands with exactly one positional
    * parameter, such as 'init' or 'status'. The parameter value is stored both
-   * in the params array and the demonstrativeType field for convenience.
+   * in the params array and the directiveType field for convenience.
    *
    * Intent: This test ensures that OneParamsResult objects contain all required
    * fields including the type discriminator 'one', the params array with one
-   * element, options object, and the demonstrativeType string field.
+   * element, options object, and the directiveType string field.
    */
   const oneParamResult: OneParamsResult = {
     type: 'one',
     params: ['init'],
     options: {},
-    demonstrativeType: 'init',
+    directiveType: 'init',
   };
   assertEquals(oneParamResult.type, 'one', 'type should be one');
   assertEquals(Array.isArray(oneParamResult.params), true, 'params should be an array');
   assertEquals(typeof oneParamResult.options, 'object', 'options should be an object');
   assertEquals(
-    typeof oneParamResult.demonstrativeType,
+    typeof oneParamResult.directiveType,
     'string',
-    'demonstrativeType should be a string',
+    'directiveType should be a string',
   );
 
   /**
    * Test for TwoParamsResult type structure.
    *
    * Purpose: Validates the structure of results for two parameter commands
-   * with both demonstrativeType and layerType fields.
+   * with both directiveType and layerType fields.
    *
    * Background: TwoParamsResult represents the primary use case with two
    * positional parameters specifying an action and target (e.g., 'to project').
@@ -98,22 +98,22 @@ Deno.test('test_result_unit', () => {
    *
    * Intent: This test ensures that TwoParamsResult objects contain all required
    * fields including the type discriminator 'two', params array with two
-   * elements, options object, and both demonstrativeType and layerType fields.
+   * elements, options object, and both directiveType and layerType fields.
    */
   const twoParamsResult: TwoParamsResult = {
     type: 'two',
     params: ['to', 'project'],
     options: {},
-    demonstrativeType: 'to',
+    directiveType: 'to',
     layerType: 'project',
   };
   assertEquals(twoParamsResult.type, 'two', 'type should be two');
   assertEquals(Array.isArray(twoParamsResult.params), true, 'params should be an array');
   assertEquals(typeof twoParamsResult.options, 'object', 'options should be an object');
   assertEquals(
-    typeof twoParamsResult.demonstrativeType,
+    typeof twoParamsResult.directiveType,
     'string',
-    'demonstrativeType should be a string',
+    'directiveType should be a string',
   );
   assertEquals(typeof twoParamsResult.layerType, 'string', 'layerType should be a string');
 
@@ -187,7 +187,7 @@ Deno.test('test_result_unit', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -305,7 +305,7 @@ Deno.test('test_validation_result', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--demonstrative-type', '--layer-type'],
+      customVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },

@@ -41,21 +41,21 @@ Deno.test('test_params_parser_e2e', () => {
   assertEquals(initResult.type, 'one', 'Init command should return one param result');
   assertEquals(initResult.params, ['init'], 'Init command should be included in params');
   assertEquals(Object.keys(initResult.options).length, 0, 'Init command should have no options');
-  assertEquals(initResult.demonstrativeType, 'init', 'Demonstrative type should be init');
+  assertEquals(initResult.directiveType, 'init', 'Directive type should be init');
 
   // Test: To command
   const toResult = parser.parse(['to', 'project']) as TwoParamsResult;
   assertEquals(toResult.type, 'two', 'To command should return two params result');
   assertEquals(toResult.params, ['to', 'project'], 'To command should be included in params');
   assertEquals(Object.keys(toResult.options).length, 0, 'To command should have no options');
-  assertEquals(toResult.demonstrativeType, 'to', 'Demonstrative type should be to');
+  assertEquals(toResult.directiveType, 'to', 'Directive type should be to');
   assertEquals(toResult.layerType, 'project', 'Layer type should be project');
 
   // Test: Command with options
   const optionsResult = parser.parse([
     'to',
     'project',
-    '--demonstrative-type=test',
+    '--directive-type=test',
     '--layer-type=component',
   ]);
   assertEquals(
@@ -86,7 +86,7 @@ Deno.test('test_params_parser_e2e', () => {
     'project',
     '--help',
     '--version',
-    '--demonstrative-type=test',
+    '--directive-type=test',
   ]);
   assertEquals(
     complexResult.type,

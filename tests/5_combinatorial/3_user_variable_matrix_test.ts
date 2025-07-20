@@ -44,11 +44,11 @@ import type { ParamsResult, TwoParamsResult } from '../../src/mod.ts';
  * Common test parameters used throughout the test suite.
  *
  * Purpose:
- * These constants provide consistent demonstrative and layer type values
+ * These constants provide consistent directive and layer type values
  * for all test cases, ensuring uniformity across the test suite.
  *
  * Background:
- * The parser requires two mandatory parameters (demonstrative type and layer type)
+ * The parser requires two mandatory parameters (directive type and layer type)
  * before processing any options. Using constants prevents typos and makes
  * tests more maintainable.
  */
@@ -95,7 +95,7 @@ function assertOptionsMatch(
  *
  * Purpose:
  * Validates that the parser correctly identified the command as a two-parameter
- * type and extracted the demonstrative and layer types accurately.
+ * type and extracted the directive and layer types accurately.
  *
  * Background:
  * Every test in this suite uses the two-parameter mode, so this common
@@ -104,7 +104,7 @@ function assertOptionsMatch(
  *
  * Intent:
  * - Confirm the result is of type 'two' (TwoParamsResult)
- * - Verify demonstrative type matches expected value
+ * - Verify directive type matches expected value
  * - Verify layer type matches expected value
  * - Provide clear error messages for any mismatches
  *
@@ -113,7 +113,7 @@ function assertOptionsMatch(
  */
 function assertBasicResult(result: TwoParamsResult, testDescription: string) {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
-  assertEquals(result.demonstrativeType, DEMO_TYPE, `${testDescription}: Wrong demonstrative type`);
+  assertEquals(result.directiveType, DEMO_TYPE, `${testDescription}: Wrong directive type`);
   assertEquals(result.layerType, LAYER_TYPE, `${testDescription}: Wrong layer type`);
 }
 

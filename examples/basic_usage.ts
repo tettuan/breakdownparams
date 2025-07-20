@@ -61,7 +61,7 @@ Options:
 
     case 'one': {
       const oneResult = result as OneParamsResult;
-      if (oneResult.demonstrativeType === 'init') {
+      if (oneResult.directiveType === 'init') {
         console.log('Initializing new project...');
         // Add initialization logic here
       }
@@ -70,8 +70,8 @@ Options:
 
     case 'two': {
       const twoResult = result as TwoParamsResult;
-      const { demonstrativeType, layerType, options = {} } = twoResult;
-      console.log(`Action: ${demonstrativeType} ${layerType}`);
+      const { directiveType, layerType, options = {} } = twoResult;
+      console.log(`Action: ${directiveType} ${layerType}`);
 
       const typedOptions = options as {
         from?: string;

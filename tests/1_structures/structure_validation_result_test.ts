@@ -5,7 +5,7 @@ Deno.test('test_validation_result_structure', () => {
   const successResult: ValidationResult = {
     isValid: true,
     validatedParams: ['param1', 'param2'],
-    demonstrativeType: 'type1',
+    directiveType: 'type1',
     layerType: 'layer1',
     options: {
       '--key1': 'value1',
@@ -31,7 +31,7 @@ Deno.test('test_validation_result_structure', () => {
    *
    * Background:
    * Successful validation results contain validated parameters and extracted
-   * metadata (demonstrativeType, layerType, options) without error fields.
+   * metadata (directiveType, layerType, options) without error fields.
    *
    * Intent:
    * - Verify isValid is true for success cases
@@ -46,9 +46,9 @@ Deno.test('test_validation_result_structure', () => {
     'validatedParams should be an array',
   );
   assertEquals(
-    typeof successResult.demonstrativeType,
+    typeof successResult.directiveType,
     'string',
-    'demonstrativeType should be a string',
+    'directiveType should be a string',
   );
   assertEquals(typeof successResult.layerType, 'string', 'layerType should be a string');
   assertEquals(typeof successResult.options, 'object', 'options should be an object');

@@ -41,7 +41,7 @@
 
 - 無効なコマンドの検出
 - 引数が多すぎる場合
-- 無効なdemonstrative type
+- 無効なdirective type
 - 無効なlayer type
 
 想定されるユースケース：
@@ -85,7 +85,7 @@
 
 カスタムパラメータバリデーションの使用例を示します：
 
-- カスタムdemonstrative typeのバリデーション
+- カスタムdirective typeのバリデーション
 - カスタムlayer typeのバリデーション
 - パターンベースのバリデーション
 - カスタムエラーメッセージ

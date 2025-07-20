@@ -63,7 +63,7 @@ Examples:
   # Custom variables with complex values
   custom_variable_options_usage to project --uv-path=/usr/local/bin --uv-config={"key":"value"} --uv-array=[1,2,3]
 
-  # Custom variables with different demonstrative types
+  # Custom variables with different directive types
   custom_variable_options_usage summary issue --uv-name=value --uv-type=test
   custom_variable_options_usage defect task --uv-name=value --uv-type=test
 
@@ -81,11 +81,11 @@ Notes:
   // Process valid command
   if (result.type === 'two') {
     const twoResult = result as TwoParamsResult;
-    const { demonstrativeType, layerType, options = {} } = twoResult;
+    const { directiveType, layerType, options = {} } = twoResult;
 
     console.log('Command processed successfully:');
     console.log('----------------------------');
-    console.log(`Action: ${demonstrativeType} ${layerType}`);
+    console.log(`Action: ${directiveType} ${layerType}`);
 
     // Display standard options
     const typedOptions = options as {

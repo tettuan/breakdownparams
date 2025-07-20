@@ -35,9 +35,9 @@ Deno.test('test_two_param_validator_structure', () => {
   const config: CustomConfig = {
     params: {
       two: {
-        demonstrativeType: {
+        directiveType: {
           pattern: '^(to|summary|defect)$',
-          errorMessage: 'Invalid demonstrative type',
+          errorMessage: 'Invalid directive type',
         },
         layerType: {
           pattern: '^(project|issue|task)$',

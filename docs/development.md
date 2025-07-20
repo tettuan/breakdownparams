@@ -43,7 +43,7 @@ Parameter types are classified into three types based on the number of positiona
 
 3. **TwoParams**
    - Two positional arguments
-   - Format: `<demonstrativeType> <layerType>`
+   - Format: `<directiveType> <layerType>`
    - Example: `breakdown to project`
 
 For detailed type definitions and usage of each type, please refer to the [Parameter Parser Type Definition Specification](params_type.md).
@@ -78,7 +78,7 @@ All options follow unified normalization rules:
 1. **Argument Count**
    - 0: Only options allowed
    - 1: Only `init` command allowed
-   - 2: Combination of demonstrativeType and layerType
+   - 2: Combination of directiveType and layerType
    - 3 or more: Error
 
 2. **Value Constraints**
@@ -107,7 +107,7 @@ Errors return appropriate messages based on the type of problem encountered:
 | Error Case    | Example Message                                    |
 |--------------|---------------------------------------------------|
 | Too Many Args | "Too many arguments. Maximum 2 arguments are allowed." |
-| Invalid Value | "Invalid value for demonstrativeType: {value}"    |
+| Invalid Value | "Invalid value for directiveType: {value}"    |
 | Missing Param | "Missing required parameter: {param}"             |
 | User Var Syntax Error | "Invalid user variable option syntax: {value}" |
 
@@ -136,7 +136,7 @@ parser.parse(['init']);
 parser.parse(['to', 'issue', '--from', './input.md']);
 // {
 //   type: "two",
-//   demonstrativeType: "to",
+//   directiveType: "to",
 //   layerType: "issue",
 //   options: { fromFile: "./input.md" }
 // }
@@ -145,7 +145,7 @@ parser.parse(['to', 'issue', '--from', './input.md']);
 parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 // {
 //   type: "two",
-//   demonstrativeType: "summary",
+//   directiveType: "summary",
 //   layerType: "task",
 //   options: { fromFile: "./tasks.md", adaptation: "strict" }
 // }
@@ -158,7 +158,7 @@ parser.parse(['summary', 'task', '--from', './tasks.md', '-a', 'strict']);
 parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // {
 //   type: "two",
-//   demonstrativeType: "to",
+//   directiveType: "to",
 //   layerType: "project",
 //   options: {
 //     "uv-project": "myproject",  // Normalized from --uv-project

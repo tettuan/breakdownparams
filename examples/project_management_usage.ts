@@ -8,7 +8,7 @@ const projectConfig: CustomConfig = {
   params: {
     two: {
       // Project management actions
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(create|update|close|assign|prioritize|estimate|track|review)$',
         errorMessage:
           'Invalid action. Available: create, update, close, assign, prioritize, estimate, track, review',
@@ -78,7 +78,7 @@ for (const args of commands) {
 
   if (result.type === 'two') {
     const twoResult = result as TwoParamsResult;
-    console.log(`✅ Executing: ${twoResult.demonstrativeType} ${twoResult.layerType}`);
+    console.log(`✅ Executing: ${twoResult.directiveType} ${twoResult.layerType}`);
 
     // Show relevant options
     const options = twoResult.options;

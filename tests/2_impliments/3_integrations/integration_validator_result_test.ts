@@ -110,7 +110,7 @@ Deno.test('test_validator_result_integration', () => {
     ['to', 'project'],
     'Validated params should match input',
   );
-  // demonstrativeType and layerType are properties of ParamsResult, not ValidationResult
+  // directiveType and layerType are properties of ParamsResult, not ValidationResult
 
   // Test: Error details
   const errorResult = securityValidator.validate(['dangerous;command']);

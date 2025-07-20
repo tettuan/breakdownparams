@@ -10,7 +10,7 @@ Deno.test('test_examples_execution', async (t) => {
     const result = parser.parse(['to', 'project']) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
-    assertEquals(result.demonstrativeType, 'to');
+    assertEquals(result.directiveType, 'to');
     assertEquals(result.layerType, 'project');
     assertEquals(result.options, {});
   });
@@ -29,7 +29,7 @@ Deno.test('test_examples_execution', async (t) => {
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
-    assertEquals(result.demonstrativeType, 'to');
+    assertEquals(result.directiveType, 'to');
     assertEquals(result.layerType, 'project');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
@@ -80,7 +80,7 @@ Deno.test('test_examples_execution', async (t) => {
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
-    assertEquals(result.demonstrativeType, 'to');
+    assertEquals(result.directiveType, 'to');
     assertEquals(result.layerType, 'project');
     assertExists(result.options['config']);
     assertExists(result.options['from']);
@@ -132,7 +132,7 @@ Deno.test('test_examples_execution', async (t) => {
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
-    assertEquals(result.demonstrativeType, 'to');
+    assertEquals(result.directiveType, 'to');
     assertEquals(result.layerType, 'project');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
@@ -170,9 +170,9 @@ Deno.test('test_examples_execution', async (t) => {
     };
 
     const customParamsConfig = {
-      demonstrativeType: {
+      directiveType: {
         pattern: '^(to|summary|defect|custom)$',
-        errorMessage: 'Invalid demonstrative type. Must be one of: to, summary, defect, custom',
+        errorMessage: 'Invalid directive type. Must be one of: to, summary, defect, custom',
       },
       layerType: {
         pattern: '^(project|issue|task|custom)$',
@@ -198,7 +198,7 @@ Deno.test('test_examples_execution', async (t) => {
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
-    assertEquals(result.demonstrativeType, 'custom');
+    assertEquals(result.directiveType, 'custom');
     assertEquals(result.layerType, 'custom');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
@@ -247,7 +247,7 @@ Deno.test('test_examples_execution', async (t) => {
     ]) as TwoParamsResult;
 
     assertEquals(result.type, 'two');
-    assertEquals(result.demonstrativeType, 'to');
+    assertEquals(result.directiveType, 'to');
     assertEquals(result.layerType, 'issue');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);

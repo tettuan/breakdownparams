@@ -12,12 +12,12 @@ type ZeroParamsResult = {
 
 type OneParamsResult = {
   type: 'one';
-  demonstrativeType: string;
+  directiveType: string;
 };
 
 type TwoParamsResult = {
   type: 'two';
-  demonstrativeType: string;
+  directiveType: string;
   layerType: string;
   options: OptionParams;
   userVariables?: UserVariables;
@@ -63,13 +63,13 @@ const zeroResult: ZeroParamsResult = {
 // OneParamsResult return
 const oneResult: OneParamsResult = {
   type: 'one',
-  demonstrativeType: 'init'
+  directiveType: 'init'
 };
 
 // TwoParamsResult return
 const twoResult: TwoParamsResult = {
   type: 'two',
-  demonstrativeType: 'to',
+  directiveType: 'to',
   layerType: 'project',
   options: {
     fromFile: 'input.json',
@@ -85,8 +85,8 @@ const twoResult: TwoParamsResult = {
 const errorResult: ErrorResult = {
   type: 'error',
   error: {
-    message: 'Invalid demonstrative type: invalid-type',
-    code: 'INVALID_DEMONSTRATIVE_TYPE',
+    message: 'Invalid directive type: invalid-type',
+    code: 'INVALID_DIRECTIVE_TYPE',
     details: {
       value: 'invalid-type',
       expected: 'to, summary, or defect'
@@ -127,7 +127,7 @@ Result type when executed with no parameters. Only options can be specified.
 Result type when executed with a single parameter. Currently only supports `init` command.
 
 - `type`: Always `'one'`
-- `demonstrativeType`: Specified command (usually `'init'`)
+- `directiveType`: Specified command (usually `'init'`)
 
 **Note**: Options are ignored in OneParamsResult.
 
@@ -136,7 +136,7 @@ Result type when executed with a single parameter. Currently only supports `init
 Result type when executed with two parameters. Used for main application execution.
 
 - `type`: Always `'two'`
-- `demonstrativeType`: First parameter (e.g., `'to'`, `'summary'`, `'defect'`)
+- `directiveType`: First parameter (e.g., `'to'`, `'summary'`, `'defect'`)
 - `layerType`: Second parameter (e.g., `'project'`, `'issue'`, `'task'`)
 - `options`: Specified options
 - `userVariables`: User variable options (`--uv-*` format)
@@ -164,7 +164,7 @@ All options are returned in normalized form:
 
 Main error codes:
 
-- `INVALID_DEMONSTRATIVE_TYPE`: Invalid demonstrativeType
+- `INVALID_DIRECTIVE_TYPE`: Invalid directiveType
 - `INVALID_LAYER_TYPE`: Invalid layerType
 - `INVALID_OPTION`: Invalid option
 - `INVALID_CUSTOM_VARIABLE`: Invalid user variable
