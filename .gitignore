@@ -148,3 +148,6 @@ tmp/
 .claude/*
 .claude.*
 .DS_Store
+
+.vscode
+.vscode/*

@@ -32,6 +32,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@aidevtool/ci@1",
       "jsr:@std/assert@~0.220.1",
       "jsr:@tettuan/breakdownlogger@0.1"
     ]

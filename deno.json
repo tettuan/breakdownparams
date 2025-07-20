@@ -16,14 +16,19 @@
   "imports": {
     "@": "./src/",
     "@tettuan/breakdownlogger": "jsr:@tettuan/breakdownlogger@^0.1.0",
-    "@std/assert": "jsr:@std/assert@^0.220.1"
+    "@std/assert": "jsr:@std/assert@^0.220.1",
+    "@aidevtool/ci": "jsr:@aidevtool/ci@^1.0.0"
   },
   "tasks": {
     "test": "deno test --allow-env --allow-read --allow-write",
     "check": "deno check **/*.ts",
+    "check-src": "deno check src/**/*.ts",
+    "check-examples": "deno check examples/**/*.ts",
+    "check-tests": "deno check tests/**/*.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
-    "ci": "bash scripts/local_ci.sh"
+    "ci": "deno run --allow-read --allow-write --allow-run --allow-net --allow-env jsr:@aidevtool/ci --hierarchy src/ && deno run --allow-read --allow-write --allow-run --allow-net --allow-env jsr:@aidevtool/ci --hierarchy tests/ && deno run --allow-read --allow-write --allow-run --allow-net --allow-env jsr:@aidevtool/ci --hierarchy examples/",
+    "ci:dirty": "deno run --allow-read --allow-write --allow-run --allow-net --allow-env jsr:@aidevtool/ci --hierarchy src/ --allow-dirty && deno run --allow-read --allow-write --allow-run --allow-net --allow-env jsr:@aidevtool/ci --hierarchy tests/ --allow-dirty && deno run --allow-read --allow-write --allow-run --allow-net --allow-env jsr:@aidevtool/ci --hierarchy examples/ --allow-dirty"
   },
   "fmt": {
     "include": [
