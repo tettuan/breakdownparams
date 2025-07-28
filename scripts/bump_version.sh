@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Check for version type argument
+VERSION_TYPE=${1:-patch}
+if [[ ! "$VERSION_TYPE" =~ ^(major|minor|patch)$ ]]; then
+    echo "Usage: $0 [major|minor|patch]"
+    echo "  major: X.0.0"
+    echo "  minor: x.Y.0"
+    echo "  patch: x.y.Z (default)"
+    exit 1
+fi
+
 # Check if there are any uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then
     echo "Error: You have uncommitted changes. Please commit or stash them first."
@@ -52,10 +62,27 @@ done
 # Split version into major.minor.patch
 IFS='.' read -r major minor patch <<< "$latest_jsr_version"
 
-# Increment patch version
-new_patch=$((patch + 1))
-new_version="$major.$minor.$new_patch"
+# Increment version based on type
+case "$VERSION_TYPE" in
+    major)
+        new_major=$((major + 1))
+        new_minor=0
+        new_patch=0
+        new_version="$new_major.$new_minor.$new_patch"
+        ;;
+    minor)
+        new_minor=$((minor + 1))
+        new_patch=0
+        new_version="$major.$new_minor.$new_patch"
+        ;;
+    patch)
+        new_patch=$((patch + 1))
+        new_version="$major.$minor.$new_patch"
+        ;;
+esac
 
+echo "Version type: $VERSION_TYPE"
+echo "Current version: $latest_jsr_version"
 echo "New version: $new_version"
 
 # Update only the version in deno.json
