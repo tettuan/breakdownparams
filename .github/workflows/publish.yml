@@ -23,7 +23,13 @@ jobs:
           deno-version: '2.3.3'
 
       - name: Cache Dependencies
-        run: deno cache mod.ts
+        run: |
+          rm -f deno.lock
+          deno cache --reload mod.ts
+          git add deno.lock
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --cached --quiet || git commit -m "chore: update deno.lock for release"
 
       - name: Get tag version
         id: get_tag
