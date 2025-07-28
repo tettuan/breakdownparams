@@ -23,10 +23,7 @@ jobs:
           deno-version: '2.3.3'
 
       - name: Cache Dependencies
-        run: |
-          rm -f deno.lock
-          git clean -fdx
-          deno cache --reload mod.ts
+        run: deno cache mod.ts
 
       - name: Get tag version
         id: get_tag
@@ -54,6 +51,6 @@ jobs:
         run: deno test --allow-env --allow-write --allow-read
 
       - name: Publish to JSR
-        run: deno publish --allow-dirty
+        run: deno publish
         env:
           DENO_JSON_PATH: './deno.json'
