@@ -10,12 +10,12 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should validate zero options correctly', () => {
     const validator = new ZeroOptionValidator();
 
-    // 正しいオプション
+    // Valid options
     const validResult = validator.validate(['--help'], 'zero', DEFAULT_OPTION_RULE);
     assert(validResult.isValid);
     assert(validResult.options?.help === true);
 
-    // 不正なオプション
+    // Invalid options
     const invalidResult = validator.validate(['--invalid'], 'zero', DEFAULT_OPTION_RULE);
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('Invalid options'));
@@ -25,12 +25,12 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should validate one options correctly', () => {
     const validator = new OneOptionValidator();
 
-    // オプションなし
+    // No options
     const validResult = validator.validate([], 'one', DEFAULT_OPTION_RULE);
     assert(validResult.isValid);
     assert(Object.keys(validResult.options || {}).length === 0);
 
-    // どのオプションも無効
+    // All options are invalid
     const invalidResult = validator.validate(['--from=test'], 'one', DEFAULT_OPTION_RULE);
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('Invalid options'));
@@ -45,7 +45,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should validate two options correctly', () => {
     const validator = new TwoOptionValidator();
 
-    // 正しいオプション
+    // Valid options
     const validResult = validator.validate(
       ['--from=test', '--destination=test'],
       'two',
@@ -55,7 +55,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     assert(validResult.options?.from === 'test');
     assert(validResult.options?.destination === 'test');
 
-    // 不正なオプション
+    // Invalid options
     const invalidResult = validator.validate(['--invalid=test'], 'two', DEFAULT_OPTION_RULE);
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('Invalid options'));
@@ -65,7 +65,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should handle invalid parameter type', () => {
     const validator = new ZeroOptionValidator();
 
-    // 不正なパラメータタイプ
+    // Invalid parameter type
     const result = validator.validate(['--help'], 'one', DEFAULT_OPTION_RULE);
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Invalid parameter type'));
@@ -75,12 +75,12 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should handle user variables in two options', () => {
     const validator = new TwoOptionValidator();
 
-    // 正しいカスタム変数
+    // Valid user variables
     const validResult = validator.validate(['--uv-test=value'], 'two', DEFAULT_OPTION_RULE);
     assert(validResult.isValid);
     assert(validResult.options?.['uv-test'] === 'value');
 
-    // 不正なカスタム変数
+    // Invalid user variables
     const invalidResult = validator.validate(['--invalid-var=value'], 'two', DEFAULT_OPTION_RULE);
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('Invalid options'));
@@ -90,7 +90,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should handle empty values correctly', () => {
     const validator = new TwoOptionValidator();
 
-    // 空の値
+    // Empty value
     const result = validator.validate(['--from='], 'two', DEFAULT_OPTION_RULE);
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Empty value not allowed'));
@@ -100,14 +100,14 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should handle short form options - ZeroParams', () => {
     const validator = new ZeroOptionValidator();
 
-    // 短縮形ヘルプオプション
+    // Short form help option
     const helpResult = validator.validate(['-h'], 'zero', DEFAULT_OPTION_RULE);
     console.log('Short help result:', helpResult);
-    // 現在は認識されず、オプションが空になる
+    // Currently not recognized, options will be empty
     assert(helpResult.isValid);
     assert(Object.keys(helpResult.options || {}).length === 0, 'Short options are not recognized');
 
-    // 短縮形バージョンオプション
+    // Short form version option
     const versionResult = validator.validate(['-v'], 'zero', DEFAULT_OPTION_RULE);
     console.log('Short version result:', versionResult);
     assert(versionResult.isValid);
@@ -120,10 +120,10 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should handle short form options - OneParam', () => {
     const validator = new OneOptionValidator();
 
-    // 短縮形オプション
+    // Short form options
     const shortResult = validator.validate(['-f=input.md'], 'one', DEFAULT_OPTION_RULE);
     console.log('OneParam short result:', shortResult);
-    // 現在は認識されず、オプションが空になる
+    // Currently not recognized, options will be empty
     assert(shortResult.isValid);
     assert(Object.keys(shortResult.options || {}).length === 0, 'Short options are not recognized');
   });
@@ -131,25 +131,25 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should handle short form options - TwoParams', () => {
     const validator = new TwoOptionValidator();
 
-    // 短縮形オプション
+    // Short form options
     const shortResult = validator.validate(
       ['-f=input.md', '-o=output.md'],
       'two',
       DEFAULT_OPTION_RULE,
     );
     console.log('TwoParams short result:', shortResult);
-    // 現在は認識されず、オプションが空になる
+    // Currently not recognized, options will be empty
     assert(shortResult.isValid);
     assert(Object.keys(shortResult.options || {}).length === 0, 'Short options are not recognized');
 
-    // 長形式と短縮形の混在
+    // Mix of long and short forms
     const mixedResult = validator.validate(
       ['--from=input.md', '-o=output.md'],
       'two',
       DEFAULT_OPTION_RULE,
     );
     console.log('Mixed options result:', mixedResult);
-    // 長形式のみ認識される
+    // Only long form is recognized
     assert(mixedResult.isValid);
     assert(mixedResult.options?.from === 'input.md', 'Long form should be recognized');
     assert(!mixedResult.options?.destination, 'Short form -o should not be recognized');
@@ -158,7 +158,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should handle user variable options correctly', () => {
     const validator = new TwoOptionValidator();
 
-    // 現在のテストでは成功しているはずだが、実際のパーサーでは失敗する
+    // Should succeed in current test, but fails in actual parser
     const userVarResult = validator.validate(
       ['--uv-project=myproject'],
       'two',
@@ -168,7 +168,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     assert(userVarResult.isValid, 'User variables should be valid in TwoParams');
     assert(userVarResult.options?.['uv-project'] === 'myproject');
 
-    // 複数のカスタム変数
+    // Multiple user variables
     const multiCustomResult = validator.validate(
       ['--uv-project=myproject', '--uv-version=1.0.0'],
       'two',

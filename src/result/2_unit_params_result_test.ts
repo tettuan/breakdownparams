@@ -6,9 +6,9 @@ import {
   ZeroParamsResult,
 } from '../types/params_result.ts';
 
-// 1. 型変換のテスト
+// 1. Type conversion tests
 Deno.test('test_type_conversion', () => {
-  // ZeroParamsResult への変換
+  // Conversion to ZeroParamsResult
   const zeroResult: ParamsResult = {
     type: 'zero',
     params: [],
@@ -17,7 +17,7 @@ Deno.test('test_type_conversion', () => {
   const zeroParamsResult = zeroResult as ZeroParamsResult;
   assertEquals(zeroParamsResult.type, 'zero');
 
-  // OneParamsResult への変換
+  // Conversion to OneParamsResult
   const oneResult: OneParamsResult = {
     type: 'one',
     params: ['init'],
@@ -28,7 +28,7 @@ Deno.test('test_type_conversion', () => {
   assertEquals(oneParamResult.type, 'one');
   assertEquals(oneParamResult.directiveType, 'init');
 
-  // TwoParamsResult への変換
+  // Conversion to TwoParamsResult
   const twoResult: TwoParamsResult = {
     type: 'two',
     params: ['to', 'project'],
@@ -42,7 +42,7 @@ Deno.test('test_type_conversion', () => {
   assertEquals(twoParamResult.layerType, 'project');
 });
 
-// 2. options の型安全性テスト
+// 2. Type safety tests for options
 Deno.test('test_options_type_safety', () => {
   const options: Record<string, unknown> = {
     fromFile: 'input.txt',

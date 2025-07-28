@@ -13,7 +13,7 @@ Deno.test('OptionCombinationValidator Structure Tests', async (t) => {
     const validator = new OptionCombinationValidator(rule);
     const result = validator.validate({});
 
-    // 結果の構造を検証
+    // Verify result structure
     assert('isValid' in result);
     assert(typeof result.isValid === 'boolean');
     assert('errorMessage' in result || result.errorMessage === undefined);

@@ -7,7 +7,7 @@ Deno.test('OptionValidator Structure Tests', async (t) => {
     const validator = new ZeroOptionValidator();
     const result = validator.validate([], 'zero', DEFAULT_OPTION_RULE);
 
-    // 結果の構造を検証
+    // Verify result structure
     assert('isValid' in result);
     assert('validatedParams' in result);
     assert(Array.isArray(result.validatedParams));

@@ -4,13 +4,13 @@ import { OneParamValidator } from '../one_param_validator.ts';
 Deno.test('test_one_param_validator_unit', () => {
   const validator = new OneParamValidator();
 
-  // 正常系テスト
+  // Normal case test
   const validResult = validator.validate(['init']);
   assertEquals(validResult.isValid, true, 'init param should be valid');
   assertEquals(validResult.validatedParams, ['init'], 'Should return correct param');
   assertEquals(validResult.directiveType, 'init', 'Should set directive type');
 
-  // 異常系テスト
+  // Abnormal case test
   const invalidResult = validator.validate(['invalid']);
   assertEquals(invalidResult.isValid, false, 'Non-init param should be invalid');
   assertEquals(

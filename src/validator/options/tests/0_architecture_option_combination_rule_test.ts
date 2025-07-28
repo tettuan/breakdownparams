@@ -3,7 +3,7 @@ import { OptionCombinationRule, OptionCombinationRules } from '../option_combina
 
 Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
   await t.step('should maintain correct interface structure', () => {
-    // OptionCombinationRule インターフェースの構造検証
+    // Verify OptionCombinationRule interface structure
     const rule: OptionCombinationRule = {
       allowedOptions: ['test'],
       requiredOptions: ['test'],
@@ -19,7 +19,7 @@ Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
   });
 
   await t.step('should maintain correct rules type structure', () => {
-    // OptionCombinationRules インターフェースの構造検証
+    // Verify OptionCombinationRules interface structure
     const rules: OptionCombinationRules = {
       zero: { allowedOptions: ['test'] },
       one: { allowedOptions: ['test'] },
@@ -35,7 +35,7 @@ Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
   });
 
   await t.step('should maintain type safety for combination rules', () => {
-    // 型安全性の検証
+    // Verify type safety
     const rule: OptionCombinationRule = {
       allowedOptions: ['test'],
       combinationRules: {

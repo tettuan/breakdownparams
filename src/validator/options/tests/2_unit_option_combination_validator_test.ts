@@ -12,11 +12,11 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
 
     const validator = new OptionCombinationValidator(rule);
 
-    // 許可されたオプション
+    // Allowed options
     const validResult = validator.validate({ test: 'value' });
     assert(validResult.isValid);
 
-    // 許可されていないオプション
+    // Disallowed options
     const invalidResult = validator.validate({ invalid: 'value' });
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('not allowed'));
@@ -32,11 +32,11 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
 
     const validator = new OptionCombinationValidator(rule);
 
-    // 必須オプションが指定されている
+    // Required option is specified
     const validResult = validator.validate({ test: 'value' });
     assert(validResult.isValid);
 
-    // 必須オプションが指定されていない
+    // Required option is not specified
     const invalidResult = validator.validate({});
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('missing'));
@@ -54,11 +54,11 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
 
     const validator = new OptionCombinationValidator(rule);
 
-    // 正しい組み合わせ
+    // Valid combination
     const validResult = validator.validate({ option1: 'value', option2: 'value' });
     assert(validResult.isValid);
 
-    // 不正な組み合わせ
+    // Invalid combination
     const invalidResult = validator.validate({ option1: 'value' });
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('requires'));
@@ -66,11 +66,11 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
   });
 
   await t.step('should handle static validate method correctly', () => {
-    // 正しい引数
+    // Valid arguments
     const validResult = OptionCombinationValidator.validate(['--help'], 'zero');
     assert(validResult.isValid);
 
-    // 不正な引数
+    // Invalid arguments
     const invalidResult = OptionCombinationValidator.validate(['--invalid'], 'zero');
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('not allowed'));
@@ -81,7 +81,7 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     // ZeroParams with short options
     const zeroShortResult = OptionCombinationValidator.validate(['-h', '-v'], 'zero');
     console.log('Zero short result:', zeroShortResult);
-    // 短縮形は認識されないが、エラーになるかvalidになるか確認
+    // Check if short forms are not recognized but result in error or valid
 
     // OneParam with short options
     const oneShortResult = OptionCombinationValidator.validate(['-c=test'], 'one');
@@ -94,9 +94,9 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     );
     console.log('Two short result:', twoShortResult);
 
-    // 現在の実装では短縮形オプションは認識されない
-    // OptionCombinationValidatorはオプション辞書を受け取るので、
-    // 上流でパースされていない短縮形は到達しない可能性がある
+    // In current implementation, short form options are not recognized
+    // OptionCombinationValidator receives an options dictionary,
+    // so unparsed short forms from upstream may not reach here
   });
 
   await t.step('should handle user variable options in TwoParams', () => {
@@ -108,7 +108,7 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
 
     const validator = new OptionCombinationValidator(rule);
 
-    // カスタム変数は特別扱いされ、TwoParamsモードでは許可される
+    // User variables are treated specially and allowed in TwoParams mode
     const userVarResult = validator.validate({
       'uv-project': 'myproject',
       'uv-version': '1.0.0',
@@ -116,7 +116,7 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     console.log('User variable result:', userVarResult);
     assert(userVarResult.isValid);
 
-    // 標準オプションとカスタム変数の混在
+    // Mix of standard options and user variables
     const mixedResult = validator.validate({
       from: 'input.md',
       'uv-project': 'myproject',
@@ -124,7 +124,7 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     console.log('Mixed options result:', mixedResult);
     assert(mixedResult.isValid);
 
-    // 無効なカスタム変数名
+    // Invalid user variable names
     const invalidUserVarResult = validator.validate({
       'uv-': 'invalid',
       'uv-123': 'invalid',

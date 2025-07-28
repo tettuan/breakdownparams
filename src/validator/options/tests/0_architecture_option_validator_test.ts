@@ -9,7 +9,7 @@ import { DEFAULT_OPTION_RULE, OptionRule } from '../../../types/option_rule.ts';
 
 Deno.test('OptionValidator Architecture Tests', async (t) => {
   await t.step('should have correct interface structure', () => {
-    // OptionValidator インターフェースの構造を検証
+    // Verify OptionValidator interface structure
     const validator: OptionValidator = {
       validate: (_args: string[], _type: 'zero' | 'one' | 'two', _optionRule: OptionRule) => ({
         isValid: true,
@@ -23,7 +23,7 @@ Deno.test('OptionValidator Architecture Tests', async (t) => {
   });
 
   await t.step('should have correct base class structure', () => {
-    // BaseOptionValidator の構造を検証
+    // Verify BaseOptionValidator structure
     const validator = new ZeroOptionValidator();
 
     assert('validate' in validator);
@@ -31,7 +31,7 @@ Deno.test('OptionValidator Architecture Tests', async (t) => {
   });
 
   await t.step('should have correct validator implementations', () => {
-    // 各バリデータの実装を検証
+    // Verify each validator implementation
     const zeroValidator = new ZeroOptionValidator();
     const oneValidator = new OneOptionValidator();
     const twoValidator = new TwoOptionValidator();
@@ -44,16 +44,16 @@ Deno.test('OptionValidator Architecture Tests', async (t) => {
   await t.step('should have correct method signatures', () => {
     const validator = new ZeroOptionValidator();
 
-    // validate メソッドのシグネチャを検証
+    // Verify validate method signature
     const validateMethod = validator.validate;
-    assert(validateMethod.length === 3); // パラメータの数
+    assert(validateMethod.length === 3); // number of parameters
   });
 
   await t.step('should have correct result type', () => {
     const validator = new ZeroOptionValidator();
     const result = validator.validate([], 'zero', DEFAULT_OPTION_RULE);
 
-    // 結果の型を検証
+    // Verify result type
     assert('isValid' in result);
     assert(typeof result.isValid === 'boolean');
     assert('validatedParams' in result);

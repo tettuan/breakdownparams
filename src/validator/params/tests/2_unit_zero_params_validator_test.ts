@@ -4,12 +4,12 @@ import { ZeroParamsValidator } from '../zero_params_validator.ts';
 Deno.test('test_zero_params_validator_unit', () => {
   const validator = new ZeroParamsValidator();
 
-  // 正常系テスト
+  // Normal case test
   const validResult = validator.validate([]);
   assertEquals(validResult.isValid, true, 'Empty params should be valid');
   assertEquals(validResult.validatedParams, [], 'Should return empty params');
 
-  // 異常系テスト
+  // Abnormal case test
   const invalidResult = validator.validate(['test']);
   assertEquals(invalidResult.isValid, false, 'Non-empty params should be invalid');
   assertEquals(

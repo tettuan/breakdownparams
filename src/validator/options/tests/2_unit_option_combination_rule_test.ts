@@ -5,12 +5,12 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
   await t.step('should validate zero options rules', () => {
     const zeroRules = DEFAULT_OPTION_COMBINATION_RULES.zero;
 
-    // 許可オプションの検証
+    // Verify allowed options
     assert(zeroRules.allowedOptions.length === 2);
     assert(zeroRules.allowedOptions.includes('help'));
     assert(zeroRules.allowedOptions.includes('version'));
 
-    // 必須オプションの検証
+    // Verify required options
     assert(!zeroRules.requiredOptions);
     assert(!zeroRules.combinationRules);
   });
@@ -18,11 +18,11 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
   await t.step('should validate one options rules', () => {
     const oneRules = DEFAULT_OPTION_COMBINATION_RULES.one;
 
-    // 許可オプションの検証
+    // Verify allowed options
     assert(oneRules.allowedOptions.length === 1);
     assert(oneRules.allowedOptions.includes('config'));
 
-    // 必須オプションの検証
+    // Verify required options
     assert(!oneRules.requiredOptions);
     assert(!oneRules.combinationRules);
   });
@@ -30,7 +30,7 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
   await t.step('should validate two options rules', () => {
     const twoRules = DEFAULT_OPTION_COMBINATION_RULES.two;
 
-    // 許可オプションの検証
+    // Verify allowed options
     assert(twoRules.allowedOptions.length === 5);
     assert(twoRules.allowedOptions.includes('from'));
     assert(twoRules.allowedOptions.includes('destination'));
@@ -38,20 +38,20 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
     assert(twoRules.allowedOptions.includes('adaptation'));
     assert(twoRules.allowedOptions.includes('input'));
 
-    // 必須オプションの検証 - two rules には必須オプションなし
+    // Verify required options - two rules has no required options
     assert(!twoRules.requiredOptions);
 
-    // 組み合わせルールの検証 - 現在は組み合わせルールなし
+    // Verify combination rules - currently no combination rules
     assert(!twoRules.combinationRules);
   });
 
   await t.step('should maintain rule consistency', () => {
     const twoRules = DEFAULT_OPTION_COMBINATION_RULES.two;
 
-    // two rules には必須オプションがないことを確認
+    // Verify two rules has no required options
     assert(!twoRules.requiredOptions);
 
-    // 組み合わせルールがないことを確認
+    // Verify no combination rules
     assert(!twoRules.combinationRules);
   });
 });

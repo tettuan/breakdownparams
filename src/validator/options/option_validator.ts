@@ -146,12 +146,12 @@ abstract class BaseOptionValidator implements OptionValidator {
 
     const options = args.filter((arg) => arg.startsWith('--'));
 
-    // オプションがない場合は成功とする
+    // If there are no options, consider it successful
     if (options.length === 0) {
       return this.createSuccess([], optionRule);
     }
 
-    // 空の値のチェック
+    // Check for empty values
     const emptyValueOptions = options.filter((opt) => {
       const { key, value } = BaseOptionValidator.normalizeOption(opt);
       return !Object.keys(optionRule.flagOptions).includes(key) && value === '';

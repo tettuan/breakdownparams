@@ -5,7 +5,7 @@ import { ParamsResult } from '../params_result.ts';
 import { OptionRule } from '../option_rule.ts';
 import { CustomConfig } from '../custom_config.ts';
 
-// 1. 型定義の基本設計確認
+// 1. Basic type definition design verification
 Deno.test('test_type_definitions_design', async (t) => {
   await t.step('should maintain option type enum', () => {
     assertEquals(OptionType.VALUE, 'value');
@@ -36,7 +36,7 @@ Deno.test('test_type_definitions_design', async (t) => {
   });
 });
 
-// 2. 型の一貫性確認
+// 2. Type consistency verification
 Deno.test('test_type_consistency', async (t) => {
   await t.step('should maintain consistent option type values', () => {
     const valueType = OptionType.VALUE;
@@ -72,7 +72,7 @@ Deno.test('test_type_consistency', async (t) => {
   });
 });
 
-// 3. 型の安全性確認
+// 3. Type safety verification
 Deno.test('test_type_safety', async (t) => {
   await t.step('should enforce option type constraints', () => {
     const valueType = OptionType.VALUE;
@@ -108,7 +108,7 @@ Deno.test('test_type_safety', async (t) => {
   });
 });
 
-// 4. オプションルールのテスト
+// 4. Option rule tests
 Deno.test('test_option_rule_structure', () => {
   const rule: OptionRule = {
     format: '--key=value',
@@ -158,7 +158,7 @@ Deno.test('test_option_rule_structure', () => {
   assertEquals(typeof rule.flagOptions, 'object', 'flagOptions should be an object');
 });
 
-// 5. カスタム設定のテスト
+// 5. Custom configuration tests
 Deno.test('test_custom_config_structure', () => {
   const config: CustomConfig = {
     params: {

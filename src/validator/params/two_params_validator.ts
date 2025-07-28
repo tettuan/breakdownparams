@@ -80,7 +80,7 @@ export class TwoParamsValidator extends BaseValidator {
    * ```
    */
   override validate(params: string[]): ValidationResult {
-    // パラメータの数が2個でない場合はエラー
+    // Error if not exactly 2 parameters
     if (params.length !== 2) {
       return {
         isValid: false,
@@ -91,17 +91,17 @@ export class TwoParamsValidator extends BaseValidator {
       };
     }
 
-    // DirectiveType と LayerType のパターンを取得
-    // 優先順位: 1. config の設定 2. デフォルト設定 3. ハードコードされたデフォルト値
+    // Get DirectiveType and LayerType patterns
+    // Priority: 1. config settings 2. default settings 3. hardcoded default values
     const directivePattern = this.config.params.two.directiveType.pattern ||
       '^(to|summary|defect)$';
     const layerPattern = this.config.params.two.layerType.pattern || '^(project|issue|task)$';
 
-    // パターンマッチングで検証
+    // Validate with pattern matching
     const directiveValid = new RegExp(directivePattern).test(params[0]);
     const layerValid = new RegExp(layerPattern).test(params[1]);
 
-    // どちらかが一致しない場合はエラー
+    // Error if either doesn't match
     if (!directiveValid || !layerValid) {
       return {
         isValid: false,
@@ -118,7 +118,7 @@ export class TwoParamsValidator extends BaseValidator {
       };
     }
 
-    // 検証成功時は、検証済みパラメータと型情報を返す
+    // On successful validation, return validated parameters with type information
     return {
       isValid: true,
       validatedParams: params,

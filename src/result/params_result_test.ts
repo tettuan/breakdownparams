@@ -6,7 +6,7 @@ import {
   ZeroParamsResult,
 } from '../types/params_result.ts';
 
-// 1. インターフェースの基本設計テスト
+// 1. Basic interface design tests
 Deno.test('test_params_result_interface', () => {
   const result: ParamsResult = {
     type: 'zero',
@@ -18,7 +18,7 @@ Deno.test('test_params_result_interface', () => {
   assertEquals(typeof result.options, 'object');
 });
 
-// 2. 各結果型の構造テスト
+// 2. Structure tests for each result type
 Deno.test('test_zero_params_result_structure', () => {
   const result: ZeroParamsResult = {
     type: 'zero',
@@ -58,7 +58,7 @@ Deno.test('test_two_param_result_structure', () => {
   assertEquals(result.layerType, 'project');
 });
 
-// 3. エラー情報のテスト
+// 3. Error information tests
 Deno.test('test_error_result_structure', () => {
   const errorResult: ParamsResult = {
     type: 'error',

@@ -137,7 +137,7 @@ Deno.test('CustomConfig functionality', async (t) => {
   });
 
   await t.step('should fail with partial config (missing required properties)', () => {
-    // パーシャル設定：params.twoのみを提供（validation, options, errorHandlingが欠けている）
+    // Partial config: only provides params.two (missing validation, options, errorHandling)
     const partialConfig = {
       params: {
         two: {
@@ -153,28 +153,28 @@ Deno.test('CustomConfig functionality', async (t) => {
       },
     };
 
-    // パーシャル設定では実行時エラーが発生することを確認
+    // Verify that partial config causes runtime error
     let constructorError = false;
     try {
-      // TypeScript型チェックを回避してランタイム動作を確認
+      // Bypass TypeScript type checking to verify runtime behavior
       // deno-lint-ignore no-explicit-any
       const parser = new ParamsParser(undefined, partialConfig as any);
-      // もしコンストラクタが成功したら、パースを試行
+      // If constructor succeeds, attempt to parse
       parser.parse(['partial1', 'partialLayer1']);
     } catch (error) {
       constructorError = true;
-      // validationプロパティが存在しないためのエラーが発生することを確認
+      // Confirm error occurs due to missing validation property
       assertEquals((error as Error).message.includes('Cannot read properties of undefined'), true);
     }
 
-    // コンストラクタでエラーが発生することを確認
+    // Confirm that error occurs in constructor
     assertEquals(constructorError, true);
   });
 
   await t.step(
     'should work correctly with DEFAULT_CUSTOM_CONFIG spread for partial override',
     () => {
-      // DEFAULT_CUSTOM_CONFIGをスプレッドして部分的にオーバーライド
+      // Spread DEFAULT_CUSTOM_CONFIG for partial override
       const mergedConfig: CustomConfig = {
         ...DEFAULT_CUSTOM_CONFIG,
         params: {
@@ -193,27 +193,27 @@ Deno.test('CustomConfig functionality', async (t) => {
 
       const parser = new ParamsParser(undefined, mergedConfig);
 
-      // カスタムパラメータが正常に動作することを確認
+      // Verify that custom parameters work correctly
       const result1 = parser.parse(['spread1', 'spreadLayer1']) as TwoParamsResult;
       assertEquals(result1.type, 'two');
       assertEquals(result1.directiveType, 'spread1');
       assertEquals(result1.layerType, 'spreadLayer1');
 
-      // デフォルトパラメータはエラーになることを確認（カスタムパターンに合わない）
+      // Verify that default parameters cause error (don't match custom pattern)
       const result2 = parser.parse(['to', 'project']);
       assertEquals(result2.type, 'error');
       if (result2.type === 'error' && result2.error) {
         assertEquals(result2.error.message, 'Spread directive type error');
       }
 
-      // デフォルトのvalidationルールとoptionsが使われることを確認
+      // Verify that default validation rules and options are used
       const result3 = parser.parse(['spread1', 'spreadLayer1', '--from=input.md']);
       assertEquals(result3.type, 'two');
       if (result3.type === 'two') {
         assertEquals(result3.options.from, 'input.md');
       }
 
-      // デフォルトのzeroパラメータバリデーションが使われることを確認
+      // Verify that default zero parameter validation is used
       const result4 = parser.parse(['--help']);
       assertEquals(result4.type, 'zero');
       if (result4.type === 'zero') {
@@ -223,21 +223,20 @@ Deno.test('CustomConfig functionality', async (t) => {
   );
 
   await t.step('should export CustomConfig and DEFAULT_CUSTOM_CONFIG from JSR entry point', () => {
-    // JSRユーザー向けエクスポートの動作確認
-    // mod.tsからのimportが正常に動作することを確認
+    // Verify export behavior for JSR users
+    // Confirm that import from mod.ts works correctly
 
-    // ParamsParserはすでにmod.tsからimportされているので、DEFAULT_CUSTOM_CONFIGも同様にアクセス可能か確認
-    // 実際のJSRユーザーの使用パターンをシミュレート
+    // Since ParamsParser is already imported from mod.ts, verify DEFAULT_CUSTOM_CONFIG is accessible too
+    // Simulate actual JSR user usage pattern
     const parser = new ParamsParser();
     const defaultResult = parser.parse(['to', 'project']);
     assertEquals(defaultResult.type, 'two');
 
-    // CustomConfigとDEFAULT_CUSTOM_CONFIGがmod.tsから利用可能であることは
-    // このテストファイルのimport文で既に確認済み
+    // CustomConfig and DEFAULT_CUSTOM_CONFIG availability from mod.ts
+    // is already confirmed by this test file's import statements
     // (import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../../src/types/custom_config.ts';)
     //
-    // JSR公開時は src/mod.ts からエクスポートされるため、
-    // ユーザーは import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from 'jsr:@scope/breakdownparams'
-    // の形で利用できる
+    // When published to JSR, exports will be from src/mod.ts,
+    // so users can use: import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from 'jsr:@scope/breakdownparams'
   });
 });

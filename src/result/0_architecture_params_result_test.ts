@@ -1,7 +1,7 @@
 import { assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { ParamsResult } from '../types/params_result.ts';
 
-// 1. インターフェースの基本設計テスト
+// 1. Basic interface design test
 Deno.test('test_params_result_interface', () => {
   const result: ParamsResult = {
     type: 'zero',

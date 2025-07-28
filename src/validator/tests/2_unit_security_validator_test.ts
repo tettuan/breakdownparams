@@ -4,12 +4,12 @@ import { SecurityValidator } from '../security_validator.ts';
 Deno.test('test_security_validator_unit', () => {
   const validator = new SecurityValidator();
 
-  // 正常系テスト
+  // Normal case test
   const validResult = validator.validate(['safe_param']);
   assertEquals(validResult.isValid, true, 'Safe param should be valid');
   assertEquals(validResult.validatedParams, ['safe_param'], 'Should return correct param');
 
-  // 異常系テスト - シェルコマンド実行の試み
+  // Abnormal case test - shell command execution attempt
   const shellCommandResult = validator.validate(['test; rm -rf /']);
   assertEquals(shellCommandResult.isValid, false, 'Shell command should be rejected');
   assertEquals(
@@ -19,7 +19,7 @@ Deno.test('test_security_validator_unit', () => {
   );
   assertEquals(shellCommandResult.errorCode, 'SECURITY_ERROR', 'Should return correct error code');
 
-  // 異常系テスト - パストラバーサルの試み
+  // Abnormal case test - path traversal attempt
   const pathTraversalResult = validator.validate(['../../../etc/passwd']);
   assertEquals(pathTraversalResult.isValid, false, 'Path traversal should be rejected');
   assertEquals(
@@ -29,8 +29,8 @@ Deno.test('test_security_validator_unit', () => {
   );
   assertEquals(pathTraversalResult.errorCode, 'SECURITY_ERROR', 'Should return correct error code');
 
-  // 短縮形オプションのセキュリティチェック
-  // 短縮形オプションが通過するか確認
+  // Security check for short form options
+  // Verify that short form options pass
   const shortOptionsResult = validator.validate(['-h', '-v', '-f=input.md']);
   assertEquals(shortOptionsResult.isValid, true, 'Short form options should pass security check');
   assertEquals(
@@ -39,7 +39,7 @@ Deno.test('test_security_validator_unit', () => {
     'Should return all short options',
   );
 
-  // カスタム変数オプションのセキュリティチェック
+  // Security check for custom variable options
   const userVarResult = validator.validate(['--uv-project=myproject', '--uv-version=1.0.0']);
   assertEquals(userVarResult.isValid, true, 'User variables should pass security check');
   assertEquals(
@@ -48,7 +48,7 @@ Deno.test('test_security_validator_unit', () => {
     'Should return all user variables',
   );
 
-  // 短縮形オプションと通常パラメータの組み合わせ
+  // Combination of short form options and regular parameters
   const mixedArgsResult = validator.validate(['to', 'project', '-f=input.md', '-o=output.md']);
   assertEquals(
     mixedArgsResult.isValid,

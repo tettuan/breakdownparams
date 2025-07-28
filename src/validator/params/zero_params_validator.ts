@@ -36,7 +36,7 @@ export class ZeroParamsValidator extends BaseValidator {
    * ```
    */
   override validate(params: string[]): ValidationResult {
-    // パラメータが0個の場合は有効
+    // Valid if no parameters
     if (params.length === 0) {
       return {
         isValid: true,
@@ -44,7 +44,7 @@ export class ZeroParamsValidator extends BaseValidator {
       };
     }
 
-    // それ以外は無効
+    // Otherwise invalid
     return {
       isValid: false,
       validatedParams: [],

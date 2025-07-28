@@ -5,21 +5,21 @@
  * with support for custom configuration and type-safe results.
  */
 
-// メインパーサークラス - コマンドライン引数の解析とバリデーションに使用
+// Main parser class - Used for parsing and validating command-line arguments
 export { ParamsParser } from './parser/params_parser.ts';
 
-// 結果型定義 - パーサーの戻り値として使用する型安全な結果オブジェクト
+// Result type definitions - Type-safe result objects used as parser return values
 export type {
-  ErrorInfo, // エラー情報の型定義
-  OneParamsResult, // 単一パラメータ実行時の結果型
-  ParamsResult, // 全パラメータパターンの統合結果型
-  TwoParamsResult, // 二重パラメータ実行時の結果型
-  ZeroParamsResult, // パラメータなし実行時の結果型
+  ErrorInfo, // Error information type definition
+  OneParamsResult, // Result type for single parameter execution
+  ParamsResult, // Unified result type for all parameter patterns
+  TwoParamsResult, // Result type for two parameter execution
+  ZeroParamsResult, // Result type for zero parameter execution
 } from './types/params_result.ts';
 
-// カスタム設定型 - パーサーの動作をカスタマイズする際の型定義
+// Custom configuration type - Type definition for customizing parser behavior
 export type { CustomConfig } from './types/custom_config.ts';
 
-// デフォルト設定値 - カスタム設定作成時のベースとして使用
-// スプレッド演算子で部分的にオーバーライドして利用: { ...DEFAULT_CUSTOM_CONFIG, params: {...} }
+// Default configuration values - Used as base for creating custom configurations
+// Use spread operator to partially override: { ...DEFAULT_CUSTOM_CONFIG, params: {...} }
 export { DEFAULT_CUSTOM_CONFIG } from './types/custom_config.ts';

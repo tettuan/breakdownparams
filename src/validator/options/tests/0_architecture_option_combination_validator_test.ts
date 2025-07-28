@@ -6,7 +6,7 @@ Deno.test('OptionCombinationValidator Architecture Tests', async (t) => {
   await t.step('should have correct class structure', () => {
     const validator = new OptionCombinationValidator({} as OptionCombinationRule);
 
-    // クラスの構造を検証
+    // Verify class structure
     assert('validate' in validator);
     assert(typeof validator.validate === 'function');
   });
@@ -14,13 +14,13 @@ Deno.test('OptionCombinationValidator Architecture Tests', async (t) => {
   await t.step('should have correct method signatures', () => {
     const validator = new OptionCombinationValidator({} as OptionCombinationRule);
 
-    // validate メソッドのシグネチャを検証
+    // Verify validate method signature
     const validateMethod = validator.validate;
-    assert(validateMethod.length === 1); // パラメータの数
+    assert(validateMethod.length === 1); // number of parameters
   });
 
   await t.step('should have correct dependency injection', () => {
-    // コンストラクタの依存性注入を検証
+    // Verify constructor dependency injection
     const rule: OptionCombinationRule = {
       allowedOptions: [],
       requiredOptions: [],
@@ -35,7 +35,7 @@ Deno.test('OptionCombinationValidator Architecture Tests', async (t) => {
     const validator = new OptionCombinationValidator({} as OptionCombinationRule);
     const result = validator.validate({});
 
-    // 結果の型を検証
+    // Verify result type
     assert('isValid' in result);
     assert(typeof result.isValid === 'boolean');
     assert('errorMessage' in result || result.errorMessage === undefined);

@@ -6,7 +6,7 @@ import {
   ZeroParamsResult,
 } from '../types/params_result.ts';
 
-// 2. 各結果型の構造テスト
+// 2. Structure tests for each result type
 Deno.test('test_zero_params_result_structure', () => {
   const result: ZeroParamsResult = {
     type: 'zero',

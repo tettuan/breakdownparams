@@ -3,7 +3,7 @@ import { DEFAULT_OPTION_COMBINATION_RULES } from '../option_combination_rule.ts'
 
 Deno.test('OptionCombinationRule Structure Tests', async (t) => {
   await t.step('should have correct default rules structure', () => {
-    // デフォルトルールの存在確認
+    // Verify default rules exist
     assert(DEFAULT_OPTION_COMBINATION_RULES.zero !== undefined);
     assert(DEFAULT_OPTION_COMBINATION_RULES.one !== undefined);
     assert(DEFAULT_OPTION_COMBINATION_RULES.two !== undefined);
@@ -14,16 +14,16 @@ Deno.test('OptionCombinationRule Structure Tests', async (t) => {
     assert(Array.isArray(zeroRules.allowedOptions));
     assert(zeroRules.allowedOptions.includes('help'));
     assert(zeroRules.allowedOptions.includes('version'));
-    assert(!zeroRules.requiredOptions); // zero options には必須オプションなし
-    assert(!zeroRules.combinationRules); // zero options には組み合わせルールなし
+    assert(!zeroRules.requiredOptions); // zero options has no required options
+    assert(!zeroRules.combinationRules); // zero options has no combination rules
   });
 
   await t.step('should have correct one options structure', () => {
     const oneRules = DEFAULT_OPTION_COMBINATION_RULES.one;
     assert(Array.isArray(oneRules.allowedOptions));
     assert(oneRules.allowedOptions.includes('config'));
-    assert(!oneRules.requiredOptions); // one options には必須オプションなし
-    assert(!oneRules.combinationRules); // one options には組み合わせルールなし
+    assert(!oneRules.requiredOptions); // one options has no required options
+    assert(!oneRules.combinationRules); // one options has no combination rules
   });
 
   await t.step('should have correct two options structure', () => {
@@ -35,10 +35,10 @@ Deno.test('OptionCombinationRule Structure Tests', async (t) => {
     assert(twoRules.allowedOptions.includes('adaptation'));
     assert(twoRules.allowedOptions.includes('input'));
 
-    // 必須オプションの検証 - two rules には必須オプションなし
+    // Verify required options - two rules has no required options
     assert(!twoRules.requiredOptions);
 
-    // 組み合わせルールの検証 - 現在は組み合わせルールなし
+    // Verify combination rules - currently no combination rules
     assert(!twoRules.combinationRules);
   });
 });

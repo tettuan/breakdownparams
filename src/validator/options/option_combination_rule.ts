@@ -1,26 +1,26 @@
 /**
- * Optionの組み合わせ検証用ルール
+ * Rules for validating option combinations
  */
 export interface OptionCombinationRule {
   /**
-   * 許可されるオプションのリスト
+   * List of allowed options
    */
   allowedOptions: string[];
 
   /**
-   * 必須のオプションのリスト
+   * List of required options
    */
   requiredOptions?: string[];
 
   /**
-   * オプションの組み合わせルール
-   * 例: { from: ['destination'] } は from が指定された場合、destination も必須
+   * Option combination rules
+   * Example: { from: ['destination'] } means if 'from' is specified, 'destination' is also required
    */
   combinationRules?: Record<string, string[]>;
 }
 
 /**
- * パラメータタイプごとのOption組み合わせルール
+ * Option combination rules for each parameter type
  */
 export interface OptionCombinationRules {
   zero: OptionCombinationRule;
@@ -29,7 +29,7 @@ export interface OptionCombinationRules {
 }
 
 /**
- * デフォルトのOption組み合わせルール
+ * Default option combination rules
  */
 export const DEFAULT_OPTION_COMBINATION_RULES: OptionCombinationRules = {
   zero: {
