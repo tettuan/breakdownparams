@@ -22,8 +22,10 @@ jobs:
         with:
           deno-version: '2.3.3'
 
-      - name: Cache Dependencies
-        run: deno cache mod.ts
+      - name: Update Dependencies
+        run: |
+          # Update deno.lock to match CI environment
+          deno cache --reload --lock-write mod.ts
 
       - name: Get tag version
         id: get_tag
@@ -51,6 +53,15 @@ jobs:
         run: deno test --allow-env --allow-write --allow-read
 
       - name: Publish to JSR
-        run: deno publish
+        run: |
+          # Check if deno.lock has changed
+          if git diff --exit-code deno.lock; then
+            # No changes, proceed with publish
+            deno publish
+          else
+            # deno.lock changed, use --allow-dirty only for this specific case
+            echo "Warning: deno.lock has been updated in CI environment"
+            deno publish --allow-dirty
+          fi
         env:
           DENO_JSON_PATH: './deno.json'
