@@ -36,9 +36,9 @@ export interface OptionDefinition {
 }
 
 /**
- * Custom variable configuration
+ * User variable configuration
  */
-export interface CustomVariableConfig {
+export interface UserVariableConfig {
   pattern: string;
   description: string;
 }
@@ -49,7 +49,7 @@ export interface CustomVariableConfig {
 export interface OptionsDefinitions {
   flags: Record<string, OptionDefinition>;
   values: Record<string, OptionDefinition>;
-  customVariables: CustomVariableConfig;
+  userVariables: UserVariableConfig;
 }
 
 /**
@@ -58,7 +58,7 @@ export interface OptionsDefinitions {
 export interface ValidationRules {
   allowedOptions: string[];
   allowedValueOptions?: string[];
-  allowCustomVariables: boolean;
+  allowUserVariables: boolean;
 }
 
 /**
@@ -140,7 +140,7 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
         valueRequired: true,
       },
     },
-    customVariables: {
+    userVariables: {
       pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
       description: 'User-defined variables (--uv-*)',
     },
@@ -149,17 +149,17 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     zero: {
       allowedOptions: ['help', 'version'],
       allowedValueOptions: [],
-      allowCustomVariables: false,
+      allowUserVariables: false,
     },
     one: {
       allowedOptions: ['config'],
       allowedValueOptions: ['from', 'destination', 'input', 'adaptation'],
-      allowCustomVariables: false,
+      allowUserVariables: false,
     },
     two: {
       allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
       allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config'],
-      allowCustomVariables: true,
+      allowUserVariables: true,
     },
   },
   errorHandling: {

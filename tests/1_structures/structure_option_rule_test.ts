@@ -5,7 +5,7 @@ Deno.test('test_option_rule_structure', () => {
   const rule: OptionRule = {
     format: '--key=value',
     rules: {
-      customVariables: ['--directive-type', '--layer-type'],
+      userVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -53,15 +53,15 @@ Deno.test('test_option_rule_structure', () => {
    * and how errors are reported. Proper structure ensures consistent behavior.
    *
    * Intent:
-   * - Verify customVariables is an array for pattern matching
+   * - Verify userVariables is an array for pattern matching
    * - Ensure error handling policies are strings
    * - Validate requiredOptions and valueTypes are arrays
    * - Confirm all validation settings have correct types
    */
   assertEquals(
-    Array.isArray(rule.rules.customVariables),
+    Array.isArray(rule.rules.userVariables),
     true,
-    'customVariables should be an array',
+    'userVariables should be an array',
   );
   assertEquals(typeof rule.errorHandling.emptyValue, 'string', 'emptyValue should be a string');
   assertEquals(
@@ -110,7 +110,7 @@ Deno.test('test_option_rule_structure', async (t) => {
     const rule: OptionRule = {
       format: '--key=value',
       rules: {
-        customVariables: ['uv-project', 'uv-version', 'uv-environment'],
+        userVariables: ['uv-project', 'uv-version', 'uv-environment'],
         requiredOptions: [],
         valueTypes: ['string'],
       },

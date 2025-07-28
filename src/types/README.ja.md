@@ -64,5 +64,5 @@
 
 - [パラメータ型定義仕様](docs/params_type.ja.md)
 - [オプション仕様](docs/options.ja.md)
-- [カスタム変数オプション仕様](docs/custom_variable_options.ja.md)
+- [カスタム変数オプション仕様](docs/user_variable_options.ja.md)
 - [バリデーション仕様](docs/validation.ja.md)

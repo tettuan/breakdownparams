@@ -40,12 +40,12 @@ Deno.test('test_security_validator_unit', () => {
   );
 
   // カスタム変数オプションのセキュリティチェック
-  const customVarResult = validator.validate(['--uv-project=myproject', '--uv-version=1.0.0']);
-  assertEquals(customVarResult.isValid, true, 'Custom variables should pass security check');
+  const userVarResult = validator.validate(['--uv-project=myproject', '--uv-version=1.0.0']);
+  assertEquals(userVarResult.isValid, true, 'User variables should pass security check');
   assertEquals(
-    customVarResult.validatedParams,
+    userVarResult.validatedParams,
     ['--uv-project=myproject', '--uv-version=1.0.0'],
-    'Should return all custom variables',
+    'Should return all user variables',
   );
 
   // 短縮形オプションと通常パラメータの組み合わせ

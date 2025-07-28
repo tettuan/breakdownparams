@@ -29,7 +29,7 @@
 | INVALID_DIRECTIVE_TYPE | "Invalid directive type. Must be one of: to, summary, defect" | DirectiveTypeの値が制約を満たさない |
 | INVALID_LAYER_TYPE | "Invalid layer type. Must be one of: project, issue, task" | LayerTypeの値が制約を満たさない |
 | INVALID_OPTION_FORMAT | "Invalid option format. Must be in the form: --key=value" | オプションの形式が不正 |
-| INVALID_CUSTOM_VARIABLE | "Invalid custom variable option syntax: {value}" | カスタム変数オプションの構文が不正 |
+| INVALID_USER_VARIABLE | "Invalid user variable option syntax: {value}" | カスタム変数オプションの構文が不正 |
 | TOO_MANY_ARGUMENTS | "Too many arguments. Maximum 2 arguments are allowed." | 引数の数が制限を超えている |
 | MISSING_REQUIRED_PARAM | "Missing required parameter: {param}" | 必須パラメータが欠落している |
 

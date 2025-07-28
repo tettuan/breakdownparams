@@ -57,7 +57,7 @@ Deno.test('CustomConfig functionality', async (t) => {
         two: {
           allowedOptions: ['from', 'destination'], // Only allow these two options
           allowedValueOptions: ['from', 'destination'],
-          allowCustomVariables: false, // Disable custom variables
+          allowUserVariables: false, // Disable user variables
         },
       },
     };
@@ -79,11 +79,11 @@ Deno.test('CustomConfig functionality', async (t) => {
       assertEquals(result2.error.code, 'INVALID_OPTION');
     }
 
-    // Test custom variables (currently still allowed despite config)
-    // TODO: Update when custom variable validation is fully implemented
+    // Test user variables (currently still allowed despite config)
+    // TODO: Update when user variable validation is fully implemented
     const result3 = parser.parse(['to', 'project', '--uv-test=value']);
     assertEquals(result3.type, 'two');
-    // This should be error when custom variable validation is implemented
+    // This should be error when user variable validation is implemented
     // assertEquals(result3.type, 'error');
     // if (result3.type === 'error' && result3.error) {
     //   assertEquals(result3.error.code, 'INVALID_OPTION');
@@ -97,17 +97,17 @@ Deno.test('CustomConfig functionality', async (t) => {
         zero: {
           allowedOptions: ['help'], // Only allow help, not version
           allowedValueOptions: [],
-          allowCustomVariables: false,
+          allowUserVariables: false,
         },
         one: {
           allowedOptions: ['from', 'destination'], // Different from default
           allowedValueOptions: ['from', 'destination'],
-          allowCustomVariables: false,
+          allowUserVariables: false,
         },
         two: {
           allowedOptions: ['config'], // Only allow config
           allowedValueOptions: ['config'],
-          allowCustomVariables: true,
+          allowUserVariables: true,
         },
       },
     };

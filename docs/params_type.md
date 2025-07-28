@@ -167,7 +167,7 @@ Main error codes:
 - `INVALID_DIRECTIVE_TYPE`: Invalid directiveType
 - `INVALID_LAYER_TYPE`: Invalid layerType
 - `INVALID_OPTION`: Invalid option
-- `INVALID_CUSTOM_VARIABLE`: Invalid user variable
+- `INVALID_USER_VARIABLE`: Invalid user variable
 - `TOO_MANY_ARGUMENTS`: Too many arguments
 - `INVALID_COMMAND`: Invalid command
 

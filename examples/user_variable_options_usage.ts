@@ -25,7 +25,7 @@ for (const args of testArgs) {
 
   if (result.type === 'error') {
     console.error(`Error: ${result.error?.message}`);
-    console.log('\nFor usage information, run: custom_variable_options_usage --help');
+    console.log('\nFor usage information, run: user_variable_options_usage --help');
     continue;
   }
 
@@ -35,7 +35,7 @@ for (const args of testArgs) {
 
     if (options.help) {
       console.log(`
-Usage: custom_variable_options_usage <command> <layer> [options]
+Usage: user_variable_options_usage <command> <layer> [options]
 
 Commands:
   to, summary, defect
@@ -48,32 +48,32 @@ Options:
   --destination=FILE, -o=FILE Output file path
   --input=TYPE, -i=TYPE     Input layer type
   --adaptation=TYPE, -a=TYPE Prompt adaptation type
-  --uv-NAME=VALUE          Custom variable options (only available with TwoParams)
+  --uv-NAME=VALUE          User variable options (only available with TwoParams)
 
 Examples:
-  # Basic custom variable usage
-  custom_variable_options_usage to project --uv-project=myproject
+  # Basic user variable usage
+  user_variable_options_usage to project --uv-project=myproject
 
-  # Multiple custom variables
-  custom_variable_options_usage to project --uv-project=myproject --uv-version=1.0.0 --uv-environment=production
+  # Multiple user variables
+  user_variable_options_usage to project --uv-project=myproject --uv-version=1.0.0 --uv-environment=production
 
-  # Custom variables with standard options
-  custom_variable_options_usage to project --from=input.txt --destination=output.txt --uv-project=myproject --uv-version=1.0.0
+  # User variables with standard options
+  user_variable_options_usage to project --from=input.txt --destination=output.txt --uv-project=myproject --uv-version=1.0.0
 
-  # Custom variables with complex values
-  custom_variable_options_usage to project --uv-path=/usr/local/bin --uv-config={"key":"value"} --uv-array=[1,2,3]
+  # User variables with complex values
+  user_variable_options_usage to project --uv-path=/usr/local/bin --uv-config={"key":"value"} --uv-array=[1,2,3]
 
-  # Custom variables with different directive types
-  custom_variable_options_usage summary issue --uv-name=value --uv-type=test
-  custom_variable_options_usage defect task --uv-name=value --uv-type=test
+  # User variables with different directive types
+  user_variable_options_usage summary issue --uv-name=value --uv-type=test
+  user_variable_options_usage defect task --uv-name=value --uv-type=test
 
 Notes:
-  - Custom variables are only available with TwoParams mode
-  - Custom variable names are case-sensitive
-  - Custom variables must use the --uv- prefix
-  - Custom variables must have a value (--uv-name=value format)
-  - Multiple custom variables can be specified
-  - Custom variables are ignored in ZeroParams and OneParam modes
+  - User variables are only available with TwoParams mode
+  - User variable names are case-sensitive
+  - User variables must use the --uv- prefix
+  - User variables must have a value (--uv-name=value format)
+  - Multiple user variables can be specified
+  - User variables are ignored in ZeroParams and OneParam modes
 `);
     }
   }
@@ -109,10 +109,10 @@ Notes:
       console.log(`Prompt adaptation: ${typedOptions.adaptation}`);
     }
 
-    // Display custom variables
+    // Display user variables
     const customVars = Object.entries(options).filter(([key]) => key.startsWith('uv-'));
     if (customVars.length > 0) {
-      console.log('\nCustom Variables:');
+      console.log('\nUser Variables:');
       console.log('----------------');
       for (const [key, value] of customVars) {
         console.log(`${key}=${value}`);

@@ -94,7 +94,7 @@ Deno.test('test_validation_rules_structure', () => {
    */
   assertEquals(DEFAULT_OPTION_RULE.format, '--key=value');
   assertEquals(typeof DEFAULT_OPTION_RULE.flagOptions, 'object');
-  assertEquals(Array.isArray(DEFAULT_OPTION_RULE.rules.customVariables), true);
+  assertEquals(Array.isArray(DEFAULT_OPTION_RULE.rules.userVariables), true);
   assertEquals(Array.isArray(DEFAULT_OPTION_RULE.rules.requiredOptions), true);
   assertEquals(Array.isArray(DEFAULT_OPTION_RULE.rules.valueTypes), true);
   assertEquals(typeof DEFAULT_OPTION_RULE.errorHandling, 'object');

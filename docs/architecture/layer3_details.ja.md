@@ -163,7 +163,7 @@ class OptionFactory {
     
     // ユーザー変数オプションの場合
     if (rawInput.startsWith('--uv-')) {
-      return new CustomVariableOption(rawInput);
+      return new UserVariableOption(rawInput);
     }
     
     // 標準オプションの場合
@@ -228,7 +228,7 @@ class ValueOption implements Option {
     return this.rawInput.startsWith('--');
   }
 
-  isCustomVariable(): boolean {
+  isUserVariable(): boolean {
     return false;
   }
 
@@ -309,7 +309,7 @@ class FlagOption implements Option {
     return this.rawInput.startsWith('--');
   }
 
-  isCustomVariable(): boolean {
+  isUserVariable(): boolean {
     return false;
   }
 
@@ -352,10 +352,10 @@ class FlagOption implements Option {
 }
 ```
 
-### 1.7 CustomVariableOption
+### 1.7 UserVariableOption
 
 ```typescript
-class CustomVariableOption implements Option {
+class UserVariableOption implements Option {
   readonly rawInput: string;
   readonly canonicalName: string;
   readonly longForm: string;
@@ -381,7 +381,7 @@ class CustomVariableOption implements Option {
     return true;
   }
 
-  isCustomVariable(): boolean {
+  isUserVariable(): boolean {
     return true;
   }
 
@@ -492,7 +492,7 @@ interface Option {
   // 判定メソッド
   isShorthand(): boolean;
   isLongForm(): boolean;
-  isCustomVariable(): boolean;
+  isUserVariable(): boolean;
   isOption(): boolean;
   matchesInput(input: string): boolean;
   
@@ -571,7 +571,7 @@ const valueResult: ValidationResult = {
 - 値の形式チェック
 - カスタムバリデーションの実行
 
-3. **CustomVariableOption（ユーザー変数オプション）**
+3. **UserVariableOption（ユーザー変数オプション）**
 ```typescript
 // ユーザー変数オプションの評価結果
 const customResult: ValidationResult = {
@@ -731,8 +731,8 @@ class OptionsValidator {
           throw new Error(result.errors.join(", "));
         }
       } else if (name.startsWith("uv-")) {
-        if (!registry.validateCustomVariable(name)) {
-          throw new Error(`Invalid custom variable name: ${name}`);
+        if (!registry.validateUserVariable(name)) {
+          throw new Error(`Invalid user variable name: ${name}`);
         }
       }
     }

@@ -186,13 +186,13 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 
 1. **OptionFactory**
    - Creates Option instances from command-line arguments
-   - Determines option type (ValueOption, FlagOption, CustomVariableOption)
+   - Determines option type (ValueOption, FlagOption, UserVariableOption)
    - Manages standard option definitions and aliases
 
 2. **Option Classes**
    - `ValueOption`: Options that accept values
    - `FlagOption`: Boolean options without values
-   - `CustomVariableOption`: User-defined variables with `--uv-*` prefix
+   - `UserVariableOption`: User-defined variables with `--uv-*` prefix
    - Each class implements the Option interface with normalization and validation
 
 3. **ParamsParser**

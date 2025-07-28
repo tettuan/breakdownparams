@@ -10,7 +10,7 @@ For detailed information about parameter patterns and usage, please refer to the
 - **Option-class-centered design** for consistency and extensibility
 - **Security-first validation** to prevent malicious inputs
 - **Flexible parameter patterns** (0, 1, or 2 parameters)
-- **Custom variable options** (`--uv-*`) for user-defined values
+- **User variable options** (`--uv-*`) for user-defined values
 - **Comprehensive validation** at parameter, option, and combination levels
 - **Unified normalization** for consistent option handling
 
@@ -156,12 +156,12 @@ For detailed option specifications, see the [Options Documentation](docs/options
 
 ## Advanced Features
 
-### Custom Variable Options
+### User Variable Options
 
 User-defined variables follow the `--uv-*` pattern for maximum flexibility:
 
 ```bash
-# Define custom variables for your workflow
+# Define user variables for your workflow
 breakdown to project --uv-project=myproject --uv-version=1.0.0 --uv-environment=production
 
 # Access in your code
@@ -173,12 +173,12 @@ if (result.type === 'two') {
 ```
 
 **Features**:
-- Unlimited custom variables
+- Unlimited user variables
 - Automatic validation (syntax only)
 - Normalized to `uv-<name>` format
 - Available only in two-parameter mode
 
-For specifications, see [Custom Variable Options](docs/custom_variable_options.md).
+For specifications, see [User Variable Options](docs/user_variable_options.md).
 
 ### Validation System
 

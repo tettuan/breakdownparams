@@ -19,7 +19,7 @@
 
 - [パラメータ仕様](params.ja.md) - 位置引数の定義と制約
 - [オプション仕様](options.ja.md) - ハイフン付き引数の定義と制約
-- [ユーザー変数オプション仕様](custom_variable_options.ja.md) - ユーザー定義変数の定義と制約
+- [ユーザー変数オプション仕様](user_variable_options.ja.md) - ユーザー定義変数の定義と制約
 - [パラメータパーサーの型定義仕様](params_type.ja.md) - 返却型の定義と使用方法
 
 ## スコープ外
@@ -190,7 +190,7 @@ TwoParamsモードでのみ使用可能で、以下の形式で指定します�
 ./.deno/bin/breakdown to project --uv-version=1.0.0 --uv-environment=production
 ```
 
-詳細な仕様については[ユーザー変数オプション仕様](custom_variable_options.ja.md)を参照してください。
+詳細な仕様については[ユーザー変数オプション仕様](user_variable_options.ja.md)を参照してください。
 
 # パラメータ優先順位ルール
 

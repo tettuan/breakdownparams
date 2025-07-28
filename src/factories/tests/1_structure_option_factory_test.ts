@@ -18,7 +18,7 @@ Deno.test('CommandLineOptionFactory Structure', async (t) => {
     assert(options[0].validate('--input=value').isValid);
   });
 
-  await t.step('should handle custom variable options', () => {
+  await t.step('should handle user variable options', () => {
     const factory = new CommandLineOptionFactory();
     const options = factory.createOptionsFromArgs(['--uv-config=value']);
     assertEquals(options.length, 1);

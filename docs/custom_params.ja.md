@@ -72,7 +72,7 @@ interface CustomConfig {
       description: string;
       valueRequired?: boolean;
     }>;
-    customVariables: {
+    userVariables: {
       pattern: string;
       description: string;
     };
@@ -122,7 +122,7 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       adaptation: { shortForm: 'a', description: 'Prompt adaptation type', valueRequired: true },
       config: { shortForm: 'c', description: 'Configuration file name', valueRequired: true },
     },
-    customVariables: {
+    userVariables: {
       pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
       description: 'User-defined variables (--uv-*)',
     },
@@ -131,17 +131,17 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     zero: {
       allowedOptions: ['help', 'version'],
       allowedValueOptions: [],
-      allowCustomVariables: false,
+      allowUserVariables: false,
     },
     one: {
       allowedOptions: ['config'],
       allowedValueOptions: ['from', 'destination', 'input', 'adaptation'],
-      allowCustomVariables: false,
+      allowUserVariables: false,
     },
     two: {
       allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
       allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config'],
-      allowCustomVariables: true,
+      allowUserVariables: true,
     },
   },
   errorHandling: {

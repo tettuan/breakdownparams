@@ -5,7 +5,7 @@ import { OptionRule } from '../../../src/types/option_rule.ts';
 const rule: OptionRule = {
   format: '--key=value',
   rules: {
-    customVariables: ['--uv-*'],
+    userVariables: ['--uv-*'],
     requiredOptions: [],
     valueTypes: [],
   },

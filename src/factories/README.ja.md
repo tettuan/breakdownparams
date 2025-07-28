@@ -7,7 +7,7 @@
 新しい設計では、OptionFactoryはシステムの中核として以下の重要な役割を担います：
 
 - **Optionインスタンスの生成**: コマンドライン引数から適切なOptionクラスのインスタンスを生成
-- **オプションタイプの判定**: ValueOption、FlagOption、CustomVariableOptionの適切な選択
+- **オプションタイプの判定**: ValueOption、FlagOption、UserVariableOptionの適切な選択
 - **正規化の委譲**: 各Optionインスタンスが自身の正規化を担当
 
 ## 概要
@@ -70,7 +70,7 @@ interface OptionFactory {
 - 存在するかどうかのみを管理
 - 常に有効なオプションとして扱う
 
-### 3. ユーザー変数オプション (CustomVariableOption)
+### 3. ユーザー変数オプション (UserVariableOption)
 
 - `--uv-*` 形式のユーザー変数
 - 正規化： `--uv-config` → `uv-config`

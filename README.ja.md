@@ -178,7 +178,7 @@ if (result.type === 'two') {
 - `uv-<name>`形式に正規化
 - 2パラメータモードでのみ利用可能
 
-仕様については、[カスタム変数オプション](docs/custom_variable_options.md)を参照してください。
+仕様については、[カスタム変数オプション](docs/user_variable_options.md)を参照してください。
 
 ### 検証システム
 

@@ -32,7 +32,7 @@
   - 先頭は英字である必要があります
   - 大文字小文字を区別する
   - 空でないこと
-  - 検証はCustomVariableOptionクラスが実施
+  - 検証はUserVariableOptionクラスが実施
 
 ### 値の検証
 - 値は有効なターミナル入力であれば何でも受け入れます
@@ -58,9 +58,9 @@ breakdown to project --uv-path=/usr/local/bin --uv-config={"key":"value"} --uv-a
 ```
 
 ## 実装上の注意点
-1. OptionFactoryが`--uv-*`引数に対してCustomVariableOptionインスタンスを生成します
+1. OptionFactoryが`--uv-*`引数に対してUserVariableOptionインスタンスを生成します
 2. 各ユーザー変数は`uv-*`形式に正規化されます（例：`--uv-config` → `uv-config`）
-3. CustomVariableOptionクラスが自身の正規化とバリデーションを処理します
+3. UserVariableOptionクラスが自身の正規化とバリデーションを処理します
 4. 無効な変数名のエラー処理はOptionクラス内で実装されます
 5. 実装はオプションクラス中心設計パターンに従います
 
@@ -139,7 +139,7 @@ interface OptionParams {
 - 例：`breakdown to project --config test --uv-environment=prod`
 
 ### エラー処理
-- 無効なユーザー変数はCustomVariableOptionクラスで処理されます
+- 無効なユーザー変数はUserVariableOptionクラスで処理されます
 - 不正な構文（`=` の欠落）はOptionバリデーションを通じてエラーを生成します
 - バリデーションエラーはOptionインスタンスのvalidate()メソッドから返されます
 
@@ -165,4 +165,4 @@ interface OptionParams {
 
 ---
 
-[日本語版](custom_variable_options.ja.md) | [English Version](custom_variable_options.md) 
+[日本語版](user_variable_options.ja.md) | [English Version](user_variable_options.md) 

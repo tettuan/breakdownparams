@@ -227,8 +227,8 @@ abstract class BaseValidator implements ParamsValidator {
           throw new Error(result.errors.join(", "));
         }
       } else if (name.startsWith("uv-")) {
-        if (!this.optionRegistry.validateCustomVariable(name)) {
-          throw new Error(`Invalid custom variable name: ${name}`);
+        if (!this.optionRegistry.validateUserVariable(name)) {
+          throw new Error(`Invalid user variable name: ${name}`);
         }
       }
     }
@@ -290,7 +290,7 @@ class FlagOption implements Option {
   }
 }
 
-class CustomVariableOption implements Option {
+class UserVariableOption implements Option {
   constructor(
     readonly name: string,
     readonly description: string,
@@ -301,7 +301,7 @@ class CustomVariableOption implements Option {
     if (!this.pattern.test(this.name)) {
       return { 
         isValid: false, 
-        errors: [`Invalid custom variable name: ${this.name}`] 
+        errors: [`Invalid user variable name: ${this.name}`] 
       };
     }
     return { isValid: true, errors: [] };

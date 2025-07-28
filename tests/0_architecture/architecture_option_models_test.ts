@@ -31,11 +31,11 @@ Deno.test('test_option_model_design', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new UserVariableOption('--uv-config', 'Configuration');
+    const userOption = new UserVariableOption('--uv-config', 'Configuration');
 
     assert(flagOption instanceof FlagOption);
     assert(valueOption instanceof ValueOption);
-    assert(customOption instanceof UserVariableOption);
+    assert(userOption instanceof UserVariableOption);
   });
 });
 
@@ -147,7 +147,7 @@ Deno.test('test_value_option_design', async (t) => {
  * handling dynamic user-defined variables.
  *
  * Background:
- * User variable options allow users to pass custom variables with the
+ * User variable options allow users to pass user variables with the
  * --uv- prefix. They have no aliases and extract values from the full
  * option string.
  *
@@ -209,11 +209,11 @@ Deno.test('test_option_model_integration_design', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new UserVariableOption('--uv-config', 'Configuration');
+    const userOption = new UserVariableOption('--uv-config', 'Configuration');
 
     assertEquals(flagOption.type, OptionType.FLAG);
     assertEquals(valueOption.type, OptionType.VALUE);
-    assertEquals(customOption.type, OptionType.USER_VARIABLE);
+    assertEquals(userOption.type, OptionType.USER_VARIABLE);
   });
 
   await t.step('should maintain consistent validation results', () => {
@@ -225,11 +225,11 @@ Deno.test('test_option_model_integration_design', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new UserVariableOption('--uv-config', 'Configuration');
+    const userOption = new UserVariableOption('--uv-config', 'Configuration');
 
     const flagResult = flagOption.validate();
     const valueResult = valueOption.validate('test.txt');
-    const customResult = customOption.validate('--uv-config=test_config');
+    const customResult = userOption.validate('--uv-config=test_config');
 
     assert(flagResult.isValid);
     assert(valueResult.isValid);

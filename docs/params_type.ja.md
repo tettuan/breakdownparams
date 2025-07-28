@@ -167,7 +167,7 @@ const errorResult: ErrorResult = {
 - `INVALID_DIRECTIVE_TYPE`: 不正な directiveType
 - `INVALID_LAYER_TYPE`: 不正な layerType
 - `INVALID_OPTION`: 不正なオプション
-- `INVALID_CUSTOM_VARIABLE`: 不正なユーザー変数
+- `INVALID_USER_VARIABLE`: 不正なユーザー変数
 - `TOO_MANY_ARGUMENTS`: 引数が多すぎる
 - `INVALID_COMMAND`: 不正なコマンド
 

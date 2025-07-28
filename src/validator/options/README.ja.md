@@ -32,7 +32,7 @@
   - `OptionCombinationResult` インターフェース: isValid, errorMessage, errorCode など
 - **特徴**:
   - 入力はOptionインスタンスから取得した正規化済みの値（`help`, `uv-config` など）
-  - オプションの組み合わせルールのみを検証（カスタム変数の検証は `CustomVariableValidator` の責務）
+  - オプションの組み合わせルールのみを検証（カスタム変数の検証は `UserVariableValidator` の責務）
   - 標準オプションの組み合わせ、必須オプションの存在、オプション間の依存関係を検証
 - **参考**: [docs/architecture/layer2_diagrams.ja.md](../../docs/architecture/layer2_diagrams.ja.md), [docs/validation.ja.md](../../docs/validation.ja.md)
 
@@ -49,11 +49,11 @@
 
 ---
 
-### custom_variable_validator.ts
+### user_variable_validator.ts
 
 - **役割**: ユーザー変数オプションの検証ロジックを提供します。
 - **主なエクスポート**:
-  - `CustomVariableValidator` クラス
+  - `UserVariableValidator` クラス
 - **特徴**:
   - ユーザー変数名の形式検証（`uv-` プレフィックス）
   - 変数名の文字列パターン検証
@@ -63,7 +63,7 @@
 
 - [docs/options.md](../../docs/options.md): オプション仕様・フォーマット・制約
 - [docs/validation.ja.md](../../docs/validation.ja.md): バリデーション仕様・エラー定義
-- [docs/custom_variable_options.md](../../docs/custom_variable_options.md): ユーザー変数オプション仕様
+- [docs/user_variable_options.md](../../docs/user_variable_options.md): ユーザー変数オプション仕様
 - [docs/architecture/layer2_diagrams.ja.md](../../docs/architecture/layer2_diagrams.ja.md): バリデーション・オプション検証のシーケンス/クラス図
 - [docs/architecture/layer5_implementation.ja.md](../../docs/architecture/layer5_implementation.ja.md): 実装詳細
 

@@ -99,7 +99,7 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     // 上流でパースされていない短縮形は到達しない可能性がある
   });
 
-  await t.step('should handle custom variable options in TwoParams', () => {
+  await t.step('should handle user variable options in TwoParams', () => {
     const rule: OptionCombinationRule = {
       allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
       requiredOptions: [],
@@ -109,12 +109,12 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     const validator = new OptionCombinationValidator(rule);
 
     // カスタム変数は特別扱いされ、TwoParamsモードでは許可される
-    const customVarResult = validator.validate({
+    const userVarResult = validator.validate({
       'uv-project': 'myproject',
       'uv-version': '1.0.0',
     });
-    console.log('Custom variable result:', customVarResult);
-    assert(customVarResult.isValid);
+    console.log('User variable result:', userVarResult);
+    assert(userVarResult.isValid);
 
     // 標準オプションとカスタム変数の混在
     const mixedResult = validator.validate({
@@ -125,11 +125,11 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
     assert(mixedResult.isValid);
 
     // 無効なカスタム変数名
-    const invalidCustomVarResult = validator.validate({
+    const invalidUserVarResult = validator.validate({
       'uv-': 'invalid',
       'uv-123': 'invalid',
     });
-    assert(!invalidCustomVarResult.isValid);
-    assert(invalidCustomVarResult.errorCode === 'INVALID_CUSTOM_VARIABLE');
+    assert(!invalidUserVarResult.isValid);
+    assert(invalidUserVarResult.errorCode === 'INVALID_USER_VARIABLE');
   });
 });

@@ -16,7 +16,7 @@ Deno.test('test_params_parser_structure_with_option_rule', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--directive-type', '--layer-type'],
+      userVariables: ['--directive-type', '--layer-type'],
       requiredOptions: ['from'],
       valueTypes: ['string'],
     },

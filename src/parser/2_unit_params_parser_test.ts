@@ -16,7 +16,7 @@ Deno.test('test_params_parser_unit', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--directive-type', '--layer-type'],
+      userVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -152,17 +152,17 @@ Deno.test('test_params_parser_unit', () => {
     );
   }
 
-  // Test custom variable options
-  logger.debug('=== Testing custom variable options ===');
+  // Test user variable options
+  logger.debug('=== Testing user variable options ===');
   const customVarArgs = ['to', 'project', '--uv-project=myproject'];
-  const customVarResult = parser.parse(customVarArgs);
-  logger.debug('Custom variable result:', customVarResult);
+  const userVarResult = parser.parse(customVarArgs);
+  logger.debug('User variable result:', userVarResult);
   // Currently fails with "Option 'uv-project' is not allowed"
-  if (customVarResult.type === 'error') {
+  if (userVarResult.type === 'error') {
     assertEquals(
-      customVarResult.error?.code,
+      userVarResult.error?.code,
       'INVALID_OPTION',
-      'Custom variables currently not supported',
+      'User variables currently not supported',
     );
   }
 });

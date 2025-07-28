@@ -1,11 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import {
   parseOption,
-  validateCustomVariableOption,
   validateEmptyValue,
   validateLongFormOption,
   validateOptionFormat,
   validateShortFormOption,
+  validateUserVariableOption,
 } from '../format_utils.ts';
 
 Deno.test('Format Utils Unit Tests', async (t) => {
@@ -31,11 +31,11 @@ Deno.test('Format Utils Unit Tests', async (t) => {
     assert(!validateEmptyValue('value'));
   });
 
-  await t.step('should validate custom variable options', () => {
-    assert(validateCustomVariableOption('--uv-test=value'));
-    assert(validateCustomVariableOption('--uv-test'));
-    assert(!validateCustomVariableOption('--test'));
-    assert(!validateCustomVariableOption('uv-test'));
+  await t.step('should validate user variable options', () => {
+    assert(validateUserVariableOption('--uv-test=value'));
+    assert(validateUserVariableOption('--uv-test'));
+    assert(!validateUserVariableOption('--test'));
+    assert(!validateUserVariableOption('uv-test'));
   });
 
   await t.step('should parse options correctly', () => {

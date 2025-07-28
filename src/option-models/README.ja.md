@@ -79,7 +79,7 @@ interface Option {
   // 判定メソッド
   isShorthand(): boolean;
   isLongForm(): boolean;
-  isCustomVariable(): boolean;
+  isUserVariable(): boolean;
   matchesInput(input: string): boolean;
 
   // 変換メソッド
@@ -99,7 +99,7 @@ interface Option {
 
 - **`FlagOption`**: 値を持たないフラグの存在確認に特化
 - **`ValueOption`**: 値の検証と型変換を担当
-- **`CustomVariableOption`**: ユーザー変数の命名規則と値の検証を管理（`--uv-*` → `uv-*`に正規化）
+- **`UserVariableOption`**: ユーザー変数の命名規則と値の検証を管理（`--uv-*` → `uv-*`に正規化）
 
 ### 3. 検証パイプライン
 
@@ -164,7 +164,7 @@ class ValueOption implements Option {
 ### ユーザー変数オプションの実装
 
 ```typescript
-class CustomVariableOption implements Option {
+class UserVariableOption implements Option {
   readonly rawInput: string;
   readonly canonicalName: string;
   readonly longForm: string;
@@ -247,7 +247,7 @@ const fromOption = new ValueOption(
 ### ユーザー変数オプション
 
 ```typescript
-const userOption = new CustomVariableOption('--uv-project');
+const userOption = new UserVariableOption('--uv-project');
 console.log(userOption.canonicalName); // 'uv-project' (先頭のハイフンを除去)
 console.log(userOption.validate().isValid); // true
 console.log(userOption.getValue()); // ユーザーが指定した値
@@ -256,7 +256,7 @@ console.log(userOption.getValue()); // ユーザーが指定した値
 ## 関連ドキュメント
 
 - [オプション仕様](docs/options.ja.md)
-- [カスタム変数オプション仕様](docs/custom_variable_options.ja.md)
+- [カスタム変数オプション仕様](docs/user_variable_options.ja.md)
 - [パラメータ型定義仕様](docs/params_type.ja.md)
 
 # Option Models 実装設計・責務分担

@@ -44,7 +44,7 @@ export interface OptionValidator {
  *
  * Provides common functionality for validating command-line options
  * including option normalization, validation against allowed lists,
- * and custom variable support.
+ * and user variable support.
  *
  * @abstract
  * @implements {OptionValidator}
@@ -52,7 +52,7 @@ export interface OptionValidator {
 abstract class BaseOptionValidator implements OptionValidator {
   protected abstract readonly paramType: 'zero' | 'one' | 'two';
   protected abstract readonly validOptions: string[];
-  protected abstract readonly allowCustomVariables: boolean;
+  protected abstract readonly allowUserVariables: boolean;
 
   /**
    * Normalizes an option string into key and value components.
@@ -85,12 +85,12 @@ abstract class BaseOptionValidator implements OptionValidator {
     options: string[],
     validOptions: string[],
     flagOptions: Record<string, boolean>,
-    allowCustomVariables: boolean,
+    allowUserVariables: boolean,
   ): { isValid: boolean; invalidOptions: string[] } {
     const invalidOptions = options.filter((opt) => {
       const { key } = this.normalizeOption(opt);
       return !validOptions.includes(key) && !Object.keys(flagOptions).includes(key) &&
-        (!allowCustomVariables || !key.startsWith('uv-'));
+        (!allowUserVariables || !key.startsWith('uv-'));
     });
     return {
       isValid: invalidOptions.length === 0,
@@ -168,7 +168,7 @@ abstract class BaseOptionValidator implements OptionValidator {
       options,
       [...this.validOptions, ...Object.keys(optionRule.flagOptions)],
       optionRule.flagOptions,
-      this.allowCustomVariables,
+      this.allowUserVariables,
     );
 
     if (!isValid) {
@@ -188,7 +188,7 @@ abstract class BaseOptionValidator implements OptionValidator {
 export class ZeroOptionValidator extends BaseOptionValidator {
   protected readonly paramType = 'zero' as const;
   protected readonly validOptions = [];
-  protected readonly allowCustomVariables = false;
+  protected readonly allowUserVariables = false;
 }
 
 /**
@@ -197,7 +197,7 @@ export class ZeroOptionValidator extends BaseOptionValidator {
 export class OneOptionValidator extends BaseOptionValidator {
   protected readonly paramType = 'one' as const;
   protected readonly validOptions = [];
-  protected readonly allowCustomVariables = false;
+  protected readonly allowUserVariables = false;
 }
 
 /**
@@ -212,5 +212,5 @@ export class TwoOptionValidator extends BaseOptionValidator {
     'adaptation',
     'config',
   ];
-  protected readonly allowCustomVariables = true;
+  protected readonly allowUserVariables = true;
 }

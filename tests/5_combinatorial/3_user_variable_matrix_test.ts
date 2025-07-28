@@ -3,7 +3,7 @@
  *
  * Purpose:
  * This test file comprehensively validates the interaction between user-defined
- * variables (--uv-*) and standard options, ensuring that custom variables can be
+ * variables (--uv-*) and standard options, ensuring that user variables can be
  * freely combined with built-in options without conflicts. It verifies the parser's
  * extensibility through user variables while maintaining backward compatibility.
  *

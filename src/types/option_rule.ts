@@ -24,7 +24,7 @@ export interface OptionRule {
      * カスタム変数の定義
      * 例：['--uv-config', '--uv-env']
      */
-    customVariables: string[];
+    userVariables: string[];
 
     /**
      * 必須オプションの定義
@@ -79,7 +79,7 @@ export const DEFAULT_OPTION_RULE: OptionRule = {
     version: true,
   },
   rules: {
-    customVariables: [],
+    userVariables: [],
     requiredOptions: [],
     valueTypes: ['string'],
   },

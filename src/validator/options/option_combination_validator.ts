@@ -42,7 +42,7 @@ export interface OptionCombinationResult {
  * 3. オプション間の依存関係（組み合わせルール）が満たされているか
  */
 export class OptionCombinationValidator {
-  private readonly customVariablePattern = /^uv-[a-zA-Z][a-zA-Z0-9_-]*$/;
+  private readonly userVariablePattern = /^uv-[a-zA-Z][a-zA-Z0-9_-]*$/;
 
   /**
    * @param rule - オプションの組み合わせルールを定義するオブジェクト
@@ -66,11 +66,11 @@ export class OptionCombinationValidator {
       // カスタム変数（uv-*）は特別扱い - TwoParamsモードでのみ許可
       if (key.startsWith('uv-')) {
         // カスタム変数の形式チェック
-        if (!this.isValidCustomVariableName(key)) {
+        if (!this.isValidUserVariableName(key)) {
           return {
             isValid: false,
-            errorMessage: `Invalid custom variable format: ${key}`,
-            errorCode: 'INVALID_CUSTOM_VARIABLE',
+            errorMessage: `Invalid user variable format: ${key}`,
+            errorCode: 'INVALID_USER_VARIABLE',
             errorCategory: 'validation',
           };
         }
@@ -128,8 +128,8 @@ export class OptionCombinationValidator {
    * @param name - チェックする変数名
    * @returns 有効な形式の場合はtrue
    */
-  private isValidCustomVariableName(name: string): boolean {
-    return this.customVariablePattern.test(name);
+  private isValidUserVariableName(name: string): boolean {
+    return this.userVariablePattern.test(name);
   }
 
   /**

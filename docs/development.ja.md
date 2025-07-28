@@ -220,13 +220,13 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 
 1. **OptionFactory**
    - コマンドライン引数からOptionインスタンスを生成
-   - オプションタイプ（ValueOption、FlagOption、CustomVariableOption）を判定
+   - オプションタイプ（ValueOption、FlagOption、UserVariableOption）を判定
    - 標準オプション定義とエイリアス管理
 
 2. **Optionクラス**
    - `ValueOption`: 値を受け取るオプション
    - `FlagOption`: 値を持たないブールオプション
-   - `CustomVariableOption`: `--uv-*`プレフィックスのユーザー定義変数
+   - `UserVariableOption`: `--uv-*`プレフィックスのユーザー定義変数
    - 各クラスがOptionインターフェースを実装し、正規化とバリデーションを実装
 
 3. **ParamsParser**

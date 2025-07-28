@@ -31,7 +31,7 @@ By using default configuration values, it supports standard usage patterns while
    - Options with values like from, destination, input, adaptation, config
    - Short form definitions
 
-3. **Custom Variables**
+3. **User Variables**
    - User-defined variables in `--uv-*` format
    - Pattern and allowed mode definitions
 
@@ -39,7 +39,7 @@ By using default configuration values, it supports standard usage patterns while
 
 For each parameter mode (zero/one/two):
 - List of allowed options
-- Allow/disallow custom variables
+- Allow/disallow user variables
 
 ## 3. Configuration Values
 
@@ -72,7 +72,7 @@ interface CustomConfig {
       description: string;
       valueRequired?: boolean;
     }>;
-    customVariables: {
+    userVariables: {
       pattern: string;
       description: string;
     };
@@ -122,7 +122,7 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       adaptation: { shortForm: 'a', description: 'Prompt adaptation type', valueRequired: true },
       config: { shortForm: 'c', description: 'Configuration file name', valueRequired: true },
     },
-    customVariables: {
+    userVariables: {
       pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
       description: 'User-defined variables (--uv-*)',
     },
@@ -131,17 +131,17 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     zero: {
       allowedOptions: ['help', 'version'],
       allowedValueOptions: [],
-      allowCustomVariables: false,
+      allowUserVariables: false,
     },
     one: {
       allowedOptions: ['config'],
       allowedValueOptions: ['from', 'destination', 'input', 'adaptation'],
-      allowCustomVariables: false,
+      allowUserVariables: false,
     },
     two: {
       allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
       allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config'],
-      allowCustomVariables: true,
+      allowUserVariables: true,
     },
   },
   errorHandling: {

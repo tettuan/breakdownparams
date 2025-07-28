@@ -80,7 +80,7 @@ format:
     - "--version" -> "version"
   
   # カスタム変数
-  custom_variables:
+  user_variables:
     prefix: "--uv-"       # カスタム変数のプレフィックス
     pattern: "--uv-[a-zA-Z0-9-]+=.+"  # カスタム変数の完全パターン
 
@@ -108,8 +108,8 @@ errors:
       message: "Invalid layer type. Must be one of: project, issue, task"
     - code: "INVALID_OPTION_FORMAT"
       message: "Invalid option format. Must be in the form: --key=value"
-    - code: "INVALID_CUSTOM_VARIABLE"
-      message: "Invalid custom variable option syntax: {value}"
+    - code: "INVALID_USER_VARIABLE"
+      message: "Invalid user variable option syntax: {value}"
   configuration:
     - code: "INVALID_PATTERN"
       message: "Invalid regex pattern: {pattern}"

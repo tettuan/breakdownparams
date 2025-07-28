@@ -6,7 +6,7 @@ import { OneParamsResult, TwoParamsResult } from '../../../src/types/params_resu
 const optionRule: OptionRule = {
   format: '--key=value',
   rules: {
-    customVariables: ['--directive-type', '--layer-type'],
+    userVariables: ['--directive-type', '--layer-type'],
     requiredOptions: [],
     valueTypes: ['string'],
   },

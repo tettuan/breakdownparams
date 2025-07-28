@@ -25,13 +25,13 @@ import { ErrorResult, OneParamsResult, TwoParamsResult } from '../../../src/type
  * - Test the parser's ability to maintain type safety through proper result typing
  *
  * Test Configuration:
- * The optionRule object defines the parsing rules including custom variables,
+ * The optionRule object defines the parsing rules including user variables,
  * error handling strategies, and supported flag options.
  */
 const optionRule: OptionRule = {
   format: '--key=value',
   rules: {
-    customVariables: ['directive-type', 'layer-type'],
+    userVariables: ['directive-type', 'layer-type'],
     requiredOptions: [],
     valueTypes: ['string'],
   },

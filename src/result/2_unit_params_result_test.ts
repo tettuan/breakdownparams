@@ -50,7 +50,7 @@ Deno.test('test_options_type_safety', () => {
     fromLayerType: 'project',
     adaptationType: 'default',
     configFile: 'config.json',
-    customVariables: {
+    userVariables: {
       key1: 'value1',
       key2: 'value2',
     },
@@ -68,6 +68,6 @@ Deno.test('test_options_type_safety', () => {
   assertEquals(result.options.fromLayerType, 'project');
   assertEquals(result.options.adaptationType, 'default');
   assertEquals(result.options.configFile, 'config.json');
-  assertEquals((result.options.customVariables as Record<string, string>).key1, 'value1');
-  assertEquals((result.options.customVariables as Record<string, string>).key2, 'value2');
+  assertEquals((result.options.userVariables as Record<string, string>).key1, 'value1');
+  assertEquals((result.options.userVariables as Record<string, string>).key2, 'value2');
 });

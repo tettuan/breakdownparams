@@ -78,9 +78,9 @@
 
 | 用語           | 説明                                                                                                                 | 参照仕様ファイル                           |
 | -------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| ユーザー変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数（`uv`は"user variable"の略）。TwoParamsモードでのみ使用可能。内部的に`uv-*`形式に正規化。 | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
-| ユーザー変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字、アンダースコア、ハイフンを許可し、大文字小文字を区別する。                    | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
-| UserVariables | ユーザー変数オプションを保持する型。`uv-*`形式のキーと値のペアで構成され、コマンドラインから受け取った値を保持する。          | [custom_variable_options.ja.md](custom_variable_options.ja.md) |
+| ユーザー変数オプション   | `--uv-*` 形式で指定されるユーザー定義の変数（`uv`は"user variable"の略）。TwoParamsモードでのみ使用可能。内部的に`uv-*`形式に正規化。 | [user_variable_options.ja.md](user_variable_options.ja.md) |
+| ユーザー変数オプション名 | `--uv-` プレフィックスの後に続く変数名。英数字、アンダースコア、ハイフンを許可し、大文字小文字を区別する。                    | [user_variable_options.ja.md](user_variable_options.ja.md) |
+| UserVariables | ユーザー変数オプションを保持する型。`uv-*`形式のキーと値のペアで構成され、コマンドラインから受け取った値を保持する。          | [user_variable_options.ja.md](user_variable_options.ja.md) |
 
 ## バリデーション関連
 

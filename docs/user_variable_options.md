@@ -37,7 +37,7 @@ This document defines the specification for implementing user variable options a
   - Allow minimal special characters (underscore, hyphen, etc.)
   - Case sensitive
   - Not empty
-  - Validation is performed by the CustomVariableOption class
+  - Validation is performed by the UserVariableOption class
 
 ### Value Validation
 - Values accept any valid terminal input
@@ -63,9 +63,9 @@ breakdown to project --uv-path=/usr/local/bin --uv-config={"key":"value"} --uv-a
 ```
 
 ## Implementation Notes
-1. The OptionFactory creates CustomVariableOption instances for `--uv-*` arguments
+1. The OptionFactory creates UserVariableOption instances for `--uv-*` arguments
 2. Each user variable is normalized to `uv-*` format (e.g., `--uv-config` → `uv-config`)
-3. The CustomVariableOption class handles its own normalization and validation
+3. The UserVariableOption class handles its own normalization and validation
 4. Error handling for invalid variable names is implemented in the Option class
 5. Implementation follows the option-class-centered design pattern
 
@@ -144,7 +144,7 @@ interface OptionParams {
 - Example: `breakdown to project --config test --uv-environment=prod`
 
 ### Error Handling
-- Invalid user variables are handled by the CustomVariableOption class
+- Invalid user variables are handled by the UserVariableOption class
 - Invalid syntax (missing `=`) generates an error through the Option validation
 - Validation errors are returned from the Option instance's validate() method
 
@@ -170,4 +170,4 @@ interface OptionParams {
 
 ---
 
-[日本語版](custom_variable_options.ja.md) | [English Version](custom_variable_options.md) 
+[日本語版](user_variable_options.ja.md) | [English Version](user_variable_options.md) 

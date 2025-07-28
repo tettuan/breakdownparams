@@ -78,9 +78,9 @@ This normalization is handled by the Option classes themselves, following the op
 
 | Term                    | Description                                                                                                                                    | Reference Specification    |
 |-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| User Variable Option    | User-defined variables specified in `--uv-*` format where `uv` stands for "user variable". Only available in TwoParams mode. Normalized to `uv-*` format internally. | [custom_variable_options.md](custom_variable_options.md) |
-| User Variable Name      | Variable name following the `--uv-` prefix. Only allows alphanumeric, underscore, and hyphen characters, case-sensitive.                       | [custom_variable_options.md](custom_variable_options.md) |
-| UserVariables           | Type that holds user variable options. Consists of key-value pairs with keys in `uv-*` format, maintains values as received from command line. | [custom_variable_options.md](custom_variable_options.md) |
+| User Variable Option    | User-defined variables specified in `--uv-*` format where `uv` stands for "user variable". Only available in TwoParams mode. Normalized to `uv-*` format internally. | [user_variable_options.md](user_variable_options.md) |
+| User Variable Name      | Variable name following the `--uv-` prefix. Only allows alphanumeric, underscore, and hyphen characters, case-sensitive.                       | [user_variable_options.md](user_variable_options.md) |
+| UserVariables           | Type that holds user variable options. Consists of key-value pairs with keys in `uv-*` format, maintains values as received from command line. | [user_variable_options.md](user_variable_options.md) |
 
 ## Validation Related
 

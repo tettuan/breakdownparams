@@ -11,7 +11,7 @@
 2. `basic_usage.ts` - 基本的な使用方法
 3. `options_usage.ts` - オプションの使用方法
 4. `config_usage.ts` - 設定ファイルの使用方法
-5. `custom_variable_options_usage.ts` - カスタム変数の使用方法
+5. `user_variable_options_usage.ts` - カスタム変数の使用方法
 6. `extended_params_usage.ts` - 拡張パラメータの使用方法
 7. `error_handling.ts` - エラー処理の確認
 8. `custom_config_usage.ts` - カスタム設定による自然な英語コマンド
@@ -97,7 +97,7 @@
 - バリデーションルールのカスタマイズ
 - エラーメッセージのカスタマイズ
 
-## カスタム変数オプション使用例 (`custom_variable_options_usage.ts`)
+## カスタム変数オプション使用例 (`user_variable_options_usage.ts`)
 
 カスタム変数オプションの使用例を示します：
 
@@ -184,7 +184,7 @@ deno run --allow-env examples/help.ts
 deno run --allow-env examples/basic_usage.ts
 deno run --allow-env examples/options_usage.ts
 deno run --allow-env examples/config_usage.ts
-deno run --allow-env examples/custom_variable_options_usage.ts
+deno run --allow-env examples/user_variable_options_usage.ts
 deno run --allow-env examples/extended_params_usage.ts
 deno run --allow-env examples/error_handling.ts
 

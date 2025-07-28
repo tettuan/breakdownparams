@@ -32,7 +32,7 @@ Deno.test('Command Line E2E Tests', async (t) => {
     assertEquals(result.options.destination, 'file2.txt');
   });
 
-  await t.step('should handle custom variables', () => {
+  await t.step('should handle user variables', () => {
     const args = ['to', 'task', '--uv-key1=value1', '--uv-key2=value2'];
     const result = parser.parse(args);
 

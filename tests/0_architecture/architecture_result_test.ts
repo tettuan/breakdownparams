@@ -87,7 +87,7 @@ Deno.test('test_option_rule_interface', async (t) => {
       version: true,
     },
     rules: {
-      customVariables: ['uv-project', 'uv-version', 'uv-environment'],
+      userVariables: ['uv-project', 'uv-version', 'uv-environment'],
       requiredOptions: [],
       valueTypes: ['string'],
     },

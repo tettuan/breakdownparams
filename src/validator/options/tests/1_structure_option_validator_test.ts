@@ -49,7 +49,7 @@ Deno.test('OptionValidator Structure Tests', async (t) => {
     assert(result.options.from === 'test');
   });
 
-  await t.step('should handle custom variables correctly', () => {
+  await t.step('should handle user variables correctly', () => {
     const validator = new TwoOptionValidator();
     const result = validator.validate(['--uv-test=value'], 'two', DEFAULT_OPTION_RULE);
 

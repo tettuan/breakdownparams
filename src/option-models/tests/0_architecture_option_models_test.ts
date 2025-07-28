@@ -14,11 +14,11 @@ Deno.test('Option Models Architecture', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new UserVariableOption('--uv-config', 'Configuration');
+    const userOption = new UserVariableOption('--uv-config', 'Configuration');
 
     assert(flagOption instanceof FlagOption);
     assert(valueOption instanceof ValueOption);
-    assert(customOption instanceof UserVariableOption);
+    assert(userOption instanceof UserVariableOption);
   });
 
   await t.step('should maintain consistent type definitions', () => {
@@ -30,11 +30,11 @@ Deno.test('Option Models Architecture', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new UserVariableOption('--uv-config', 'Configuration');
+    const userOption = new UserVariableOption('--uv-config', 'Configuration');
 
     assertEquals(flagOption.type, OptionType.FLAG);
     assertEquals(valueOption.type, OptionType.VALUE);
-    assertEquals(customOption.type, OptionType.USER_VARIABLE);
+    assertEquals(userOption.type, OptionType.USER_VARIABLE);
   });
 
   await t.step('should maintain consistent validation results', () => {
@@ -46,11 +46,11 @@ Deno.test('Option Models Architecture', async (t) => {
       'Input file',
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
-    const customOption = new UserVariableOption('--uv-config', 'Configuration');
+    const userOption = new UserVariableOption('--uv-config', 'Configuration');
 
     const flagResult = flagOption.validate();
     const valueResult = valueOption.validate('test.txt');
-    const customResult = customOption.validate('--uv-config=test_config');
+    const customResult = userOption.validate('--uv-config=test_config');
 
     console.log('flagResult:', flagResult);
     console.log('valueResult:', valueResult);

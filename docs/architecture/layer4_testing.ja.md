@@ -240,9 +240,9 @@ Deno.test('OptionRegistry', async (t) => {
     assert(alias === option);
   });
 
-  await t.step('should validate custom variables', () => {
-    assert(registry.validateCustomVariable('uv-test'));
-    assert(!registry.validateCustomVariable('invalid'));
+  await t.step('should validate user variables', () => {
+    assert(registry.validateUserVariable('uv-test'));
+    assert(!registry.validateUserVariable('invalid'));
   });
 
   await t.step('should get all registered options', () => {
@@ -306,12 +306,12 @@ Deno.test('FlagOption', async (t) => {
 });
 ```
 
-#### 3.2.4 CustomVariableOption
+#### 3.2.4 UserVariableOption
 
 ```typescript
-Deno.test('CustomVariableOption', async (t) => {
+Deno.test('UserVariableOption', async (t) => {
   const pattern = /^uv-[a-zA-Z0-9_]+$/;
-  const option = new CustomVariableOption('uv-test', 'Test variable', pattern);
+  const option = new UserVariableOption('uv-test', 'Test variable', pattern);
 
   await t.step('should validate name pattern', () => {
     const result = option.validate('value');
@@ -319,10 +319,10 @@ Deno.test('CustomVariableOption', async (t) => {
   });
 
   await t.step('should reject invalid name pattern', () => {
-    const invalidOption = new CustomVariableOption('invalid', 'Invalid', pattern);
+    const invalidOption = new UserVariableOption('invalid', 'Invalid', pattern);
     const result = invalidOption.validate('value');
     assert(!result.isValid);
-    assert(result.errors.includes('Invalid custom variable name: invalid'));
+    assert(result.errors.includes('Invalid user variable name: invalid'));
   });
 
   await t.step('should parse value', () => {
@@ -347,12 +347,12 @@ Deno.test('OptionsValidator', async (t) => {
     assert(result.isValid);
   });
 
-  await t.step('should validate custom variables', () => {
+  await t.step('should validate user variables', () => {
     const result = validator.validate(['--uv-name=test'], registry);
     assert(result.isValid);
   });
 
-  await t.step('should reject invalid custom variables', () => {
+  await t.step('should reject invalid user variables', () => {
     const result = validator.validate(['--invalid-name=test'], registry);
     assert(!result.isValid);
   });

@@ -48,7 +48,7 @@ Deno.test('test_two_param_validator_structure', () => {
     options: {
       flags: {},
       values: {},
-      customVariables: {
+      userVariables: {
         pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
         description: 'User-defined variables',
       },
@@ -56,15 +56,15 @@ Deno.test('test_two_param_validator_structure', () => {
     validation: {
       zero: {
         allowedOptions: [],
-        allowCustomVariables: false,
+        allowUserVariables: false,
       },
       one: {
         allowedOptions: [],
-        allowCustomVariables: false,
+        allowUserVariables: false,
       },
       two: {
         allowedOptions: [],
-        allowCustomVariables: false,
+        allowUserVariables: false,
       },
     },
     errorHandling: {

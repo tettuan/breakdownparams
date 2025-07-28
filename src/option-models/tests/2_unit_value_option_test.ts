@@ -52,17 +52,17 @@ Deno.test('ValueOption Unit Tests', async (t) => {
       validatedParams: [value],
       errorMessage: value !== 'valid' ? 'Invalid value' : undefined,
     });
-    const customOption = new ValueOption(
+    const userOption = new ValueOption(
       '--test',
       ['-t'],
       true,
       'Test value option',
       customValidator,
     );
-    const result = customOption.validate('valid');
+    const result = userOption.validate('valid');
     assert(result.isValid);
     assertEquals(result.validatedParams, ['valid']);
-    assertEquals(customOption.parse('valid'), 'valid');
+    assertEquals(userOption.parse('valid'), 'valid');
   });
 
   await t.step('should handle short form value correctly', () => {

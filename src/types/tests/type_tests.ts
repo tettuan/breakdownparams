@@ -41,14 +41,14 @@ Deno.test('test_type_consistency', async (t) => {
   await t.step('should maintain consistent option type values', () => {
     const valueType = OptionType.VALUE;
     const flagType = OptionType.FLAG;
-    const customVarType = OptionType.USER_VARIABLE;
+    const userVarType = OptionType.USER_VARIABLE;
 
     assertEquals(typeof valueType, 'string');
     assertEquals(typeof flagType, 'string');
-    assertEquals(typeof customVarType, 'string');
+    assertEquals(typeof userVarType, 'string');
     assertEquals(valueType, 'value');
     assertEquals(flagType, 'flag');
-    assertEquals(customVarType, 'user_variable');
+    assertEquals(userVarType, 'user_variable');
   });
 
   await t.step('should maintain consistent validation result structure', () => {
@@ -77,11 +77,11 @@ Deno.test('test_type_safety', async (t) => {
   await t.step('should enforce option type constraints', () => {
     const valueType = OptionType.VALUE;
     const flagType = OptionType.FLAG;
-    const customVarType = OptionType.USER_VARIABLE;
+    const userVarType = OptionType.USER_VARIABLE;
 
     assertEquals(valueType, 'value');
     assertEquals(flagType, 'flag');
-    assertEquals(customVarType, 'user_variable');
+    assertEquals(userVarType, 'user_variable');
   });
 
   await t.step('should enforce validation result constraints', () => {
@@ -117,7 +117,7 @@ Deno.test('test_option_rule_structure', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--directive-type', '--layer-type'],
+      userVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -130,9 +130,9 @@ Deno.test('test_option_rule_structure', () => {
 
   assertEquals(typeof rule.format, 'string', 'format should be a string');
   assertEquals(
-    Array.isArray(rule.rules.customVariables),
+    Array.isArray(rule.rules.userVariables),
     true,
-    'customVariables should be an array',
+    'userVariables should be an array',
   );
   assertEquals(typeof rule.errorHandling.emptyValue, 'string', 'emptyValue should be a string');
   assertEquals(
@@ -186,7 +186,7 @@ Deno.test('test_custom_config_structure', () => {
           valueRequired: true,
         },
       },
-      customVariables: {
+      userVariables: {
         pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
         description: 'User-defined variables (--uv-*)',
       },
@@ -195,17 +195,17 @@ Deno.test('test_custom_config_structure', () => {
       zero: {
         allowedOptions: ['help', 'version'],
         allowedValueOptions: [],
-        allowCustomVariables: false,
+        allowUserVariables: false,
       },
       one: {
         allowedOptions: ['config'],
         allowedValueOptions: ['from', 'destination'],
-        allowCustomVariables: false,
+        allowUserVariables: false,
       },
       two: {
         allowedOptions: ['from', 'destination', 'config'],
         allowedValueOptions: ['from', 'destination', 'config'],
-        allowCustomVariables: true,
+        allowUserVariables: true,
       },
     },
     errorHandling: {

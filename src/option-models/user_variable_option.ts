@@ -6,7 +6,7 @@ import { BaseOption } from './base_option.ts';
 /**
  * Represents a user-defined variable option with the --uv- prefix.
  *
- * User variable options allow users to define custom variables on the command line
+ * User variable options allow users to define user variables on the command line
  * that can be used for configuration or data passing. They follow strict naming rules
  * to ensure consistency and prevent conflicts with standard options.
  *

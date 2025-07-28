@@ -30,7 +30,7 @@ export enum OptionType {
    */
   FLAG = 'flag',
   /**
-   * Custom user-defined variable options.
+   * User-defined variable options.
    *
    * These options allow users to define arbitrary key-value pairs
    * for extended configuration or customization purposes.
@@ -131,14 +131,14 @@ export interface Option {
    */
   isLongForm(): boolean;
   /**
-   * Checks if this option represents a custom user variable.
+   * Checks if this option represents a user variable.
    *
    * User variables have special parsing rules and are typically used
    * for extending configuration beyond predefined options.
    *
    * @returns true if this is a USER_VARIABLE type option, false otherwise
    */
-  isCustomVariable(): boolean;
+  isUserVariable(): boolean;
   /**
    * Tests whether a given input string matches this option.
    *
@@ -218,6 +218,6 @@ export interface OptionParams {
   /** Configuration file name */
   configFile?: string;
 
-  /** Custom variables */
-  customVariables?: Record<string, string>;
+  /** User variables */
+  userVariables?: Record<string, string>;
 }

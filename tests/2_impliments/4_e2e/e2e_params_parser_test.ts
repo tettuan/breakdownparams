@@ -10,7 +10,7 @@ const optionRule: OptionRule = {
     'version': true,
   },
   rules: {
-    customVariables: ['--uv-*'],
+    userVariables: ['--uv-*'],
     requiredOptions: [],
     valueTypes: ['string'],
   },

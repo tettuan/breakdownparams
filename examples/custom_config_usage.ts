@@ -41,7 +41,7 @@ const examples = [
   ['convert', 'simple', '--from=technical-spec.md', '--adaptation=non-technical'],
   ['convert', 'steps', '--from=algorithm.py', '--destination=tutorial.md'],
 
-  // With custom variables
+  // With user variables
   ['breakdown', 'chunks', '--from=dataset.csv', '--uv-size=1000', '--uv-format=json'],
   ['split', 'pieces', '--from=video.mp4', '--uv-duration=5min', '--uv-quality=high'],
 
@@ -98,4 +98,4 @@ console.log('  --destination=PATH  Output location');
 console.log('  --config=FILE       Configuration file');
 console.log('  --adaptation=TYPE   Adaptation strategy');
 console.log('  --input=TYPE        Input type specification');
-console.log('  --uv-*              Custom variables (e.g., --uv-size=1000)');
+console.log('  --uv-*              User variables (e.g., --uv-size=1000)');

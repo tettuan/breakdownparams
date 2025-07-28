@@ -123,9 +123,9 @@ export const validateEmptyValue = (value: string | undefined): boolean => {
 };
 
 /**
- * Validates custom variable option format.
+ * Validates user variable option format.
  *
- * Custom variable options use the --uv- prefix and follow strict naming rules:
+ * User variable options use the --uv- prefix and follow strict naming rules:
  * - Variable names can only contain letters, numbers, and underscores
  * - Must start with a letter (uppercase or lowercase)
  * - Case sensitive (myVar !== myvar)
@@ -136,13 +136,13 @@ export const validateEmptyValue = (value: string | undefined): boolean => {
  *
  * @example
  * ```ts
- * validateCustomVariableOption("--uv-apiKey=value"); // true
- * validateCustomVariableOption("--uv-max_retries=3"); // true
- * validateCustomVariableOption("--uv-123invalid"); // false
- * validateCustomVariableOption("--uv-_underscore"); // false
+ * validateUserVariableOption("--uv-apiKey=value"); // true
+ * validateUserVariableOption("--uv-max_retries=3"); // true
+ * validateUserVariableOption("--uv-123invalid"); // false
+ * validateUserVariableOption("--uv-_underscore"); // false
  * ```
  */
-export const validateCustomVariableOption = (option: string): boolean => {
+export const validateUserVariableOption = (option: string): boolean => {
   if (!option.startsWith('--uv-')) {
     return false;
   }
@@ -184,7 +184,7 @@ export const parseOption = (option: string): { key: string; value: string | unde
  * - Proper prefix (must start with --)
  * - No space-separated values (must use = for values)
  * - No multiple equals signs
- * - Proper format for both standard and custom variable options
+ * - Proper format for both standard and user variable options
  *
  * @param option - The complete option string to validate
  * @returns Validation result with optional error message
@@ -223,12 +223,12 @@ export const validateOptionFormat = (option: string): { isValid: boolean; error?
     };
   }
 
-  // For custom variable options, use case-sensitive validation
+  // For user variable options, use case-sensitive validation
   if (option.startsWith('--uv-')) {
-    if (!validateCustomVariableOption(option)) {
+    if (!validateUserVariableOption(option)) {
       return {
         isValid: false,
-        error: 'Invalid custom variable option format',
+        error: 'Invalid user variable option format',
       };
     }
     return { isValid: true };

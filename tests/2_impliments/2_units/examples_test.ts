@@ -43,7 +43,7 @@ Deno.test('test_examples_execution', async (t) => {
     const customConfig: OptionRule = {
       format: '--key=value',
       rules: {
-        customVariables: [
+        userVariables: [
           '--config',
           '--from',
           '--destination',
@@ -91,11 +91,11 @@ Deno.test('test_examples_execution', async (t) => {
     assertExists(result.options['uv-version']);
   });
 
-  await t.step('custom_variable_options_usage example', () => {
+  await t.step('user_variable_options_usage example', () => {
     const customConfig: OptionRule = {
       format: '--key=value',
       rules: {
-        customVariables: [
+        userVariables: [
           '--from',
           '--destination',
           '--input',
@@ -147,7 +147,7 @@ Deno.test('test_examples_execution', async (t) => {
     const customConfig: OptionRule = {
       format: '--key=value',
       rules: {
-        customVariables: [
+        userVariables: [
           '--from',
           '--destination',
           '--input',
@@ -212,7 +212,7 @@ Deno.test('test_examples_execution', async (t) => {
     const customConfig: OptionRule = {
       format: '--key=value',
       rules: {
-        customVariables: [
+        userVariables: [
           '--from',
           '--destination',
           '--input',

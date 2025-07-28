@@ -72,7 +72,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     assert(result.errorCode === 'INVALID_PARAMETER_TYPE');
   });
 
-  await t.step('should handle custom variables in two options', () => {
+  await t.step('should handle user variables in two options', () => {
     const validator = new TwoOptionValidator();
 
     // 正しいカスタム変数
@@ -155,18 +155,18 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     assert(!mixedResult.options?.destination, 'Short form -o should not be recognized');
   });
 
-  await t.step('should handle custom variable options correctly', () => {
+  await t.step('should handle user variable options correctly', () => {
     const validator = new TwoOptionValidator();
 
     // 現在のテストでは成功しているはずだが、実際のパーサーでは失敗する
-    const customVarResult = validator.validate(
+    const userVarResult = validator.validate(
       ['--uv-project=myproject'],
       'two',
       DEFAULT_OPTION_RULE,
     );
-    console.log('Custom variable result in validator:', customVarResult);
-    assert(customVarResult.isValid, 'Custom variables should be valid in TwoParams');
-    assert(customVarResult.options?.['uv-project'] === 'myproject');
+    console.log('User variable result in validator:', userVarResult);
+    assert(userVarResult.isValid, 'User variables should be valid in TwoParams');
+    assert(userVarResult.options?.['uv-project'] === 'myproject');
 
     // 複数のカスタム変数
     const multiCustomResult = validator.validate(

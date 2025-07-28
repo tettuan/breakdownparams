@@ -83,10 +83,10 @@ export abstract class BaseOption implements Option {
    *
    * @example
    * ```ts
-   * option.isCustomVariable(); // true for "--uv-config", false for "--verbose"
+   * option.isUserVariable(); // true for "--uv-config", false for "--verbose"
    * ```
    */
-  isCustomVariable(): boolean {
+  isUserVariable(): boolean {
     return this.longname.startsWith('--uv-');
   }
 

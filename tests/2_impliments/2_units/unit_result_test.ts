@@ -187,7 +187,7 @@ Deno.test('test_result_unit', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--directive-type', '--layer-type'],
+      userVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -199,9 +199,9 @@ Deno.test('test_result_unit', () => {
   };
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
   assertEquals(
-    Array.isArray(optionRule.rules.customVariables),
+    Array.isArray(optionRule.rules.userVariables),
     true,
-    'customVariables should be an array',
+    'userVariables should be an array',
   );
   assertEquals(
     typeof optionRule.errorHandling.emptyValue,
@@ -305,7 +305,7 @@ Deno.test('test_validation_result', () => {
       version: true,
     },
     rules: {
-      customVariables: ['--directive-type', '--layer-type'],
+      userVariables: ['--directive-type', '--layer-type'],
       requiredOptions: [],
       valueTypes: ['string'],
     },
@@ -318,9 +318,9 @@ Deno.test('test_validation_result', () => {
 
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
   assertEquals(
-    Array.isArray(optionRule.rules.customVariables),
+    Array.isArray(optionRule.rules.userVariables),
     true,
-    'customVariables should be an array',
+    'userVariables should be an array',
   );
   assertEquals(
     typeof optionRule.errorHandling.emptyValue,

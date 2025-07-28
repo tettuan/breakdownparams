@@ -101,7 +101,7 @@ interface Option {
   // 判定メソッド
   isShorthand(): boolean;
   isLongForm(): boolean;
-  isCustomVariable(): boolean;
+  isUserVariable(): boolean;
   matchesInput(input: string): boolean;
   
   // 変換メソッド
@@ -118,7 +118,7 @@ interface Option {
 - **種類**:
   - FlagOption: フラグオプション
   - ValueOption: 値付きオプション
-  - CustomVariableOption: ユーザー変数オプション（--uv-*）
+  - UserVariableOption: ユーザー変数オプション（--uv-*）
 
 - **責務**:
   - 自身の入力形式の判定（ショート/ロング）

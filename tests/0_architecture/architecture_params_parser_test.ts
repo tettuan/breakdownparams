@@ -9,7 +9,7 @@ const optionRule: OptionRule = {
     version: true,
   },
   rules: {
-    customVariables: ['uv-project', 'uv-version', 'uv-environment'],
+    userVariables: ['uv-project', 'uv-version', 'uv-environment'],
     requiredOptions: [],
     valueTypes: ['string'],
   },

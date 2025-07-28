@@ -56,7 +56,7 @@ Options:
   -i, --input=TYPE   Input layer type
   -a, --adaptation=TYPE  Prompt adaptation type
   -c, --config=NAME  Configuration file name (TwoParams only)
-  --uv-NAME=VALUE    Custom variable options (TwoParams only)
+  --uv-NAME=VALUE    User variable options (TwoParams only)
 
 Examples:
   # Show help
@@ -72,7 +72,7 @@ Examples:
   myapp summary task --config=prod --uv-env=production
 
 Note: Short form options (-f, -o, etc.) are not currently implemented.
-      Custom variables (--uv-*) are not currently implemented.
+      User variables (--uv-*) are not currently implemented.
 `);
     } else if (options.version) {
       console.log('breakdownparams v0.1.0');

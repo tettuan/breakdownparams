@@ -19,7 +19,7 @@ For detailed specifications, please refer to the following documents:
 
 - [Parameter Specification](params.md) - Definition and constraints of positional arguments
 - [Options Specification](options.md) - Definition and constraints of hyphenated arguments
-- [Custom Variable Options Specification](custom_variable_options.md) - Definition and constraints of user-defined variables
+- [User Variable Options Specification](user_variable_options.md) - Definition and constraints of user-defined variables
 - [Parameter Parser Type Definition Specification](params_type.md) - Definition and usage of return types
 
 ## Out of Scope
@@ -28,7 +28,7 @@ This library does not provide the following features:
 
 - Interpretation of parameter value meanings (e.g., "display help because --help was specified")
 - Default value provision
-- Validation of custom variable option values (syntax check only)
+- Validation of user variable option values (syntax check only)
 
 # Parameter Patterns
 
@@ -175,9 +175,9 @@ The following are equivalent:
 - Gets the `<config_file>` part
 - Example: For `--config=test`, stores `test`
 
-#### Custom Variable Options (`--uv-*`)
+#### User Variable Options (`--uv-*`)
 
-Custom variable options are used to specify user-defined variables.
+User variable options are used to specify user-defined variables.
 Only available in TwoParams mode, specified in the following format:
 
 ```bash
@@ -190,7 +190,7 @@ Examples:
 ./.deno/bin/breakdown to project --uv-version=1.0.0 --uv-environment=production
 ```
 
-For detailed specifications, please refer to the [Custom Variable Options Specification](custom_variable_options.md).
+For detailed specifications, please refer to the [User Variable Options Specification](user_variable_options.md).
 
 # Parameter Priority Rules
 

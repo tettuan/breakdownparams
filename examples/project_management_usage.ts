@@ -26,7 +26,7 @@ const projectConfig: CustomConfig = {
     two: {
       allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
       allowedValueOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
-      allowCustomVariables: true,
+      allowUserVariables: true,
     },
   },
 };
@@ -95,7 +95,7 @@ for (const args of commands) {
       console.log(`   Mode: ${options.adaptation}`);
     }
 
-    // Show custom variables
+    // Show user variables
     const customVars = Object.entries(options)
       .filter(([key]) => key.startsWith('uv-'))
       .map(([key, value]) => `${key.substring(3)}=${value}`);

@@ -177,7 +177,7 @@ classDiagram
         +shortForm?: string
         +isShorthand(): boolean
         +isLongForm(): boolean
-        +isCustomVariable(): boolean
+        +isUserVariable(): boolean
         +matchesInput(input: string): boolean
         +toNormalized(): string
         +toLong(): string
@@ -196,7 +196,7 @@ classDiagram
         +getValue(): string
     }
     
-    class CustomVariableOption {
+    class UserVariableOption {
         +validate(): ValidationResult
         +getValue(): string
         +toNormalized(): string
@@ -223,7 +223,7 @@ classDiagram
     
     Option <|.. FlagOption
     Option <|.. ValueOption
-    Option <|.. CustomVariableOption
+    Option <|.. UserVariableOption
     OptionFactory --> Option
     ParamsParser --> OptionFactory
     ParamsParser --> ParamsValidator
@@ -243,7 +243,7 @@ graph TD
     subgraph "option-models"
         D --> D1[FlagOption]
         D --> D2[ValueOption]
-        D --> D3[CustomVariableOption]
+        D --> D3[UserVariableOption]
     end
     
     subgraph "factories"
