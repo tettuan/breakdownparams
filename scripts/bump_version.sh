@@ -362,20 +362,14 @@ execute_step_b1() {
     case $ci_status in
         "success")
             log_success "All GitHub Actions passed"
-            log_info "Ready to merge PR #$pr_number to develop"
+            log_info "Merging PR #$pr_number to develop"
 
-            read -p "Merge PR now? (y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                gh pr merge "$pr_number" --merge --delete-branch
-                log_success "PR merged to develop"
+            gh pr merge "$pr_number" --merge --delete-branch
+            log_success "PR merged to develop"
 
-                # Switch to develop
-                git checkout develop
-                git pull origin develop
-            else
-                log_info "Please merge PR #$pr_number manually, then run --continue"
-            fi
+            # Switch to develop
+            git checkout develop
+            git pull origin develop
             ;;
         "pending")
             log_warning "GitHub Actions still running on PR #$pr_number"
@@ -427,20 +421,14 @@ execute_step_c1() {
     case $ci_status in
         "success")
             log_success "All GitHub Actions passed"
-            log_info "Ready to merge PR #$pr_number to main"
+            log_info "Merging PR #$pr_number to main"
 
-            read -p "Merge PR now? (y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                gh pr merge "$pr_number" --merge
-                log_success "PR merged to main"
+            gh pr merge "$pr_number" --merge
+            log_success "PR merged to main"
 
-                # Switch to main
-                git checkout main
-                git pull origin main
-            else
-                log_info "Please merge PR #$pr_number manually, then run --continue"
-            fi
+            # Switch to main
+            git checkout main
+            git pull origin main
             ;;
         "pending")
             log_warning "GitHub Actions still running on PR #$pr_number"
