@@ -5,7 +5,7 @@ Deno.test('CommandLineOptionFactory Architecture', async (t) => {
   await t.step('should create options with correct types', () => {
     const factory = new CommandLineOptionFactory();
     const options = factory.createOptionsFromArgs(['--input=value']);
-    assertEquals(options[0].name, '--input');
+    assertEquals(options[0].name, '--edition');
     const result = options[0].validate('--input=value');
     assert(result.isValid);
   });

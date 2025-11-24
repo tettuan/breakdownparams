@@ -123,7 +123,7 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
     // Short-long-short pattern
     {
       args: [DEMO_TYPE, LAYER_TYPE, '-f=input.md', '--destination=output.md', '-i=task'],
-      expected: { from: 'input.md', destination: 'output.md', input: 'task' },
+      expected: { from: 'input.md', destination: 'output.md', edition: 'task' },
       description: 'short-long-short pattern',
     },
     // Long-short-long pattern
@@ -146,7 +146,7 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
       expected: {
         from: 'input.md',
         destination: 'output.md',
-        input: 'task',
+        edition: 'task',
         adaptation: 'strict',
         config: 'test',
       },
@@ -166,7 +166,7 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
       expected: {
         from: 'input.md',
         destination: 'output.md',
-        input: 'task',
+        edition: 'task',
         adaptation: 'strict',
         config: 'test',
       },
@@ -182,7 +182,7 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
         '-i=task',
         '--config=test',
       ],
-      expected: { from: 'input.md', destination: 'output.md', input: 'task', config: 'test' },
+      expected: { from: 'input.md', destination: 'output.md', edition: 'task', config: 'test' },
       description: 'random mixed pattern',
     },
   ];
@@ -282,7 +282,7 @@ Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
       expected: {
         from: 'long.md',
         destination: 'short_out.md',
-        input: 'task',
+        edition: 'task',
         adaptation: 'long_adapt',
       },
       description: 'Complex mixed forms with duplicates and priorities',
@@ -302,7 +302,7 @@ Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
         config: 'test',
         from: 'input.md',
         destination: 'output.md',
-        input: 'task',
+        edition: 'task',
         adaptation: 'strict',
       },
       description: 'Random order mixed forms',
@@ -338,7 +338,7 @@ Deno.test('Mixed Form Combinations - Order Independence', async (t) => {
   const baseOptions = {
     from: 'input.md',
     destination: 'output.md',
-    input: 'task',
+    edition: 'task',
     adaptation: 'strict',
   };
 

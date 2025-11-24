@@ -70,7 +70,7 @@
 | --version     | -v         | バージョン情報を表示。ライブラリの現在のバージョンを確認するために使用。             | [options.ja.md](options.ja.md) |
 | --from        | -f         | ソースファイルパス。入力ファイルの場所を指定。相対パスと絶対パスの両方をサポート。   | [options.ja.md](options.ja.md) |
 | --destination | -o         | 出力ファイルパス。結果の保存先を指定。パスの存在確認は行わない。                     | [options.ja.md](options.ja.md) |
-| --input       | -i         | 入力レイヤータイプ。処理の入力元となる層を指定。LayerTypeの値のみを許可。            | [options.ja.md](options.ja.md) |
+| --edition     | -e         | エディションレイヤータイプ。処理の入力元となる層を指定。LayerTypeの値のみを許可。    | [options.ja.md](options.ja.md) |
 | --adaptation  | -a         | プロンプト適応タイプ。処理の挙動を調整するために使用。カスタマイズ可能な動作を指定。 | [options.ja.md](options.ja.md) |
 | --config      | -c         | 設定ファイル名。TwoParamsでのみ使用可能。処理の設定を外部ファイルから読み込む。   | [options.ja.md](options.ja.md) |
 

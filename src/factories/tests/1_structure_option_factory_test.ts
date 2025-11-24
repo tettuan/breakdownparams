@@ -14,7 +14,7 @@ Deno.test('CommandLineOptionFactory Structure', async (t) => {
     const factory = new CommandLineOptionFactory();
     const options = factory.createOptionsFromArgs(['--input=value']);
     assertEquals(options.length, 1);
-    assertEquals(options[0].name, '--input');
+    assertEquals(options[0].name, '--edition');
     assert(options[0].validate('--input=value').isValid);
   });
 
@@ -31,7 +31,7 @@ Deno.test('CommandLineOptionFactory Structure', async (t) => {
     const options = factory.createOptionsFromArgs(['--help', '--input=value']);
     assertEquals(options.length, 2);
     assertEquals(options[0].name, '--help');
-    assertEquals(options[1].name, '--input');
+    assertEquals(options[1].name, '--edition');
     assert(options[0].validate().isValid);
     assert(options[1].validate('--input=value').isValid);
   });

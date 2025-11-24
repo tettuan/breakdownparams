@@ -277,21 +277,21 @@ The following are equivalent:
 - Gets the `<output_file>` part
 - Example: For `--destination=./.agent/breakdown/issues/issue_summary.md`, stores `./.agent/breakdown/issues/issue_summary.md`
 
-#### --input `<from_layer_type>`
+#### --edition `<from_layer_type>`
 
 Option name: FromLayerType
-Alias: `-i`
+Alias: `-e`
 The following are equivalent:
 
 ```bash
-./.deno/bin/breakdown <DirectiveType> <LayerType> --input=<from_layer_type>
-./.deno/bin/breakdown <DirectiveType> <LayerType> -i=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --edition=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -e=<from_layer_type>
 ```
 
 ##### from_layer_type Values
 
 - Gets the `<from_layer_type>` part
-- Example: For `--input=issue`, stores `issue`
+- Example: For `--edition=issue`, stores `issue`
 - Default regex pattern: `^(project|issue|task)$`
 
 #### --config `<config_file>`

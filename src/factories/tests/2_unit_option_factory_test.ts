@@ -31,8 +31,8 @@ Deno.test('CommandLineOptionFactory Unit Tests', async (t) => {
     const factory = new CommandLineOptionFactory();
     const options = factory.createOptionsFromArgs(['--input=value', '-i=value']);
     assertEquals(options.length, 2);
-    assertEquals(options[0].name, '--input');
-    assertEquals(options[1].name, '--input');
+    assertEquals(options[0].name, '--edition');
+    assertEquals(options[1].name, '--edition');
     assert(options[0].validate('--input=value').isValid);
     assert(options[1].validate('-i=value').isValid);
   });

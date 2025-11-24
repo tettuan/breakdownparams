@@ -70,7 +70,7 @@ This normalization is handled by the Option classes themselves, following the op
 | --version     | -v    | Display version information. Used to check current library version.                                                                            | [options.md](options.md)   |
 | --from        | -f    | Source file path. Specifies input file location. Supports both relative and absolute paths.                                                    | [options.md](options.md)   |
 | --destination | -o    | Output file path. Specifies where to save results. Does not verify path existence.                                                             | [options.md](options.md)   |
-| --input       | -i    | Input layer type. Specifies the source layer for processing. Only allows LayerType values.                                                     | [options.md](options.md)   |
+| --edition     | -e    | Edition layer type. Specifies the source layer for processing. Only allows LayerType values.                                                   | [options.md](options.md)   |
 | --adaptation  | -a    | Prompt adaptation type. Used to adjust processing behavior. Specifies customizable behavior.                                                   | [options.md](options.md)   |
 | --config      | -c    | Configuration file name. Only available in TwoParams. Loads processing settings from external file.                                         | [options.md](options.md)   |
 

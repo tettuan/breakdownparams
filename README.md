@@ -135,7 +135,7 @@ The parser returns a discriminated union type `ParamsResult` with four possible 
 #### Value Options
 - `--from=<file>` or `-f=<file>`: Source file path
 - `--destination=<file>` or `-o=<file>`: Output file path
-- `--input=<type>` or `-i=<type>`: Input layer type
+- `--edition=<type>` or `-e=<type>`: Edition layer type (input source layer)
 - `--adaptation=<mode>`: Adaptation strategy
 - `--config=<name>` or `-c=<name>`: Configuration profile
 
@@ -232,7 +232,7 @@ const customConfig: CustomConfig = {
     },
     two: {
       allowedOptions: ["verbose", "experimental"],
-      allowedValueOptions: ["from", "destination", "input", "config"]
+      allowedValueOptions: ["from", "destination", "edition", "config"]
     }
   }
 };

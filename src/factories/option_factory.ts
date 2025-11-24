@@ -9,11 +9,13 @@ import { UserVariableOption } from '../option-models/user_variable_option.ts';
  * @property longname - The long form name without dashes (e.g., "help")
  * @property shortname - The short form name without dash (e.g., "h")
  * @property type - The option type: "flag" for boolean, "value" for options with values
+ * @property aliasOf - Optional alias target, maps this option to another option's internal name
  */
 type OptionConfig = {
   longname: string;
   shortname: string;
   type: 'flag' | 'value';
+  aliasOf?: string;
 };
 
 /**
@@ -54,6 +56,7 @@ export const STANDARD_OPTIONS: Record<string, OptionConfig> = {
     longname: 'input',
     shortname: 'i',
     type: 'value',
+    aliasOf: 'edition',
   },
   adaptation: {
     longname: 'adaptation',
@@ -63,6 +66,11 @@ export const STANDARD_OPTIONS: Record<string, OptionConfig> = {
   config: {
     longname: 'config',
     shortname: 'c',
+    type: 'value',
+  },
+  edition: {
+    longname: 'edition',
+    shortname: 'e',
     type: 'value',
   },
 } as const;
@@ -177,21 +185,24 @@ export class CommandLineOptionFactory implements OptionFactory {
           `--${optionConfig.longname}`,
           `-${optionConfig.shortname}`,
         );
-      case 'value':
+      case 'value': {
         // Value options require a value (= must be present)
         if (!optionInput.includes('=')) {
           throw new Error(`Option ${name} requires a value`);
         }
+        // Use aliasOf for internal name if this is an alias
+        const internalName = optionConfig.aliasOf || optionConfig.longname;
         return new ValueOption(
-          `--${optionConfig.longname}`,
+          `--${internalName}`,
           [`-${optionConfig.shortname}`],
           false,
           'Value option',
           (val: string) => ({ isValid: true, validatedParams: [val] }),
           optionInput, // Pass raw input
-          `--${optionConfig.longname}`,
+          `--${internalName}`,
           `-${optionConfig.shortname}`,
         );
+      }
       default:
         throw new Error(`Unsupported option type: ${optionConfig.type}`);
     }

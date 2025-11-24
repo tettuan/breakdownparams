@@ -48,7 +48,7 @@ To specify an empty value for an option, use one of the following methods:
 | --version     | -v    | Display version info | boolean    | No       | `--version`                |
 | --from        | -f    | Source file path     | string     | No       | `--from=input.md`          |
 | --destination | -o    | Output file path     | string     | No       | `--destination=output.md`  |
-| --input       | -i    | Input layer type     | enum       | No       | `--input=project`          |
+| --edition     | -e    | Edition layer type   | enum       | No       | `--edition=project`        |
 | --adaptation  | -a    | Prompt adaptation type | string  | No       | `--adaptation=strict`      |
 | --config      | -c    | Configuration file   | string     | No       | `--config=test`            |
 | --uv-*        | None  | User variable option | string   | No       | `--uv-project=myproject`   |
@@ -77,7 +77,7 @@ To specify an empty value for an option, use one of the following methods:
 
 ## Input Layer Type Values
 
-When using the `--input` option, the validation rules for the second parameter are used:
+When using the `--edition` option, the validation rules for the second parameter are used:
 
 ## Usage Examples
 
@@ -104,12 +104,12 @@ breakdown to issue -f='' -o=
 
 ```bash
 # Correct format
-breakdown summary task --input=project
-breakdown summary task -i=project
+breakdown summary task --edition=project
+breakdown summary task -e=project
 
 # Empty value examples
-breakdown summary task --input=
-breakdown summary task -i=""
+breakdown summary task --edition=
+breakdown summary task -e=""
 ```
 
 ### Prompt Adaptation
@@ -139,13 +139,13 @@ breakdown to project --uv-project= --uv-version=""
 
 ```bash
 # Correct format
-breakdown to issue --from=input.md -o=output.md -i=project -a=strict
+breakdown to issue --from=input.md -o=output.md -e=project -a=strict
 breakdown to project --config=test
 breakdown summary task -c=test
 breakdown to project --config=test --uv-environment=prod --uv-version=1.0.0
 
 # Examples with empty values
-breakdown to issue --from= -o="" -i=project -a=
+breakdown to issue --from= -o="" -e=project -a=
 breakdown to project --config= --uv-environment="" --uv-version=
 ```
 

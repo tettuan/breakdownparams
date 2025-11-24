@@ -211,6 +211,7 @@ export class TwoOptionValidator extends BaseOptionValidator {
     'input',
     'adaptation',
     'config',
+    'edition',
   ];
   protected readonly allowUserVariables = true;
 }
