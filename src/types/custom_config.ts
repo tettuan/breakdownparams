@@ -139,6 +139,11 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
         description: 'Configuration file name',
         valueRequired: true,
       },
+      edition: {
+        shortForm: 'e',
+        description: 'Input layer type (alias for input)',
+        valueRequired: true,
+      },
     },
     userVariables: {
       pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
@@ -153,12 +158,12 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     },
     one: {
       allowedOptions: ['config'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation'],
+      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'edition'],
       allowUserVariables: false,
     },
     two: {
-      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config'],
+      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input', 'edition'],
+      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config', 'edition'],
       allowUserVariables: true,
     },
   },
