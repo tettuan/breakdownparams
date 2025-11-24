@@ -344,7 +344,7 @@ Deno.test('Boundary Values - Quantity Boundaries', async (t) => {
     const expected: Record<string, string> = {
       from: 'input.md',
       destination: 'output.md',
-      input: 'task',
+      edition: 'task',
       adaptation: 'strict',
       config: 'test',
     };
@@ -420,7 +420,7 @@ Deno.test('Boundary Values - Edge Case Combinations', async (t) => {
     const expected = {
       from: 'a',
       destination: 'b',
-      input: 'c',
+      edition: 'c',
       adaptation: 'd',
       config: 'e',
       'uv-x': 'f',

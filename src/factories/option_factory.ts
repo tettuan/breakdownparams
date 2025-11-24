@@ -56,6 +56,7 @@ export const STANDARD_OPTIONS: Record<string, OptionConfig> = {
     longname: 'input',
     shortname: 'i',
     type: 'value',
+    aliasOf: 'edition',
   },
   adaptation: {
     longname: 'adaptation',
@@ -71,7 +72,6 @@ export const STANDARD_OPTIONS: Record<string, OptionConfig> = {
     longname: 'edition',
     shortname: 'e',
     type: 'value',
-    aliasOf: 'input',
   },
 } as const;
 

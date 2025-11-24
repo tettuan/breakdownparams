@@ -126,7 +126,7 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       },
       input: {
         shortForm: 'i',
-        description: 'Input layer type',
+        description: 'Input layer type (alias for edition)',
         valueRequired: true,
       },
       adaptation: {
@@ -141,7 +141,7 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       },
       edition: {
         shortForm: 'e',
-        description: 'Input layer type (alias for input)',
+        description: 'Input layer type',
         valueRequired: true,
       },
     },

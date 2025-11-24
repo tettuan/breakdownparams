@@ -154,7 +154,7 @@ Deno.test('User Variable Matrix - Standard Options + Single User Variable', asyn
     // input + user variable
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--input=task', '--uv-environment=dev'],
-      expected: { input: 'task', 'uv-environment': 'dev' },
+      expected: { edition: 'task', 'uv-environment': 'dev' },
       description: 'input + user variable',
     },
     // adaptation + user variable
@@ -247,7 +247,7 @@ Deno.test('User Variable Matrix - Multiple Standard Options + Multiple User Vari
       ],
       expected: {
         from: 'input.md',
-        input: 'task',
+        edition: 'task',
         config: 'test',
         'uv-env': 'prod',
         'uv-debug': 'true',
@@ -276,7 +276,7 @@ Deno.test('User Variable Matrix - Multiple Standard Options + Multiple User Vari
       expected: {
         from: 'input.md',
         destination: 'output.md',
-        input: 'task',
+        edition: 'task',
         adaptation: 'strict',
         config: 'test',
         'uv-project': 'myproject',
@@ -645,7 +645,7 @@ Deno.test('User Variable Matrix - Mixed with Short Forms', async (t) => {
       expected: {
         from: 'input.md',
         destination: 'output.md',
-        input: 'task',
+        edition: 'task',
         'uv-project': 'test',
         config: 'config',
       },
