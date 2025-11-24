@@ -142,21 +142,21 @@
 - `<output_file>`部分を取得
 - 例：`--destination=./.agent/breakdown/issues/issue_summary.md`の場合、`./.agent/breakdown/issues/issue_summary.md`を保存
 
-#### --input `<from_layer_type>`
+#### --edition `<from_layer_type>`
 
 オプション名：FromLayerType
-エイリアス：`-i`
+エイリアス：`-e`
 以下は同等です：
 
 ```bash
-./.deno/bin/breakdown <DirectiveType> <LayerType> --input=<from_layer_type>
-./.deno/bin/breakdown <DirectiveType> <LayerType> -i=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> --edition=<from_layer_type>
+./.deno/bin/breakdown <DirectiveType> <LayerType> -e=<from_layer_type>
 ```
 
 ##### from_layer_type値
 
 - `<from_layer_type>`部分を取得
-- 例：`--input=issue`の場合、`issue`を保存
+- 例：`--edition=issue`の場合、`issue`を保存
 - デフォルトの正規表現パターン：`^(project|issue|task)$`
 
 #### --config `<config_file>`

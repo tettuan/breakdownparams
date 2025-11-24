@@ -58,7 +58,7 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
 | --version      | -v             | バージョン表示           | `version`    |
 | --from         | -f             | 入力ファイル指定         | `from`       |
 | --destination  | -o             | 出力ファイル指定         | `destination`|
-| --input        | -i             | 入力レイヤー指定         | `input`      |
+| --edition      | -e             | エディションレイヤー指定 | `edition`    |
 | --adaptation   | -a             | プロンプト適応タイプ指定 | `adaptation` |
 | --config       | -c             | 設定ファイル名指定       | `config`     |
 | --uv-*         | なし           | ユーザー変数オプション指定 | `uv-*`       |
@@ -88,8 +88,8 @@ breakdownparamsは、コマンドライン引数を解析し構造化された�
    - オプションの重複時は最後の指定が有効
 
 3. **オプションの優先順位**
-   - ロングフォーム（--from, --destination, --input）が優先
-   - ショートハンド（-f, -o, -i）はロングフォームが未指定の場合のみ有効
+   - ロングフォーム（--from, --destination, --edition）が優先
+   - ショートハンド（-f, -o, -e）はロングフォームが未指定の場合のみ有効
    - 同じオプションが複数回指定された場合、最後の指定が有効
 
 4. **大文字小文字の扱い**

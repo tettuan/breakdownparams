@@ -135,12 +135,12 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     },
     one: {
       allowedOptions: ['config'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation'],
+      allowedValueOptions: ['from', 'destination', 'edition', 'adaptation'],
       allowUserVariables: false,
     },
     two: {
-      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config'],
+      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'edition'],
+      allowedValueOptions: ['from', 'destination', 'edition', 'adaptation', 'config'],
       allowUserVariables: true,
     },
   },
