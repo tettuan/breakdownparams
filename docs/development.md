@@ -58,7 +58,7 @@ Options are specified as hyphenated arguments. Each option supports both long an
 | --version    | -v         | Display version            | `version`        |
 | --from       | -f         | Input file specification   | `from`           |
 | --destination| -o         | Output file specification  | `destination`    |
-| --input      | -i         | Input layer specification  | `input`          |
+| --edition    | -e         | Edition layer specification| `edition`        |
 | --adaptation | -a         | Prompt adaptation type     | `adaptation`     |
 | --config     | -c         | Configuration file name    | `config`         |
 | --uv-*       | None       | User variable option       | `uv-*`           |
@@ -86,8 +86,8 @@ All options follow unified normalization rules:
    - Last specification takes effect for duplicate options
 
 3. **Option Priority**
-   - Long forms (--from, --destination, --input) take precedence
-   - Short forms (-f, -o, -i) are only valid when long form is not specified
+   - Long forms (--from, --destination, --edition) take precedence
+   - Short forms (-f, -o, -e) are only valid when long form is not specified
    - Last specification takes effect when same option is specified multiple times
 
 4. **Case Sensitivity**

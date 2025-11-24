@@ -28,7 +28,7 @@
    - 短縮形の定義
 
 2. **値オプション**
-   - from, destination, input, adaptation, config などの値を持つオプション
+   - from, destination, edition, adaptation, config などの値を持つオプション
    - 短縮形の定義
 
 3. **カスタム変数**
@@ -118,7 +118,7 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     values: {
       from: { shortForm: 'f', description: 'Source file path', valueRequired: true },
       destination: { shortForm: 'o', description: 'Output file path', valueRequired: true },
-      input: { shortForm: 'i', description: 'Input layer type', valueRequired: true },
+      edition: { shortForm: 'e', description: 'Edition layer type', valueRequired: true },
       adaptation: { shortForm: 'a', description: 'Prompt adaptation type', valueRequired: true },
       config: { shortForm: 'c', description: 'Configuration file name', valueRequired: true },
     },
@@ -135,12 +135,12 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     },
     one: {
       allowedOptions: ['config'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation'],
+      allowedValueOptions: ['from', 'destination', 'edition', 'adaptation'],
       allowUserVariables: false,
     },
     two: {
-      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config'],
+      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'edition'],
+      allowedValueOptions: ['from', 'destination', 'edition', 'adaptation', 'config'],
       allowUserVariables: true,
     },
   },

@@ -126,7 +126,7 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       },
       input: {
         shortForm: 'i',
-        description: 'Input layer type',
+        description: 'Input layer type (alias for edition)',
         valueRequired: true,
       },
       adaptation: {
@@ -137,6 +137,11 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       config: {
         shortForm: 'c',
         description: 'Configuration file name',
+        valueRequired: true,
+      },
+      edition: {
+        shortForm: 'e',
+        description: 'Input layer type',
         valueRequired: true,
       },
     },
@@ -153,12 +158,12 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     },
     one: {
       allowedOptions: ['config'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation'],
+      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'edition'],
       allowUserVariables: false,
     },
     two: {
-      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input'],
-      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config'],
+      allowedOptions: ['from', 'destination', 'config', 'adaptation', 'input', 'edition'],
+      allowedValueOptions: ['from', 'destination', 'input', 'adaptation', 'config', 'edition'],
       allowUserVariables: true,
     },
   },

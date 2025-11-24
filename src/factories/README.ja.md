@@ -44,7 +44,7 @@ const STANDARD_OPTIONS = {
 | version      | --version     | -v       | flag   | バージョン情報を表示   |
 | from         | --from        | -f       | value  | 入力元を指定           |
 | destination  | --destination | -o       | value  | 出力先を指定           |
-| input        | --input       | -i       | value  | 入力ファイルを指定     |
+| edition      | --edition     | -e       | value  | エディションレイヤーを指定 |
 | adaptation   | --adaptation  | -a       | value  | 適応設定を指定         |
 | config       | --config      | -c       | value  | 設定ファイルを指定     |
 
@@ -84,12 +84,12 @@ interface OptionFactory {
 const factory = new OptionFactory();
 
 // コマンドライン引数からのOptionインスタンス生成
-const args = ['--help', '-i=value', '--uv-config=config.json'];
+const args = ['--help', '-e=value', '--uv-config=config.json'];
 const options = factory.createOptions(args);
 
 // 生成されたOptionインスタンスの使用
 options.forEach((option) => {
-  console.log(option.canonicalName); // 'help', 'input', 'uv-config'
+  console.log(option.canonicalName); // 'help', 'edition', 'uv-config'
   console.log(option.validate()); // バリデーション結果
   console.log(option.getValue()); // 値の取得
 });
@@ -145,8 +145,8 @@ factory.createOptionsFromArgs(['--unknown']);
 2. 値が必要なオプションに値が指定されていない
 
 ```typescript
-// エラー: Option --input requires a value
-factory.createOptionsFromArgs(['--input']);
+// エラー: Option --edition requires a value
+factory.createOptionsFromArgs(['--edition']);
 ```
 
 ## テスト

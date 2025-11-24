@@ -142,7 +142,7 @@ Deno.test('Standard Option Combinations - 2 Options', async (t) => {
     // from + input
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=input.md', '--input=task'],
-      expected: { from: 'input.md', input: 'task' },
+      expected: { from: 'input.md', edition: 'task' },
       description: 'from + input',
     },
     // from + adaptation
@@ -160,7 +160,7 @@ Deno.test('Standard Option Combinations - 2 Options', async (t) => {
     // destination + input
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--destination=output.md', '--input=task'],
-      expected: { destination: 'output.md', input: 'task' },
+      expected: { destination: 'output.md', edition: 'task' },
       description: 'destination + input',
     },
     // destination + adaptation
@@ -178,13 +178,13 @@ Deno.test('Standard Option Combinations - 2 Options', async (t) => {
     // input + adaptation
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--input=task', '--adaptation=strict'],
-      expected: { input: 'task', adaptation: 'strict' },
+      expected: { edition: 'task', adaptation: 'strict' },
       description: 'input + adaptation',
     },
     // input + config
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--input=task', '--config=test'],
-      expected: { input: 'task', config: 'test' },
+      expected: { edition: 'task', config: 'test' },
       description: 'input + config',
     },
     // adaptation + config
@@ -219,7 +219,7 @@ Deno.test('Standard Option Combinations - 3 Options', async (t) => {
     // from + destination + input
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=input.md', '--destination=output.md', '--input=task'],
-      expected: { from: 'input.md', destination: 'output.md', input: 'task' },
+      expected: { from: 'input.md', destination: 'output.md', edition: 'task' },
       description: 'from + destination + input',
     },
     // from + destination + adaptation
@@ -243,13 +243,13 @@ Deno.test('Standard Option Combinations - 3 Options', async (t) => {
     // from + input + adaptation
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=input.md', '--input=task', '--adaptation=strict'],
-      expected: { from: 'input.md', input: 'task', adaptation: 'strict' },
+      expected: { from: 'input.md', edition: 'task', adaptation: 'strict' },
       description: 'from + input + adaptation',
     },
     // from + input + config
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--from=input.md', '--input=task', '--config=test'],
-      expected: { from: 'input.md', input: 'task', config: 'test' },
+      expected: { from: 'input.md', edition: 'task', config: 'test' },
       description: 'from + input + config',
     },
     // from + adaptation + config
@@ -267,13 +267,13 @@ Deno.test('Standard Option Combinations - 3 Options', async (t) => {
         '--input=task',
         '--adaptation=strict',
       ],
-      expected: { destination: 'output.md', input: 'task', adaptation: 'strict' },
+      expected: { destination: 'output.md', edition: 'task', adaptation: 'strict' },
       description: 'destination + input + adaptation',
     },
     // destination + input + config
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--destination=output.md', '--input=task', '--config=test'],
-      expected: { destination: 'output.md', input: 'task', config: 'test' },
+      expected: { destination: 'output.md', edition: 'task', config: 'test' },
       description: 'destination + input + config',
     },
     // destination + adaptation + config
@@ -291,7 +291,7 @@ Deno.test('Standard Option Combinations - 3 Options', async (t) => {
     // input + adaptation + config
     {
       args: [DEMO_TYPE, LAYER_TYPE, '--input=task', '--adaptation=strict', '--config=test'],
-      expected: { input: 'task', adaptation: 'strict', config: 'test' },
+      expected: { edition: 'task', adaptation: 'strict', config: 'test' },
       description: 'input + adaptation + config',
     },
   ];
@@ -327,7 +327,12 @@ Deno.test('Standard Option Combinations - 4 Options', async (t) => {
         '--input=task',
         '--adaptation=strict',
       ],
-      expected: { from: 'input.md', destination: 'output.md', input: 'task', adaptation: 'strict' },
+      expected: {
+        from: 'input.md',
+        destination: 'output.md',
+        edition: 'task',
+        adaptation: 'strict',
+      },
       description: 'from + destination + input + adaptation',
     },
     // from + destination + input + config
@@ -340,7 +345,7 @@ Deno.test('Standard Option Combinations - 4 Options', async (t) => {
         '--input=task',
         '--config=test',
       ],
-      expected: { from: 'input.md', destination: 'output.md', input: 'task', config: 'test' },
+      expected: { from: 'input.md', destination: 'output.md', edition: 'task', config: 'test' },
       description: 'from + destination + input + config',
     },
     // from + destination + adaptation + config
@@ -371,7 +376,7 @@ Deno.test('Standard Option Combinations - 4 Options', async (t) => {
         '--adaptation=strict',
         '--config=test',
       ],
-      expected: { from: 'input.md', input: 'task', adaptation: 'strict', config: 'test' },
+      expected: { from: 'input.md', edition: 'task', adaptation: 'strict', config: 'test' },
       description: 'from + input + adaptation + config',
     },
     // destination + input + adaptation + config
@@ -384,7 +389,7 @@ Deno.test('Standard Option Combinations - 4 Options', async (t) => {
         '--adaptation=strict',
         '--config=test',
       ],
-      expected: { destination: 'output.md', input: 'task', adaptation: 'strict', config: 'test' },
+      expected: { destination: 'output.md', edition: 'task', adaptation: 'strict', config: 'test' },
       description: 'destination + input + adaptation + config',
     },
   ];
@@ -421,7 +426,7 @@ Deno.test('Standard Option Combinations - All Options', async (t) => {
     const expected = {
       from: 'input.md',
       destination: 'output.md',
-      input: 'task',
+      edition: 'task',
       adaptation: 'strict',
       config: 'test',
     };

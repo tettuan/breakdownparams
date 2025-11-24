@@ -33,7 +33,7 @@ Deno.test('test_examples_execution', async (t) => {
     assertEquals(result.layerType, 'project');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
-    assertExists(result.options['input']);
+    assertExists(result.options['edition']);
     assertExists(result.options['adaptation']);
     assertExists(result.options['uv-project']);
     assertExists(result.options['uv-version']);
@@ -85,7 +85,7 @@ Deno.test('test_examples_execution', async (t) => {
     assertExists(result.options['config']);
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
-    assertExists(result.options['input']);
+    assertExists(result.options['edition']);
     assertExists(result.options['adaptation']);
     assertExists(result.options['uv-project']);
     assertExists(result.options['uv-version']);
@@ -136,7 +136,7 @@ Deno.test('test_examples_execution', async (t) => {
     assertEquals(result.layerType, 'project');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
-    assertExists(result.options['input']);
+    assertExists(result.options['edition']);
     assertExists(result.options['adaptation']);
     assertExists(result.options['uv-project']);
     assertExists(result.options['uv-version']);
@@ -202,7 +202,7 @@ Deno.test('test_examples_execution', async (t) => {
     assertEquals(result.layerType, 'custom');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
-    assertExists(result.options['input']);
+    assertExists(result.options['edition']);
     assertExists(result.options['adaptation']);
     assertExists(result.options['uv-project']);
     assertExists(result.options['uv-version']);
@@ -251,7 +251,7 @@ Deno.test('test_examples_execution', async (t) => {
     assertEquals(result.layerType, 'issue');
     assertExists(result.options['from']);
     assertExists(result.options['destination']);
-    assertExists(result.options['input']);
+    assertExists(result.options['edition']);
     assertExists(result.options['adaptation']);
     assertExists(result.options['uv-project']);
     assertExists(result.options['uv-version']);

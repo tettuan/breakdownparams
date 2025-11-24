@@ -135,7 +135,7 @@ const parser = new ParamsParser(optionRule?, customConfig?);
 #### 値オプション
 - `--from=<file>` または `-f=<file>`: ソースファイルパス
 - `--destination=<file>` または `-o=<file>`: 出力ファイルパス
-- `--input=<type>` または `-i=<type>`: 入力レイヤータイプ
+- `--edition=<type>` または `-e=<type>`: エディションレイヤータイプ（入力元レイヤー）
 - `--adaptation=<mode>`: 適応戦略
 - `--config=<name>` または `-c=<name>`: 設定プロファイル
 
@@ -232,7 +232,7 @@ const customConfig: CustomConfig = {
     },
     two: {
       allowedOptions: ["verbose", "experimental"],
-      allowedValueOptions: ["from", "destination", "input", "config"]
+      allowedValueOptions: ["from", "destination", "edition", "config"]
     }
   }
 };

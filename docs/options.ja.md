@@ -48,7 +48,7 @@
 | --version     | -v         | バージョン情報を表示 | boolean | いいえ | `--version`               |
 | --from        | -f         | ソースファイルパス   | string  | いいえ | `--from=input.md`         |
 | --destination | -o         | 出力ファイルパス     | string  | いいえ | `--destination=output.md` |
-| --input       | -i         | 入力レイヤータイプ   | enum    | いいえ | `--input=project`         |
+| --edition     | -e         | エディションレイヤータイプ | enum    | いいえ | `--edition=project`       |
 | --adaptation  | -a         | プロンプト適応タイプ | string  | いいえ | `--adaptation=strict`     |
 | --config      | -c         | 設定ファイル名       | string  | いいえ | `--config=test`           |
 | --uv-*        | なし       | ユーザー変数オプション | string  | いいえ | `--uv-project=myproject`  |
@@ -75,9 +75,9 @@
    - ユーザー変数オプション（`--uv-*`）も TwoParams でのみ使用可能です
    - 他のパラメータタイプ（ZeroParams, OneParam, TwoParams）では無視されます
 
-## 入力レイヤータイプの値
+## エディションレイヤータイプの値
 
-`--input`オプションを使用する場合、２番目パラメータのバリデーションルールを使います：
+`--edition`オプションを使用する場合、２番目パラメータのバリデーションルールを使います：
 
 
 ## 使用例
@@ -105,12 +105,12 @@ breakdown to issue -f='' -o=
 
 ```bash
 # 正しいフォーマット
-breakdown summary task --input=project
-breakdown summary task -i=project
+breakdown summary task --edition=project
+breakdown summary task -e=project
 
 # 空値指定の例
-breakdown summary task --input=
-breakdown summary task -i=""
+breakdown summary task --edition=
+breakdown summary task -e=""
 ```
 
 ### プロンプト適応
