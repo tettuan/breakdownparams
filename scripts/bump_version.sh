@@ -214,7 +214,9 @@ detect_current_step() {
 
     # Step B-2: On develop, need to create PR to main
     if [ "$current_branch" = "develop" ]; then
-        if has_version_commit "develop"; then
+        # Check if develop has commits ahead of main
+        local commits_ahead=$(git rev-list --count main..develop 2>/dev/null || echo "0")
+        if [ "$commits_ahead" -gt 0 ]; then
             echo "B-2"
             return
         fi
