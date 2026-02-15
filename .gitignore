@@ -140,9 +140,11 @@ tmp/
 
 .cursor/
 
-# Claude Code (local settings)
-.claude/settings.local.json
-.claude/plans/
+# Claude Code
+.claude/
+!.claude/skills/
+!.claude/skills/**
+!.claude/settings.json
 
 # Obsidian
 .obsidian/
