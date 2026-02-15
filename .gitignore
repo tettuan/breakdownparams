@@ -142,6 +142,10 @@ tmp/
 
 # Claude Code (local settings)
 .claude/settings.local.json
+.claude/plans/
+
+# Obsidian
+.obsidian/
 # macOS
 .DS_Store
 .DS_Store?

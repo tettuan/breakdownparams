@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "executions": [
+    {
+      "id": "mlnpwiju-ac0d9542",
+      "timestamp": "2026-02-15T12:24:28.650Z",
+      "success": true,
+      "totalDuration": 1458.2954590000002,
+      "stages": [
+        {
+          "stage": "git-status-check",
+          "status": "success",
+          "duration": 25.085834000000002
+        },
+        {
+          "stage": "format-check",
+          "status": "success",
+          "duration": 40.784082999999995
+        },
+        {
+          "stage": "lockfile-init",
+          "status": "success",
+          "duration": 17.330292
+        },
+        {
+          "stage": "type-check",
+          "status": "success",
+          "duration": 537.7465000000001
+        },
+        {
+          "stage": "test-execution",
+          "status": "success",
+          "duration": 802.1379590000001,
+          "strategy": "all",
+          "testSummary": "\u001b[0m\u001b[32mok\u001b[0m | 0 passed | 0 failed \u001b[0m\u001b[38;5;245m(101ms)\u001b[0m"
+        },
+        {
+          "stage": "lint-check",
+          "status": "success",
+          "duration": 31.483999999999924
+        }
+      ],
+      "config": {
+        "mode": "all",
+        "hierarchy": "examples/",
+        "fallbackEnabled": true,
+        "batchSize": 2
+      },
+      "git": {
+        "branch": "feature/v1.2.1",
+        "commit": "3771f4e"
+      }
+    },
+    {
+      "id": "mlnpwhco-5ba37ea4",
+      "timestamp": "2026-02-15T12:24:27.096Z",
+      "success": true,
+      "totalDuration": 1771.560875,
+      "stages": [
+        {
+          "stage": "git-status-check",
+          "status": "success",
+          "duration": 24.598042000000007
+        },
+        {
+          "stage": "format-check",
+          "status": "success",
+          "duration": 39.351375
+        },
+        {
+          "stage": "lockfile-init",
+          "status": "success",
+          "duration": 17.179457999999997
+        },
+        {
+          "stage": "type-check",
+          "status": "success",
+          "duration": 28.153415999999993
+        },
+        {
+          "stage": "test-execution",
+          "status": "success",
+          "duration": 1633.155875,
+          "strategy": "all",
+          "testSummary": "\u001b[0m\u001b[32mok\u001b[0m | 103 passed (198 steps) | 0 failed \u001b[0m\u001b[38;5;245m(1s)\u001b[0m"
+        },
+        {
+          "stage": "lint-check",
+          "status": "success",
+          "duration": 20.049499999999853
+        }
+      ],
+      "config": {
+        "mode": "all",
+        "hierarchy": "tests/",
+        "fallbackEnabled": true,
+        "batchSize": 2
+      },
+      "git": {
+        "branch": "feature/v1.2.1",
+        "commit": "3771f4e"
+      }
+    },
+    {
+      "id": "mlnpwfwn-798aafd9",
+      "timestamp": "2026-02-15T12:24:25.223Z",
+      "success": true,
+      "totalDuration": 1834.424916,
+      "stages": [
+        {
+          "stage": "git-status-check",
+          "status": "success",
+          "duration": 24.996665999999998
+        },
+        {
+          "stage": "format-check",
+          "status": "success",
+          "duration": 46.048
+        },
+        {
+          "stage": "lockfile-init",
+          "status": "success",
+          "duration": 19.985416999999984
+        },
+        {
+          "stage": "type-check",
+          "status": "success",
+          "duration": 43.497625
+        },
+        {
+          "stage": "test-execution",
+          "status": "success",
+          "duration": 1672.3196659999999,
+          "strategy": "all",
+          "testSummary": "\u001b[0m\u001b[32mok\u001b[0m | 52 passed (107 steps) | 0 failed \u001b[0m\u001b[38;5;245m(1s)\u001b[0m"
+        },
+        {
+          "stage": "lint-check",
+          "status": "success",
+          "duration": 21.276083999999855
+        }
+      ],
+      "config": {
+        "mode": "all",
+        "hierarchy": "src/",
+        "fallbackEnabled": true,
+        "batchSize": 2
+      },
+      "git": {
+        "branch": "feature/v1.2.1",
+        "commit": "3771f4e"
+      }
+    },
+    {
+      "id": "mlnp9ysu-fb3493de",
+      "timestamp": "2026-02-15T12:06:56.622Z",
+      "success": true,
+      "totalDuration": 2572.115041,
+      "stages": [
+        {
+          "stage": "git-status-check",
+          "status": "success",
+          "duration": 24.086917000000007
+        },
+        {
+          "stage": "format-check",
+          "status": "success",
+          "duration": 39.881708
+        },
+        {
+          "stage": "lockfile-init",
+          "status": "success",
+          "duration": 17.49004099999999
+        },
+        {
+          "stage": "type-check",
+          "status": "success",
+          "duration": 704.911833
+        },
+        {
+          "stage": "test-execution",
+          "status": "success",
+          "duration": 1730.8833339999999,
+          "strategy": "all",
+          "testSummary": "\u001b[0m\u001b[32mok\u001b[0m | 103 passed (198 steps) | 0 failed \u001b[0m\u001b[38;5;245m(1s)\u001b[0m"
+        },
+        {
+          "stage": "lint-check",
+          "status": "success",
+          "duration": 48.32075000000032
+        }
+      ],
+      "config": {
+        "mode": "all",
+        "hierarchy": "tests/",
+        "fallbackEnabled": true,
+        "batchSize": 2
+      },
+      "git": {
+        "branch": "feature/v1.2.1",
+        "commit": "cefb6f4"
+      }
+    },
+    {
+      "id": "mlnp9wqa-6ddb7795",
+      "timestamp": "2026-02-15T12:06:53.938Z",
+      "success": true,
+      "totalDuration": 3485.9745,
+      "stages": [
+        {
+          "stage": "git-status-check",
+          "status": "success",
+          "duration": 24.39029200000001
+        },
+        {
+          "stage": "format-check",
+          "status": "success",
+          "duration": 70.327
+        },
+        {
+          "stage": "lockfile-init",
+          "status": "success",
+          "duration": 35.794250000000005
+        },
+        {
+          "stage": "type-check",
+          "status": "success",
+          "duration": 629.162916
+        },
+        {
+          "stage": "test-execution",
+          "status": "success",
+          "duration": 2667.409916,
+          "strategy": "all",
+          "testSummary": "\u001b[0m\u001b[32mok\u001b[0m | 52 passed (107 steps) | 0 failed \u001b[0m\u001b[38;5;245m(1s)\u001b[0m"
+        },
+        {
+          "stage": "lint-check",
+          "status": "success",
+          "duration": 50.593083000000206
+        }
+      ],
+      "config": {
+        "mode": "all",
+        "hierarchy": "src/",
+        "fallbackEnabled": true,
+        "batchSize": 2
+      },
+      "git": {
+        "branch": "feature/v1.2.1",
+        "commit": "cefb6f4"
+      }
+    }
+  ],
+  "maxRecords": 50
+}
