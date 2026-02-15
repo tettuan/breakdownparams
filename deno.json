@@ -15,7 +15,7 @@
   "exports": "./mod.ts",
   "imports": {
     "@": "./src/",
-    "@tettuan/breakdownlogger": "jsr:@tettuan/breakdownlogger@^0.1.0",
+    "@tettuan/breakdownlogger": "jsr:@tettuan/breakdownlogger@^1.1.2",
     "@std/assert": "jsr:@std/assert@^0.220.1",
     "@aidevtool/ci": "jsr:@aidevtool/ci@^1.0.0"
   },
@@ -53,7 +53,32 @@
     ],
     "rules": {
       "tags": [
-        "recommended"
+        "recommended",
+        "jsr"
+      ],
+      "include": [
+        "ban-untagged-todo",
+        "camelcase",
+        "default-param-last",
+        "eqeqeq",
+        "explicit-function-return-type",
+        "explicit-module-boundary-types",
+        "guard-for-in",
+        "no-await-in-loop",
+        "no-boolean-literal-for-arguments",
+        "no-console",
+        "no-eval",
+        "no-inferrable-types",
+        "no-non-null-asserted-optional-chain",
+        "no-non-null-assertion",
+        "no-self-compare",
+        "no-sparse-arrays",
+        "no-sync-fn-in-async-fn",
+        "no-throw-literal",
+        "no-top-level-await",
+        "no-useless-rename",
+        "single-var-declarator",
+        "triple-slash-reference"
       ]
     }
   },
