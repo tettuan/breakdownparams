@@ -165,5 +165,8 @@ Icon?
 .vscode
 .vscode/*
 
+# Local CI
+.ci-local/
+
 # Deno
 deno.lock
