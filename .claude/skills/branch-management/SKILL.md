@@ -19,4 +19,8 @@ allowed-tools: [Bash, Read, Grep, Glob]
 
 マージ方式: work→release=squash, release→develop=merge, develop→main=merge
 
+## バージョンゲート
+
+release/*ブランチ作成時に `deno.json` のバージョンがJSR最新より大きいことを確認する。未更新なら `/release-procedure` のステップ1（bump_version.sh）を先に実行する。develop→main PR作成時も同様に検証し、バージョン未更新のままマージを進めない。
+
 警告: `git push origin main`/`git push origin develop` は直接push禁止。作業ブランチは `release/*` から分岐すること。
