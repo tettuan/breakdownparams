@@ -1,7 +1,10 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OptionRule } from '../../../src/types/option_rule.ts';
-import { OneParamsResult, TwoParamsResult } from '../../../src/types/params_result.ts';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+import type { OneParamsResult, TwoParamsResult } from '../../../src/types/params_result.ts';
+
+const logger = new BreakdownLogger('e2e');
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -26,15 +29,18 @@ Deno.test('test_params_parser_e2e', () => {
 
   // Test: Help command
   const helpResult = parser.parse(['--help']);
+  logger.debug('Help command result', {
+    data: { type: helpResult.type, options: helpResult.options },
+  });
   assertEquals(helpResult.type, 'zero', 'Help command should return zero params result');
   assertEquals(helpResult.params, [], 'Help command should be empty params');
-  assertEquals(helpResult.options.help, true, 'Help option should be true');
+  assert(helpResult.options.help, 'Help option should be true');
 
   // Test: Version command
   const versionResult = parser.parse(['--version']);
   assertEquals(versionResult.type, 'zero', 'Version command should return zero params result');
   assertEquals(versionResult.params, [], 'Version command should be empty params');
-  assertEquals(versionResult.options.version, true, 'Version option should be true');
+  assert(versionResult.options.version, 'Version option should be true');
 
   // Test: Init command
   const initResult = parser.parse(['init']) as OneParamsResult;
@@ -72,6 +78,13 @@ Deno.test('test_params_parser_e2e', () => {
 
   // Test: Error cases
   const errorResult = parser.parse(['invalid;command']);
+  logger.debug('Error case result', {
+    data: {
+      type: errorResult.type,
+      errorCode: errorResult.error?.code,
+      errorCategory: errorResult.error?.category,
+    },
+  });
   assertEquals(errorResult.type, 'error', 'Invalid command should return error result');
   assertEquals(errorResult.error?.code, 'SECURITY_ERROR', 'Error should be security error');
   assertEquals(

@@ -1,4 +1,5 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import type { OptionRule } from '../../../src/types/option_rule.ts';
 import type {
   ErrorInfo,
@@ -8,6 +9,8 @@ import type {
   ZeroParamsResult,
 } from '../../../src/types/params_result.ts';
 import type { ValidationResult } from '../../../src/types/validation_result.ts';
+
+const logger = new BreakdownLogger('result');
 
 Deno.test('test_result_unit', () => {
   /**
@@ -30,7 +33,7 @@ Deno.test('test_result_unit', () => {
     options: {},
   };
   assertEquals(typeof paramsResult.type, 'string', 'type should be a string');
-  assertEquals(Array.isArray(paramsResult.params), true, 'params should be an array');
+  assert(Array.isArray(paramsResult.params), 'params should be an array');
   assertEquals(typeof paramsResult.options, 'object', 'options should be an object');
 
   /**
@@ -53,7 +56,7 @@ Deno.test('test_result_unit', () => {
     options: {},
   };
   assertEquals(zeroParamsResult.type, 'zero', 'type should be zero');
-  assertEquals(Array.isArray(zeroParamsResult.params), true, 'params should be an array');
+  assert(Array.isArray(zeroParamsResult.params), 'params should be an array');
   assertEquals(typeof zeroParamsResult.options, 'object', 'options should be an object');
 
   /**
@@ -77,7 +80,7 @@ Deno.test('test_result_unit', () => {
     directiveType: 'init',
   };
   assertEquals(oneParamResult.type, 'one', 'type should be one');
-  assertEquals(Array.isArray(oneParamResult.params), true, 'params should be an array');
+  assert(Array.isArray(oneParamResult.params), 'params should be an array');
   assertEquals(typeof oneParamResult.options, 'object', 'options should be an object');
   assertEquals(
     typeof oneParamResult.directiveType,
@@ -108,7 +111,7 @@ Deno.test('test_result_unit', () => {
     layerType: 'project',
   };
   assertEquals(twoParamsResult.type, 'two', 'type should be two');
-  assertEquals(Array.isArray(twoParamsResult.params), true, 'params should be an array');
+  assert(Array.isArray(twoParamsResult.params), 'params should be an array');
   assertEquals(typeof twoParamsResult.options, 'object', 'options should be an object');
   assertEquals(
     typeof twoParamsResult.directiveType,
@@ -116,6 +119,13 @@ Deno.test('test_result_unit', () => {
     'directiveType should be a string',
   );
   assertEquals(typeof twoParamsResult.layerType, 'string', 'layerType should be a string');
+  logger.debug('Result type structures validated', {
+    data: {
+      zeroType: zeroParamsResult.type,
+      oneType: oneParamResult.type,
+      twoType: twoParamsResult.type,
+    },
+  });
 
   /**
    * Test for ErrorInfo interface structure.
@@ -159,9 +169,8 @@ Deno.test('test_result_unit', () => {
     validatedParams: ['test'],
   };
   assertEquals(typeof validationResult.isValid, 'boolean', 'isValid should be a boolean');
-  assertEquals(
+  assert(
     Array.isArray(validationResult.validatedParams),
-    true,
     'validatedParams should be an array',
   );
 
@@ -198,9 +207,8 @@ Deno.test('test_result_unit', () => {
     },
   };
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.userVariables),
-    true,
     'userVariables should be an array',
   );
   assertEquals(
@@ -218,14 +226,12 @@ Deno.test('test_result_unit', () => {
     'string',
     'duplicateOption should be a string',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.requiredOptions),
-    true,
     'requiredOptions should be an array',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.valueTypes),
-    true,
     'valueTypes should be an array',
   );
   assertEquals(typeof optionRule.flagOptions, 'object', 'flagOptions should be an object');
@@ -250,7 +256,7 @@ Deno.test('test_validation_result', () => {
     isValid: true,
     validatedParams: ['test'],
   };
-  assertEquals(successResult.isValid, true, 'Success result should be valid');
+  assert(successResult.isValid, 'Success result should be valid');
   assertEquals(successResult.validatedParams, ['test'], 'Validated params should match');
   assertEquals(successResult.errorMessage, undefined, 'Error message should be undefined');
   assertEquals(successResult.errorCode, undefined, 'Error code should be undefined');
@@ -278,7 +284,7 @@ Deno.test('test_validation_result', () => {
     errorCode: 'TEST_ERROR',
     errorCategory: 'test_category',
   };
-  assertEquals(errorResult.isValid, false, 'Error result should be invalid');
+  assertFalse(errorResult.isValid, 'Error result should be invalid');
   assertEquals(errorResult.validatedParams, [], 'Validated params should be empty');
   assertEquals(errorResult.errorMessage, 'Test error', 'Error message should match');
   assertEquals(errorResult.errorCode, 'TEST_ERROR', 'Error code should match');
@@ -317,9 +323,8 @@ Deno.test('test_validation_result', () => {
   };
 
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.userVariables),
-    true,
     'userVariables should be an array',
   );
   assertEquals(
@@ -337,14 +342,12 @@ Deno.test('test_validation_result', () => {
     'string',
     'duplicateOption should be a string',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.requiredOptions),
-    true,
     'requiredOptions should be an array',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.valueTypes),
-    true,
     'valueTypes should be an array',
   );
   assertEquals(typeof optionRule.flagOptions, 'object', 'flagOptions should be an object');

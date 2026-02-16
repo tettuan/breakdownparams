@@ -1,5 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+
+const logger = new BreakdownLogger('security');
 
 Deno.test('test_security_error_validator_implementation', () => {
   const validator = new SecurityValidator();
@@ -23,7 +26,10 @@ Deno.test('test_security_error_validator_implementation', () => {
    */
   const safeArgs = ['test', '--option=value', 'normal-param'];
   const safeResult = validator.validate(safeArgs);
-  assertEquals(safeResult.isValid, true, 'Safe parameters should pass validation');
+  logger.debug('Safe validation result', {
+    data: { isValid: safeResult.isValid, params: safeArgs },
+  });
+  assert(safeResult.isValid, 'Safe parameters should pass validation');
   assertEquals(
     safeResult.validatedParams,
     ['test', '--option=value', 'normal-param'],
@@ -58,9 +64,8 @@ Deno.test('test_security_error_validator_implementation', () => {
 
   dangerousArgs.forEach((arg) => {
     const result = validator.validate([arg]);
-    assertEquals(
+    assertFalse(
       result.isValid,
-      false,
       `Parameter with dangerous character should fail validation: ${arg}`,
     );
     assertEquals(
@@ -89,9 +94,11 @@ Deno.test('test_security_error_validator_implementation', () => {
    */
   const mixedArgs = ['safe-param', 'dangerous;param', 'another-safe'];
   const mixedResult = validator.validate(mixedArgs);
-  assertEquals(
+  logger.debug('Mixed args validation result', {
+    data: { isValid: mixedResult.isValid, params: mixedArgs },
+  });
+  assertFalse(
     mixedResult.isValid,
-    false,
     'Parameters with any dangerous character should fail validation',
   );
   assertEquals(

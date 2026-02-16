@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-console
 import { ParamsParser } from '../src/mod.ts';
 import type { ZeroParamsResult } from '../src/mod.ts';
 

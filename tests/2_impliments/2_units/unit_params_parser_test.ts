@@ -1,7 +1,10 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
-import { OptionRule } from '../../../src/types/option_rule.ts';
-import { OneParamsResult, TwoParamsResult } from '../../../src/types/params_result.ts';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+import type { OneParamsResult, TwoParamsResult } from '../../../src/types/params_result.ts';
+
+const logger = new BreakdownLogger('parser');
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -39,7 +42,7 @@ Deno.test('test_params_parser_unit', () => {
    * and no parameters included in the result.
    */
   const optionsOnlyResult = parser.parse(['--help', '--version']);
-  console.log('[DEBUG] optionsOnlyResult:', optionsOnlyResult);
+  logger.debug('[DEBUG] optionsOnlyResult:', optionsOnlyResult);
   assertEquals(optionsOnlyResult.type, 'zero', 'Options only should be zero type');
   assertEquals(optionsOnlyResult.params, [], 'Params should be empty for options only');
   assertEquals(
@@ -63,7 +66,7 @@ Deno.test('test_params_parser_unit', () => {
    * directiveType field and the result properly typed as 'one'.
    */
   const oneParamResult = parser.parse(['init']) as OneParamsResult;
-  console.log('[DEBUG] oneParamResult:', oneParamResult);
+  logger.debug('[DEBUG] oneParamResult:', oneParamResult);
   assertEquals(oneParamResult.type, 'one', 'One parameter should be one type');
   assertEquals(oneParamResult.params, ['init'], 'Params should match input');
   assertEquals(oneParamResult.options, {}, 'Options should be empty');
@@ -84,7 +87,7 @@ Deno.test('test_params_parser_unit', () => {
    * fields respectively, and the result properly typed as 'two'.
    */
   const twoParamResult = parser.parse(['to', 'project']) as TwoParamsResult;
-  console.log('[DEBUG] twoParamResult:', twoParamResult);
+  logger.debug('[DEBUG] twoParamResult:', twoParamResult);
   assertEquals(twoParamResult.type, 'two', 'Two parameters should be two type');
   assertEquals(twoParamResult.params, ['to', 'project'], 'Params should match input');
   assertEquals(twoParamResult.options, {}, 'Options should be empty');
@@ -112,7 +115,7 @@ Deno.test('test_params_parser_unit', () => {
     '--from=source',
     '--destination=target',
   ]) as TwoParamsResult;
-  console.log('[DEBUG] twoParamWithOptionsResult:', twoParamWithOptionsResult);
+  logger.debug('[DEBUG] twoParamWithOptionsResult:', twoParamWithOptionsResult);
   assertEquals(
     twoParamWithOptionsResult.type,
     'two',
@@ -146,7 +149,7 @@ Deno.test('test_params_parser_unit', () => {
    * downstream processing of malformed commands.
    */
   const invalidResult = parser.parse(['invalid']);
-  console.log('[DEBUG] invalidResult:', invalidResult);
+  logger.debug('[DEBUG] invalidResult:', invalidResult);
   assertEquals(invalidResult.type, 'error', 'Invalid arguments should be error type');
   assertEquals(invalidResult.params, [], 'Params should be empty for invalid input');
   assertEquals(invalidResult.options, {}, 'Options should be empty for invalid input');

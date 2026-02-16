@@ -1,4 +1,5 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
 import {
@@ -9,7 +10,9 @@ import {
 import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../../../src/validator/params/two_params_validator.ts';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger('integration');
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -46,64 +49,64 @@ Deno.test('test_parser_validator_integration', () => {
   const securityValidator = new SecurityValidator();
   assertEquals(paramValidators.length, 3, 'Should create 3 param validators');
   assertEquals(optionValidators.length, 3, 'Should create 3 option validators');
-  assertEquals(
+  assert(
     securityValidator instanceof SecurityValidator,
-    true,
     'Should create SecurityValidator',
   );
-  assertEquals(
+  assert(
     paramValidators[0] instanceof ZeroParamsValidator,
-    true,
     'First param validator should be ZeroParamsValidator',
   );
-  assertEquals(
+  assert(
     paramValidators[1] instanceof OneParamValidator,
-    true,
     'Second param validator should be OneParamValidator',
   );
-  assertEquals(
+  assert(
     paramValidators[2] instanceof TwoParamsValidator,
-    true,
     'Third param validator should be TwoParamsValidator',
   );
 
   // Integration tests for each validator
   // 1. Security error validator
   const securityResult = securityValidator.validate(['safe;command']);
-  assertEquals(
+  assertFalse(
     securityResult.isValid,
-    false,
     'Security validator should reject dangerous commands',
   );
 
   // 2. Option validator
   const optionsResult = optionValidators[0].validate(['--help', '--version'], 'zero', optionRule);
-  assertEquals(optionsResult.isValid, true, 'Options validator should accept valid options');
+  assert(optionsResult.isValid, 'Options validator should accept valid options');
 
   // 3. Zero parameter validator
   const zeroParamsResult = paramValidators[0].validate([]);
-  assertEquals(zeroParamsResult.isValid, true, 'Zero params validator should accept empty params');
+  assert(zeroParamsResult.isValid, 'Zero params validator should accept empty params');
 
   // 4. One parameter validator
   const oneParamResult = paramValidators[1].validate(['init']);
-  assertEquals(oneParamResult.isValid, true, 'One param validator should accept init command');
+  assert(oneParamResult.isValid, 'One param validator should accept init command');
 
   // 5. Two parameter validator
   const twoParamsResult = paramValidators[2].validate(['to', 'project']);
-  assertEquals(
+  assert(
     twoParamsResult.isValid,
-    true,
     'Two params validator should accept valid parameters',
   );
+
+  logger.debug('Validator integration setup', {
+    data: {
+      paramValidatorCount: paramValidators.length,
+      optionValidatorCount: optionValidators.length,
+    },
+  });
 
   // Parser and validator integration tests
   // 1. Zero parameter case
   const zeroParamsParseResult = parser.parse(['--help']);
   assertEquals(zeroParamsParseResult.type, 'zero', 'Should parse as zero params');
   assertEquals(zeroParamsParseResult.params, [], 'Should have empty params');
-  assertEquals(
+  assert(
     zeroParamsParseResult.options.help,
-    true,
     'Should have help option as true',
   );
 
@@ -119,6 +122,9 @@ Deno.test('test_parser_validator_integration', () => {
 
   // 4. Error case
   const errorParseResult = parser.parse(['invalid', 'command']);
+  logger.debug('Error parse result', {
+    data: { type: errorParseResult.type, error: errorParseResult.error },
+  });
   assertEquals(errorParseResult.type, 'error', 'Should parse as error');
   assertEquals(errorParseResult.params, [], 'Should have empty params for error');
   assertEquals(typeof errorParseResult.error, 'object', 'Should have error object');

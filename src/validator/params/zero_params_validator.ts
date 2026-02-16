@@ -1,5 +1,5 @@
 import { BaseValidator } from './base_validator.ts';
-import { ValidationResult } from '../../types/validation_result.ts';
+import type { ValidationResult } from '../../types/validation_result.ts';
 
 /**
  * Validator for zero-parameter commands.

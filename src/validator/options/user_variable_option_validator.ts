@@ -1,4 +1,4 @@
-import { ValidationResult } from '../../types/validation_result.ts';
+import type { ValidationResult } from '../../types/validation_result.ts';
 
 /**
  * Validator for user variable options (--uv-*)

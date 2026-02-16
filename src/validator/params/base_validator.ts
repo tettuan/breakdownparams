@@ -1,4 +1,4 @@
-import { ValidationResult } from '../../types/validation_result.ts';
+import type { ValidationResult } from '../../types/validation_result.ts';
 
 /**
  * Base abstract class for all parameter validators.

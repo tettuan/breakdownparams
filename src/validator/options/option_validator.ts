@@ -1,5 +1,5 @@
-import { OptionRule } from '../../types/option_rule.ts';
-import { ValidationResult } from '../../types/validation_result.ts';
+import type { OptionRule } from '../../types/option_rule.ts';
+import type { ValidationResult } from '../../types/validation_result.ts';
 
 /**
  * Predefined error messages for option validation.

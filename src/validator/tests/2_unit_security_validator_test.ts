@@ -1,17 +1,26 @@
-import { assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../security_validator.ts';
+
+const logger = new BreakdownLogger('security');
 
 Deno.test('test_security_validator_unit', () => {
   const validator = new SecurityValidator();
 
   // Normal case test
   const validResult = validator.validate(['safe_param']);
-  assertEquals(validResult.isValid, true, 'Safe param should be valid');
+  logger.debug('Valid security result', {
+    data: { isValid: validResult.isValid, validatedParams: validResult.validatedParams },
+  });
+  assert(validResult.isValid, 'Safe param should be valid');
   assertEquals(validResult.validatedParams, ['safe_param'], 'Should return correct param');
 
   // Abnormal case test - shell command execution attempt
   const shellCommandResult = validator.validate(['test; rm -rf /']);
-  assertEquals(shellCommandResult.isValid, false, 'Shell command should be rejected');
+  logger.debug('Shell command rejection result', {
+    data: { isValid: shellCommandResult.isValid, errorCode: shellCommandResult.errorCode },
+  });
+  assertFalse(shellCommandResult.isValid, 'Shell command should be rejected');
   assertEquals(
     shellCommandResult.errorMessage,
     'Security error: Shell command execution or redirection attempt detected',
@@ -21,7 +30,7 @@ Deno.test('test_security_validator_unit', () => {
 
   // Abnormal case test - path traversal attempt
   const pathTraversalResult = validator.validate(['../../../etc/passwd']);
-  assertEquals(pathTraversalResult.isValid, false, 'Path traversal should be rejected');
+  assertFalse(pathTraversalResult.isValid, 'Path traversal should be rejected');
   assertEquals(
     pathTraversalResult.errorMessage,
     'Security error: Path traversal attempt detected',
@@ -32,7 +41,7 @@ Deno.test('test_security_validator_unit', () => {
   // Security check for short form options
   // Verify that short form options pass
   const shortOptionsResult = validator.validate(['-h', '-v', '-f=input.md']);
-  assertEquals(shortOptionsResult.isValid, true, 'Short form options should pass security check');
+  assert(shortOptionsResult.isValid, 'Short form options should pass security check');
   assertEquals(
     shortOptionsResult.validatedParams,
     ['-h', '-v', '-f=input.md'],
@@ -41,7 +50,7 @@ Deno.test('test_security_validator_unit', () => {
 
   // Security check for custom variable options
   const userVarResult = validator.validate(['--uv-project=myproject', '--uv-version=1.0.0']);
-  assertEquals(userVarResult.isValid, true, 'User variables should pass security check');
+  assert(userVarResult.isValid, 'User variables should pass security check');
   assertEquals(
     userVarResult.validatedParams,
     ['--uv-project=myproject', '--uv-version=1.0.0'],
@@ -50,9 +59,8 @@ Deno.test('test_security_validator_unit', () => {
 
   // Combination of short form options and regular parameters
   const mixedArgsResult = validator.validate(['to', 'project', '-f=input.md', '-o=output.md']);
-  assertEquals(
+  assert(
     mixedArgsResult.isValid,
-    true,
     'Mixed params and short options should pass security check',
   );
   assertEquals(

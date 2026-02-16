@@ -1,5 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert@1';
-import { ValidationResult } from '../../src/types/validation_result.ts';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { ValidationResult } from '../../src/types/validation_result.ts';
+
+const logger = new BreakdownLogger('param-validator');
 
 Deno.test('test_validation_result_structure', () => {
   const successResult: ValidationResult = {
@@ -21,6 +24,13 @@ Deno.test('test_validation_result_structure', () => {
     errorCategory: 'validation',
     errors: ['error'],
   };
+  logger.debug('ValidationResult constructions', {
+    data: {
+      successValid: successResult.isValid,
+      errorValid: errorResult.isValid,
+      errorCode: errorResult.errorCode,
+    },
+  });
 
   /**
    * Test: Success case validation result structure
@@ -39,10 +49,9 @@ Deno.test('test_validation_result_structure', () => {
    * - Validate optional metadata fields are strings when present
    * - Confirm options is an object when provided
    */
-  assertEquals(successResult.isValid, true, 'isValid should be true');
-  assertEquals(
+  assert(successResult.isValid, 'isValid should be true');
+  assert(
     Array.isArray(successResult.validatedParams),
-    true,
     'validatedParams should be an array',
   );
   assertEquals(
@@ -70,15 +79,14 @@ Deno.test('test_validation_result_structure', () => {
    * - Validate all error fields (message, code, category) are strings
    * - Confirm errors array is properly structured
    */
-  assertEquals(errorResult.isValid, false, 'isValid should be false');
-  assertEquals(
+  assertFalse(errorResult.isValid, 'isValid should be false');
+  assert(
     Array.isArray(errorResult.validatedParams),
-    true,
     'validatedParams should be an array',
   );
   assertEquals(typeof errorResult.errorMessage, 'string', 'errorMessage should be a string');
   assertEquals(typeof errorResult.errorCode, 'string', 'errorCode should be a string');
   assertEquals(typeof errorResult.errorCategory, 'string', 'errorCategory should be a string');
   assertEquals(typeof errorResult.errors, 'object', 'errors should be an object');
-  assertEquals(Array.isArray(errorResult.errors), true, 'errors should be an array');
+  assert(Array.isArray(errorResult.errors), 'errors should be an array');
 });

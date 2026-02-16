@@ -1,5 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+
+const logger = new BreakdownLogger('param-validator');
 
 Deno.test('test_security_validator_implementation', () => {
   const validator = new SecurityValidator();
@@ -20,7 +23,8 @@ Deno.test('test_security_validator_implementation', () => {
    * - Confirm no error message is generated for valid input
    */
   const result = validator.validate(['test']);
-  assertEquals(result.isValid, true, 'Normal validation should succeed');
+  logger.debug('Normal validation result', { data: { isValid: result.isValid, params: ['test'] } });
+  assert(result.isValid, 'Normal validation should succeed');
   assertEquals(result.validatedParams, ['test'], 'Validated params should match input');
   assertEquals(result.errorMessage, undefined, 'Should have no error message');
 
@@ -42,7 +46,7 @@ Deno.test('test_security_validator_implementation', () => {
    * - Validate specific error message for shell command attempts
    */
   const shellCommandResult = validator.validate(['test; ls']);
-  assertEquals(shellCommandResult.isValid, false, 'Shell command attempt should fail');
+  assertFalse(shellCommandResult.isValid, 'Shell command attempt should fail');
   assertEquals(shellCommandResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
   assertEquals(shellCommandResult.errorCategory, 'security', 'Should have security category');
   assertEquals(
@@ -69,7 +73,7 @@ Deno.test('test_security_validator_implementation', () => {
    * - Validate that any parameter containing '../' is rejected
    */
   const pathTraversalResult = validator.validate(['test', '../file']);
-  assertEquals(pathTraversalResult.isValid, false, 'Path traversal attempt should fail');
+  assertFalse(pathTraversalResult.isValid, 'Path traversal attempt should fail');
   assertEquals(pathTraversalResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
   assertEquals(pathTraversalResult.errorCategory, 'security', 'Should have security category');
   assertEquals(
@@ -95,7 +99,10 @@ Deno.test('test_security_validator_implementation', () => {
    * - Ensure comprehensive security coverage
    */
   const multipleChecksResult = validator.validate(['test; ls', '../file']);
-  assertEquals(multipleChecksResult.isValid, false, 'Multiple security violations should fail');
+  logger.debug('Multiple security violations result', {
+    data: { isValid: multipleChecksResult.isValid, errorCode: multipleChecksResult.errorCode },
+  });
+  assertFalse(multipleChecksResult.isValid, 'Multiple security violations should fail');
   assertEquals(multipleChecksResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
   assertEquals(multipleChecksResult.errorCategory, 'security', 'Should have security category');
 });

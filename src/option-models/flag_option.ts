@@ -1,5 +1,5 @@
 import { OptionType } from '../types/option_type.ts';
-import { ValidationResult } from '../types/validation_result.ts';
+import type { ValidationResult } from '../types/validation_result.ts';
 import { validateOptionName } from './format_utils.ts';
 import { BaseOption } from './base_option.ts';
 
@@ -36,18 +36,18 @@ export class FlagOption extends BaseOption {
    * @param name - The primary name of the option (without dashes)
    * @param aliases - Array of alternative names for this option
    * @param description - Human-readable description of what this option does
-   * @param rawInput - The raw command-line input that created this option
    * @param longname - The long form of the option (e.g., "--verbose")
    * @param shortname - The short form of the option (e.g., "-v")
+   * @param rawInput - The raw command-line input that created this option
    * @throws Error if the option name or any alias is invalid
    */
   constructor(
     readonly name: string,
     readonly aliases: string[],
     readonly description: string,
-    rawInput: string = '',
     longname?: string,
     shortname?: string,
+    rawInput: string = '',
   ) {
     // Initialize base option with long and short names
     super(rawInput || name, longname || name, shortname);

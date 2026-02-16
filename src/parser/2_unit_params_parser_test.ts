@@ -1,7 +1,7 @@
 import { assertEquals } from 'jsr:@std/assert@1';
 import { ParamsParser } from './params_parser.ts';
-import { OptionRule } from '../types/option_rule.ts';
-import { ErrorResult, OneParamsResult, TwoParamsResult } from '../types/params_result.ts';
+import type { OptionRule } from '../types/option_rule.ts';
+import type { ErrorResult, OneParamsResult, TwoParamsResult } from '../types/params_result.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
@@ -28,7 +28,7 @@ Deno.test('test_params_parser_unit', () => {
   };
 
   const parser = new ParamsParser(optionRule);
-  const logger = new BreakdownLogger();
+  const logger = new BreakdownLogger('parser');
 
   // Test options only functionality
   const optionsOnlyArgs = ['--help', '--version'];

@@ -12,7 +12,7 @@
 #
 # Step Flow:
 #   A: Work Branch Phase
-#      A-1: Version update (deno.json, src/version.ts)
+#      A-1: Version update (deno.json)
 #      A-2: Local CI check
 #      A-3: Create PR to develop
 #
@@ -105,11 +105,6 @@ get_current_branch() {
 # Get version from deno.json
 get_deno_version() {
     deno eval "const config = JSON.parse(await Deno.readTextFile('deno.json')); console.log(config.version);"
-}
-
-# Get version from deno.json (single source of truth)
-get_mod_version() {
-    get_deno_version
 }
 
 # Check if PR exists for given head and base
@@ -261,8 +256,6 @@ execute_step_a1() {
 
     # Get current version
     local deno_version=$(get_deno_version)
-    local mod_version=$(get_mod_version)
-
     # Version is managed in deno.json only
     log_info "Current version: $deno_version"
 
@@ -308,7 +301,7 @@ execute_step_a2() {
     local work_branch=$1
     log_step "A-2" "Running local CI checks"
 
-    if ! ./scripts/local_ci.sh; then
+    if ! deno task ci:dirty; then
         log_error "Local CI failed. Please fix issues before continuing."
         exit 1
     fi
