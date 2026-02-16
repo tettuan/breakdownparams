@@ -6,93 +6,26 @@ allowed-tools: [Read, Glob, Grep, Edit, Write, Bash, Task]
 
 # Refactoring
 
-Prove the new path inherits every contract from the old path before deleting it. If you cannot prove it, do not delete.
+新パスが旧パスの全契約を継承すると証明できるまで、旧パスを削除してはならない。
 
-## Failure Patterns
+## Phase 1: 棚卸し
 
-| Pattern | Why it breaks | Prevention |
-|---------|--------------|------------|
-| Old path deleted + new path incomplete | Contract breaks in intermediate state | List all contracts in Before/After table before deleting |
-| Build cache inconsistency | Cache serves old module instead of updated one | Run --reload or clear cache after every change |
-| Dead code left behind | Produces false positives in grep/search | Delete superseded code in the same PR |
-| Documentation not updated | Users cannot discover changes | Grep docs for changed names and update all references |
+削除・変更対象と全消費者をgrepで列挙する。移行先のない消費者がある場合、削除不可。
 
-## Phase 1: Inventory
+## Phase 2: 契約検証
 
-Map everything being removed or changed before writing any code.
+Before/After表を作成し、After列が空の行があれば未完了。検証方法: 直線=コードレビュー / 分岐あり=境界テスト / 外部依存=E2E実行。
 
-**1. Removal Inventory** — List what is being removed, who consumes it.
+## Phase 3: 実行
 
-```markdown
-| Item | File | Consumers |
-|------|------|-----------|
-| PromptManager.oldMethod | src/core/prompt_manager.ts:42 | tests, mod.ts |
-```
+1commit=1関心事（新パス追加→消費者移行→旧パス削除→docs更新）。各commitで `deno task ci` 通過必須。dead codeは同一PRで削除する。
 
-**2. Consumer Audit** — Grep imports and call sites. If any consumer has no migration target, deletion is not allowed.
+## Phase 4: 検証
 
 ```bash
-grep -r "OldName" --include="*.ts" src/ tests/ mod.ts
+deno cache --reload mod.ts                              # キャッシュクリア
+grep -r "OldName" --include="*.ts" src/ tests/ mod.ts   # 残存参照ゼロ確認
+grep -r "OldName" --include="*.md" docs/ README.md      # docs残存確認
 ```
 
-## Phase 2: Contract & Verification
-
-**3. Before/After Table** — Any row with empty "After" = not ready.
-
-```markdown
-| Behavior | Before | After | Verified |
-|----------|--------|-------|----------|
-| schema_file replacement | SchemaFileReplacer.replace() | New implementation | [ ] |
-```
-
-**4. Verification Design** — Match proof method to complexity:
-
-| Path characteristic | Proof method |
-|--------------------|-------------|
-| Straight line, 1-2 hops | Code review sufficient |
-| Contains branches, filters | Automated test on boundary |
-| Depends on external state | E2E execution |
-
-## Phase 3: Execute
-
-**5.** 1 commit = 1 concern. Separate: add new path -> migrate consumers -> delete old path -> update docs.
-
-**6.** Every commit must pass `scripts/local_ci.sh`. If intermediate state breaks, commit granularity is too coarse.
-
-**7.** Delete dead code in the same PR. "Cleanup later" never comes.
-
-## Phase 4: Verify
-
-**8. Cache clear**
-
-```bash
-deno cache --reload mod.ts
-```
-
-**9. Consumer grep** — Ensure zero remaining references:
-
-```bash
-grep -r "OldName" --include="*.ts" src/ tests/ mod.ts | grep -v test
-```
-
-**10. Docs grep** — Ensure zero stale references:
-
-```bash
-grep -r "OldName" --include="*.md" docs/ README.md
-```
-
-## Anti-Patterns
-
-| Bad | Good |
-|-----|------|
-| Delete old path, implement new path later | Make new path work first, then delete old |
-| Assume "nobody uses this" without grep | Show evidence via consumer audit |
-| Combine refactor and feature in one PR | Separate for bisectability |
-| Skip cache clear after refactor | Always --reload after changes |
-
-## Related Skills
-
-| Skill | When to use together |
-|-------|---------------------|
-| `fix-checklist` | Root cause analysis before deciding what to refactor |
-| `docs-consistency` | Documentation updates after refactoring |
+アンチパターン: 旧削除→新実装後回し / grep無しの「誰も使ってない」判断 / リファクタと機能追加の混在 / キャッシュクリア忘れ

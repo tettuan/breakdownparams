@@ -8,81 +8,24 @@ allowed-tools: Read, Grep, Glob, Bash
 
 KEY命名とロガー配置はデバッグ精度を決める設計判断なので、命名重複・配置ミス・本番混入を事前に防ぐ。
 
-## 1. KEY Discovery
+## KEY Discovery
 
-重複KEYはフィルタリングを破壊するので、新規作成前に既存KEYを検索する。
+重複KEYはフィルタリングを破壊するので、新規作成前に検索する: `grep -rn 'new BreakdownLogger(' --include='*.ts' | grep -oP '"[^"]*"' | sort -u`
 
-```bash
-grep -rn 'new BreakdownLogger(' --include='*.ts' | grep -oP '"[^"]*"' | sort -u
-```
+既存KEYあり→再利用 / 広すぎ→sub-key作成 / なし→新規作成 / 一時調査→`fix-<issue>`prefixで作成後削除
 
-| 状況                        | アクション                                   |
-| :-------------------------- | :------------------------------------------- |
-| 既存KEYがモジュールをカバー | 再利用する                                   |
-| 既存KEYが広すぎる           | より具体的なsub-keyを作成する                |
-| 該当KEYなし                 | 命名ルールに従い新規作成する                 |
-| 一時的な調査                | `fix-<issue>` prefixで作成し、調査後削除する |
+## KEY命名
 
-## 2. KEY Naming
+方式: By feature(`auth`,`payment`) / By layer(`controller`,`service`) / By flow(`order-auth`)。制約: lowercase kebab-case、汎用名禁止(`util`,`helper`)、論理単位ごとにユニーク。
 
-KEYは `LOG_KEY=...`
-で毎回タイプするフィルタハンドルなので、プロジェクトで1方式を選び一貫させる。
+## 配置
 
-| 方式       | 用途                             | 例                                    |
-| :--------- | :------------------------------- | :------------------------------------ |
-| By feature | ユーザー向け機能のデバッグ       | `auth`, `payment`, `notification`     |
-| By layer   | データフロー・アーキテクチャ問題 | `controller`, `service`, `repository` |
-| By flow    | 横断的ビジネスプロセス           | `order-auth`, `order-stock`           |
+データは境界で変換されるので、4境界点（引数受信後・値返却前・外部呼出前後・エラーハンドラ内）に置く。タイトループ内・全行後・dataパラム無し・循環参照オブジェクトは禁止。
 
-制約: lowercase
-kebab-case、汎用名(`util`,`helper`)禁止、論理単位ごとにユニーク、名前空間にはprefix(`auth-token`)、一時キーは
-`fix-<id>`。
+## 記述
 
-## 3. Placement
+`LOG_LENGTH`は末尾切り詰めなので重要情報を先頭40字に置く: `logger.debug("Timeout: DB conn exceeded 30s", { host });`
 
-データは境界で変換・転送されるので、ロガーは4つの境界点（引数受信後・値返却前・外部呼出前後・エラーハンドラ内）に置く。
+## 検証
 
-| アンチパターン       | 理由                                 |
-| :------------------- | :----------------------------------- |
-| タイトループ内       | 出力洪水でシグナルが埋没する         |
-| 全行の後             | デバッグではなくナレーションになる   |
-| `data`パラム無し     | メッセージだけでは根本原因が見えない |
-| 循環参照オブジェクト | `[Object]` にフォールバックする      |
-
-## 4. Writing Style
-
-`LOG_LENGTH`
-は末尾から切り詰めるので、重要情報を先頭40字に置く。メッセージ=何が起きたか、data=証拠。
-
-```typescript
-logger.debug("Timeout: DB conn exceeded 30s", { host });
-```
-
-## 5. Validation
-
-BreakdownLoggerはテスト専用なので、非テストファイルのimportを `validate`
-で検出する。Pre-commitフック・CI・コードレビュー時に実行する。
-
-```bash
-deno run --allow-read jsr:@tettuan/breakdownlogger/validate [target-dir]
-```
-
-## 6. Docs
-
-実戦パターン（関数トレース・マルチモジュール分離・動的KEY）は `docs/usage.md`
-§4,§5,§6,§9 にある。外部プロジェクトには
-`deno run -A jsr:@tettuan/breakdownlogger/docs [target-dir]`
-でエクスポートする。
-
-## Checklist
-
-```
-- [ ] 既存KEY検索済み — 重複なし
-- [ ] プロジェクトの命名方式(feature/layer/flow)に準拠
-- [ ] 境界点にロガー配置
-- [ ] メッセージは重要情報を先頭に
-- [ ] dataパラムで構造化された証拠を渡す
-- [ ] 循環参照オブジェクトなし
-- [ ] validate_cliで本番使用なし確認済み
-- [ ] 調査完了した `fix-*` ロガーは削除済み
-```
+BreakdownLoggerはテスト専用なので、`deno run --allow-read jsr:@tettuan/breakdownlogger/validate [target-dir]` で非テストファイルの混入を検出する。
