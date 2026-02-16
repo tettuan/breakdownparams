@@ -6,65 +6,16 @@ allowed-tools: [Read, Edit, Grep, Glob, Bash]
 
 # Documentation Update
 
-## Purpose
+ユーザー向け変更を適切な場所に文書化するため、変更種別に応じたドキュメントを更新する。
 
-Ensure user-facing changes are properly documented across all relevant locations.
+| 変更種別 | 更新先 |
+|----------|--------|
+| 新公開API | README.md（概要）+ docs/api_reference.md（詳細）+ mod.ts（export/JSDoc） |
+| 新機能 | README.md + docs/user_guide.md（複雑な場合） |
+| 動作変更 | README.md（既存記述更新）+ CHANGELOG.md |
+| 変数システム変更 | README.md + docs/variables.ja.md / docs/type_of_variables.ja.md |
+| 内部変更 | CLAUDE.md（開発ワークフローに影響する場合のみ） |
 
-## Trigger Conditions
+手順: `git diff --name-only`で変更特定→種別分類→対象ドキュメント更新→コード例の動作確認
 
-- Adding new public API methods or types
-- Changing existing behavior
-- Adding new features or capabilities
-- Modifying variable replacement rules
-- Making breaking changes
-
-## Documentation Locations
-
-| Location | Purpose | Update Criteria |
-|----------|---------|-----------------|
-| `README.md` | Quick reference, installation, usage | Major features, API changes |
-| `docs/user_guide.md` | Detailed usage guide | Complex features, tutorials |
-| `docs/api_reference.md` | API documentation | All public API changes |
-| `docs/design_pattern.md` | Architecture docs | Structural changes |
-| `docs/path_validation.md` | Path validation rules | Validation behavior changes |
-| `.claude/CLAUDE.md` | Development guidelines | Internal workflow changes |
-
-## Decision Matrix
-
-```
-Change Type → Documentation Scope
-├── New public API (type, function, class)
-│   ├── README.md: Brief mention with example
-│   ├── docs/api_reference.md: Full signature and usage
-│   └── mod.ts: Export and JSDoc comment
-├── New feature
-│   ├── README.md: Brief description
-│   └── docs/user_guide.md: Detailed usage (if complex)
-├── Behavior change
-│   ├── README.md: Update existing description
-│   └── CHANGELOG.md: Note the change
-├── Variable system change
-│   ├── README.md: Update template format section
-│   └── docs/variables.ja.md / docs/type_of_variables.ja.md: Update design docs
-└── Internal change
-    └── .claude/CLAUDE.md: If affects development workflow
-```
-
-## Process
-
-1. Identify what changed: `git diff --name-only`
-2. Categorize: API change? Feature? Behavior change?
-3. Update appropriate documentation locations
-4. Verify code examples in docs still work
-
-## Guidelines
-
-- **Concise**: One sentence per feature in README
-- **Example-first**: Show usage before explaining
-- **Searchable**: Include keywords users would search for
-
-## What NOT to Document
-
-- Internal implementation details (unless in design docs)
-- Temporary workarounds
-- Debug-only options
+原則: 簡潔に、例を先に、検索可能なキーワードを含める。内部実装詳細・一時的回避策・デバッグ専用オプションは文書化しない。

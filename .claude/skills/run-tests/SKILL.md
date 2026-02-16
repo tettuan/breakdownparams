@@ -5,28 +5,10 @@ argument-hint: "[test-file-path]"
 allowed-tools: [Bash, Read, Grep, Glob]
 ---
 
-Run the specified test file with debug output.
+デバッグ出力付きでテストを実行する。引数なしの場合は全テスト実行。
 
 ```bash
 LOG_LEVEL=debug deno test $ARGUMENTS --allow-env --allow-write --allow-read
 ```
 
-If no argument is provided, run all tests:
-
-```bash
-LOG_LEVEL=debug deno test --allow-env --allow-write --allow-read
-```
-
-## Test hierarchy
-
-Tests are in `tests/` with the following structure:
-
-```
-tests/
-├── 00_fixtures/   # Test fixtures and templates
-├── 01_unit/       # Unit tests
-├── 02_integration/ # Integration tests
-└── 03_system/     # System/E2E tests
-```
-
-Test file naming: `*_test.ts`
+テスト階層: `tests/`下に `00_fixtures/` `01_unit/` `02_integration/` `03_system/`。ファイル命名: `*_test.ts`。
