@@ -6,32 +6,14 @@ disable-model-invocation: true
 allowed-tools: [Bash, Read]
 ---
 
-Run the version bump script with PR workflow.
+バージョン更新からvtag作成までをPRワークフロー経由で自動実行するスクリプト。
 
 ```bash
 scripts/bump_version.sh $ARGUMENTS
 ```
 
-Default: `--patch`
+デフォルト: `--patch`。`--status`で進捗確認、`--step`で1ステップのみ実行。
 
-## Version files
+フロー: A-1(deno.json更新) → A-2(ローカルCI→commit&push) → A-3(PR→develop) → B-1(CI待ち→マージ) → B-2(PR→main) → C-1(CI待ち→マージ) → C-2(vtag作成)
 
-| File | Field |
-|------|-------|
-| `deno.json` | `"version": "x.y.z"` |
-
-## Script workflow
-
-```
-A-1: Version update (deno.json) with JSR latest check
-A-2: Local CI check → commit & push
-A-3: Create PR to develop
-B-1: Wait for PR merge (remote CI must pass)
-B-2: Create PR to main
-C-1: Wait for PR merge (remote CI must pass)
-C-2: Create vtag on main merge commit
-```
-
-Use `--status` to check progress. Use `--step` for single-step execution.
-
-Only run when explicitly ordered. Do not speculate about releases.
+明示的に指示された場合のみ実行する。
