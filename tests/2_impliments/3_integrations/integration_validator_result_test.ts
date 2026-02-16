@@ -1,10 +1,13 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../../../src/validator/params/two_params_validator.ts';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger('integration');
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -28,9 +31,11 @@ Deno.test('test_validator_result_integration', () => {
   // Test: Security error validator results
   const securityValidator = new SecurityValidator();
   const securityResult = securityValidator.validate(['safe;command']);
-  assertEquals(
+  logger.debug('Security validation result', {
+    data: { isValid: securityResult.isValid, errorCode: securityResult.errorCode },
+  });
+  assertFalse(
     securityResult.isValid,
-    false,
     'Security validation should fail for dangerous command',
   );
   assertEquals(
@@ -45,7 +50,7 @@ Deno.test('test_validator_result_integration', () => {
   // Test: Option validator results
   const zeroOptionValidator = new ZeroOptionValidator();
   const optionsResult = zeroOptionValidator.validate(['--help', '--version'], 'zero', optionRule);
-  assertEquals(optionsResult.isValid, true, 'Options validation should pass for valid options');
+  assert(optionsResult.isValid, 'Options validation should pass for valid options');
   assertEquals(
     optionsResult.validatedParams,
     [],
@@ -55,9 +60,8 @@ Deno.test('test_validator_result_integration', () => {
   // Test: Zero parameter validator results
   const zeroParamsValidator = new ZeroParamsValidator();
   const zeroParamsResult = zeroParamsValidator.validate([]);
-  assertEquals(
+  assert(
     zeroParamsResult.isValid,
-    true,
     'Zero params validation should pass for empty params',
   );
   assertEquals(zeroParamsResult.validatedParams, [], 'Validated params should be empty');
@@ -65,15 +69,14 @@ Deno.test('test_validator_result_integration', () => {
   // Test: One parameter validator results
   const oneParamValidator = new OneParamValidator();
   const oneParamResult = oneParamValidator.validate(['init']);
-  assertEquals(oneParamResult.isValid, true, 'One param validation should pass for init command');
+  assert(oneParamResult.isValid, 'One param validation should pass for init command');
   assertEquals(oneParamResult.validatedParams, ['init'], 'Validated params should match input');
 
   // Test: Two parameter validator results
   const twoParamsValidator = new TwoParamsValidator();
   const twoParamsResult = twoParamsValidator.validate(['to', 'project']);
-  assertEquals(
+  assert(
     twoParamsResult.isValid,
-    true,
     'Two params validation should pass for valid parameters',
   );
   assertEquals(
@@ -88,9 +91,8 @@ Deno.test('test_validator_result_integration', () => {
     'zero',
     optionRule,
   );
-  assertEquals(
+  assertFalse(
     invalidOptionsResult.isValid,
-    false,
     'Options validation should fail for invalid option',
   );
   assertEquals(
@@ -104,7 +106,7 @@ Deno.test('test_validator_result_integration', () => {
 
   // Test: Complex case results
   const complexResult = twoParamsValidator.validate(['to', 'project']);
-  assertEquals(complexResult.isValid, true, 'Complex validation should pass for valid parameters');
+  assert(complexResult.isValid, 'Complex validation should pass for valid parameters');
   assertEquals(
     complexResult.validatedParams,
     ['to', 'project'],
@@ -114,7 +116,10 @@ Deno.test('test_validator_result_integration', () => {
 
   // Test: Error details
   const errorResult = securityValidator.validate(['dangerous;command']);
-  assertEquals(errorResult.isValid, false, 'Validation should fail for dangerous command');
+  logger.debug('Error details result', {
+    data: { isValid: errorResult.isValid, errorCategory: errorResult.errorCategory },
+  });
+  assertFalse(errorResult.isValid, 'Validation should fail for dangerous command');
   assertEquals(typeof errorResult.errorMessage, 'string', 'Should have error message');
   assertEquals(typeof errorResult.errorCode, 'string', 'Should have error code');
   assertEquals(errorResult.errorCategory, 'security', 'Should have security category');

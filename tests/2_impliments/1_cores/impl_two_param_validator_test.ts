@@ -1,5 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { TwoParamsValidator } from '../../../src/validator/params/two_params_validator.ts';
+
+const logger = new BreakdownLogger('param-validator');
 
 /**
  * Test suite for TwoParamsValidator implementation
@@ -45,7 +48,10 @@ Deno.test('test_two_param_validator_implementation', () => {
    */
   const twoParams = ['to', 'project'];
   const twoParamsResult = validator.validate(twoParams);
-  assertEquals(twoParamsResult.isValid, true, 'Two parameters should be valid');
+  logger.debug('Valid two params result', {
+    data: { isValid: twoParamsResult.isValid, params: twoParamsResult.validatedParams },
+  });
+  assert(twoParamsResult.isValid, 'Two parameters should be valid');
   assertEquals(twoParamsResult.validatedParams, ['to', 'project'], 'Params should match');
 
   /**
@@ -67,7 +73,10 @@ Deno.test('test_two_param_validator_implementation', () => {
    */
   const invalidParams = ['invalid'];
   const invalidResult = validator.validate(invalidParams);
-  assertEquals(invalidResult.isValid, false, 'Invalid parameters should fail validation');
+  logger.debug('Invalid two params result', {
+    data: { isValid: invalidResult.isValid, errorCode: invalidResult.errorCode },
+  });
+  assertFalse(invalidResult.isValid, 'Invalid parameters should fail validation');
   assertEquals(
     invalidResult.validatedParams,
     invalidParams,

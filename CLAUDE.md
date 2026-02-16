@@ -24,7 +24,15 @@
 - Adopt the format used by `deno fmt` when writing code
 - read `deno.json` for settings
 
-# Git push
+# Git
+
+## Git Branch
+
+- mainへはdevelopから **のみ** マージする
+- mainから作業ブランチを作成するのは禁止する
+  作業ブランチやリリースブランチは、mainではなく **develop** をベースブランチとする（作業ブランチから、さらにブランチを派生させても良い）
+
+## Git push
 - DO NOT push untile `deno task ci` pass all.
 - run  `LOG_LEVEL=debug deno task ci` (DEBUG=true deno task ci) if error.
 

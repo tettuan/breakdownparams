@@ -1,5 +1,5 @@
-import { DEFAULT_OPTION_RULE, OptionRule } from '../types/option_rule.ts';
-import {
+import { DEFAULT_OPTION_RULE, type OptionRule } from '../types/option_rule.ts';
+import type {
   OneParamsResult,
   ParamsResult,
   TwoParamsResult,
@@ -8,7 +8,7 @@ import {
 import { SecurityValidator } from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 // Parameter configuration is handled through CustomConfig
-import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../types/custom_config.ts';
+import { type CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../types/custom_config.ts';
 import { ZeroParamsValidator } from '../validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../validator/params/two_params_validator.ts';

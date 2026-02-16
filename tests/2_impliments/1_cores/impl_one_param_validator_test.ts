@@ -1,5 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
+
+const logger = new BreakdownLogger('param-validator');
 
 /**
  * Test suite for OneParamValidator implementation
@@ -42,7 +45,10 @@ Deno.test('test_one_param_validator_implementation', () => {
    */
   const validArgs = ['init'];
   const validResult = validator.validate(validArgs);
-  assertEquals(validResult.isValid, true, 'Valid parameter should pass validation');
+  logger.debug('Valid one param result', {
+    data: { isValid: validResult.isValid, params: validResult.validatedParams },
+  });
+  assert(validResult.isValid, 'Valid parameter should pass validation');
   assertEquals(validResult.validatedParams, validArgs, 'Validated params should match input');
 
   /**
@@ -60,7 +66,10 @@ Deno.test('test_one_param_validator_implementation', () => {
    */
   const invalidArgs = ['invalid'];
   const invalidResult = validator.validate(invalidArgs);
-  assertEquals(invalidResult.isValid, false, 'Invalid parameter should fail validation');
+  logger.debug('Invalid one param result', {
+    data: { isValid: invalidResult.isValid, params: invalidResult.validatedParams },
+  });
+  assertFalse(invalidResult.isValid, 'Invalid parameter should fail validation');
   assertEquals(
     invalidResult.validatedParams,
     invalidArgs,
@@ -82,7 +91,7 @@ Deno.test('test_one_param_validator_implementation', () => {
    */
   const emptyArgs: string[] = [];
   const emptyResult = validator.validate(emptyArgs);
-  assertEquals(emptyResult.isValid, false, 'Empty arguments should fail validation');
+  assertFalse(emptyResult.isValid, 'Empty arguments should fail validation');
   assertEquals(
     emptyResult.validatedParams,
     emptyArgs,
@@ -105,7 +114,7 @@ Deno.test('test_one_param_validator_implementation', () => {
    */
   const multipleArgs = ['init', 'to'];
   const multipleResult = validator.validate(multipleArgs);
-  assertEquals(multipleResult.isValid, false, 'Multiple arguments should fail validation');
+  assertFalse(multipleResult.isValid, 'Multiple arguments should fail validation');
   assertEquals(
     multipleResult.validatedParams,
     multipleArgs,

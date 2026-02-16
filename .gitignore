@@ -139,18 +139,34 @@ tmp/*
 tmp/
 
 .cursor/
-.cursor/*
-.*/
-.*/*
 
+# Claude Code
+.claude/
+!.claude/skills/
+!.claude/skills/**
+!.claude/settings.json
 
-.claude.json
-.claude/*
-.claude.*
+# Obsidian
+.obsidian/
+# macOS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+Icon?
 
 .vscode
 .vscode/*
+
+# Local CI
+.ci-local/
 
 # Deno
 deno.lock

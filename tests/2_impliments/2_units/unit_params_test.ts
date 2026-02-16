@@ -1,6 +1,9 @@
-import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../../src/types/option_rule.ts';
-import { ParamsResult } from '../../../src/types/params_result.ts';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+import type { ParamsResult } from '../../../src/types/params_result.ts';
+
+const logger = new BreakdownLogger('parser');
 
 Deno.test('test_params_result', () => {
   /**
@@ -24,6 +27,13 @@ Deno.test('test_params_result', () => {
     params: [],
     options: {},
   };
+  logger.debug('Params result structure', {
+    data: {
+      type: result.type,
+      paramsLength: result.params.length,
+      hasError: result.error !== undefined,
+    },
+  });
   assertEquals(result.type, 'zero', 'Result type should be zero');
   assertEquals(result.params, [], 'Params should be empty');
   assertEquals(result.options, {}, 'Options should be empty');
@@ -64,9 +74,8 @@ Deno.test('test_params_result', () => {
   };
 
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.userVariables),
-    true,
     'userVariables should be an array',
   );
   assertEquals(
@@ -84,14 +93,12 @@ Deno.test('test_params_result', () => {
     'string',
     'duplicateOption should be a string',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.requiredOptions),
-    true,
     'requiredOptions should be an array',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.valueTypes),
-    true,
     'valueTypes should be an array',
   );
   assertEquals(typeof optionRule.flagOptions, 'object', 'flagOptions should be an object');

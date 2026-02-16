@@ -1,6 +1,6 @@
 import {
   DEFAULT_OPTION_COMBINATION_RULES,
-  OptionCombinationRule,
+  type OptionCombinationRule,
 } from './option_combination_rule.ts';
 
 /**

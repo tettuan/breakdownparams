@@ -1,12 +1,18 @@
-import { assert, assertEquals, assertThrows } from 'jsr:@std/assert@^0.218.2';
+import { assert, assertEquals, assertFalse, assertThrows } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { FlagOption } from '../flag_option.ts';
 import { OptionType } from '../../types/option_type.ts';
+
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('FlagOption Structure', async (t) => {
   await t.step('should have correct structure', () => {
     const option = new FlagOption('--flag', ['-f'], 'Flag option');
+    logger.debug('FlagOption created', {
+      data: { name: option.name, type: option.type, aliases: option.aliases },
+    });
     assert(option.type === OptionType.FLAG);
-    assertEquals(option.isRequired, false);
+    assertFalse(option.isRequired);
     assertEquals(option.name, '--flag');
     assertEquals(option.aliases, ['-f']);
     assertEquals(option.description, 'Flag option');
@@ -51,6 +57,9 @@ Deno.test('FlagOption Structure', async (t) => {
   await t.step('should validate flag option', () => {
     const option = new FlagOption('--flag', ['-f'], 'Flag option');
     const result = option.validate();
+    logger.debug('FlagOption validation result', {
+      data: { isValid: result.isValid, validatedParams: result.validatedParams },
+    });
     assert(result.isValid);
     assertEquals(result.validatedParams, []);
   });

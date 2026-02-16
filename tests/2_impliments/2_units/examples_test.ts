@@ -1,13 +1,19 @@
 import { assertEquals, assertExists } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../../src/mod.ts';
-import { OptionRule } from '../../../src/types/option_rule.ts';
-import { TwoParamsResult } from '../../../src/types/params_result.ts';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+import type { TwoParamsResult } from '../../../src/types/params_result.ts';
 import { DEFAULT_CUSTOM_CONFIG } from '../../../src/types/custom_config.ts';
+
+const logger = new BreakdownLogger('e2e');
 
 Deno.test('test_examples_execution', async (t) => {
   await t.step('basic_usage example', () => {
     const parser = new ParamsParser();
     const result = parser.parse(['to', 'project']) as TwoParamsResult;
+    logger.debug('Basic usage parse result', {
+      data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType },
+    });
 
     assertEquals(result.type, 'two');
     assertEquals(result.directiveType, 'to');
@@ -27,6 +33,9 @@ Deno.test('test_examples_execution', async (t) => {
       '--uv-project=myproject',
       '--uv-version=1.0.0',
     ]) as TwoParamsResult;
+    logger.debug('Options usage parse result', {
+      data: { type: result.type, optionKeys: Object.keys(result.options) },
+    });
 
     assertEquals(result.type, 'two');
     assertEquals(result.directiveType, 'to');

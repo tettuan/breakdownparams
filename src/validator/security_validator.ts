@@ -1,5 +1,5 @@
 import { BaseValidator } from './params/base_validator.ts';
-import { ValidationResult } from '../types/validation_result.ts';
+import type { ValidationResult } from '../types/validation_result.ts';
 
 /**
  * Security validator for command-line arguments.

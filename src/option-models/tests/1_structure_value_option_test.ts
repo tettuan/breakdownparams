@@ -1,6 +1,9 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ValueOption } from '../value_option.ts';
 import { OptionType } from '../../types/option_type.ts';
+
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('ValueOption Structure', async (t) => {
   const validator = (value: string) => ({
@@ -22,7 +25,7 @@ Deno.test('ValueOption Structure', async (t) => {
 
   await t.step('should validate value with custom validator', () => {
     const result = option.validate('');
-    console.log('ValueOption validation result:', {
+    logger.debug('ValueOption validation result:', {
       isValid: result.isValid,
       errorMessage: result.errorMessage,
       validatedParams: result.validatedParams,
@@ -31,7 +34,7 @@ Deno.test('ValueOption Structure', async (t) => {
     assert(result.errorMessage === 'Value cannot be empty');
 
     const validResult = option.validate('valid');
-    console.log('ValueOption valid result:', {
+    logger.debug('ValueOption valid result:', {
       isValid: validResult.isValid,
       errorMessage: validResult.errorMessage,
       validatedParams: validResult.validatedParams,

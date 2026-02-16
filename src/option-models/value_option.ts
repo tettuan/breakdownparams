@@ -1,5 +1,5 @@
 import { OptionType } from '../types/option_type.ts';
-import { ValidationResult } from '../types/validation_result.ts';
+import type { ValidationResult } from '../types/validation_result.ts';
 import { validateOptionName } from './format_utils.ts';
 import { BaseOption } from './base_option.ts';
 
@@ -39,9 +39,9 @@ export class ValueOption extends BaseOption {
    * @param isRequired - Whether this option must be provided
    * @param description - Human-readable description of what this option does
    * @param validator - Function to validate the option's value
-   * @param rawInput - The raw command-line input that created this option
    * @param longname - The long form of the option (e.g., "--config")
    * @param shortname - The short form of the option (e.g., "-c")
+   * @param rawInput - The raw command-line input that created this option
    * @throws Error if the option name or any alias is invalid
    */
   constructor(
@@ -50,9 +50,9 @@ export class ValueOption extends BaseOption {
     readonly isRequired: boolean,
     readonly description: string,
     readonly validator: (value: string) => ValidationResult,
-    rawInput: string = '',
     longname?: string,
     shortname?: string,
+    rawInput: string = '',
   ) {
     // Initialize base option with long and short names
     super(rawInput || name, longname || name, shortname);

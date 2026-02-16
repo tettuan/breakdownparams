@@ -1,7 +1,10 @@
-import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
 import { FlagOption } from '../../../src/option-models/flag_option.ts';
 import { OptionType } from '../../../src/types/option_type.ts';
+
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('test_option_rule', () => {
   /**
@@ -39,9 +42,8 @@ Deno.test('test_option_rule', () => {
   };
 
   assertEquals(typeof optionRule.format, 'string', 'format should be a string');
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.userVariables),
-    true,
     'userVariables should be an array',
   );
   assertEquals(
@@ -59,14 +61,12 @@ Deno.test('test_option_rule', () => {
     'string',
     'duplicateOption should be a string',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.requiredOptions),
-    true,
     'requiredOptions should be an array',
   );
-  assertEquals(
+  assert(
     Array.isArray(optionRule.rules.valueTypes),
-    true,
     'valueTypes should be an array',
   );
   assertEquals(typeof optionRule.flagOptions, 'object', 'flagOptions should be an object');
@@ -77,7 +77,7 @@ Deno.test('test_flag_option_unit', async (t) => {
 
   await t.step('should have correct type and properties', () => {
     assertEquals(flagOption.type, OptionType.FLAG);
-    assertEquals(flagOption.isRequired, false);
+    assertFalse(flagOption.isRequired);
     assertEquals(flagOption.name, 'help');
     assertEquals(flagOption.aliases, ['h']);
     assertEquals(flagOption.description, 'Show help message');
@@ -85,21 +85,22 @@ Deno.test('test_flag_option_unit', async (t) => {
 
   await t.step('should validate flag option correctly', () => {
     const result = flagOption.validate();
-    assertEquals(result.isValid, true, 'Flag option should be valid when no value is provided');
+    logger.debug('Flag option validation result', {
+      data: { isValid: result.isValid, params: result.validatedParams },
+    });
+    assert(result.isValid, 'Flag option should be valid when no value is provided');
     assertEquals(result.validatedParams, []);
 
     const resultWithValue = flagOption.validate();
-    assertEquals(
+    assert(
       resultWithValue.isValid,
-      true,
       'Flag option should be valid',
     );
   });
 
   await t.step('should get flag option values correctly', () => {
-    assertEquals(
+    assert(
       flagOption.getValue(),
-      true,
       'Flag option should return true when present',
     );
   });

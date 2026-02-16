@@ -1,9 +1,9 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { OptionType } from '../option_type.ts';
-import { ValidationResult } from '../validation_result.ts';
-import { ParamsResult } from '../params_result.ts';
-import { OptionRule } from '../option_rule.ts';
-import { CustomConfig } from '../custom_config.ts';
+import type { ValidationResult } from '../validation_result.ts';
+import type { ParamsResult } from '../params_result.ts';
+import type { OptionRule } from '../option_rule.ts';
+import type { CustomConfig } from '../custom_config.ts';
 
 // 1. Basic type definition design verification
 Deno.test('test_type_definitions_design', async (t) => {
@@ -20,7 +20,7 @@ Deno.test('test_type_definitions_design', async (t) => {
     };
     assert('isValid' in result);
     assert('validatedParams' in result);
-    assertEquals(Array.isArray(result.validatedParams), true);
+    assert(Array.isArray(result.validatedParams));
   });
 
   await t.step('should maintain params result type', () => {
@@ -57,7 +57,7 @@ Deno.test('test_type_consistency', async (t) => {
       validatedParams: [],
     };
     assertEquals(typeof result.isValid, 'boolean');
-    assertEquals(Array.isArray(result.validatedParams), true);
+    assert(Array.isArray(result.validatedParams));
   });
 
   await t.step('should maintain consistent params result structure', () => {
@@ -67,7 +67,7 @@ Deno.test('test_type_consistency', async (t) => {
       options: {},
     };
     assertEquals(typeof result.type, 'string');
-    assertEquals(Array.isArray(result.params), true);
+    assert(Array.isArray(result.params));
     assertEquals(typeof result.options, 'object');
   });
 });
@@ -129,9 +129,8 @@ Deno.test('test_option_rule_structure', () => {
   };
 
   assertEquals(typeof rule.format, 'string', 'format should be a string');
-  assertEquals(
+  assert(
     Array.isArray(rule.rules.userVariables),
-    true,
     'userVariables should be an array',
   );
   assertEquals(typeof rule.errorHandling.emptyValue, 'string', 'emptyValue should be a string');
@@ -145,14 +144,12 @@ Deno.test('test_option_rule_structure', () => {
     'string',
     'duplicateOption should be a string',
   );
-  assertEquals(
+  assert(
     Array.isArray(rule.rules.requiredOptions),
-    true,
     'requiredOptions should be an array',
   );
-  assertEquals(
+  assert(
     Array.isArray(rule.rules.valueTypes),
-    true,
     'valueTypes should be an array',
   );
   assertEquals(typeof rule.flagOptions, 'object', 'flagOptions should be an object');

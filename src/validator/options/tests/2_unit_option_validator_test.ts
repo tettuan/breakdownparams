@@ -1,10 +1,13 @@
 import { assert } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import {
   OneOptionValidator,
   TwoOptionValidator,
   ZeroOptionValidator,
 } from '../option_validator.ts';
 import { DEFAULT_OPTION_RULE } from '../../../types/option_rule.ts';
+
+const logger = new BreakdownLogger('option-validator');
 
 Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should validate zero options correctly', () => {
@@ -102,14 +105,14 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
 
     // Short form help option
     const helpResult = validator.validate(['-h'], 'zero', DEFAULT_OPTION_RULE);
-    console.log('Short help result:', helpResult);
+    logger.debug('Short help result:', helpResult);
     // Currently not recognized, options will be empty
     assert(helpResult.isValid);
     assert(Object.keys(helpResult.options || {}).length === 0, 'Short options are not recognized');
 
     // Short form version option
     const versionResult = validator.validate(['-v'], 'zero', DEFAULT_OPTION_RULE);
-    console.log('Short version result:', versionResult);
+    logger.debug('Short version result:', versionResult);
     assert(versionResult.isValid);
     assert(
       Object.keys(versionResult.options || {}).length === 0,
@@ -122,7 +125,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
 
     // Short form options
     const shortResult = validator.validate(['-f=input.md'], 'one', DEFAULT_OPTION_RULE);
-    console.log('OneParam short result:', shortResult);
+    logger.debug('OneParam short result:', shortResult);
     // Currently not recognized, options will be empty
     assert(shortResult.isValid);
     assert(Object.keys(shortResult.options || {}).length === 0, 'Short options are not recognized');
@@ -137,7 +140,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
       'two',
       DEFAULT_OPTION_RULE,
     );
-    console.log('TwoParams short result:', shortResult);
+    logger.debug('TwoParams short result:', shortResult);
     // Currently not recognized, options will be empty
     assert(shortResult.isValid);
     assert(Object.keys(shortResult.options || {}).length === 0, 'Short options are not recognized');
@@ -148,7 +151,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
       'two',
       DEFAULT_OPTION_RULE,
     );
-    console.log('Mixed options result:', mixedResult);
+    logger.debug('Mixed options result:', mixedResult);
     // Only long form is recognized
     assert(mixedResult.isValid);
     assert(mixedResult.options?.from === 'input.md', 'Long form should be recognized');
@@ -164,7 +167,7 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
       'two',
       DEFAULT_OPTION_RULE,
     );
-    console.log('User variable result in validator:', userVarResult);
+    logger.debug('User variable result in validator:', userVarResult);
     assert(userVarResult.isValid, 'User variables should be valid in TwoParams');
     assert(userVarResult.options?.['uv-project'] === 'myproject');
 
