@@ -37,8 +37,11 @@
  */
 
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../src/mod.ts';
 import type { ParamsResult, TwoParamsResult } from '../../src/mod.ts';
+
+const logger = new BreakdownLogger('combinatorial');
 
 /**
  * Common test parameters used throughout the test suite.
@@ -80,7 +83,7 @@ function assertOptionsMatch(
   actual: Record<string, unknown>,
   expected: Record<string, unknown>,
   testDescription: string,
-) {
+): void {
   for (const [key, expectedValue] of Object.entries(expected)) {
     assertEquals(
       actual[key],
@@ -111,7 +114,7 @@ function assertOptionsMatch(
  * @param result - The parsed result to validate
  * @param testDescription - Human-readable description for error messages
  */
-function assertBasicResult(result: TwoParamsResult, testDescription: string) {
+function assertBasicResult(result: TwoParamsResult, testDescription: string): void {
   assertEquals(result.type, 'two', `${testDescription}: Should be two params type`);
   assertEquals(result.directiveType, DEMO_TYPE, `${testDescription}: Wrong directive type`);
   assertEquals(result.layerType, LAYER_TYPE, `${testDescription}: Wrong layer type`);
@@ -176,6 +179,7 @@ Deno.test('User Variable Matrix - Standard Options + Single User Variable', asyn
 
     await t.step(`Standard + User Variable ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
+      logger.debug('Standard + user variable result', { data: { combination: testCase.description, type: result.type, optionKeys: Object.keys(result.options) } });
 
       assertBasicResult(result, `Standard + user variable ${i + 1}`);
       assertOptionsMatch(
@@ -541,6 +545,7 @@ Deno.test('User Variable Matrix - Error Cases', async (t) => {
   await t.step('User variables in OneParam mode should error', () => {
     const args = ['init', '--uv-test=value'];
     const result = parser.parse(args) as ParamsResult;
+    logger.debug('User variable error case', { data: { type: result.type, error: result.error?.message } });
 
     assertEquals(result.type, 'error');
     assertStringIncludes(

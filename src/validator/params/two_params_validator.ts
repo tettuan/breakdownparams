@@ -1,6 +1,6 @@
 import { BaseValidator } from './base_validator.ts';
-import { ValidationResult } from '../../types/validation_result.ts';
-import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../types/custom_config.ts';
+import type { ValidationResult } from '../../types/validation_result.ts';
+import { type CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../types/custom_config.ts';
 
 /**
  * Validator for two-parameter commands.

@@ -1,4 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../../src/parser/params_parser.ts';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
 import {
@@ -9,7 +10,9 @@ import {
 import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../../../src/validator/params/two_params_validator.ts';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger('integration');
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -96,6 +99,8 @@ Deno.test('test_parser_validator_integration', () => {
     'Two params validator should accept valid parameters',
   );
 
+  logger.debug('Validator integration setup', { data: { paramValidatorCount: paramValidators.length, optionValidatorCount: optionValidators.length } });
+
   // Parser and validator integration tests
   // 1. Zero parameter case
   const zeroParamsParseResult = parser.parse(['--help']);
@@ -119,6 +124,7 @@ Deno.test('test_parser_validator_integration', () => {
 
   // 4. Error case
   const errorParseResult = parser.parse(['invalid', 'command']);
+  logger.debug('Error parse result', { data: { type: errorParseResult.type, error: errorParseResult.error } });
   assertEquals(errorParseResult.type, 'error', 'Should parse as error');
   assertEquals(errorParseResult.params, [], 'Should have empty params for error');
   assertEquals(typeof errorParseResult.error, 'object', 'Should have error object');

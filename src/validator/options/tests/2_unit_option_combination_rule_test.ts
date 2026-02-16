@@ -1,9 +1,13 @@
 import { assert } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../option_combination_rule.ts';
+
+const logger = new BreakdownLogger("option-validator");
 
 Deno.test('OptionCombinationRule Unit Tests', async (t) => {
   await t.step('should validate zero options rules', () => {
     const zeroRules = DEFAULT_OPTION_COMBINATION_RULES.zero;
+    logger.debug("Zero options rules", { data: { allowedCount: zeroRules.allowedOptions.length, options: zeroRules.allowedOptions } });
 
     // Verify allowed options
     assert(zeroRules.allowedOptions.length === 2);
@@ -29,6 +33,7 @@ Deno.test('OptionCombinationRule Unit Tests', async (t) => {
 
   await t.step('should validate two options rules', () => {
     const twoRules = DEFAULT_OPTION_COMBINATION_RULES.two;
+    logger.debug("Two options rules", { data: { allowedCount: twoRules.allowedOptions.length, options: twoRules.allowedOptions } });
 
     // Verify allowed options
     assert(twoRules.allowedOptions.length === 5);

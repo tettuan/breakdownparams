@@ -1,8 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { FlagOption } from '../../src/option-models/flag_option.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
 import { OptionType } from '../../src/types/option_type.ts';
+
+const logger = new BreakdownLogger("option-model");
 
 /**
  * Test 1: Basic option model design verification
@@ -69,6 +72,7 @@ Deno.test('test_flag_option_design', async (t) => {
   await t.step('should validate flag options', () => {
     const option = new FlagOption('--help', ['h'], 'Show help message');
     const result = option.validate();
+    logger.debug("flag option validate result", { data: { isValid: result.isValid, validatedParams: result.validatedParams } });
     assert(result.isValid);
     assertEquals(result.validatedParams, []);
   });
@@ -122,6 +126,7 @@ Deno.test('test_value_option_design', async (t) => {
       (_v) => ({ isValid: true, validatedParams: [] }),
     );
     const result = option.validate('test.txt');
+    logger.debug("value option validate result", { data: { isValid: result.isValid, validatedParams: result.validatedParams } });
     assert(result.isValid);
     assertEquals(result.validatedParams, []);
   });
@@ -230,6 +235,7 @@ Deno.test('test_option_model_integration_design', async (t) => {
     const flagResult = flagOption.validate();
     const valueResult = valueOption.validate('test.txt');
     const customResult = userOption.validate('--uv-config=test_config');
+    logger.debug("integration validation results", { data: { flagValid: flagResult.isValid, valueValid: valueResult.isValid, customValid: customResult.isValid } });
 
     assert(flagResult.isValid);
     assert(valueResult.isValid);

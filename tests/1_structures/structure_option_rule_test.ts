@@ -1,5 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../src/types/option_rule.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger("option-validator");
 
 Deno.test('test_option_rule_structure', () => {
   const rule: OptionRule = {
@@ -36,6 +39,7 @@ Deno.test('test_option_rule_structure', () => {
    * - Ensure each property has the correct type
    * - Validate the overall configuration structure
    */
+  logger.debug("OptionRule construction", { data: { format: rule.format, userVariables: rule.rules.userVariables, flagOptions: rule.flagOptions } });
   assertEquals(typeof rule.format, 'string', 'format should be a string');
   assertEquals(typeof rule.rules, 'object', 'rules should be an object');
   assertEquals(typeof rule.errorHandling, 'object', 'errorHandling should be an object');

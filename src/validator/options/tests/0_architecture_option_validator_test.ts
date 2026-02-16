@@ -1,11 +1,14 @@
 import { assert } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import {
   OneOptionValidator,
-  OptionValidator,
+  type OptionValidator,
   TwoOptionValidator,
   ZeroOptionValidator,
 } from '../option_validator.ts';
-import { DEFAULT_OPTION_RULE, OptionRule } from '../../../types/option_rule.ts';
+import { DEFAULT_OPTION_RULE, type OptionRule } from '../../../types/option_rule.ts';
+
+const logger = new BreakdownLogger("option-validator");
 
 Deno.test('OptionValidator Architecture Tests', async (t) => {
   await t.step('should have correct interface structure', () => {
@@ -52,6 +55,7 @@ Deno.test('OptionValidator Architecture Tests', async (t) => {
   await t.step('should have correct result type', () => {
     const validator = new ZeroOptionValidator();
     const result = validator.validate([], 'zero', DEFAULT_OPTION_RULE);
+    logger.debug("Architecture validation result", { data: { isValid: result.isValid, hasOptions: 'options' in result } });
 
     // Verify result type
     assert('isValid' in result);

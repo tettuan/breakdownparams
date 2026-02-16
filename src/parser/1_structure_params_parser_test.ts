@@ -1,7 +1,7 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { ParamsParser } from './params_parser.ts';
-import { OptionRule } from '../types/option_rule.ts';
-import { OneParamsResult, TwoParamsResult, ZeroParamsResult } from '../types/params_result.ts';
+import type { OptionRule } from '../types/option_rule.ts';
+import type { OneParamsResult, TwoParamsResult, ZeroParamsResult } from '../types/params_result.ts';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 
 /**
@@ -28,7 +28,7 @@ Deno.test('test_params_parser_structure_with_option_rule', () => {
   };
 
   const parser = new ParamsParser(optionRule);
-  const logger = new BreakdownLogger();
+  const logger = new BreakdownLogger("parser");
 
   // Test zero params structure
   const zeroResult = parser.parse(['--help']) as ZeroParamsResult;
@@ -63,7 +63,7 @@ Deno.test('test_params_parser_structure_with_option_rule', () => {
 
 Deno.test('test_params_parser_structure_without_option_rule', () => {
   const parser = new ParamsParser();
-  const logger = new BreakdownLogger();
+  const logger = new BreakdownLogger("parser");
 
   // Test zero params structure
   const zeroResult = parser.parse(['--help']) as ZeroParamsResult;

@@ -1,11 +1,15 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { UserVariableOptionValidator } from '../user_variable_option_validator.ts';
+
+const logger = new BreakdownLogger("option-validator");
 
 Deno.test('UserVariableOptionValidator Unit Tests', async (t) => {
   const validator = new UserVariableOptionValidator();
 
   await t.step('should handle valid user variable name correctly', () => {
     const result = validator.validate('--uv-test=value');
+    logger.debug("Valid user variable result", { data: { isValid: result.isValid, validatedParams: result.validatedParams } });
     assert(result.isValid);
     assertEquals(result.validatedParams, []);
     assertEquals(validator.parse('--uv-test=value'), 'value');
@@ -13,6 +17,7 @@ Deno.test('UserVariableOptionValidator Unit Tests', async (t) => {
 
   await t.step('should handle invalid pattern (starts with digit)', () => {
     const result = validator.validate('--uv-1abc=value');
+    logger.debug("Invalid pattern result", { data: { isValid: result.isValid, errorMessage: result.errorMessage } });
     assert(!result.isValid);
     assert(result.errorMessage?.includes('Invalid variable name pattern'));
   });

@@ -1,6 +1,9 @@
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger('option-validator');
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -23,7 +26,7 @@ const optionRule: OptionRule = {
 Deno.test('unit_options_validator_test', async (t) => {
   const validator = new ZeroOptionValidator();
 
-  console.log('[DEBUG] Testing ZeroOptionValidator with different scenarios');
+  logger.debug('[DEBUG] Testing ZeroOptionValidator with different scenarios');
 
   await t.step('should validate valid options', () => {
     const result = validator.validate(['--help', '--version'], 'zero', optionRule);

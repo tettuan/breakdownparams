@@ -1,5 +1,5 @@
-import { Option, OptionType } from '../types/option_type.ts';
-import { ValidationResult } from '../types/validation_result.ts';
+import type { Option, OptionType } from '../types/option_type.ts';
+import type { ValidationResult } from '../types/validation_result.ts';
 
 /**
  * Base abstract class for all command-line option types.

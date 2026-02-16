@@ -1,6 +1,9 @@
 import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../../src/types/option_rule.ts';
-import { ErrorInfo } from '../../../src/types/params_result.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+import type { ErrorInfo } from '../../../src/types/params_result.ts';
+
+const logger = new BreakdownLogger('parser');
 
 Deno.test('test_validation_error', () => {
   /**
@@ -22,6 +25,7 @@ Deno.test('test_validation_error', () => {
     code: 'TEST_ERROR',
     category: 'test_category',
   };
+  logger.debug('Error info structure', { data: { message: error.message, code: error.code, category: error.category } });
   assertEquals(error.message, 'Test error', 'Error message should match');
   assertEquals(error.code, 'TEST_ERROR', 'Error code should match');
   assertEquals(error.category, 'test_category', 'Error category should match');

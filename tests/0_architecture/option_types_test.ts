@@ -1,8 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { FlagOption } from '../../src/option-models/flag_option.ts';
 import { OptionType } from '../../src/types/option_type.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
+
+const logger = new BreakdownLogger("option-model");
 
 /**
  * Test 1: Basic type definitions and value verification
@@ -21,6 +24,7 @@ import { UserVariableOption } from '../../src/option-models/user_variable_option
  * - Verify USER_VARIABLE enum equals 'user_variable'
  */
 Deno.test('test_option_type_enum', () => {
+  logger.debug("OptionType enum values", { data: { VALUE: OptionType.VALUE, FLAG: OptionType.FLAG, USER_VARIABLE: OptionType.USER_VARIABLE } });
   assertEquals(OptionType.VALUE, 'value');
   assertEquals(OptionType.FLAG, 'flag');
   assertEquals(OptionType.USER_VARIABLE, 'user_variable');
@@ -158,6 +162,7 @@ Deno.test('test_option_design_consistency', async (t) => {
   await t.step('should maintain consistent method signatures', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
     const validateResult = flagOption.validate();
+    logger.debug("flag option validate result for design consistency", { data: { isValid: validateResult.isValid, validatedParams: validateResult.validatedParams } });
     assert('isValid' in validateResult);
     assert('validatedParams' in validateResult);
   });

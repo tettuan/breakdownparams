@@ -1,9 +1,9 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { OptionType } from '../option_type.ts';
-import { ValidationResult } from '../validation_result.ts';
-import { ParamsResult } from '../params_result.ts';
-import { OptionRule } from '../option_rule.ts';
-import { CustomConfig } from '../custom_config.ts';
+import type { ValidationResult } from '../validation_result.ts';
+import type { ParamsResult } from '../params_result.ts';
+import type { OptionRule } from '../option_rule.ts';
+import type { CustomConfig } from '../custom_config.ts';
 
 // 1. Basic type definition design verification
 Deno.test('test_type_definitions_design', async (t) => {

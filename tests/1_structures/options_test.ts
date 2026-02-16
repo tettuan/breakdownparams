@@ -1,8 +1,11 @@
 import { assert, assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { FlagOption } from '../../src/option-models/flag_option.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
 import { OptionType } from '../../src/types/option_type.ts';
+
+const logger = new BreakdownLogger("option-model");
 
 Deno.test('ValueOption', async (t) => {
   const validator = (value: string) => ({
@@ -18,6 +21,7 @@ Deno.test('ValueOption', async (t) => {
 
   await t.step('should validate required option', () => {
     const result = option.validate('--test=');
+    logger.debug("ValueOption validate empty value", { data: { isValid: result.isValid, errorMessage: result.errorMessage } });
     assert(!result.isValid);
     assert(result.errorMessage && result.errorMessage.includes('Value cannot be empty'));
   });
@@ -49,6 +53,7 @@ Deno.test('FlagOption', async (t) => {
 
   await t.step('should validate flag option structure', () => {
     const result = option.validate();
+    logger.debug("FlagOption validate result", { data: { isValid: result.isValid } });
     assert(result.isValid);
   });
 
@@ -66,11 +71,13 @@ Deno.test('UserVariableOption', async (t) => {
 
   await t.step('should validate name pattern', () => {
     const result = option.validate('--uv-test=value');
+    logger.debug("UserVariableOption validate valid pattern", { data: { isValid: result.isValid } });
     assert(result.isValid);
   });
 
   await t.step('should reject invalid name pattern', () => {
     const result = option.validate('--uv-123=value');
+    logger.debug("UserVariableOption validate invalid pattern", { data: { isValid: result.isValid, errorMessage: result.errorMessage } });
     assert(!result.isValid);
   });
 

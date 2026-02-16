@@ -1,5 +1,8 @@
 import { assert } from 'jsr:@std/assert@^0.218.2';
-import { OptionCombinationRule, OptionCombinationRules } from '../option_combination_rule.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionCombinationRule, OptionCombinationRules } from '../option_combination_rule.ts';
+
+const logger = new BreakdownLogger("option-validator");
 
 Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
   await t.step('should maintain correct interface structure', () => {
@@ -10,6 +13,7 @@ Deno.test('OptionCombinationRule Architecture Tests', async (t) => {
       combinationRules: { test: ['test2'] },
     };
 
+    logger.debug("Rule structure", { data: { allowedOptions: rule.allowedOptions, requiredOptions: rule.requiredOptions } });
     assert('allowedOptions' in rule);
     assert(Array.isArray(rule.allowedOptions));
     assert('requiredOptions' in rule);

@@ -1,5 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@1';
-import { ValidationResult } from '../../src/types/validation_result.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { ValidationResult } from '../../src/types/validation_result.ts';
+
+const logger = new BreakdownLogger("param-validator");
 
 Deno.test('test_validation_result_structure', () => {
   const successResult: ValidationResult = {
@@ -21,6 +24,7 @@ Deno.test('test_validation_result_structure', () => {
     errorCategory: 'validation',
     errors: ['error'],
   };
+  logger.debug("ValidationResult constructions", { data: { successValid: successResult.isValid, errorValid: errorResult.isValid, errorCode: errorResult.errorCode } });
 
   /**
    * Test: Success case validation result structure

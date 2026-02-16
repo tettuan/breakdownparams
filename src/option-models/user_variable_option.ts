@@ -1,5 +1,5 @@
 import { OptionType } from '../types/option_type.ts';
-import { ValidationResult } from '../types/validation_result.ts';
+import type { ValidationResult } from '../types/validation_result.ts';
 import { UserVariableOptionValidator } from '../validator/options/user_variable_option_validator.ts';
 import { BaseOption } from './base_option.ts';
 

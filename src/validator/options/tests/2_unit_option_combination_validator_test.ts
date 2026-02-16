@@ -1,6 +1,9 @@
 import { assert } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { OptionCombinationValidator } from '../option_combination_validator.ts';
-import { OptionCombinationRule } from '../option_combination_rule.ts';
+import type { OptionCombinationRule } from '../option_combination_rule.ts';
+
+const logger = new BreakdownLogger("option-validator");
 
 Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
   await t.step('should validate standard options correctly', () => {
@@ -80,19 +83,19 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
   await t.step('should handle short form options', () => {
     // ZeroParams with short options
     const zeroShortResult = OptionCombinationValidator.validate(['-h', '-v'], 'zero');
-    console.log('Zero short result:', zeroShortResult);
+    logger.debug('Zero short result:', zeroShortResult);
     // Check if short forms are not recognized but result in error or valid
 
     // OneParam with short options
     const oneShortResult = OptionCombinationValidator.validate(['-c=test'], 'one');
-    console.log('One short result:', oneShortResult);
+    logger.debug('One short result:', oneShortResult);
 
     // TwoParams with short options
     const twoShortResult = OptionCombinationValidator.validate(
       ['-f=input.md', '-o=output.md'],
       'two',
     );
-    console.log('Two short result:', twoShortResult);
+    logger.debug('Two short result:', twoShortResult);
 
     // In current implementation, short form options are not recognized
     // OptionCombinationValidator receives an options dictionary,
@@ -113,7 +116,7 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
       'uv-project': 'myproject',
       'uv-version': '1.0.0',
     });
-    console.log('User variable result:', userVarResult);
+    logger.debug('User variable result:', userVarResult);
     assert(userVarResult.isValid);
 
     // Mix of standard options and user variables
@@ -121,7 +124,7 @@ Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
       from: 'input.md',
       'uv-project': 'myproject',
     });
-    console.log('Mixed options result:', mixedResult);
+    logger.debug('Mixed options result:', mixedResult);
     assert(mixedResult.isValid);
 
     // Invalid user variable names

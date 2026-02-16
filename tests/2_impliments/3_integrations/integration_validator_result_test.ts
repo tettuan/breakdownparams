@@ -1,10 +1,13 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
 import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
 import { TwoParamsValidator } from '../../../src/validator/params/two_params_validator.ts';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger('integration');
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -28,6 +31,7 @@ Deno.test('test_validator_result_integration', () => {
   // Test: Security error validator results
   const securityValidator = new SecurityValidator();
   const securityResult = securityValidator.validate(['safe;command']);
+  logger.debug('Security validation result', { data: { isValid: securityResult.isValid, errorCode: securityResult.errorCode } });
   assertEquals(
     securityResult.isValid,
     false,
@@ -114,6 +118,7 @@ Deno.test('test_validator_result_integration', () => {
 
   // Test: Error details
   const errorResult = securityValidator.validate(['dangerous;command']);
+  logger.debug('Error details result', { data: { isValid: errorResult.isValid, errorCategory: errorResult.errorCategory } });
   assertEquals(errorResult.isValid, false, 'Validation should fail for dangerous command');
   assertEquals(typeof errorResult.errorMessage, 'string', 'Should have error message');
   assertEquals(typeof errorResult.errorCode, 'string', 'Should have error code');

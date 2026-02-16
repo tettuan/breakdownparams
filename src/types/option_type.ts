@@ -1,4 +1,4 @@
-import { ValidationResult } from './validation_result.ts';
+import type { ValidationResult } from './validation_result.ts';
 
 /**
  * Defines the types of command-line options that the system can handle.

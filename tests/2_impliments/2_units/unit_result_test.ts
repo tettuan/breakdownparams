@@ -1,4 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import type { OptionRule } from '../../../src/types/option_rule.ts';
 import type {
   ErrorInfo,
@@ -8,6 +9,8 @@ import type {
   ZeroParamsResult,
 } from '../../../src/types/params_result.ts';
 import type { ValidationResult } from '../../../src/types/validation_result.ts';
+
+const logger = new BreakdownLogger('result');
 
 Deno.test('test_result_unit', () => {
   /**
@@ -116,6 +119,7 @@ Deno.test('test_result_unit', () => {
     'directiveType should be a string',
   );
   assertEquals(typeof twoParamsResult.layerType, 'string', 'layerType should be a string');
+  logger.debug('Result type structures validated', { data: { zeroType: zeroParamsResult.type, oneType: oneParamResult.type, twoType: twoParamsResult.type } });
 
   /**
    * Test for ErrorInfo interface structure.

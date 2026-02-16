@@ -1,6 +1,9 @@
 import { assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../src/parser/params_parser.ts';
-import { OptionRule } from '../../src/types/option_rule.ts';
+import type { OptionRule } from '../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger("parser");
 
 const optionRule: OptionRule = {
   format: '--key=value',
@@ -34,6 +37,7 @@ Deno.test('test_params_parser_default_option_rule', () => {
   const parser = new ParamsParser();
   assertEquals(parser instanceof ParamsParser, true);
   const result = parser.parse(['--help']);
+  logger.debug("parse result with default option rule", { data: { type: result.type, options: result.options } });
   assertEquals(result.type, 'zero');
   assertEquals(result.options.help, true, 'Flag option should be true');
 });

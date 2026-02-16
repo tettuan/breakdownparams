@@ -1,5 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { OneParamValidator } from '../../../src/validator/params/one_param_validator.ts';
+
+const logger = new BreakdownLogger('param-validator');
 
 /**
  * Test suite for OneParamValidator implementation
@@ -42,6 +45,7 @@ Deno.test('test_one_param_validator_implementation', () => {
    */
   const validArgs = ['init'];
   const validResult = validator.validate(validArgs);
+  logger.debug('Valid one param result', { data: { isValid: validResult.isValid, params: validResult.validatedParams } });
   assertEquals(validResult.isValid, true, 'Valid parameter should pass validation');
   assertEquals(validResult.validatedParams, validArgs, 'Validated params should match input');
 
@@ -60,6 +64,7 @@ Deno.test('test_one_param_validator_implementation', () => {
    */
   const invalidArgs = ['invalid'];
   const invalidResult = validator.validate(invalidArgs);
+  logger.debug('Invalid one param result', { data: { isValid: invalidResult.isValid, params: invalidResult.validatedParams } });
   assertEquals(invalidResult.isValid, false, 'Invalid parameter should fail validation');
   assertEquals(
     invalidResult.validatedParams,

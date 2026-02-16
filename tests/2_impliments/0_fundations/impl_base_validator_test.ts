@@ -1,5 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+
+const logger = new BreakdownLogger('param-validator');
 
 Deno.test('test_security_validator_implementation', () => {
   const validator = new SecurityValidator();
@@ -20,6 +23,7 @@ Deno.test('test_security_validator_implementation', () => {
    * - Confirm no error message is generated for valid input
    */
   const result = validator.validate(['test']);
+  logger.debug('Normal validation result', { data: { isValid: result.isValid, params: ['test'] } });
   assertEquals(result.isValid, true, 'Normal validation should succeed');
   assertEquals(result.validatedParams, ['test'], 'Validated params should match input');
   assertEquals(result.errorMessage, undefined, 'Should have no error message');
@@ -95,6 +99,7 @@ Deno.test('test_security_validator_implementation', () => {
    * - Ensure comprehensive security coverage
    */
   const multipleChecksResult = validator.validate(['test; ls', '../file']);
+  logger.debug('Multiple security violations result', { data: { isValid: multipleChecksResult.isValid, errorCode: multipleChecksResult.errorCode } });
   assertEquals(multipleChecksResult.isValid, false, 'Multiple security violations should fail');
   assertEquals(multipleChecksResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
   assertEquals(multipleChecksResult.errorCategory, 'security', 'Should have security category');

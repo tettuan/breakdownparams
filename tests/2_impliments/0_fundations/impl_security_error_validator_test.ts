@@ -1,5 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+
+const logger = new BreakdownLogger('security');
 
 Deno.test('test_security_error_validator_implementation', () => {
   const validator = new SecurityValidator();
@@ -23,6 +26,7 @@ Deno.test('test_security_error_validator_implementation', () => {
    */
   const safeArgs = ['test', '--option=value', 'normal-param'];
   const safeResult = validator.validate(safeArgs);
+  logger.debug('Safe validation result', { data: { isValid: safeResult.isValid, params: safeArgs } });
   assertEquals(safeResult.isValid, true, 'Safe parameters should pass validation');
   assertEquals(
     safeResult.validatedParams,
@@ -89,6 +93,7 @@ Deno.test('test_security_error_validator_implementation', () => {
    */
   const mixedArgs = ['safe-param', 'dangerous;param', 'another-safe'];
   const mixedResult = validator.validate(mixedArgs);
+  logger.debug('Mixed args validation result', { data: { isValid: mixedResult.isValid, params: mixedArgs } });
   assertEquals(
     mixedResult.isValid,
     false,

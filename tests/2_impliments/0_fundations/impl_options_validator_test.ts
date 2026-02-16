@@ -1,6 +1,9 @@
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
 import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+
+const logger = new BreakdownLogger('option-validator');
 
 const rule: OptionRule = {
   format: '--key=value',
@@ -25,6 +28,7 @@ Deno.test('impl_options_validator_test', async (t) => {
 
   await t.step('should validate valid options', () => {
     const result = validator.validate(['--help', '--version'], 'zero', rule);
+    logger.debug('Valid options validation result', { data: { isValid: result.isValid, options: result.options } });
     assertEquals(result.isValid, true);
     assertEquals(result.validatedParams, []);
     assertEquals(result.options?.help, true);
@@ -33,6 +37,7 @@ Deno.test('impl_options_validator_test', async (t) => {
 
   await t.step('should reject invalid options', () => {
     const result = validator.validate(['--invalid-option'], 'zero', rule);
+    logger.debug('Invalid options validation result', { data: { isValid: result.isValid, errorMessage: result.errorMessage } });
     assertEquals(result.isValid, false);
   });
 

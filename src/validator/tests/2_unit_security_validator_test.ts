@@ -1,16 +1,21 @@
 import { assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { SecurityValidator } from '../security_validator.ts';
+
+const logger = new BreakdownLogger("security");
 
 Deno.test('test_security_validator_unit', () => {
   const validator = new SecurityValidator();
 
   // Normal case test
   const validResult = validator.validate(['safe_param']);
+  logger.debug("Valid security result", { data: { isValid: validResult.isValid, validatedParams: validResult.validatedParams } });
   assertEquals(validResult.isValid, true, 'Safe param should be valid');
   assertEquals(validResult.validatedParams, ['safe_param'], 'Should return correct param');
 
   // Abnormal case test - shell command execution attempt
   const shellCommandResult = validator.validate(['test; rm -rf /']);
+  logger.debug("Shell command rejection result", { data: { isValid: shellCommandResult.isValid, errorCode: shellCommandResult.errorCode } });
   assertEquals(shellCommandResult.isValid, false, 'Shell command should be rejected');
   assertEquals(
     shellCommandResult.errorMessage,

@@ -1,6 +1,9 @@
 import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../../src/types/option_rule.ts';
-import { ParamsResult } from '../../../src/types/params_result.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
+import type { ParamsResult } from '../../../src/types/params_result.ts';
+
+const logger = new BreakdownLogger('parser');
 
 Deno.test('test_params_result', () => {
   /**
@@ -24,6 +27,7 @@ Deno.test('test_params_result', () => {
     params: [],
     options: {},
   };
+  logger.debug('Params result structure', { data: { type: result.type, paramsLength: result.params.length, hasError: result.error !== undefined } });
   assertEquals(result.type, 'zero', 'Result type should be zero');
   assertEquals(result.params, [], 'Params should be empty');
   assertEquals(result.options, {}, 'Options should be empty');

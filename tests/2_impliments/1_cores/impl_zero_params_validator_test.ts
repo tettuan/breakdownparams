@@ -1,5 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@1';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
+
+const logger = new BreakdownLogger('param-validator');
 
 /**
  * Test suite for ZeroParamsValidator implementation
@@ -48,6 +51,7 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const validArgs: string[] = [];
   const validResult = validator.validate(validArgs);
+  logger.debug('Valid zero params result', { data: { isValid: validResult.isValid, params: validResult.validatedParams } });
   assertEquals(validResult.isValid, true, 'Zero parameters should pass validation');
   assertEquals(validResult.validatedParams, validArgs, 'Validated params should match input');
 
@@ -162,6 +166,7 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const mixedArgs = ['--help', 'init', '--version'];
   const mixedResult = validator.validate(mixedArgs);
+  logger.debug('Mixed args validation result', { data: { isValid: mixedResult.isValid, params: mixedResult.validatedParams } });
   assertEquals(
     mixedResult.isValid,
     false,

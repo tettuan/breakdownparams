@@ -1,7 +1,10 @@
 import { assertEquals } from 'jsr:@std/assert@1';
-import { OptionRule } from '../../../src/types/option_rule.ts';
+import { BreakdownLogger } from '@tettuan/breakdownlogger';
+import type { OptionRule } from '../../../src/types/option_rule.ts';
 import { FlagOption } from '../../../src/option-models/flag_option.ts';
 import { OptionType } from '../../../src/types/option_type.ts';
+
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('test_option_rule', () => {
   /**
@@ -85,6 +88,7 @@ Deno.test('test_flag_option_unit', async (t) => {
 
   await t.step('should validate flag option correctly', () => {
     const result = flagOption.validate();
+    logger.debug('Flag option validation result', { data: { isValid: result.isValid, params: result.validatedParams } });
     assertEquals(result.isValid, true, 'Flag option should be valid when no value is provided');
     assertEquals(result.validatedParams, []);
 

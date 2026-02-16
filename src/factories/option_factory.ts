@@ -1,4 +1,4 @@
-import { Option } from '../types/option_type.ts';
+import type { Option } from '../types/option_type.ts';
 import { FlagOption } from '../option-models/flag_option.ts';
 import { ValueOption } from '../option-models/value_option.ts';
 import { UserVariableOption } from '../option-models/user_variable_option.ts';
@@ -181,9 +181,9 @@ export class CommandLineOptionFactory implements OptionFactory {
           `--${optionConfig.longname}`,
           [`-${optionConfig.shortname}`],
           'Flag option',
-          optionInput, // Pass raw input
           `--${optionConfig.longname}`,
           `-${optionConfig.shortname}`,
+          optionInput, // Pass raw input
         );
       case 'value': {
         // Value options require a value (= must be present)
@@ -198,9 +198,9 @@ export class CommandLineOptionFactory implements OptionFactory {
           false,
           'Value option',
           (val: string) => ({ isValid: true, validatedParams: [val] }),
-          optionInput, // Pass raw input
           `--${internalName}`,
           `-${optionConfig.shortname}`,
+          optionInput, // Pass raw input
         );
       }
       default:
