@@ -3,11 +3,11 @@ import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { UserVariableOption } from '../user_variable_option.ts';
 import { OptionType } from '../../types/option_type.ts';
 
-const logger = new BreakdownLogger("option-model");
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('UserVariableOption Structure', async (t) => {
   const option = new UserVariableOption('--uv-test', 'Test variable');
-  logger.debug("UserVariableOption created", { data: { name: option.name, type: option.type } });
+  logger.debug('UserVariableOption created', { data: { name: option.name, type: option.type } });
 
   await t.step('should have correct type', () => {
     assert(option.type === OptionType.USER_VARIABLE);
@@ -15,7 +15,9 @@ Deno.test('UserVariableOption Structure', async (t) => {
 
   await t.step('should validate name pattern', () => {
     const result = option.validate('--uv-test=value');
-    logger.debug("UserVariableOption validation result", { data: { isValid: result.isValid, errorMessage: result.errorMessage } });
+    logger.debug('UserVariableOption validation result', {
+      data: { isValid: result.isValid, errorMessage: result.errorMessage },
+    });
     assertEquals(result.errorMessage, undefined);
   });
 

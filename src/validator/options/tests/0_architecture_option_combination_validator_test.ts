@@ -3,7 +3,7 @@ import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { OptionCombinationValidator } from '../option_combination_validator.ts';
 import type { OptionCombinationRule } from '../option_combination_rule.ts';
 
-const logger = new BreakdownLogger("option-validator");
+const logger = new BreakdownLogger('option-validator');
 
 Deno.test('OptionCombinationValidator Architecture Tests', async (t) => {
   await t.step('should have correct class structure', () => {
@@ -37,7 +37,9 @@ Deno.test('OptionCombinationValidator Architecture Tests', async (t) => {
   await t.step('should have correct result type', () => {
     const validator = new OptionCombinationValidator({} as OptionCombinationRule);
     const result = validator.validate({});
-    logger.debug("Combination validator result", { data: { isValid: result.isValid, hasError: !!result.errorMessage } });
+    logger.debug('Combination validator result', {
+      data: { isValid: result.isValid, hasError: !!result.errorMessage },
+    });
 
     // Verify result type
     assert('isValid' in result);

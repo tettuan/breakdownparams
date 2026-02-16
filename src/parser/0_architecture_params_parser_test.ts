@@ -4,7 +4,7 @@ import { ParamsParser } from './params_parser.ts';
 import type { OptionRule } from '../types/option_rule.ts';
 import type { ParamsResult } from '../types/params_result.ts';
 
-const logger = new BreakdownLogger("parser");
+const logger = new BreakdownLogger('parser');
 
 /**
  * Architecture test for ParamsParser
@@ -33,7 +33,7 @@ Deno.test('test_params_parser_architecture', () => {
 
   // Test interface contract
   const result = parser.parse(['--help']);
-  logger.debug("parse result for interface contract", { result });
+  logger.debug('parse result for interface contract', { result });
   assertEquals(typeof result, 'object', 'Result should be an object');
   assert('type' in result, 'Result should have a type property');
   assert('params' in result, 'Result should have a params property');
@@ -41,7 +41,7 @@ Deno.test('test_params_parser_architecture', () => {
 
   // Test error handling contract
   const errorResult = parser.parse(['invalid']) as ParamsResult;
-  logger.debug("parse result for error handling", { errorResult });
+  logger.debug('parse result for error handling', { errorResult });
   assertEquals(errorResult.type, 'error', 'Invalid input should return error type');
   assert('error' in errorResult, 'Error result should have an error property');
   assertEquals(typeof errorResult.error?.message, 'string', 'Error should have a message');

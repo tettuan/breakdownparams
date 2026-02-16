@@ -28,7 +28,7 @@ Deno.test('test_params_parser_unit', () => {
   };
 
   const parser = new ParamsParser(optionRule);
-  const logger = new BreakdownLogger("parser");
+  const logger = new BreakdownLogger('parser');
 
   // Test options only functionality
   const optionsOnlyArgs = ['--help', '--version'];

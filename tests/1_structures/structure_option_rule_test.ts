@@ -1,8 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import type { OptionRule } from '../../src/types/option_rule.ts';
 
-const logger = new BreakdownLogger("option-validator");
+const logger = new BreakdownLogger('option-validator');
 
 Deno.test('test_option_rule_structure', () => {
   const rule: OptionRule = {
@@ -39,7 +39,13 @@ Deno.test('test_option_rule_structure', () => {
    * - Ensure each property has the correct type
    * - Validate the overall configuration structure
    */
-  logger.debug("OptionRule construction", { data: { format: rule.format, userVariables: rule.rules.userVariables, flagOptions: rule.flagOptions } });
+  logger.debug('OptionRule construction', {
+    data: {
+      format: rule.format,
+      userVariables: rule.rules.userVariables,
+      flagOptions: rule.flagOptions,
+    },
+  });
   assertEquals(typeof rule.format, 'string', 'format should be a string');
   assertEquals(typeof rule.rules, 'object', 'rules should be an object');
   assertEquals(typeof rule.errorHandling, 'object', 'errorHandling should be an object');
@@ -62,9 +68,8 @@ Deno.test('test_option_rule_structure', () => {
    * - Validate requiredOptions and valueTypes are arrays
    * - Confirm all validation settings have correct types
    */
-  assertEquals(
+  assert(
     Array.isArray(rule.rules.userVariables),
-    true,
     'userVariables should be an array',
   );
   assertEquals(typeof rule.errorHandling.emptyValue, 'string', 'emptyValue should be a string');
@@ -78,12 +83,11 @@ Deno.test('test_option_rule_structure', () => {
     'string',
     'duplicateOption should be a string',
   );
-  assertEquals(
+  assert(
     Array.isArray(rule.rules.requiredOptions),
-    true,
     'requiredOptions should be an array',
   );
-  assertEquals(Array.isArray(rule.rules.valueTypes), true, 'valueTypes should be an array');
+  assert(Array.isArray(rule.rules.valueTypes), 'valueTypes should be an array');
 
   /**
    * Test: Flag options structure
@@ -130,7 +134,7 @@ Deno.test('test_option_rule_structure', async (t) => {
     };
 
     assertEquals(typeof rule.flagOptions, 'object');
-    assertEquals(rule.flagOptions.help, true);
-    assertEquals(rule.flagOptions.version, true);
+    assert(rule.flagOptions.help);
+    assert(rule.flagOptions.version);
   });
 });

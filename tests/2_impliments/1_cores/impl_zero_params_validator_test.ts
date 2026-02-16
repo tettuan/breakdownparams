@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ZeroParamsValidator } from '../../../src/validator/params/zero_params_validator.ts';
 
@@ -51,8 +51,10 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const validArgs: string[] = [];
   const validResult = validator.validate(validArgs);
-  logger.debug('Valid zero params result', { data: { isValid: validResult.isValid, params: validResult.validatedParams } });
-  assertEquals(validResult.isValid, true, 'Zero parameters should pass validation');
+  logger.debug('Valid zero params result', {
+    data: { isValid: validResult.isValid, params: validResult.validatedParams },
+  });
+  assert(validResult.isValid, 'Zero parameters should pass validation');
   assertEquals(validResult.validatedParams, validArgs, 'Validated params should match input');
 
   /**
@@ -74,7 +76,7 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const withParams = ['init'];
   const withParamsResult = validator.validate(withParams);
-  assertEquals(withParamsResult.isValid, false, 'Parameters should fail validation');
+  assertFalse(withParamsResult.isValid, 'Parameters should fail validation');
   assertEquals(
     withParamsResult.validatedParams,
     [],
@@ -96,7 +98,7 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const emptyArgs: string[] = [];
   const emptyResult = validator.validate(emptyArgs);
-  assertEquals(emptyResult.isValid, true, 'Empty arguments should pass validation');
+  assert(emptyResult.isValid, 'Empty arguments should pass validation');
   assertEquals(emptyResult.validatedParams, [], 'Validated params should be empty for empty input');
 
   /**
@@ -115,7 +117,7 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const invalidOptionArgs = ['--invalid-option'];
   const invalidOptionResult = validator.validate(invalidOptionArgs);
-  assertEquals(invalidOptionResult.isValid, false, 'Invalid options should fail validation');
+  assertFalse(invalidOptionResult.isValid, 'Invalid options should fail validation');
   assertEquals(
     invalidOptionResult.validatedParams,
     [],
@@ -138,9 +140,8 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const multiplePositionalArgs = ['init', 'to', 'project'];
   const multiplePositionalResult = validator.validate(multiplePositionalArgs);
-  assertEquals(
+  assertFalse(
     multiplePositionalResult.isValid,
-    false,
     'Multiple positional arguments should fail validation',
   );
   assertEquals(
@@ -166,10 +167,11 @@ Deno.test('test_zero_params_validator_implementation', () => {
    */
   const mixedArgs = ['--help', 'init', '--version'];
   const mixedResult = validator.validate(mixedArgs);
-  logger.debug('Mixed args validation result', { data: { isValid: mixedResult.isValid, params: mixedResult.validatedParams } });
-  assertEquals(
+  logger.debug('Mixed args validation result', {
+    data: { isValid: mixedResult.isValid, params: mixedResult.validatedParams },
+  });
+  assertFalse(
     mixedResult.isValid,
-    false,
     'Mixed options and positional arguments should fail validation',
   );
   assertEquals(

@@ -1,5 +1,6 @@
+// deno-lint-ignore-file no-console
 import { ParamsParser } from '../src/parser/params_parser.ts';
-import { CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../src/types/custom_config.ts';
+import { type CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../src/types/custom_config.ts';
 import type { TwoParamsResult } from '../src/types/params_result.ts';
 
 // Custom configuration for a project management tool

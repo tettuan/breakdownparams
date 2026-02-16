@@ -3,7 +3,7 @@ import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { OptionCombinationValidator } from '../option_combination_validator.ts';
 import type { OptionCombinationRule } from '../option_combination_rule.ts';
 
-const logger = new BreakdownLogger("option-validator");
+const logger = new BreakdownLogger('option-validator');
 
 Deno.test('OptionCombinationValidator Unit Tests', async (t) => {
   await t.step('should validate standard options correctly', () => {

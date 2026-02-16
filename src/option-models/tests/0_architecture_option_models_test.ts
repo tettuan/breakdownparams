@@ -5,7 +5,7 @@ import { ValueOption } from '../value_option.ts';
 import { UserVariableOption } from '../user_variable_option.ts';
 import { OptionType } from '../../types/option_type.ts';
 
-const logger = new BreakdownLogger("option-model");
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('Option Models Architecture', async (t) => {
   await t.step('should maintain option model interfaces', () => {

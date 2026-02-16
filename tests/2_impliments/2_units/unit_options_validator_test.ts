@@ -1,5 +1,5 @@
 import { ZeroOptionValidator } from '../../../src/validator/options/option_validator.ts';
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import type { OptionRule } from '../../../src/types/option_rule.ts';
 
@@ -30,19 +30,19 @@ Deno.test('unit_options_validator_test', async (t) => {
 
   await t.step('should validate valid options', () => {
     const result = validator.validate(['--help', '--version'], 'zero', optionRule);
-    assertEquals(result.isValid, true);
+    assert(result.isValid);
     assertEquals(result.validatedParams, []);
-    assertEquals(result.options?.help, true);
-    assertEquals(result.options?.version, true);
+    assert(result.options?.help);
+    assert(result.options?.version);
   });
 
   await t.step('should reject invalid options', () => {
     const result = validator.validate(['--invalid-option'], 'zero', optionRule);
-    assertEquals(result.isValid, false);
+    assertFalse(result.isValid);
   });
 
   await t.step('should handle empty values correctly', () => {
     const result = validator.validate(['--key='], 'zero', optionRule);
-    assertEquals(result.isValid, false);
+    assertFalse(result.isValid);
   });
 });

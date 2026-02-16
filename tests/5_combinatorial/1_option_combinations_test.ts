@@ -201,9 +201,16 @@ Deno.test('Standard Option Combinations - 2 Options', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`2-Option Combination ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
-      logger.debug('2-option combination result', { data: { combination: testCase.description, type: result.type, optionKeys: Object.keys(result.options) } });
+      logger.debug('2-option combination result', {
+        data: {
+          combination: testCase.description,
+          type: result.type,
+          optionKeys: Object.keys(result.options),
+        },
+      });
 
       assertBasicResult(result, `2-option combination ${i + 1} (${testCase.description})`);
       assertOptionsMatch(
@@ -303,6 +310,7 @@ Deno.test('Standard Option Combinations - 3 Options', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`3-Option Combination ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -401,6 +409,7 @@ Deno.test('Standard Option Combinations - 4 Options', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`4-Option Combination ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -436,7 +445,9 @@ Deno.test('Standard Option Combinations - All Options', async (t) => {
     };
 
     const result = parser.parse(args) as TwoParamsResult;
-    logger.debug('All options combined result', { data: { type: result.type, optionCount: Object.keys(result.options).length } });
+    logger.debug('All options combined result', {
+      data: { type: result.type, optionCount: Object.keys(result.options).length },
+    });
 
     assertBasicResult(result, 'All options combination');
     assertOptionsMatch(
@@ -455,6 +466,7 @@ Deno.test('Standard Option Combinations - Different DirectiveTypes', async (t) =
 
   for (const demoType of demoTypes) {
     for (const layerType of layerTypes) {
+      // deno-lint-ignore no-await-in-loop
       await t.step(`${demoType} ${layerType} with multiple options`, () => {
         const args = [
           demoType,

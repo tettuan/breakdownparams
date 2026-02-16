@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ParamsParser } from '../../../src/mod.ts';
 import { type CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../../src/types/custom_config.ts';
@@ -10,7 +10,9 @@ Deno.test('CustomConfig functionality', async (t) => {
   await t.step('should use default custom config when not provided', () => {
     const parser = new ParamsParser();
     const result = parser.parse(['to', 'project']) as TwoParamsResult;
-    logger.debug('Default config parse result', { data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType } });
+    logger.debug('Default config parse result', {
+      data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType },
+    });
 
     assertEquals(result.type, 'two');
     assertEquals(result.directiveType, 'to');
@@ -44,7 +46,9 @@ Deno.test('CustomConfig functionality', async (t) => {
 
     // Test invalid values
     const result2 = parser.parse(['invalid', 'module']);
-    logger.debug('Custom config invalid parse result', { data: { type: result2.type, error: result2.error } });
+    logger.debug('Custom config invalid parse result', {
+      data: { type: result2.type, error: result2.error },
+    });
     assertEquals(result2.type, 'error');
     if (result2.type === 'error' && result2.error) {
       assertEquals(
@@ -169,11 +173,11 @@ Deno.test('CustomConfig functionality', async (t) => {
     } catch (error) {
       constructorError = true;
       // Confirm error occurs due to missing validation property
-      assertEquals((error as Error).message.includes('Cannot read properties of undefined'), true);
+      assert((error as Error).message.includes('Cannot read properties of undefined'));
     }
 
     // Confirm that error occurs in constructor
-    assertEquals(constructorError, true);
+    assert(constructorError);
   });
 
   await t.step(
@@ -222,7 +226,7 @@ Deno.test('CustomConfig functionality', async (t) => {
       const result4 = parser.parse(['--help']);
       assertEquals(result4.type, 'zero');
       if (result4.type === 'zero') {
-        assertEquals(result4.options.help, true);
+        assert(result4.options.help);
       }
     },
   );

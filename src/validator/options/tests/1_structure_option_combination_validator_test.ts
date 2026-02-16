@@ -3,7 +3,7 @@ import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { OptionCombinationValidator } from '../option_combination_validator.ts';
 import type { OptionCombinationRule } from '../option_combination_rule.ts';
 
-const logger = new BreakdownLogger("option-validator");
+const logger = new BreakdownLogger('option-validator');
 
 Deno.test('OptionCombinationValidator Structure Tests', async (t) => {
   await t.step('should have correct validation result structure', () => {
@@ -49,7 +49,9 @@ Deno.test('OptionCombinationValidator Structure Tests', async (t) => {
 
     const validator = new OptionCombinationValidator(rule);
     const result = validator.validate({});
-    logger.debug("Required options validation result", { data: { isValid: result.isValid, errorCode: result.errorCode } });
+    logger.debug('Required options validation result', {
+      data: { isValid: result.isValid, errorCode: result.errorCode },
+    });
 
     assert(!result.isValid);
     assert(result.errorMessage?.includes('missing'));
@@ -69,7 +71,9 @@ Deno.test('OptionCombinationValidator Structure Tests', async (t) => {
 
     const validator = new OptionCombinationValidator(rule);
     const result = validator.validate({ option1: 'value' });
-    logger.debug("Combination rules validation result", { data: { isValid: result.isValid, errorCode: result.errorCode } });
+    logger.debug('Combination rules validation result', {
+      data: { isValid: result.isValid, errorCode: result.errorCode },
+    });
 
     assert(!result.isValid);
     assert(result.errorMessage?.includes('requires'));

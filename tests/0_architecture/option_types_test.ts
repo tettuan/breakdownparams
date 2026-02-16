@@ -5,7 +5,7 @@ import { OptionType } from '../../src/types/option_type.ts';
 import { ValueOption } from '../../src/option-models/value_option.ts';
 import { UserVariableOption } from '../../src/option-models/user_variable_option.ts';
 
-const logger = new BreakdownLogger("option-model");
+const logger = new BreakdownLogger('option-model');
 
 /**
  * Test 1: Basic type definitions and value verification
@@ -24,7 +24,13 @@ const logger = new BreakdownLogger("option-model");
  * - Verify USER_VARIABLE enum equals 'user_variable'
  */
 Deno.test('test_option_type_enum', () => {
-  logger.debug("OptionType enum values", { data: { VALUE: OptionType.VALUE, FLAG: OptionType.FLAG, USER_VARIABLE: OptionType.USER_VARIABLE } });
+  logger.debug('OptionType enum values', {
+    data: {
+      VALUE: OptionType.VALUE,
+      FLAG: OptionType.FLAG,
+      USER_VARIABLE: OptionType.USER_VARIABLE,
+    },
+  });
   assertEquals(OptionType.VALUE, 'value');
   assertEquals(OptionType.FLAG, 'flag');
   assertEquals(OptionType.USER_VARIABLE, 'user_variable');
@@ -154,7 +160,7 @@ Deno.test('test_option_design_consistency', async (t) => {
   await t.step('should maintain consistent property types', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
     assertEquals(typeof flagOption.name, 'string');
-    assertEquals(Array.isArray(flagOption.aliases), true);
+    assert(Array.isArray(flagOption.aliases));
     assertEquals(typeof flagOption.description, 'string');
     assertEquals(typeof flagOption.isRequired, 'boolean');
   });
@@ -162,7 +168,9 @@ Deno.test('test_option_design_consistency', async (t) => {
   await t.step('should maintain consistent method signatures', () => {
     const flagOption = new FlagOption('help', ['h'], 'Show help message');
     const validateResult = flagOption.validate();
-    logger.debug("flag option validate result for design consistency", { data: { isValid: validateResult.isValid, validatedParams: validateResult.validatedParams } });
+    logger.debug('flag option validate result for design consistency', {
+      data: { isValid: validateResult.isValid, validatedParams: validateResult.validatedParams },
+    });
     assert('isValid' in validateResult);
     assert('validatedParams' in validateResult);
   });

@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import type {
   OneParamsResult,
@@ -7,7 +7,7 @@ import type {
   ZeroParamsResult,
 } from '../types/params_result.ts';
 
-const logger = new BreakdownLogger("result");
+const logger = new BreakdownLogger('result');
 
 // 1. Basic interface design tests
 Deno.test('test_params_result_interface', () => {
@@ -16,9 +16,9 @@ Deno.test('test_params_result_interface', () => {
     params: [],
     options: {},
   };
-  logger.debug("params result interface", { result });
+  logger.debug('params result interface', { result });
   assertEquals(result.type, 'zero');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
 });
 
@@ -29,9 +29,9 @@ Deno.test('test_zero_params_result_structure', () => {
     params: [],
     options: {},
   };
-  logger.debug("zero params result", { result });
+  logger.debug('zero params result', { result });
   assertEquals(result.type, 'zero');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
 });
 
@@ -42,9 +42,9 @@ Deno.test('test_one_param_result_structure', () => {
     options: {},
     directiveType: 'init',
   };
-  logger.debug("one param result", { result });
+  logger.debug('one param result', { result });
   assertEquals(result.type, 'one');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
   assertEquals(result.directiveType, 'init');
 });
@@ -57,9 +57,9 @@ Deno.test('test_two_param_result_structure', () => {
     directiveType: 'to',
     layerType: 'project',
   };
-  logger.debug("two param result", { result });
+  logger.debug('two param result', { result });
   assertEquals(result.type, 'two');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
   assertEquals(result.directiveType, 'to');
   assertEquals(result.layerType, 'project');
@@ -77,7 +77,7 @@ Deno.test('test_error_result_structure', () => {
       category: 'error_category',
     },
   };
-  logger.debug("error result", { errorResult });
+  logger.debug('error result', { errorResult });
 
   assertEquals(errorResult.type, 'error');
   assertEquals(typeof errorResult.error, 'object');

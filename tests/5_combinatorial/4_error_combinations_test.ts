@@ -150,9 +150,16 @@ Deno.test('Error Combinations - Parameter Errors with Valid Options', async (t) 
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Parameter Error + Valid Options ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as ParamsResult;
-      logger.debug('Error combination result', { data: { description: testCase.description, type: result.type, errorCode: result.error?.code } });
+      logger.debug('Error combination result', {
+        data: {
+          description: testCase.description,
+          type: result.type,
+          errorCode: result.error?.code,
+        },
+      });
 
       assertErrorResult(
         result,
@@ -203,6 +210,7 @@ Deno.test('Error Combinations - Parameter Errors with Invalid Options', async (t
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Parameter Error + Invalid Options ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as ParamsResult;
 
@@ -252,6 +260,7 @@ Deno.test('Error Combinations - Option Constraint Violations', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Option Constraint Violation ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as ParamsResult;
 
@@ -296,9 +305,16 @@ Deno.test('Error Combinations - Multiple Error Scenarios', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Multiple Error Scenario ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as ParamsResult;
-      logger.debug('Multiple error scenario result', { data: { description: testCase.description, type: result.type, errorCode: result.error?.code } });
+      logger.debug('Multiple error scenario result', {
+        data: {
+          description: testCase.description,
+          type: result.type,
+          errorCode: result.error?.code,
+        },
+      });
 
       assertErrorResult(
         result,
@@ -382,6 +398,7 @@ Deno.test('Error Combinations - Mixed Form Errors', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Mixed Form Error ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as ParamsResult;
 

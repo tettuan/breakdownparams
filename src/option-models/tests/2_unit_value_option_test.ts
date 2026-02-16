@@ -2,7 +2,7 @@ import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ValueOption } from '../value_option.ts';
 
-const logger = new BreakdownLogger("option-model");
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('ValueOption Unit Tests', async (t) => {
   const valueOption = new ValueOption(
@@ -19,7 +19,9 @@ Deno.test('ValueOption Unit Tests', async (t) => {
 
   await t.step('should handle required value correctly', () => {
     const result = valueOption.validate('value');
-    logger.debug("ValueOption required validate result", { data: { isValid: result.isValid, validatedParams: result.validatedParams } });
+    logger.debug('ValueOption required validate result', {
+      data: { isValid: result.isValid, validatedParams: result.validatedParams },
+    });
     assert(result.isValid);
     assertEquals(result.validatedParams, ['value']);
     assertEquals(valueOption.parse('value'), 'value');
@@ -45,7 +47,9 @@ Deno.test('ValueOption Unit Tests', async (t) => {
 
   await t.step('should handle empty value correctly', () => {
     const result = valueOption.validate('');
-    logger.debug("ValueOption empty validate result", { data: { isValid: result.isValid, errorMessage: result.errorMessage } });
+    logger.debug('ValueOption empty validate result', {
+      data: { isValid: result.isValid, errorMessage: result.errorMessage },
+    });
     assert(!result.isValid);
     assertEquals(result.validatedParams, []);
     assert(result.errorMessage?.includes('Value cannot be empty'));

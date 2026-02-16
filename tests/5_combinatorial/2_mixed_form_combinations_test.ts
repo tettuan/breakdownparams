@@ -193,9 +193,16 @@ Deno.test('Mixed Form Combinations - Basic Patterns', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Mixed Pattern ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
-      logger.debug('Mixed form parse result', { data: { pattern: testCase.description, type: result.type, optionKeys: Object.keys(result.options) } });
+      logger.debug('Mixed form parse result', {
+        data: {
+          pattern: testCase.description,
+          type: result.type,
+          optionKeys: Object.keys(result.options),
+        },
+      });
 
       assertBasicResult(result, `Mixed pattern ${i + 1} (${testCase.description})`);
       assertOptionsMatch(
@@ -253,6 +260,7 @@ Deno.test('Mixed Form Combinations - Priority Tests', async (t) => {
   for (let i = 0; i < priorityTests.length; i++) {
     const testCase = priorityTests[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Priority Test ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -322,6 +330,7 @@ Deno.test('Mixed Form Combinations - Complex Scenarios', async (t) => {
   for (let i = 0; i < complexTests.length; i++) {
     const testCase = complexTests[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Complex Scenario ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -360,6 +369,7 @@ Deno.test('Mixed Form Combinations - Order Independence', async (t) => {
   for (let i = 0; i < orderVariations.length; i++) {
     const optionArgs = orderVariations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Order Variation ${i + 1}`, () => {
       const args = [DEMO_TYPE, LAYER_TYPE, ...optionArgs];
       const result = parser.parse(args) as TwoParamsResult;
@@ -380,7 +390,9 @@ Deno.test('Mixed Form Combinations - Edge Cases', async (t) => {
   await t.step('Empty values with mixed forms should error', () => {
     const args = [DEMO_TYPE, LAYER_TYPE, '-f=', '--destination=', '--input=task'];
     const result = parser.parse(args) as ParamsResult;
-    logger.debug('Empty value error result', { data: { type: result.type, error: result.error?.message } });
+    logger.debug('Empty value error result', {
+      data: { type: result.type, error: result.error?.message },
+    });
 
     // Verify empty values result in errors
     assertEquals(result.type, 'error', 'Empty values should result in error');

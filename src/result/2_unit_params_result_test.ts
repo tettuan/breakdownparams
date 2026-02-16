@@ -7,7 +7,7 @@ import type {
   ZeroParamsResult,
 } from '../types/params_result.ts';
 
-const logger = new BreakdownLogger("result");
+const logger = new BreakdownLogger('result');
 
 // 1. Type conversion tests
 Deno.test('test_type_conversion', () => {
@@ -18,7 +18,7 @@ Deno.test('test_type_conversion', () => {
     options: {},
   };
   const zeroParamsResult = zeroResult as ZeroParamsResult;
-  logger.debug("zero params result after conversion", { zeroParamsResult });
+  logger.debug('zero params result after conversion', { zeroParamsResult });
   assertEquals(zeroParamsResult.type, 'zero');
 
   // Conversion to OneParamsResult
@@ -29,7 +29,7 @@ Deno.test('test_type_conversion', () => {
     directiveType: 'init',
   };
   const oneParamResult = oneResult as OneParamsResult;
-  logger.debug("one param result after conversion", { oneParamResult });
+  logger.debug('one param result after conversion', { oneParamResult });
   assertEquals(oneParamResult.type, 'one');
   assertEquals(oneParamResult.directiveType, 'init');
 
@@ -42,7 +42,7 @@ Deno.test('test_type_conversion', () => {
     layerType: 'project',
   };
   const twoParamResult = twoResult as TwoParamsResult;
-  logger.debug("two param result after conversion", { twoParamResult });
+  logger.debug('two param result after conversion', { twoParamResult });
   assertEquals(twoParamResult.type, 'two');
   assertEquals(twoParamResult.directiveType, 'to');
   assertEquals(twoParamResult.layerType, 'project');
@@ -67,7 +67,7 @@ Deno.test('test_options_type_safety', () => {
     params: [],
     options,
   };
-  logger.debug("options type safety result", { options: result.options });
+  logger.debug('options type safety result', { options: result.options });
 
   assertEquals(typeof result.options, 'object');
   assertEquals(result.options.fromFile, 'input.txt');

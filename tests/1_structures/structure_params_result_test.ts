@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import type {
   OneParamsResult,
@@ -6,7 +6,7 @@ import type {
   TwoParamsResult,
 } from '../../src/types/params_result.ts';
 
-const logger = new BreakdownLogger("result");
+const logger = new BreakdownLogger('result');
 
 Deno.test('test_params_result_structure', () => {
   /**
@@ -31,10 +31,10 @@ Deno.test('test_params_result_structure', () => {
     params: [],
     options: {},
   };
-  logger.debug("ParamsResult construction", { data: { type: result.type, params: result.params } });
+  logger.debug('ParamsResult construction', { data: { type: result.type, params: result.params } });
 
   assertEquals(typeof result.type, 'string', 'type should be a string');
-  assertEquals(Array.isArray(result.params), true, 'params should be an array');
+  assert(Array.isArray(result.params), 'params should be an array');
   assertEquals(typeof result.options, 'object', 'options should be an object');
 
   /**
@@ -78,7 +78,7 @@ Deno.test('test_zero_params_result_structure', () => {
   };
 
   assertEquals(result.type, 'zero', 'type should be zero');
-  assertEquals(Array.isArray(result.params), true, 'params should be an array');
+  assert(Array.isArray(result.params), 'params should be an array');
   assertEquals(typeof result.options, 'object', 'options should be an object');
 });
 
@@ -91,7 +91,7 @@ Deno.test('test_one_param_result_structure', () => {
   };
 
   assertEquals(result.type, 'one', 'type should be one');
-  assertEquals(Array.isArray(result.params), true, 'params should be an array');
+  assert(Array.isArray(result.params), 'params should be an array');
   assertEquals(typeof result.options, 'object', 'options should be an object');
   assertEquals(typeof result.directiveType, 'string', 'directiveType should be a string');
 });
@@ -104,10 +104,12 @@ Deno.test('test_two_param_result_structure', () => {
     directiveType: 'to',
     layerType: 'project',
   };
-  logger.debug("TwoParamsResult construction", { data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType } });
+  logger.debug('TwoParamsResult construction', {
+    data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType },
+  });
 
   assertEquals(result.type, 'two', 'type should be two');
-  assertEquals(Array.isArray(result.params), true, 'params should be an array');
+  assert(Array.isArray(result.params), 'params should be an array');
   assertEquals(typeof result.options, 'object', 'options should be an object');
   assertEquals(typeof result.directiveType, 'string', 'directiveType should be a string');
   assertEquals(typeof result.layerType, 'string', 'layerType should be a string');

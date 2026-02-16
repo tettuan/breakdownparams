@@ -171,7 +171,9 @@ Deno.test('Boundary Values - Very Long Values', async (t) => {
     const expected = { 'uv-huge': extremelyLongValue };
 
     const result = parser.parse(args) as TwoParamsResult;
-    logger.debug('Extremely long value result', { data: { type: result.type, valueLength: extremelyLongValue.length } });
+    logger.debug('Extremely long value result', {
+      data: { type: result.type, valueLength: extremelyLongValue.length },
+    });
 
     assertBasicResult(result, 'Extremely long value');
     assertOptionsMatch(
@@ -228,6 +230,7 @@ Deno.test('Boundary Values - Unicode and International Characters', async (t) =>
   for (let i = 0; i < unicodeTests.length; i++) {
     const testCase = unicodeTests[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Unicode Test ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -296,6 +299,7 @@ Deno.test('Boundary Values - Special Characters and Symbols', async (t) => {
   for (let i = 0; i < specialCharTests.length; i++) {
     const testCase = specialCharTests[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Special Characters ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -325,7 +329,9 @@ Deno.test('Boundary Values - Quantity Boundaries', async (t) => {
     }
 
     const result = parser.parse(args) as TwoParamsResult;
-    logger.debug('Maximum user variables result', { data: { type: result.type, optionCount: Object.keys(result.options).length } });
+    logger.debug('Maximum user variables result', {
+      data: { type: result.type, optionCount: Object.keys(result.options).length },
+    });
 
     assertBasicResult(result, 'Maximum user variables');
     assertOptionsMatch(

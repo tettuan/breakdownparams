@@ -3,7 +3,7 @@ import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { ValueOption } from '../value_option.ts';
 import { OptionType } from '../../types/option_type.ts';
 
-const logger = new BreakdownLogger("option-model");
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('ValueOption Structure', async (t) => {
   const validator = (value: string) => ({

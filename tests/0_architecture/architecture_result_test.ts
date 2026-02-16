@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@^0.218.2';
+import { assert, assertEquals } from 'jsr:@std/assert@^0.218.2';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import type {
   ErrorInfo,
@@ -10,7 +10,7 @@ import type {
 import type { OptionRule } from '../../src/types/option_rule.ts';
 import type { ValidationResult } from '../../src/types/validation_result.ts';
 
-const logger = new BreakdownLogger("result");
+const logger = new BreakdownLogger('result');
 
 Deno.test('test_params_result_interface', () => {
   const result: ParamsResult = {
@@ -18,9 +18,9 @@ Deno.test('test_params_result_interface', () => {
     params: [],
     options: {},
   };
-  logger.debug("ParamsResult construction", { data: { type: result.type, params: result.params } });
+  logger.debug('ParamsResult construction', { data: { type: result.type, params: result.params } });
   assertEquals(result.type, 'zero');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
 });
 
@@ -31,7 +31,7 @@ Deno.test('test_zero_params_result_interface', () => {
     options: {},
   };
   assertEquals(result.type, 'zero');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
 });
 
@@ -43,7 +43,7 @@ Deno.test('test_one_param_result_interface', () => {
     directiveType: 'init',
   };
   assertEquals(result.type, 'one');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
   assertEquals(typeof result.directiveType, 'string');
 });
@@ -56,9 +56,11 @@ Deno.test('test_two_param_result_interface', () => {
     directiveType: 'to',
     layerType: 'project',
   };
-  logger.debug("TwoParamsResult construction", { data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType } });
+  logger.debug('TwoParamsResult construction', {
+    data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType },
+  });
   assertEquals(result.type, 'two');
-  assertEquals(Array.isArray(result.params), true);
+  assert(Array.isArray(result.params));
   assertEquals(typeof result.options, 'object');
   assertEquals(typeof result.directiveType, 'string');
   assertEquals(typeof result.layerType, 'string');
@@ -80,9 +82,11 @@ Deno.test('test_validation_result_interface', () => {
     isValid: true,
     validatedParams: [],
   };
-  logger.debug("ValidationResult construction", { data: { isValid: result.isValid, validatedParams: result.validatedParams } });
+  logger.debug('ValidationResult construction', {
+    data: { isValid: result.isValid, validatedParams: result.validatedParams },
+  });
   assertEquals(typeof result.isValid, 'boolean');
-  assertEquals(Array.isArray(result.validatedParams), true);
+  assert(Array.isArray(result.validatedParams));
 });
 
 Deno.test('test_option_rule_interface', async (t) => {

@@ -177,9 +177,16 @@ Deno.test('User Variable Matrix - Standard Options + Single User Variable', asyn
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Standard + User Variable ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
-      logger.debug('Standard + user variable result', { data: { combination: testCase.description, type: result.type, optionKeys: Object.keys(result.options) } });
+      logger.debug('Standard + user variable result', {
+        data: {
+          combination: testCase.description,
+          type: result.type,
+          optionKeys: Object.keys(result.options),
+        },
+      });
 
       assertBasicResult(result, `Standard + user variable ${i + 1}`);
       assertOptionsMatch(
@@ -294,6 +301,7 @@ Deno.test('User Variable Matrix - Multiple Standard Options + Multiple User Vari
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Multiple Matrix ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -384,6 +392,7 @@ Deno.test('User Variable Matrix - Special Values', async (t) => {
   for (let i = 0; i < specialValueTests.length; i++) {
     const testCase = specialValueTests[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Special Value ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -474,6 +483,7 @@ Deno.test('User Variable Matrix - Variable Name Patterns', async (t) => {
   for (let i = 0; i < namePatternTests.length; i++) {
     const testCase = namePatternTests[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Name Pattern ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 
@@ -545,7 +555,9 @@ Deno.test('User Variable Matrix - Error Cases', async (t) => {
   await t.step('User variables in OneParam mode should error', () => {
     const args = ['init', '--uv-test=value'];
     const result = parser.parse(args) as ParamsResult;
-    logger.debug('User variable error case', { data: { type: result.type, error: result.error?.message } });
+    logger.debug('User variable error case', {
+      data: { type: result.type, error: result.error?.message },
+    });
 
     assertEquals(result.type, 'error');
     assertStringIncludes(
@@ -661,6 +673,7 @@ Deno.test('User Variable Matrix - Mixed with Short Forms', async (t) => {
   for (let i = 0; i < combinations.length; i++) {
     const testCase = combinations[i];
 
+    // deno-lint-ignore no-await-in-loop
     await t.step(`Mixed Short Form ${i + 1}: ${testCase.description}`, () => {
       const result = parser.parse(testCase.args) as TwoParamsResult;
 

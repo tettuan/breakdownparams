@@ -2,7 +2,7 @@ import { assert } from 'jsr:@std/assert@^0.218.2';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { DEFAULT_OPTION_COMBINATION_RULES } from '../option_combination_rule.ts';
 
-const logger = new BreakdownLogger("option-validator");
+const logger = new BreakdownLogger('option-validator');
 
 Deno.test('OptionCombinationRule Structure Tests', async (t) => {
   await t.step('should have correct default rules structure', () => {
@@ -14,7 +14,7 @@ Deno.test('OptionCombinationRule Structure Tests', async (t) => {
 
   await t.step('should have correct zero options structure', () => {
     const zeroRules = DEFAULT_OPTION_COMBINATION_RULES.zero;
-    logger.debug("Zero rules structure", { data: { allowedOptions: zeroRules.allowedOptions } });
+    logger.debug('Zero rules structure', { data: { allowedOptions: zeroRules.allowedOptions } });
     assert(Array.isArray(zeroRules.allowedOptions));
     assert(zeroRules.allowedOptions.includes('help'));
     assert(zeroRules.allowedOptions.includes('version'));
@@ -32,7 +32,7 @@ Deno.test('OptionCombinationRule Structure Tests', async (t) => {
 
   await t.step('should have correct two options structure', () => {
     const twoRules = DEFAULT_OPTION_COMBINATION_RULES.two;
-    logger.debug("Two rules structure", { data: { allowedOptions: twoRules.allowedOptions } });
+    logger.debug('Two rules structure', { data: { allowedOptions: twoRules.allowedOptions } });
     assert(Array.isArray(twoRules.allowedOptions));
     assert(twoRules.allowedOptions.includes('from'));
     assert(twoRules.allowedOptions.includes('destination'));

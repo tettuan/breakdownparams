@@ -7,7 +7,7 @@ import {
 } from '../option_validator.ts';
 import { DEFAULT_OPTION_RULE } from '../../../types/option_rule.ts';
 
-const logger = new BreakdownLogger("option-validator");
+const logger = new BreakdownLogger('option-validator');
 
 Deno.test('OptionValidator Unit Tests', async (t) => {
   await t.step('should validate zero options correctly', () => {

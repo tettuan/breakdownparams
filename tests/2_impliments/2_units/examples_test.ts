@@ -11,7 +11,9 @@ Deno.test('test_examples_execution', async (t) => {
   await t.step('basic_usage example', () => {
     const parser = new ParamsParser();
     const result = parser.parse(['to', 'project']) as TwoParamsResult;
-    logger.debug('Basic usage parse result', { data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType } });
+    logger.debug('Basic usage parse result', {
+      data: { type: result.type, directiveType: result.directiveType, layerType: result.layerType },
+    });
 
     assertEquals(result.type, 'two');
     assertEquals(result.directiveType, 'to');
@@ -31,7 +33,9 @@ Deno.test('test_examples_execution', async (t) => {
       '--uv-project=myproject',
       '--uv-version=1.0.0',
     ]) as TwoParamsResult;
-    logger.debug('Options usage parse result', { data: { type: result.type, optionKeys: Object.keys(result.options) } });
+    logger.debug('Options usage parse result', {
+      data: { type: result.type, optionKeys: Object.keys(result.options) },
+    });
 
     assertEquals(result.type, 'two');
     assertEquals(result.directiveType, 'to');

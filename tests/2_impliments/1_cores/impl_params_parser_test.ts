@@ -71,7 +71,9 @@ Deno.test('test_params_parser_implementation', () => {
    */
   const optionsOnlyArgs = ['--help', '--version'];
   const optionsOnlyResult = parser.parse(optionsOnlyArgs);
-  logger.debug('Options only parse result', { data: { type: optionsOnlyResult.type, options: optionsOnlyResult.options } });
+  logger.debug('Options only parse result', {
+    data: { type: optionsOnlyResult.type, options: optionsOnlyResult.options },
+  });
   assertEquals(optionsOnlyResult.type, 'zero', 'Options only should be zero type');
   assertEquals(optionsOnlyResult.params, [], 'Params should be empty for options only');
   assertEquals(
@@ -174,7 +176,9 @@ Deno.test('test_params_parser_implementation', () => {
    */
   const invalidArgs = ['invalid'];
   const invalidResult = parser.parse(invalidArgs) as ErrorResult;
-  logger.debug('Invalid parse result', { data: { type: invalidResult.type, errorCode: invalidResult.error?.code } });
+  logger.debug('Invalid parse result', {
+    data: { type: invalidResult.type, errorCode: invalidResult.error?.code },
+  });
   assertEquals(invalidResult.type, 'error', 'Invalid arguments should be error type');
   assertEquals(invalidResult.params, [], 'Params should be empty for invalid input');
   assertEquals(invalidResult.options, {}, 'Options should be empty for invalid input');

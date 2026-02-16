@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert@1';
+import { assert, assertEquals } from 'jsr:@std/assert@1';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { BaseValidator } from '../../src/validator/params/base_validator.ts';
 import { SecurityValidator } from '../../src/validator/security_validator.ts';
@@ -9,29 +9,31 @@ import { OneParamValidator } from '../../src/validator/params/one_param_validato
 import { TwoParamsValidator } from '../../src/validator/params/two_params_validator.ts';
 import type { CustomConfig } from '../../src/types/custom_config.ts';
 
-const logger = new BreakdownLogger("param-validator");
+const logger = new BreakdownLogger('param-validator');
 
 Deno.test('test_security_validator_structure', () => {
   const validator = new SecurityValidator();
-  assertEquals(validator instanceof BaseValidator, true);
+  assert(validator instanceof BaseValidator);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_option_combination_validator_structure', () => {
-  logger.debug("option combination rules for zero params", { data: { rules: DEFAULT_OPTION_COMBINATION_RULES.zero } });
+  logger.debug('option combination rules for zero params', {
+    data: { rules: DEFAULT_OPTION_COMBINATION_RULES.zero },
+  });
   const validator = new OptionCombinationValidator(DEFAULT_OPTION_COMBINATION_RULES.zero);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_zero_params_validator_structure', () => {
   const validator = new ZeroParamsValidator();
-  assertEquals(validator instanceof BaseValidator, true);
+  assert(validator instanceof BaseValidator);
   assertEquals(typeof validator.validate, 'function');
 });
 
 Deno.test('test_one_param_validator_structure', () => {
   const validator = new OneParamValidator();
-  assertEquals(validator instanceof BaseValidator, true);
+  assert(validator instanceof BaseValidator);
   assertEquals(typeof validator.validate, 'function');
 });
 
@@ -78,7 +80,12 @@ Deno.test('test_two_param_validator_structure', () => {
     },
   };
   const validator = new TwoParamsValidator(config);
-  logger.debug("TwoParamsValidator construction", { data: { isBaseValidator: validator instanceof BaseValidator, hasValidate: typeof validator.validate } });
-  assertEquals(validator instanceof BaseValidator, true);
+  logger.debug('TwoParamsValidator construction', {
+    data: {
+      isBaseValidator: validator instanceof BaseValidator,
+      hasValidate: typeof validator.validate,
+    },
+  });
+  assert(validator instanceof BaseValidator);
   assertEquals(typeof validator.validate, 'function');
 });

@@ -3,12 +3,14 @@ import { BreakdownLogger } from '@tettuan/breakdownlogger';
 import { FlagOption } from '../flag_option.ts';
 import { OptionType } from '../../types/option_type.ts';
 
-const logger = new BreakdownLogger("option-model");
+const logger = new BreakdownLogger('option-model');
 
 Deno.test('FlagOption Structure', async (t) => {
   await t.step('should have correct structure', () => {
     const option = new FlagOption('--flag', ['-f'], 'Flag option');
-    logger.debug("FlagOption created", { data: { name: option.name, type: option.type, aliases: option.aliases } });
+    logger.debug('FlagOption created', {
+      data: { name: option.name, type: option.type, aliases: option.aliases },
+    });
     assert(option.type === OptionType.FLAG);
     assertFalse(option.isRequired);
     assertEquals(option.name, '--flag');
@@ -55,7 +57,9 @@ Deno.test('FlagOption Structure', async (t) => {
   await t.step('should validate flag option', () => {
     const option = new FlagOption('--flag', ['-f'], 'Flag option');
     const result = option.validate();
-    logger.debug("FlagOption validation result", { data: { isValid: result.isValid, validatedParams: result.validatedParams } });
+    logger.debug('FlagOption validation result', {
+      data: { isValid: result.isValid, validatedParams: result.validatedParams },
+    });
     assert(result.isValid);
     assertEquals(result.validatedParams, []);
   });
