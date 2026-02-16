@@ -4,19 +4,11 @@ description: Run local CI checks before merge or push. Use when user says 'CI', 
 allowed-tools: [Bash, Read]
 ---
 
-Run the local CI script to validate the project.
+push/マージ前に品質を保証するため、ローカルCIパイプラインを実行する。
 
-## Steps
+1. `deno task ci` 実行
+2. エラー時は `LOG_LEVEL=debug deno task ci` で詳細確認
 
-1. Run `deno task ci`
-2. If errors occur, re-run with debug logging: `LOG_LEVEL=debug deno task ci`
-3. Report results
+パイプライン: check(型検査) → test(全テスト) → fmt(フォーマット) → lint(リント)
 
-## CI pipeline stages (@aidevtool/ci)
-
-1. **check** - Type checking (`deno check`)
-2. **test** - Run all tests in `tests/`
-3. **fmt** - Format check (`deno fmt --check`)
-4. **lint** - Lint check (`deno lint`)
-
-DO NOT push until all checks pass.
+全チェック通過までpush禁止。

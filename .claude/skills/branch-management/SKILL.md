@@ -4,117 +4,23 @@ description: Review and guide branch strategy when creating PRs, merging, or cre
 allowed-tools: [Bash, Read, Grep, Glob]
 ---
 
-# Branch Management Guide
+# Branch Management
 
-## Purpose
+品質を段階検証するため、`Work → release/vX.Y.Z → develop → main → vtag` の一方向でマージする。リリースフローは `/release-procedure` を参照。
 
-Manage branch strategy, naming conventions, and PR rules for breakdownprompt.
+| 操作 | 許可 | 禁止 |
+|------|------|------|
+| main変更 | developからのPRのみ | 直接push、他ブランチからマージ |
+| develop変更 | release/*からのPRのみ | 直接push |
+| release/*作成 | developから分岐 | main・作業ブランチから分岐 |
+| 作業ブランチ作成 | release/*から分岐 | main・developから直接分岐 |
 
-- Full release flow (version bump -> tag -> merge): see `/release-procedure` skill
-- CI execution and troubleshooting: see `/local-ci` skill
+命名: `feature/*` `fix/*` `refactor/*` `docs/*` `release/vX.Y.Z`
 
-## Branch Strategy
+マージ方式: work→release=squash, release→develop=merge, develop→main=merge
 
-### Flow
+## バージョンゲート
 
-```mermaid
-flowchart LR
-    subgraph Protected["Protected (no direct push)"]
-        main[main]
-        develop[develop]
-    end
+release/*ブランチ作成時に `deno.json` のバージョンがJSR最新より大きいことを確認する。未更新なら `/release-procedure` のステップ1（bump_version.sh）を先に実行する。develop→main PR作成時も同様に検証し、バージョン未更新のままマージを進めない。
 
-    subgraph Release["Release branches"]
-        release[release/vX.Y.Z]
-    end
-
-    subgraph Work["Work branches"]
-        feature[feature/*]
-        fix[fix/*]
-        refactor[refactor/*]
-        docs[docs/*]
-    end
-
-    develop -->|branch from| release
-    release -->|branch from| feature
-    release -->|branch from| fix
-    release -->|branch from| refactor
-    release -->|branch from| docs
-
-    feature -->|PR| release
-    fix -->|PR| release
-    refactor -->|PR| release
-    docs -->|PR| release
-
-    release -->|PR| develop
-    develop -->|PR| main
-```
-
-### Merge Direction
-
-```
-Work branch → release/vX.Y.Z → develop → main → vtag
-```
-
-## Rules
-
-| Operation | Allowed | Prohibited |
-|-----------|---------|------------|
-| Changes to main | PR merge from develop only | Direct push, merge from other branches |
-| Changes to develop | PR merge from release/* only | Direct push |
-| Create release/* | Branch from develop | Branch from main or work branches |
-| Create work branches | Branch from release/* | Branch from main or develop directly |
-
-## Procedures
-
-### Create a work branch
-
-```bash
-git checkout release/vX.Y.Z
-git checkout -b feature/my-feature
-```
-
-### Create a PR
-
-| Current branch | PR target | Command |
-|---------------|-----------|---------|
-| feature/*, fix/*, refactor/*, docs/* | release/vX.Y.Z | `gh pr create --base release/vX.Y.Z` |
-| release/* | develop | `gh pr create --base develop` |
-| develop | main | `gh pr create --base main` |
-
-### Merge a PR
-
-1. Verify CI passes: `gh pr checks <PR#>`
-2. Merge with appropriate strategy:
-
-| Merge method | Use case | Command |
-|-------------|----------|---------|
-| Squash | Work branch -> release (clean history) | `gh pr merge --squash` |
-| Merge | release -> develop (preserve history) | `gh pr merge --merge` |
-| Merge | develop -> main (preserve history) | `gh pr merge --merge` |
-
-3. Update local:
-
-```bash
-git checkout <target-branch>
-git pull origin <target-branch>
-```
-
-## Branch naming conventions
-
-```
-feature/*  - New features
-fix/*      - Bug fixes
-refactor/* - Refactoring
-docs/*     - Documentation changes
-release/vX.Y.Z - Release preparation
-```
-
-## Warning patterns
-
-| Operation | Warning |
-|-----------|---------|
-| `git push origin main` | Direct push to main is prohibited. Create a PR from develop. |
-| `git push origin develop` | Direct push to develop is prohibited. Create a PR from release/*. |
-| `git checkout -b feature/* develop` | Work branches must branch from release/*. |
-| `git merge main` | Merging from main is not expected. Check the branch origin. |
+警告: `git push origin main`/`git push origin develop` は直接push禁止。作業ブランチは `release/*` から分岐すること。
