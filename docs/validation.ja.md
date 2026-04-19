@@ -11,9 +11,13 @@ ParamsParser:
   - BaseValidator:
       - バリデータの基底クラス
       - エラーコードとカテゴリの管理
-  - SecurityErrorValidator:
-      - コマンドインジェクションの検出
-      - セキュリティチェック
+  - SecurityValidator:
+      - 二段階のセキュリティ検査
+      - Phase 1 (validatePhase1): 生の引数列に shellInjection のみを適用（全引数対象）
+      - Phase 2 (validatePhase2): オプション解決後、kind: 'path' の値オプションに対して
+        absolutePath / homeExpansion / parentTraversal / specialChars を適用
+      - 設定: CustomConfig.security.policy（Level または SecurityCategoryLevels）
+      - 詳細: docs/development.ja.md#セキュリティ検証
   - OptionsValidator:
       - オプション形式の一元化された検証
       - すべてのパーサーで共通のオプション検証ロジックを提供

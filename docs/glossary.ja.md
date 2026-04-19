@@ -90,6 +90,15 @@
 | カスタム設定値   | ユーザー定義のバリデーション設定。正規表現パターンでカスタムな値を許可。                     | [custom_params.ja.md](custom_params.ja.md) |
 | ParserConfig | パーサーの設定を定義するインターフェース。バリデーションルールを指定するために使用。         | [custom_params.ja.md](custom_params.ja.md) |
 
+## セキュリティ関連
+
+| 用語             | 説明                                                                                                                                                                                 | 参照仕様ファイル                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| SecurityPolicy   | `CustomConfig.security.policy` で宣言するセキュリティ意図。全カテゴリに一律適用する単一の `Level`、または部分的なカテゴリ別マップのいずれか。                                         | [development.ja.md](development.ja.md#セキュリティ検証)  |
+| Level            | カテゴリ単位の強度。`'off'`（無効）／`'safe'`（既定。高精度パターン）／`'strict'`（エンコード変種を含む広い集合）。                                                                   | [development.ja.md](development.ja.md#セキュリティ検証)  |
+| SecurityCategory | 組み込み 5 カテゴリ。`shellInjection`（グローバル）、`absolutePath`、`homeExpansion`、`parentTraversal`、`specialChars`（後者 4 つは path-kind のみ）。                                | [development.ja.md](development.ja.md#セキュリティ検証)  |
+| ValueKind        | 値オプションの値の分類。`'path'` は 4 つのパス系カテゴリを適用し、`'text'`（既定）は `shellInjection` のみを適用。                                                                    | [custom_params.ja.md](custom_params.ja.md#8-セキュリティポリシー) |
+
 ## エラー関連
 
 | 用語                 | 説明                                                                                             | 参照仕様ファイル                           |

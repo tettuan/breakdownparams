@@ -690,31 +690,30 @@ class ErrorFactory {
 
 ## 4. バリデーション詳細
 
-### 4.1 セキュリティチェック
+### 4.1 セキュリティチェック（二段階）
+
+`SecurityValidator` は `CustomConfig.security.policy` を受け取り、カテゴリごとの `Level`（`'off'` / `'safe'` / `'strict'`）に応じた正規表現で判定する。
 
 ```typescript
 class SecurityValidator {
-  static validate(args: string[]): void {
-    // コマンドインジェクションの検出
-    if (this.containsCommandInjection(args)) {
-      throw new Error("Potential command injection detected");
-    }
+  constructor(customConfig?: CustomConfig) { /* policy を保持 */ }
 
-    // 不正な文字の検出
-    if (this.containsInvalidCharacters(args)) {
-      throw new Error("Invalid characters detected");
-    }
+  // Phase 1: 生の引数列に対して shellInjection のみを適用（全引数対象）
+  validatePhase1(args: string[]): void {
+    // shellInjection パターンを resolveEffectivePolicy の結果に従って実行
   }
 
-  private static containsCommandInjection(args: string[]): boolean {
-    // コマンドインジェクション検出の実装
-  }
-
-  private static containsInvalidCharacters(args: string[]): boolean {
-    // 不正な文字検出の実装
+  // Phase 2: オプション解決後、kind: 'path' の値オプションのみに 4 パス系カテゴリを適用
+  validatePhase2(input: {
+    positionalParams: string[];
+    resolvedOptions: Map<string, { value: string; rawArg: string; isUserVariable: boolean }>;
+  }): void {
+    // first-hit-wins: absolutePath → homeExpansion → parentTraversal → specialChars
   }
 }
 ```
+
+違反時は `SECURITY_ERROR` を投げ、メッセージは `Security error: <category> violation in <context>` 形式。詳細は [セキュリティ検証](../development.ja.md#セキュリティ検証) を参照。
 
 ### 4.2 オプション検証
 
