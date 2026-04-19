@@ -33,16 +33,16 @@ Deno.test('OptionValidator Unit Tests', async (t) => {
     assert(validResult.isValid);
     assert(Object.keys(validResult.options || {}).length === 0);
 
-    // All options are invalid
-    const invalidResult = validator.validate(['--from=test'], 'one', DEFAULT_OPTION_RULE);
+    // --from is allowed in one mode by DEFAULT_CUSTOM_CONFIG.validation.one.allowedValueOptions.
+    const fromResult = validator.validate(['--from=test'], 'one', DEFAULT_OPTION_RULE);
+    assert(fromResult.isValid);
+    assert(fromResult.options?.from === 'test');
+
+    // Truly unknown options must still be rejected.
+    const invalidResult = validator.validate(['--invalid=test'], 'one', DEFAULT_OPTION_RULE);
     assert(!invalidResult.isValid);
     assert(invalidResult.errorMessage?.includes('Invalid options'));
     assert(invalidResult.errorCode === 'INVALID_OPTIONS');
-
-    const invalidResult2 = validator.validate(['--invalid=test'], 'one', DEFAULT_OPTION_RULE);
-    assert(!invalidResult2.isValid);
-    assert(invalidResult2.errorMessage?.includes('Invalid options'));
-    assert(invalidResult2.errorCode === 'INVALID_OPTIONS');
   });
 
   await t.step('should validate two options correctly', () => {

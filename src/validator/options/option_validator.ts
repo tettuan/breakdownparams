@@ -1,5 +1,6 @@
 import type { OptionRule } from '../../types/option_rule.ts';
 import type { ValidationResult } from '../../types/validation_result.ts';
+import { type CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../../types/custom_config.ts';
 
 /**
  * Predefined error messages for option validation.
@@ -50,9 +51,45 @@ export interface OptionValidator {
  * @implements {OptionValidator}
  */
 abstract class BaseOptionValidator implements OptionValidator {
-  protected abstract readonly paramType: 'zero' | 'one' | 'two';
-  protected abstract readonly validOptions: string[];
-  protected abstract readonly allowUserVariables: boolean;
+  protected readonly paramType: 'zero' | 'one' | 'two';
+  /**
+   * Allowed option names for this parameter mode.
+   *
+   * Sourced from `CustomConfig.validation.{zero,one,two}.allowedOptions` and
+   * `allowedValueOptions` (concatenated, deduplicated). When CustomConfig is
+   * not injected, falls back to `DEFAULT_CUSTOM_CONFIG`.
+   *
+   * Per docs/custom_params.md section 2.3, this list REPLACES the default
+   * (it does not append). Users who want to extend defaults must spread
+   * `DEFAULT_CUSTOM_CONFIG.validation.{mode}.allowedOptions` themselves.
+   */
+  protected readonly validOptions: string[];
+  /**
+   * Whether `--uv-*` user variable options are accepted in this mode.
+   * Sourced from `CustomConfig.validation.{zero,one,two}.allowUserVariables`.
+   */
+  protected readonly allowUserVariables: boolean;
+
+  /**
+   * @param paramType   Parameter mode this validator handles ('zero' | 'one' | 'two').
+   * @param customConfig Optional CustomConfig for option allow-lists.
+   *                     Defaults to DEFAULT_CUSTOM_CONFIG when omitted.
+   */
+  protected constructor(
+    paramType: 'zero' | 'one' | 'two',
+    customConfig: CustomConfig = DEFAULT_CUSTOM_CONFIG,
+  ) {
+    this.paramType = paramType;
+    const rules = customConfig.validation[paramType];
+    // Merge allowedOptions and allowedValueOptions; dedupe to keep the list
+    // semantically a set of allowed option names.
+    const merged = [
+      ...rules.allowedOptions,
+      ...(rules.allowedValueOptions ?? []),
+    ];
+    this.validOptions = Array.from(new Set(merged));
+    this.allowUserVariables = rules.allowUserVariables;
+  }
 
   /**
    * Normalizes an option string into key and value components.
@@ -183,35 +220,49 @@ abstract class BaseOptionValidator implements OptionValidator {
 }
 
 /**
- * Validator for zero parameter options (help/version)
+ * Validator for zero parameter options (help/version).
+ *
+ * Allowed options are sourced from
+ * `CustomConfig.validation.zero.allowedOptions` /
+ * `allowedValueOptions` / `allowUserVariables`.
  */
 export class ZeroOptionValidator extends BaseOptionValidator {
-  protected readonly paramType = 'zero' as const;
-  protected readonly validOptions = [];
-  protected readonly allowUserVariables = false;
+  /**
+   * @param customConfig Optional CustomConfig override.
+   */
+  constructor(customConfig?: CustomConfig) {
+    super('zero', customConfig);
+  }
 }
 
 /**
- * Validator for one parameter options (init)
+ * Validator for one parameter options (e.g. `init`).
+ *
+ * Allowed options are sourced from
+ * `CustomConfig.validation.one.allowedOptions` /
+ * `allowedValueOptions` / `allowUserVariables`.
  */
 export class OneOptionValidator extends BaseOptionValidator {
-  protected readonly paramType = 'one' as const;
-  protected readonly validOptions = [];
-  protected readonly allowUserVariables = false;
+  /**
+   * @param customConfig Optional CustomConfig override.
+   */
+  constructor(customConfig?: CustomConfig) {
+    super('one', customConfig);
+  }
 }
 
 /**
- * Validator for two parameter options (main functionality)
+ * Validator for two parameter options (main directive/layer commands).
+ *
+ * Allowed options are sourced from
+ * `CustomConfig.validation.two.allowedOptions` /
+ * `allowedValueOptions` / `allowUserVariables`.
  */
 export class TwoOptionValidator extends BaseOptionValidator {
-  protected readonly paramType = 'two' as const;
-  protected readonly validOptions = [
-    'from',
-    'destination',
-    'input',
-    'adaptation',
-    'config',
-    'edition',
-  ];
-  protected readonly allowUserVariables = true;
+  /**
+   * @param customConfig Optional CustomConfig override.
+   */
+  constructor(customConfig?: CustomConfig) {
+    super('two', customConfig);
+  }
 }

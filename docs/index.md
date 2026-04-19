@@ -195,7 +195,7 @@ For detailed specifications, please refer to the [User Variable Options Specific
 # Parameter Priority Rules
 
 - When both short and long form options are specified, the long form takes precedence. The long form is primary, and the short form is considered an alias.
-- No path processing is performed (values are used as is)
+- Path values are passed through as-is, with only the minimum security checks applied (shell injection on all arguments, path traversal on path-like arguments). No normalization, resolution, or filesystem access is performed. See [Security Validation](development.md#security-validation) for details.
 - Aliases must be lowercase (uppercase variants are not processed and are ignored without error)
 - Undefined aliases are treated as unspecified (ignored without error)
 

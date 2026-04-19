@@ -10,8 +10,9 @@ It specializes in parameter parsing, validation, and value storage, aiming for a
 1. **Single Responsibility**
    - Only handles parameter parsing and storage
    - Does not interpret parameter meanings
-   - Does not process values (e.g., path normalization)
+   - Does not process path values (no normalization, no resolution, no filesystem access)
    - Does not have default values (returns error on validation failure)
+   - Performs only the minimum security checks described in "Security Validation" below
 
 2. **Clear Interface**
    - Input: String array (command-line arguments)
@@ -167,16 +168,38 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 // }
 ```
 
+## Security Validation
+
+The parser performs a minimum set of security checks on the raw arguments. These are intentionally narrow: they reject inputs that have no legitimate use as CLI arguments, but they do **not** attempt to interpret values as paths, files, or URLs.
+
+### What the parser does
+
+- **Shell injection check (all arguments)**: Rejects any argument containing the metacharacters `;`, `|`, `&`, `<`, `>`. Applied uniformly to every argument, including option values and positional arguments.
+- **Path traversal check (path-like arguments only)**: For arguments that semantically denote a path (`--from`, `--destination`, `--config`, `--input`, `--edition`, `--adaptation`, and positional arguments), rejects values that contain `../`, `..\\`, or end with a trailing `..`. This is a minimal-defense check against the most common traversal patterns and is not a substitute for downstream sanitization.
+
+### What the parser does **not** do
+
+- No path normalization or resolution (`path.normalize`, `path.resolve` are not invoked)
+- No filesystem access (existence, permission, or stat checks)
+- No directory traversal of the filesystem
+- No allow-list / deny-list judgment of paths
+- No interpretation of value semantics beyond the checks above
+
+### Exemption: `--uv-*` user variables
+
+`--uv-*` values are template variable values, not paths. They are explicitly **excluded from the path traversal check**, so any text — including `../`, ellipsis (`...`), narrative text, or multi-line content — may be passed through. The shell injection check still applies.
+
 ## Constraints
 
 1. **Unsupported Features**
    - Parameter meaning interpretation
-   - Path validation/normalization
+   - Path normalization/resolution (only the minimal traversal check above is performed)
+   - Filesystem access of any kind
    - User variable option value validation (syntax check only)
 
 2. **Limitations**
    - Maximum of 2 parameters
-   - No path string processing
+   - No path string processing beyond the minimal security check
    - Last specification takes effect for duplicate options
    - User variable options only available in TwoParams mode
 

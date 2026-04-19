@@ -33,13 +33,13 @@ without touching source code.
 ## 2. Quick Start
 
 ```typescript
-import { BreakdownLogger } from "jsr:@tettuan/breakdownlogger";
+import { BreakdownLogger } from 'jsr:@tettuan/breakdownlogger';
 
 // example_test.ts
-Deno.test("my first logged test", () => {
-  const logger = new BreakdownLogger("example");
-  logger.info("Test is running");
-  logger.debug("Detailed state", { step: 1, status: "ok" });
+Deno.test('my first logged test', () => {
+  const logger = new BreakdownLogger('example');
+  logger.info('Test is running');
+  logger.debug('Detailed state', { step: 1, status: 'ok' });
 });
 ```
 
@@ -164,20 +164,20 @@ value:
 
 ```typescript
 async function processOrder(order: Order): Promise<Receipt> {
-  const logger = new BreakdownLogger("order");
-  logger.debug("processOrder called", order); // 1
-  logger.debug("Calling paymentGateway.charge", { orderId: order.id }); // 3
+  const logger = new BreakdownLogger('order');
+  logger.debug('processOrder called', order); // 1
+  logger.debug('Calling paymentGateway.charge', { orderId: order.id }); // 3
   try {
     const charge = await paymentGateway.charge(order);
-    logger.debug("paymentGateway.charge returned", charge); // 3
+    logger.debug('paymentGateway.charge returned', charge); // 3
   } catch (err) {
-    logger.error("paymentGateway.charge failed", {
+    logger.error('paymentGateway.charge failed', {
       orderId: order.id,
       error: err,
     }); // 4
     throw err;
   }
-  logger.debug("processOrder returning", receipt); // 2
+  logger.debug('processOrder returning', receipt); // 2
   return receipt;
 }
 ```
@@ -271,8 +271,8 @@ messages compact.
 Use separate keys for caller/callee to trace data across boundaries:
 
 ```typescript
-const callerLog = new BreakdownLogger("order-caller");
-const serviceLog = new BreakdownLogger("order-service");
+const callerLog = new BreakdownLogger('order-caller');
+const serviceLog = new BreakdownLogger('order-service');
 ```
 
 ```bash
@@ -284,9 +284,9 @@ LOG_LEVEL=debug LOG_KEY=order-caller,order-service deno test --allow-env --allow
 Assign each subsystem its own logger and filter with `LOG_KEY`:
 
 ```typescript
-const authLog = new BreakdownLogger("auth");
-const dbLog = new BreakdownLogger("database");
-const cacheLog = new BreakdownLogger("cache");
+const authLog = new BreakdownLogger('auth');
+const dbLog = new BreakdownLogger('database');
+const cacheLog = new BreakdownLogger('cache');
 ```
 
 ```bash

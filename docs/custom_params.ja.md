@@ -38,8 +38,15 @@
 ### 2.3 バリデーションルール
 
 各パラメータモード（zero/one/two）ごとに：
-- 許可されるオプションのリスト
+- 許可されるオプションのリスト（`validation.{zero,one,two}.allowedOptions`）
 - カスタム変数の許可/不許可
+
+#### `validation.{zero,one,two}.allowedOptions` のセマンティクス
+
+- このリストは、該当パラメータモードに対する `OptionValidator`
+  （`ZeroOptionValidator` / `OneOptionValidator` / `TwoOptionValidator`）が許可と判定する正規オプション名の一覧を定義します。
+- このリストはデフォルトを **置換** します。**追加（追記）ではありません**。利用者がここに書いたものがそのまま OptionValidator の許可リストになります。デフォルトに追加したい場合は、`DEFAULT_CUSTOM_CONFIG.validation.{mode}.allowedOptions` をスプレッドした上で要素を追記してください。
+- `ParamsParser` は OptionValidator を生成する際に `CustomConfig` を注入するため、ここで設定した値が各モードで受理されるオプションを直接決定します。
 
 ## 3. 設定値
 

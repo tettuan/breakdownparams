@@ -19,6 +19,7 @@
 3. **セキュリティエラー**
    - コマンドインジェクションの検出
    - 不正な文字列の検出
+   - パストラバーサル試行の検出
 
 ## 2. エラーコードとメッセージ
 
@@ -47,6 +48,15 @@
 |------------|------------|------|
 | COMMAND_INJECTION | "Potential command injection detected" | コマンドインジェクションの可能性を検出 |
 | INVALID_CHARACTERS | "Invalid characters detected in input" | 不正な文字を検出 |
+| PATH_TRAVERSAL | "Security error: Path traversal attempt detected" | パストラバーサル試行を検出 |
+
+#### パストラバーサル検査の対象と条件
+
+- **対象引数**: 意味的にパスを表す引数のみ
+  - `--from`, `--destination`, `--config`, `--input`, `--edition`, `--adaptation`
+  - 位置引数（directiveType / layerType / `init` など）
+- **拒否条件**: 値に `../`、`..\\`、または末尾の `..` を含むものを拒否
+- **対象外**: `--uv-*`（ユーザー変数）はテンプレート変数値として素通りする。パスとしては解釈されないため、`../` 等を含んでもエラーにはならない
 
 ## 3. エラー結果の構造
 

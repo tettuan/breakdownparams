@@ -229,13 +229,7 @@ Deno.test('Error Combinations - Option Constraint Violations', async (t) => {
 
   // Test cases: Option constraint violation combinations
   const combinations = [
-    // OneParam + multiple invalid options
-    {
-      args: ['init', '--config=test', '--from=input.md'],
-      expectedError: 'Invalid options for one parameters',
-      expectedCode: 'INVALID_OPTIONS',
-      description: 'OneParam with multiple invalid options',
-    },
+    // OneParam + user variable (one mode does not allow --uv-* per DEFAULT_CUSTOM_CONFIG)
     {
       args: ['init', '--uv-test=value', '--destination=output.md'],
       expectedError: 'Invalid options for one parameters',
@@ -372,9 +366,11 @@ Deno.test('Error Combinations - Mixed Form Errors', async (t) => {
 
   // Test cases: Error scenarios with mixed long/short form options
   const combinations = [
-    // OneParam + mixed long/short form invalid options
+    // OneParam + unknown long-form option (`-f=input.md` short form is ignored
+    // by the long-form-only option parser; the unknown `--unknown=value`
+    // triggers the constraint violation).
     {
-      args: ['init', '--config=test', '-f=input.md'],
+      args: ['init', '--unknown=value', '-f=input.md'],
       expectedError: 'Invalid options for one parameters',
       expectedCode: 'INVALID_OPTIONS',
       description: 'OneParam with mixed form invalid options',
