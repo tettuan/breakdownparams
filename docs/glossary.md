@@ -90,6 +90,15 @@ This normalization is handled by the Option classes themselves, following the op
 | Custom Configuration | User-defined validation configuration. Allows custom values with regex patterns.                                                              | [custom_params.md](custom_params.md) |
 | ParserConfig  | Interface that defines parser configuration. Used to specify validation rules.                                                                  | [custom_params.md](custom_params.md) |
 
+## Security Related
+
+| Term              | Description                                                                                                                                    | Reference Specification    |
+|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| SecurityPolicy    | Declarative expression of security intent injected via `CustomConfig.security.policy`. Either a single `Level` applied to every category, or a partial per-category map. | [development.md](development.md#security-validation) |
+| Level             | Per-category enforcement strength: `'off'` (disabled), `'safe'` (default; high-confidence patterns), or `'strict'` (broader pattern set including encoded variants). | [development.md](development.md#security-validation) |
+| SecurityCategory  | One of five built-in categories: `shellInjection` (global), `absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars` (the latter four are path-kind only). | [development.md](development.md#security-validation) |
+| ValueKind         | Classification of a value option's content: `'path'` opts the value into the four path-related categories; `'text'` (default) limits checks to `shellInjection`. | [custom_params.md](custom_params.md#8-security-policy) |
+
 ## Error Related
 
 | Term              | Description                                                                                                                                    | Reference Specification    |

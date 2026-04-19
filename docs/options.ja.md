@@ -158,6 +158,10 @@ breakdown to project --config= --uv-environment="" --uv-version=
 - ユーザー変数オプション（`--uv-config`）は`uv-config`に正規化されます（先頭のハイフンを除去）
 - 各オプションクラスが独自の正規化ロジックを処理します
 
+## セキュリティ検証
+
+値オプションは二段階のセキュリティバリデータを通過します。すべての引数はまずグローバルな `shellInjection` チェック（Phase 1）を受け、その後オプション解決を経た値オプションのうち `kind` が `'path'` のものは、4 つのパス系カテゴリ（`absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars`）でもチェックされます。組み込みの `--from` と `--destination` は既定で `kind: 'path'`、`--input`, `--adaptation`, `--config`, `--edition` は既定で `kind: 'text'` のためパス系 4 カテゴリは適用されません。呼び出し側が独自登録する値オプションも既定は `kind: 'text'` です。パスとして扱いたい場合は `kind: 'path'` を明示してください。詳細な行列と設定例は [セキュリティ検証](development.ja.md#セキュリティ検証)、[セキュリティポリシー](custom_params.ja.md#8-セキュリティポリシー) を参照。
+
 ## 返却型
 
 オプションの解析結果は、パラメータの型に含まれて返却されます：
