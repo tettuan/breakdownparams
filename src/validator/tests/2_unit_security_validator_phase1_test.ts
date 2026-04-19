@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@^0.218.2';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
-import { SecurityValidator } from '../security_validator.ts';
+import { formatSecurityError, SecurityValidator } from '../security_validator.ts';
 
 const logger = new BreakdownLogger('security-phase1');
 
@@ -8,7 +8,7 @@ const logger = new BreakdownLogger('security-phase1');
 //
 // v1.3.0 変更点:
 //   - error message が `'Security error: <category> violation in <context>'`
-//     に統一された。
+//     に統一された (formatSecurityError でテストも導出)。
 //   - 標準 `validate(args)`（CustomConfig 不指定）は Phase 1 (shellInjection)
 //     と back-compat の parentTraversal を順に実行する。
 //   - 詳細は design.md / CHANGELOG 参照。
@@ -48,7 +48,7 @@ Deno.test('phase1: ../etc/passwd は parentTraversal で拒否される', () => 
   assertFalse(result.isValid, 'path traversal は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: parentTraversal violation in positional',
+    formatSecurityError('parentTraversal', 'positional'),
   );
 });
 
@@ -62,7 +62,7 @@ Deno.test('phase1: --from=../sibling は parentTraversal で拒否される', ()
   assertFalse(result.isValid, 'path traversal は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: parentTraversal violation in option from',
+    formatSecurityError('parentTraversal', 'option from'),
   );
 });
 
@@ -73,7 +73,7 @@ Deno.test('phase1: ..\\windows\\sys は parentTraversal で拒否される', () 
   assertFalse(result.isValid, 'バックスラッシュ path traversal は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: parentTraversal violation in positional',
+    formatSecurityError('parentTraversal', 'positional'),
   );
 });
 
@@ -84,7 +84,7 @@ Deno.test('phase1: 末尾 .. は parentTraversal で拒否される', () => {
   assertFalse(result.isValid, '末尾 .. は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: parentTraversal violation in positional',
+    formatSecurityError('parentTraversal', 'positional'),
   );
 });
 
@@ -95,7 +95,7 @@ Deno.test('phase1: --uv-* でも shell injection は拒否される', () => {
   assertFalse(result.isValid, '--uv-* でも shell injection は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: shellInjection violation in argument',
+    formatSecurityError('shellInjection', 'argument'),
   );
 });
 
@@ -106,7 +106,7 @@ Deno.test('phase1: 通常引数の shell injection は拒否される', () => {
   assertFalse(result.isValid, '通常引数の shell injection は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: shellInjection violation in positional',
+    formatSecurityError('shellInjection', 'positional'),
   );
 });
 

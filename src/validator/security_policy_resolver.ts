@@ -37,14 +37,23 @@ export const ALL_CATEGORIES: ReadonlyArray<SecurityCategory> = [
  * Categories that require a value with `kind === 'path'` to be evaluated.
  *
  * @reason When `kind` is not `'path'`, these categories are forced to `'off'`
- * by `resolveEffectivePolicy`.
+ * by `resolveEffectivePolicy`. Exported so tests can derive the path-only
+ * subset instead of duplicating the list.
  */
-const PATH_ONLY_CATEGORIES: ReadonlyArray<SecurityCategory> = [
+export const PATH_ONLY_CATEGORIES: ReadonlyArray<SecurityCategory> = [
   'absolutePath',
   'homeExpansion',
   'parentTraversal',
   'specialChars',
 ] as const;
+
+/**
+ * Authoritative list of every supported security level.
+ *
+ * @intent Mirrors the `Level` union in {@link ../types/custom_config.ts} so
+ * tests can iterate without re-stating the literal values.
+ */
+export const ALL_LEVELS: ReadonlyArray<Level> = ['off', 'safe', 'strict'] as const;
 
 /**
  * Default security level applied when neither global nor per-option policy

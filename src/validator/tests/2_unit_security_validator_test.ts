@@ -1,71 +1,79 @@
 import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@^0.218.2';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
-import { SecurityValidator } from '../security_validator.ts';
+import {
+  formatSecurityError,
+  SECURITY_ERROR_CODE_VALUE,
+  SecurityValidator,
+} from '../security_validator.ts';
 
 const logger = new BreakdownLogger('security');
 
-Deno.test('test_security_validator_unit', () => {
+/**
+ * @purpose Smoke-level Acceptance / Rejection / Diagnosis triplet through
+ *   the legacy `validate(args)` entry point.
+ *
+ * @reason Detailed Phase 1 / Phase 2 / per-category coverage lives in
+ *   2_unit_security_validator_phase1_test.ts and
+ *   2_unit_security_validator_categories_test.ts. This file keeps a few
+ *   high-level invariants only, with messages derived from
+ *   {@link formatSecurityError}.
+ */
+
+Deno.test('unit: validate accepts a benign param', () => {
   const validator = new SecurityValidator();
-
-  // Normal case test
-  const validResult = validator.validate(['safe_param']);
+  const result = validator.validate(['safe_param']);
   logger.debug('Valid security result', {
-    data: { isValid: validResult.isValid, validatedParams: validResult.validatedParams },
+    data: { isValid: result.isValid, validatedParams: result.validatedParams },
   });
-  assert(validResult.isValid, 'Safe param should be valid');
-  assertEquals(validResult.validatedParams, ['safe_param'], 'Should return correct param');
+  assert(result.isValid, 'Safe param should be valid');
+  assertEquals(result.validatedParams, ['safe_param'], 'Should return correct param');
+});
 
-  // Abnormal case test - shell command execution attempt
-  const shellCommandResult = validator.validate(['test; rm -rf /']);
+Deno.test('unit: validate rejects shell command injection with diagnostic message', () => {
+  const validator = new SecurityValidator();
+  const result = validator.validate(['test; rm -rf /']);
   logger.debug('Shell command rejection result', {
-    data: { isValid: shellCommandResult.isValid, errorCode: shellCommandResult.errorCode },
+    data: { isValid: result.isValid, errorCode: result.errorCode },
   });
-  assertFalse(shellCommandResult.isValid, 'Shell command should be rejected');
+  assertFalse(result.isValid, 'Shell command should be rejected');
   assertEquals(
-    shellCommandResult.errorMessage,
-    'Security error: shellInjection violation in positional',
-    'Should return correct error message',
+    result.errorMessage,
+    formatSecurityError('shellInjection', 'positional'),
   );
-  assertEquals(shellCommandResult.errorCode, 'SECURITY_ERROR', 'Should return correct error code');
+  assertEquals(result.errorCode, SECURITY_ERROR_CODE_VALUE);
+});
 
-  // Abnormal case test - path traversal attempt
-  const pathTraversalResult = validator.validate(['../../../etc/passwd']);
-  assertFalse(pathTraversalResult.isValid, 'Path traversal should be rejected');
+Deno.test('unit: validate rejects parent traversal with diagnostic message', () => {
+  const validator = new SecurityValidator();
+  const result = validator.validate(['../../../etc/passwd']);
+  assertFalse(result.isValid, 'Path traversal should be rejected');
   assertEquals(
-    pathTraversalResult.errorMessage,
-    'Security error: parentTraversal violation in positional',
-    'Should return correct error message',
+    result.errorMessage,
+    formatSecurityError('parentTraversal', 'positional'),
   );
-  assertEquals(pathTraversalResult.errorCode, 'SECURITY_ERROR', 'Should return correct error code');
+  assertEquals(result.errorCode, SECURITY_ERROR_CODE_VALUE);
+});
 
-  // Security check for short form options
-  // Verify that short form options pass
-  const shortOptionsResult = validator.validate(['-h', '-v', '-f=input.md']);
-  assert(shortOptionsResult.isValid, 'Short form options should pass security check');
-  assertEquals(
-    shortOptionsResult.validatedParams,
-    ['-h', '-v', '-f=input.md'],
-    'Should return all short options',
-  );
+Deno.test('unit: validate accepts short-form options', () => {
+  const validator = new SecurityValidator();
+  const args = ['-h', '-v', '-f=input.md'];
+  const result = validator.validate(args);
+  assert(result.isValid, 'Short form options should pass security check');
+  assertEquals(result.validatedParams, args);
+});
 
-  // Security check for custom variable options
-  const userVarResult = validator.validate(['--uv-project=myproject', '--uv-version=1.0.0']);
-  assert(userVarResult.isValid, 'User variables should pass security check');
-  assertEquals(
-    userVarResult.validatedParams,
-    ['--uv-project=myproject', '--uv-version=1.0.0'],
-    'Should return all user variables',
-  );
+Deno.test('unit: validate accepts user-variable args', () => {
+  const validator = new SecurityValidator();
+  const args = ['--uv-project=myproject', '--uv-version=1.0.0'];
+  const result = validator.validate(args);
+  assert(result.isValid, 'User variables should pass security check');
+  assertEquals(result.validatedParams, args);
+});
 
-  // Combination of short form options and regular parameters
-  const mixedArgsResult = validator.validate(['to', 'project', '-f=input.md', '-o=output.md']);
-  assert(
-    mixedArgsResult.isValid,
-    'Mixed params and short options should pass security check',
-  );
-  assertEquals(
-    mixedArgsResult.validatedParams,
-    ['to', 'project', '-f=input.md', '-o=output.md'],
-    'Should return all arguments',
-  );
+Deno.test('unit: validate accepts mixed positional + short-form options', () => {
+  const validator = new SecurityValidator();
+  const args = ['to', 'project', '-f=input.md', '-o=output.md'];
+  const result = validator.validate(args);
+  assert(result.isValid, 'Mixed params and short options should pass');
+  assertEquals(result.validatedParams, args);
 });

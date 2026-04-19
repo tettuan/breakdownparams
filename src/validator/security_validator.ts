@@ -248,10 +248,41 @@ function firstCategoryViolation(
 
 /**
  * Build the canonical security error message.
+ *
+ * @reason Exported as {@link formatSecurityError} so tests can assert against
+ * the same template the validator produces. This eliminates test-side string
+ * duplication and keeps the message format under a single source of truth.
  */
 function buildErrorMessage(category: SecurityCategory, context: string): string {
   return `Security error: ${category} violation in ${context}`;
 }
+
+/**
+ * Public alias for {@link buildErrorMessage}.
+ *
+ * @intent Single source of truth for the security error message template.
+ *   Production code uses this to produce `errorMessage`; tests use it to
+ *   derive expected values without duplicating the format string.
+ */
+export function formatSecurityError(category: SecurityCategory, context: string): string {
+  return buildErrorMessage(category, context);
+}
+
+/**
+ * Public security error code.
+ *
+ * @intent Re-export of {@link SECURITY_ERROR_CODE} so tests can derive the
+ *   expected `errorCode` instead of hardcoding the string.
+ */
+export const SECURITY_ERROR_CODE_VALUE = SECURITY_ERROR_CODE;
+
+/**
+ * Public security error category.
+ *
+ * @intent Re-export of {@link SECURITY_ERROR_CATEGORY} so tests can derive the
+ *   expected `errorCategory` instead of hardcoding the string.
+ */
+export const SECURITY_ERROR_CATEGORY_VALUE = SECURITY_ERROR_CATEGORY;
 
 /**
  * Build a successful ValidationResult with the given echoed params.
