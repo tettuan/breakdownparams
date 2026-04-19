@@ -81,22 +81,19 @@ Deno.test('CustomConfig functionality', async (t) => {
       assertEquals(result1.options.destination, 'output.md');
     }
 
-    // Test disallowed option
+    // Test disallowed option: rejected by OptionValidator (allowedOptions in CustomConfig).
     const result2 = parser.parse(['to', 'project', '--config=myconfig']);
     assertEquals(result2.type, 'error');
     if (result2.type === 'error' && result2.error) {
-      assertEquals(result2.error.code, 'INVALID_OPTION');
+      assertEquals(result2.error.code, 'INVALID_OPTIONS');
     }
 
-    // Test user variables (currently still allowed despite config)
-    // TODO(tettuan): Update when user variable validation is fully implemented
+    // Test user variables: allowUserVariables=false should reject --uv-* options.
     const result3 = parser.parse(['to', 'project', '--uv-test=value']);
-    assertEquals(result3.type, 'two');
-    // This should be error when user variable validation is implemented
-    // assertEquals(result3.type, 'error');
-    // if (result3.type === 'error' && result3.error) {
-    //   assertEquals(result3.error.code, 'INVALID_OPTION');
-    // }
+    assertEquals(result3.type, 'error');
+    if (result3.type === 'error' && result3.error) {
+      assertEquals(result3.error.code, 'INVALID_OPTIONS');
+    }
   });
 
   await t.step('should allow different allowed options per mode', () => {
@@ -130,9 +127,9 @@ Deno.test('CustomConfig functionality', async (t) => {
     const result2 = parser.parse(['--version']);
     assertEquals(result2.type, 'error'); // version not allowed
 
-    // Test one mode
+    // Test one mode: allowedOptions=['from','destination'] so --from is accepted.
     const result3 = parser.parse(['init', '--from=src']);
-    assertEquals(result3.type, 'error'); // OneOptionValidator doesn't allow any options
+    assertEquals(result3.type, 'one');
 
     const result4 = parser.parse(['init', '--config=test']);
     assertEquals(result4.type, 'error'); // config not allowed in one mode
