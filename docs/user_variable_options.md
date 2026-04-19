@@ -45,6 +45,15 @@ This document defines the specification for implementing user variable options a
 - Values must be specified after the `=` symbol
 - Empty values are allowed
 
+### Security Validation
+
+`--uv-*` values are treated as template variable values, not paths. Their interaction with the parser's security checks is intentionally narrow:
+
+- **Path traversal check: not applied.** `--uv-*` values are exempt from the path traversal check, because they are never interpreted as paths by the parser. Values containing `../`, `..\\`, ellipsis (`...`), narrative text, or multi-line content are passed through verbatim.
+- **Shell injection check: applied.** The check for `;`, `|`, `&`, `<`, `>` continues to apply to `--uv-*` values, the same as for any other argument.
+
+This design lets callers pass arbitrary template content (including text that resembles paths) through user variables, while still rejecting shell metacharacters that have no legitimate use in CLI input.
+
 ## Usage Examples
 
 ### One Variable
