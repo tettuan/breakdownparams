@@ -27,12 +27,91 @@ export interface ParamsConfig {
 }
 
 /**
- * Option definition
+ * Security enforcement level for a single category.
+ *
+ * - `'off'` disables the category completely.
+ * - `'safe'` rejects the most common high-confidence threats.
+ * - `'strict'` rejects a broader pattern set, including encoded variants.
+ *
+ * @intent Express the trade-off between false positives and coverage explicitly.
+ */
+export type Level = 'off' | 'safe' | 'strict';
+
+/**
+ * The five built-in security categories enforced by SecurityValidator.
+ *
+ * - `shellInjection` — shell control characters (Phase 1, applies to every argument)
+ * - `absolutePath` — POSIX/Windows absolute paths (Phase 2, path-kind only)
+ * - `homeExpansion` — `~` based home directory expansion (Phase 2, path-kind only)
+ * - `parentTraversal` — `..` traversal sequences (Phase 2, path-kind only)
+ * - `specialChars` — control characters / non-printable bytes (Phase 2, path-kind only)
+ *
+ * @intent Each category has an independent level so callers can tune surface area.
+ */
+export type SecurityCategory =
+  | 'shellInjection'
+  | 'absolutePath'
+  | 'homeExpansion'
+  | 'parentTraversal'
+  | 'specialChars';
+
+/**
+ * Per-category level map.
+ *
+ * @expects Missing keys fall back to the surrounding global level.
+ */
+export type SecurityCategoryLevels = Partial<Record<SecurityCategory, Level>>;
+
+/**
+ * Security policy expression.
+ *
+ * Either a single level applied to every category, or an explicit per-category
+ * map. The value is interpreted by `resolveEffectivePolicy`.
+ *
+ * @reason Most callers only want a single knob. Power users can override
+ * individual categories without adopting a full custom resolver.
+ */
+export type SecurityPolicy = Level | SecurityCategoryLevels;
+
+/**
+ * Classification of a value option's content kind.
+ *
+ * - `'path'` — value is treated as a filesystem path; the four path-related
+ *   categories (absolutePath / homeExpansion / parentTraversal / specialChars)
+ *   are evaluated.
+ * - `'text'` — value is opaque text; only `shellInjection` (Phase 1) applies.
+ *
+ * @reason Path checks would produce false positives on arbitrary text values
+ * (e.g. `--config=../sibling` is a config file name, not a traversal attempt).
+ */
+export type ValueKind = 'path' | 'text';
+
+/**
+ * Top-level security configuration injected via `CustomConfig.security`.
+ *
+ * @intent Library callers express security intent declaratively rather than
+ * by registering custom validator instances.
+ */
+export interface SecurityConfig {
+  policy: SecurityPolicy;
+}
+
+/**
+ * Option definition for a single CLI option entry.
+ *
+ * @property kind - For value options only: how the value should be classified
+ *   for security validation. Defaults to `'text'` when omitted; built-in
+ *   `from` and `destination` default to `'path'`.
+ * @property securityPolicy - Per-option override of the global security policy.
+ *   Only the four path categories can be relaxed/tightened per-option;
+ *   `shellInjection` is global.
  */
 export interface OptionDefinition {
   shortForm?: string;
   description: string;
   valueRequired?: boolean;
+  kind?: ValueKind;
+  securityPolicy?: SecurityPolicy;
 }
 
 /**
@@ -84,6 +163,11 @@ export interface CustomConfig {
     two: ValidationRules;
   };
   errorHandling: ErrorHandlingConfig;
+  /**
+   * Optional security policy. When omitted the runtime treats it as
+   * `{ policy: 'safe' }` for all categories.
+   */
+  security?: SecurityConfig;
 }
 
 /**
@@ -118,31 +202,37 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
         shortForm: 'f',
         description: 'Source file path',
         valueRequired: true,
+        kind: 'path',
       },
       destination: {
         shortForm: 'o',
         description: 'Output file path',
         valueRequired: true,
+        kind: 'path',
       },
       input: {
         shortForm: 'i',
         description: 'Input layer type (alias for edition)',
         valueRequired: true,
+        kind: 'text',
       },
       adaptation: {
         shortForm: 'a',
         description: 'Prompt adaptation type',
         valueRequired: true,
+        kind: 'text',
       },
       config: {
         shortForm: 'c',
         description: 'Configuration file name',
         valueRequired: true,
+        kind: 'text',
       },
       edition: {
         shortForm: 'e',
         description: 'Input layer type',
         valueRequired: true,
+        kind: 'text',
       },
     },
     userVariables: {
@@ -171,5 +261,8 @@ export const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     unknownOption: 'error',
     duplicateOption: 'error',
     emptyValue: 'error',
+  },
+  security: {
+    policy: 'safe',
   },
 };

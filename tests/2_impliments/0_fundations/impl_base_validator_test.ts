@@ -1,108 +1,79 @@
 import { assert, assertEquals, assertFalse } from 'jsr:@std/assert@1';
 import { BreakdownLogger } from '@tettuan/breakdownlogger';
-import { SecurityValidator } from '../../../src/validator/security_validator.ts';
+import {
+  formatSecurityError,
+  SECURITY_ERROR_CATEGORY_VALUE,
+  SECURITY_ERROR_CODE_VALUE,
+  SecurityValidator,
+} from '../../../src/validator/security_validator.ts';
 
 const logger = new BreakdownLogger('param-validator');
 
-Deno.test('test_security_validator_implementation', () => {
-  const validator = new SecurityValidator();
+/**
+ * @purpose Implementation-level smoke for SecurityValidator's three contracts:
+ *   Acceptance / Rejection / Diagnosis. Every expected error message and
+ *   error code is derived from the validator's own format helpers so the
+ *   test does not duplicate the format string.
+ */
 
+Deno.test('impl: SecurityValidator accepts a benign parameter', () => {
   /**
-   * Test: Normal validation (happy path)
-   *
-   * Purpose:
-   * Validates that clean, safe parameters pass security validation without errors.
-   *
-   * Background:
-   * Most command-line arguments are legitimate and should pass validation. This
-   * test ensures the validator doesn't produce false positives for normal usage.
-   *
-   * Intent:
-   * - Verify normal parameters pass validation
-   * - Ensure validated params match the input
-   * - Confirm no error message is generated for valid input
+   * @purpose Acceptance: clean input must pass without errors.
+   * @intent Guards against false positives in the validator pattern set.
    */
+  const validator = new SecurityValidator();
   const result = validator.validate(['test']);
   logger.debug('Normal validation result', { data: { isValid: result.isValid, params: ['test'] } });
   assert(result.isValid, 'Normal validation should succeed');
   assertEquals(result.validatedParams, ['test'], 'Validated params should match input');
   assertEquals(result.errorMessage, undefined, 'Should have no error message');
+});
 
+Deno.test('impl: SecurityValidator rejects shell injection with canonical diagnostic', () => {
   /**
-   * Test: Shell command execution attempt detection
-   *
-   * Purpose:
-   * Validates that attempts to execute shell commands through command chaining
-   * are properly detected and blocked.
-   *
-   * Background:
-   * Semicolons can be used to chain multiple commands in shell environments.
-   * This is a common attack vector for command injection vulnerabilities.
-   *
-   * Intent:
-   * - Test detection of semicolon command separator
-   * - Verify proper error code (SECURITY_ERROR) is returned
-   * - Ensure error category is 'security'
-   * - Validate specific error message for shell command attempts
+   * @purpose Rejection + Diagnosis: shellInjection must surface the
+   *   canonical error code, category, and formatted message.
+   * @reason Semicolon command chaining is a textbook injection vector.
    */
-  const shellCommandResult = validator.validate(['test; ls']);
-  assertFalse(shellCommandResult.isValid, 'Shell command attempt should fail');
-  assertEquals(shellCommandResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
-  assertEquals(shellCommandResult.errorCategory, 'security', 'Should have security category');
+  const validator = new SecurityValidator();
+  const result = validator.validate(['test; ls']);
+  assertFalse(result.isValid, 'Shell command attempt should fail');
+  assertEquals(result.errorCode, SECURITY_ERROR_CODE_VALUE);
+  assertEquals(result.errorCategory, SECURITY_ERROR_CATEGORY_VALUE);
   assertEquals(
-    shellCommandResult.errorMessage,
-    'Security error: Shell command execution or redirection attempt detected',
-    'Should have correct error message',
+    result.errorMessage,
+    formatSecurityError('shellInjection', 'positional'),
   );
+});
 
+Deno.test('impl: SecurityValidator rejects parent traversal with canonical diagnostic', () => {
   /**
-   * Test: Path traversal attempt detection
-   *
-   * Purpose:
-   * Validates that attempts to access parent directories or traverse the
-   * filesystem are properly detected and blocked.
-   *
-   * Background:
-   * Path traversal attacks use '../' sequences to escape intended directories
-   * and access sensitive files. This is a critical security vulnerability.
-   *
-   * Intent:
-   * - Test detection of '../' path traversal pattern
-   * - Verify proper error code and category
-   * - Ensure specific error message for path traversal
-   * - Validate that any parameter containing '../' is rejected
+   * @purpose Rejection + Diagnosis for parentTraversal in positional context.
+   * @reason `../` sequences escape the intended directory.
    */
-  const pathTraversalResult = validator.validate(['test', '../file']);
-  assertFalse(pathTraversalResult.isValid, 'Path traversal attempt should fail');
-  assertEquals(pathTraversalResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
-  assertEquals(pathTraversalResult.errorCategory, 'security', 'Should have security category');
+  const validator = new SecurityValidator();
+  const result = validator.validate(['test', '../file']);
+  assertFalse(result.isValid, 'Path traversal attempt should fail');
+  assertEquals(result.errorCode, SECURITY_ERROR_CODE_VALUE);
+  assertEquals(result.errorCategory, SECURITY_ERROR_CATEGORY_VALUE);
   assertEquals(
-    pathTraversalResult.errorMessage,
-    'Security error: Path traversal attempt detected',
-    'Should have correct error message',
+    result.errorMessage,
+    formatSecurityError('parentTraversal', 'positional'),
   );
+});
 
+Deno.test('impl: SecurityValidator surfaces a security error when multiple violations are present', () => {
   /**
-   * Test: Multiple security violations
-   *
-   * Purpose:
-   * Validates that when multiple security issues are present, the validator
-   * still correctly identifies and rejects the input.
-   *
-   * Background:
-   * Attackers may combine multiple techniques in a single command. The validator
-   * must detect any and all security issues, not just the first one found.
-   *
-   * Intent:
-   * - Test handling of multiple dangerous patterns
-   * - Verify consistent error reporting
-   * - Ensure comprehensive security coverage
+   * @purpose Rejection: when several violations co-occur, the validator
+   *   must still surface a security-error diagnosis (first-hit wins, but
+   *   this test does not pin which category — only that the contract holds).
    */
-  const multipleChecksResult = validator.validate(['test; ls', '../file']);
+  const validator = new SecurityValidator();
+  const result = validator.validate(['test; ls', '../file']);
   logger.debug('Multiple security violations result', {
-    data: { isValid: multipleChecksResult.isValid, errorCode: multipleChecksResult.errorCode },
+    data: { isValid: result.isValid, errorCode: result.errorCode },
   });
-  assertFalse(multipleChecksResult.isValid, 'Multiple security violations should fail');
-  assertEquals(multipleChecksResult.errorCode, 'SECURITY_ERROR', 'Should have security error code');
-  assertEquals(multipleChecksResult.errorCategory, 'security', 'Should have security category');
+  assertFalse(result.isValid, 'Multiple security violations should fail');
+  assertEquals(result.errorCode, SECURITY_ERROR_CODE_VALUE);
+  assertEquals(result.errorCategory, SECURITY_ERROR_CATEGORY_VALUE);
 });

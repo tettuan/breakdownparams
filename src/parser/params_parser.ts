@@ -5,7 +5,11 @@ import type {
   TwoParamsResult,
   ZeroParamsResult,
 } from '../types/params_result.ts';
-import { SecurityValidator } from '../validator/security_validator.ts';
+import {
+  type Phase2Input,
+  type Phase2ResolvedOption,
+  SecurityValidator,
+} from '../validator/security_validator.ts';
 import { OptionCombinationValidator } from '../validator/options/option_combination_validator.ts';
 // Parameter configuration is handled through CustomConfig
 import { type CustomConfig, DEFAULT_CUSTOM_CONFIG } from '../types/custom_config.ts';
@@ -97,7 +101,7 @@ export class ParamsParser {
     this.optionRule = optionRule || DEFAULT_OPTION_RULE;
     this.customConfig = customConfig || DEFAULT_CUSTOM_CONFIG;
 
-    this.securityValidator = new SecurityValidator();
+    this.securityValidator = new SecurityValidator(this.customConfig);
     this.optionFactory = new CommandLineOptionFactory();
 
     // Use custom config for option combination rules
@@ -169,6 +173,74 @@ export class ParamsParser {
   }
 
   /**
+   * Collects positional and resolved option metadata for Phase 2 security
+   * validation.
+   *
+   * @param args - Raw command-line arguments.
+   * @param positionalParams - Pre-computed positional parameters (those that
+   *   do not start with `-` or `--`).
+   * @returns Phase2Input keyed by canonical option name.
+   *
+   * @intent Phase 2 needs `(optionName, value)` pairs to consult per-option
+   *   `kind` and `securityPolicy`. We build that here without re-running the
+   *   factory's full Option construction, but we use the same factory output
+   *   for consistency on standard options. Unknown options or factory
+   *   failures are skipped silently — Phase 1 already rejected raw shell
+   *   injection, and option-existence errors surface in later validation.
+   */
+  private collectPhase2Targets(
+    args: string[],
+    positionalParams: string[],
+  ): Phase2Input {
+    const resolvedOptions = new Map<string, Phase2ResolvedOption>();
+    for (const arg of args) {
+      if (!arg.startsWith('-')) continue;
+
+      // Extract canonical name and value
+      const eqIndex = arg.indexOf('=');
+      const head = eqIndex >= 0 ? arg.slice(0, eqIndex) : arg;
+      const rawValue = eqIndex >= 0 ? arg.slice(eqIndex + 1) : '';
+
+      if (head.startsWith('--uv-')) {
+        // User variable — record under the full prefix-stripped name so
+        // Phase 2 can identify it via the isUserVariable flag.
+        const name = head.slice(2); // 'uv-foo'
+        resolvedOptions.set(name, {
+          value: rawValue,
+          rawArg: arg,
+          isUserVariable: true,
+        });
+        continue;
+      }
+
+      // Resolve via factory to get the canonical (long form) option name
+      let canonicalName: string | undefined;
+      try {
+        const option = this.optionFactory.createOptionsFromArgs([arg])[0];
+        if (option) {
+          canonicalName = option.toNormalized();
+        }
+      } catch {
+        // Skip unknown / malformed options — later validators handle them.
+        continue;
+      }
+      if (canonicalName === undefined) continue;
+      // Skip flag options (no `=`): they have no value to inspect.
+      if (eqIndex < 0) continue;
+
+      resolvedOptions.set(canonicalName, {
+        value: rawValue,
+        rawArg: arg,
+        isUserVariable: false,
+      });
+    }
+    return {
+      positionalParams: [...positionalParams],
+      resolvedOptions,
+    };
+  }
+
+  /**
    * Parses command-line arguments with comprehensive validation.
    *
    * Processing flow:
@@ -199,19 +271,17 @@ export class ParamsParser {
    * ```
    */
   public parse(args: string[]): ParamsResult {
-    // 1. Security check
-    // Check for malicious strings that could compromise the system
-    // No additional checks are needed beyond security validation
-    const securityResult = this.securityValidator.validate(args);
-    if (!securityResult.isValid) {
+    // 1. Security check — Phase 1 (raw args, shellInjection only)
+    const phase1Result = this.securityValidator.validatePhase1(args);
+    if (!phase1Result.isValid) {
       return {
         type: 'error',
         params: [],
         options: {},
         error: {
-          message: securityResult.errorMessage || 'Security error',
-          code: securityResult.errorCode || 'SECURITY_ERROR',
-          category: securityResult.errorCategory || 'security',
+          message: phase1Result.errorMessage || 'Security error',
+          code: phase1Result.errorCode || 'SECURITY_ERROR',
+          category: phase1Result.errorCategory || 'security',
         },
       };
     }
@@ -238,6 +308,22 @@ export class ParamsParser {
         };
       }
       throw error;
+    }
+
+    // 2a. Security check — Phase 2 (resolved options, path categories)
+    const phase2Input = this.collectPhase2Targets(args, params);
+    const phase2Result = this.securityValidator.validatePhase2(phase2Input);
+    if (!phase2Result.isValid) {
+      return {
+        type: 'error',
+        params: [],
+        options: {},
+        error: {
+          message: phase2Result.errorMessage || 'Security error',
+          code: phase2Result.errorCode || 'SECURITY_ERROR',
+          category: phase2Result.errorCategory || 'security',
+        },
+      };
     }
 
     // 3. Parameter validation

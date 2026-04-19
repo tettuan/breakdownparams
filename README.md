@@ -185,9 +185,9 @@ For specifications, see [User Variable Options](docs/user_variable_options.md).
 The library implements a comprehensive three-tier validation system:
 
 #### 1. Security Validation
-- Prevents command injection and path traversal attacks
-- Validates against malicious input patterns
-- First line of defense in the parsing pipeline
+- Declarative two-phase enforcement driven by `CustomConfig.security.policy` (default `'safe'`)
+- Five categories (`shellInjection`, `absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars`) at three levels (`'off'` / `'safe'` / `'strict'`)
+- **Caution**: with the default `'safe'` policy, path-kind value options (`--from`, `--destination`) reject absolute paths (`/etc/...`) and `~/...` home expansion. Override per-option via `securityPolicy` if v1.2.x leniency is needed — see [Security Validation](docs/development.md#security-validation).
 
 #### 2. Parameter Validation
 - **Zero parameters**: Ensures no positional arguments
@@ -359,22 +359,12 @@ This script will:
 
 ## Version Management
 
-To bump the version and create a new release:
+Releases follow a two-step workflow using Claude Code skills:
 
-```bash
-./scripts/bump_version.sh
-```
+1. `/release-branch-init [--major|--minor|--patch]` — creates `release/vX.Y.Z` from `develop`, bumps version in `deno.json`, runs local CI, and pushes the branch.
+2. After completing release work, `/release-procedure` — opens PRs (release → develop → main), waits for CI, merges, creates the `vX.Y.Z` tag, and triggers JSR publish.
 
-This script will:
-- Check for uncommitted changes
-- Verify GitHub Actions tests have passed
-- Check latest version from JSR
-- Remove newer tags than the latest JSR version
-- Increment patch version
-- Update `deno.json`
-- Create and push a new git tag
-
-When the tag is pushed, the new version will be automatically published to JSR.
+When the tag is pushed, the new version is automatically published to JSR.
 
 ## Contributing
 

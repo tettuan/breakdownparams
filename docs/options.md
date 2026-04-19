@@ -157,6 +157,10 @@ The library uses a unified normalization approach:
 - User variable options (`--uv-config`) are normalized to `uv-config` (removing leading hyphens)
 - Each option class handles its own normalization logic
 
+## Security Validation
+
+Value options are subject to the two-phase security validator. Every argument passes through the global `shellInjection` check (Phase 1). After option resolution, value options whose `kind` is `'path'` are additionally checked against the four path-related categories (`absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars`). Built-in `--from` and `--destination` default to `kind: 'path'`; `--input`, `--adaptation`, `--config`, `--edition` default to `kind: 'text'` and therefore skip the four path checks. Caller-registered value options also default to `kind: 'text'` — declare `kind: 'path'` explicitly to opt them into path-kind enforcement. See [Security Validation](development.md#security-validation) and [Security Policy](custom_params.md#8-security-policy) for the full matrix and configuration examples.
+
 ## Return Type
 
 The option parsing result is included in the parameter type:
