@@ -170,6 +170,7 @@ const errorResult: ErrorResult = {
 - `INVALID_USER_VARIABLE`: 不正なユーザー変数
 - `TOO_MANY_ARGUMENTS`: 引数が多すぎる
 - `INVALID_COMMAND`: 不正なコマンド
+- `SECURITY_ERROR`: 二段階セキュリティバリデータが検出した違反。メッセージは `Security error: <category> violation in <context>` の形式（category は `shellInjection`, `absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars` のいずれか、context は `option <name>` / `argument` / `positional`）。詳細は [セキュリティ検証](development.ja.md#セキュリティ検証) を参照。
 
 ## 注意事項
 

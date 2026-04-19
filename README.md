@@ -185,9 +185,9 @@ For specifications, see [User Variable Options](docs/user_variable_options.md).
 The library implements a comprehensive three-tier validation system:
 
 #### 1. Security Validation
-- Prevents command injection and path traversal attacks
-- Validates against malicious input patterns
-- First line of defense in the parsing pipeline
+- Declarative two-phase enforcement driven by `CustomConfig.security.policy` (default `'safe'`)
+- Five categories (`shellInjection`, `absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars`) at three levels (`'off'` / `'safe'` / `'strict'`)
+- **Caution**: with the default `'safe'` policy, path-kind value options (`--from`, `--destination`) reject absolute paths (`/etc/...`) and `~/...` home expansion. Override per-option via `securityPolicy` if v1.2.x leniency is needed — see [Security Validation](docs/development.md#security-validation).
 
 #### 2. Parameter Validation
 - **Zero parameters**: Ensures no positional arguments

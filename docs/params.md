@@ -327,6 +327,9 @@ Only available in TwoParams mode, specified in the following format:
 | Invalid DirectiveType | "Invalid directive type. Must be one of: to, summary, defect" |
 | Invalid LayerType       | "Invalid layer type. Must be one of: project, issue, task" |
 | Invalid Config usage    | "Config option is only available with TwoParams"          |
+| Security violation      | "Security error: &lt;category&gt; violation in &lt;context&gt;" (e.g. `parentTraversal violation in option from`) |
+
+Security violations are produced by the two-phase security validator. See [Security Validation](development.md#security-validation) for the per-category behaviour and [Security Policy](custom_params.md#8-security-policy) for configuration.
 
 ## Return Type
 

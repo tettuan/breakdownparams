@@ -170,6 +170,7 @@ Main error codes:
 - `INVALID_USER_VARIABLE`: Invalid user variable
 - `TOO_MANY_ARGUMENTS`: Too many arguments
 - `INVALID_COMMAND`: Invalid command
+- `SECURITY_ERROR`: Security violation detected by the two-phase security validator. Message follows `Security error: <category> violation in <context>` (category is one of `shellInjection`, `absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars`; context is `option <name>`, `argument`, or `positional`). See [Security Validation](development.md#security-validation).
 
 ## Notes
 

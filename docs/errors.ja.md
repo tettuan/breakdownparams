@@ -17,9 +17,9 @@
    - 必須の設定値が欠落している場合
 
 3. **セキュリティエラー**
-   - コマンドインジェクションの検出
-   - 不正な文字列の検出
-   - パストラバーサル試行の検出
+   - 二段階セキュリティバリデータ（`SecurityValidator`）が検出する違反
+   - 5 カテゴリ： `shellInjection`（Phase 1・全引数対象）／`absolutePath`／`homeExpansion`／`parentTraversal`／`specialChars`（後者 4 つは Phase 2・`kind: 'path'` の値オプションのみ）
+   - 適用強度は `CustomConfig.security.policy` の `Level`（`'off'` / `'safe'` / `'strict'`）で制御
 
 ## 2. エラーコードとメッセージ
 
@@ -44,19 +44,37 @@
 
 ### 2.3 セキュリティエラー
 
-| エラーコード | メッセージ | 説明 |
-|------------|------------|------|
-| COMMAND_INJECTION | "Potential command injection detected" | コマンドインジェクションの可能性を検出 |
-| INVALID_CHARACTERS | "Invalid characters detected in input" | 不正な文字を検出 |
-| PATH_TRAVERSAL | "Security error: Path traversal attempt detected" | パストラバーサル試行を検出 |
+すべてのセキュリティ違反は単一のエラーコード `SECURITY_ERROR` として返されます。具体的にどのカテゴリが拒否したかはメッセージに含まれます。
 
-#### パストラバーサル検査の対象と条件
+| エラーコード | メッセージ形式 | 説明 |
+|------------|----------------|------|
+| SECURITY_ERROR | "Security error: &lt;category&gt; violation in &lt;context&gt;" | 二段階セキュリティバリデータが違反を検出 |
 
-- **対象引数**: 意味的にパスを表す引数のみ
-  - `--from`, `--destination`, `--config`, `--input`, `--edition`, `--adaptation`
-  - 位置引数（directiveType / layerType / `init` など）
-- **拒否条件**: 値に `../`、`..\\`、または末尾の `..` を含むものを拒否
-- **対象外**: `--uv-*`（ユーザー変数）はテンプレート変数値として素通りする。パスとしては解釈されないため、`../` 等を含んでもエラーにはならない
+- `<category>`: `shellInjection` / `absolutePath` / `homeExpansion` / `parentTraversal` / `specialChars`
+- `<context>`: `option <name>`（`--name=...` / `-x=...`）、`argument`（`--uv-*`）、または `positional`（位置引数）
+- 例： `Security error: parentTraversal violation in option from`
+
+#### 二段階実行と対象範囲
+
+- **Phase 1 (`validatePhase1`)**: 生の引数列に対して実行。`shellInjection` のみを全引数に一律適用する。ここではオプションの識別がまだ行われないため、その他 4 カテゴリはスコープ外。
+- **Phase 2 (`validatePhase2`)**: オプション解決後に、解決済みの `(optionName, value)` ペアに対して実行。`kind: 'path'` の値オプションに対してのみ 4 カテゴリ（`absolutePath` / `homeExpansion` / `parentTraversal` / `specialChars`）を適用する。
+
+判定は first-hit-wins の順序で行う： `shellInjection` → `absolutePath` → `homeExpansion` → `parentTraversal` → `specialChars`。
+
+#### カテゴリ別強度
+
+`CustomConfig.security.policy`（`Level` または `SecurityCategoryLevels`）で制御する：
+
+- `'off'`: 検査を無効化
+- `'safe'`: 既定。高精度パターンを拒否
+- `'strict'`: エンコード変種などを含む広い集合を拒否
+
+値オプション単位では `OptionDefinition.securityPolicy` でカテゴリ別に上書きできる（ただし `shellInjection` は Phase 1 で動くため上書き不可）。カテゴリ別の正規表現と具体例は [セキュリティ検証](development.ja.md#セキュリティ検証)、[セキュリティポリシー](custom_params.ja.md#8-セキュリティポリシー) を参照。
+
+#### 対象外
+
+- **`--uv-*`（ユーザー変数）**: `kind` を持たないため 4 パス系カテゴリは適用されない。ただし `shellInjection`（Phase 1）は引き続き適用される。`../`、`..\\`、`...`、narrative text、複数行などは素通りするが、`;` `|` `&` `<` `>` などのシェルメタ文字は拒否される。
+- **位置引数（directiveType / layerType / `init` など）**: `kind` を持たないため 4 パス系カテゴリは適用されない。`shellInjection` のみ適用される。
 
 ## 3. エラー結果の構造
 
