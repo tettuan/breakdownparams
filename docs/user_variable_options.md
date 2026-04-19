@@ -47,12 +47,12 @@ This document defines the specification for implementing user variable options a
 
 ### Security Validation
 
-`--uv-*` values are treated as template variable values, not paths. Their interaction with the parser's security checks is intentionally narrow:
+`--uv-*` values are treated as template variable values, not paths. Their interaction with the parser's two-phase security validator is intentionally narrow:
 
-- **Path traversal check: not applied.** `--uv-*` values are exempt from the path traversal check, because they are never interpreted as paths by the parser. Values containing `../`, `..\\`, ellipsis (`...`), narrative text, or multi-line content are passed through verbatim.
-- **Shell injection check: applied.** The check for `;`, `|`, `&`, `<`, `>` continues to apply to `--uv-*` values, the same as for any other argument.
+- **Path-kind categories (`absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars`): not applied.** These four categories run in Phase 2 and are gated on the option having `kind: 'path'`. User variable options have no `kind` association, so Phase 2 never evaluates them. Values containing `../`, `..\\`, `/abs/path`, `~/data`, ellipsis (`...`), narrative text, or multi-line content pass through verbatim.
+- **`shellInjection` check: applied.** Phase 1 runs on every raw argument before option resolution, so `--uv-*` values are still checked. At the default `'safe'` level the characters `;`, `|`, `&`, `<`, `>` are rejected; at `'strict'` the set additionally includes `` ` ``, `$`, newlines, and `$( )`.
 
-This design lets callers pass arbitrary template content (including text that resembles paths) through user variables, while still rejecting shell metacharacters that have no legitimate use in CLI input.
+This design lets callers pass arbitrary template content (including text that resembles paths) through user variables, while still rejecting shell metacharacters that have no legitimate use in CLI input. See [Security Validation](development.md#security-validation) for the full category × level matrix.
 
 ## Usage Examples
 

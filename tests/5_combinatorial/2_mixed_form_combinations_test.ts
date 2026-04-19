@@ -404,14 +404,16 @@ Deno.test('Mixed Form Combinations - Edge Cases', async (t) => {
   });
 
   await t.step('Special characters in values with mixed forms', () => {
+    // v1.3.0: default security policy is 'safe'. `from` / `destination` are
+    // path-kind, so absolute paths are rejected. Use a relative path here.
     const args = [
       DEMO_TYPE,
       LAYER_TYPE,
-      '-f=/path/with-hyphens_and_underscores.md',
+      '-f=path/with-hyphens_and_underscores.md',
       '--destination=output with spaces.md',
     ];
     const expected = {
-      from: '/path/with-hyphens_and_underscores.md',
+      from: 'path/with-hyphens_and_underscores.md',
       destination: 'output with spaces.md',
     };
 

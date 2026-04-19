@@ -78,6 +78,8 @@ interface CustomConfig {
       shortForm?: string;
       description: string;
       valueRequired?: boolean;
+      kind?: ValueKind;              // 'path' | 'text'; defaults to 'text'
+      securityPolicy?: SecurityPolicy; // per-option override
     }>;
     userVariables: {
       pattern: string;
@@ -97,6 +99,11 @@ interface CustomConfig {
     unknownOption: 'error' | 'ignore' | 'warn';
     duplicateOption: 'error' | 'ignore' | 'warn';
     emptyValue: 'error' | 'ignore' | 'warn';
+  };
+
+  // Security policy (optional; runtime defaults to { policy: 'safe' })
+  security?: {
+    policy: SecurityPolicy;
   };
 }
 ```
@@ -123,11 +130,12 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       version: { shortForm: 'v', description: 'Display version information' },
     },
     values: {
-      from: { shortForm: 'f', description: 'Source file path', valueRequired: true },
-      destination: { shortForm: 'o', description: 'Output file path', valueRequired: true },
-      input: { shortForm: 'i', description: 'Input layer type', valueRequired: true },
-      adaptation: { shortForm: 'a', description: 'Prompt adaptation type', valueRequired: true },
-      config: { shortForm: 'c', description: 'Configuration file name', valueRequired: true },
+      from: { shortForm: 'f', description: 'Source file path', valueRequired: true, kind: 'path' },
+      destination: { shortForm: 'o', description: 'Output file path', valueRequired: true, kind: 'path' },
+      input: { shortForm: 'i', description: 'Input layer type', valueRequired: true, kind: 'text' },
+      adaptation: { shortForm: 'a', description: 'Prompt adaptation type', valueRequired: true, kind: 'text' },
+      config: { shortForm: 'c', description: 'Configuration file name', valueRequired: true, kind: 'text' },
+      edition: { shortForm: 'e', description: 'Input layer type', valueRequired: true, kind: 'text' },
     },
     userVariables: {
       pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
@@ -155,6 +163,9 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     unknownOption: 'error',
     duplicateOption: 'error',
     emptyValue: 'error',
+  },
+  security: {
+    policy: 'safe',
   },
 };
 ```
@@ -357,9 +368,166 @@ const resultWithOptions = parser.parse(['update', 'product', '--from=data.json']
    - Patterns should be appropriately restricted
    - Avoid direct use of user input
 
-## 8. Migration Guide
+## 8. Security Policy
 
-### 8.1 Migration from Default to Custom Configuration
+The `security` field controls the parser's built-in path / shell injection enforcement. Behavioural details and the full per-category × per-level matrix live in [Security Validation](development.md#security-validation); this section documents the public types and shows how callers wire them in.
+
+### 8.1 Types
+
+```typescript
+// Per-category enforcement strength.
+type Level = 'off' | 'safe' | 'strict';
+
+// Five built-in categories. shellInjection is global; the other four apply
+// only to value options whose `kind` is 'path'.
+type SecurityCategory =
+  | 'shellInjection'
+  | 'absolutePath'
+  | 'homeExpansion'
+  | 'parentTraversal'
+  | 'specialChars';
+
+// Partial per-category map. Missing keys fall back to the surrounding level.
+type SecurityCategoryLevels = Partial<Record<SecurityCategory, Level>>;
+
+// A single Level is shorthand for "apply to every category"; a partial map
+// allows per-category tuning.
+type SecurityPolicy = Level | SecurityCategoryLevels;
+
+// Classifies how a value option's value is interpreted by Phase 2.
+// 'path' opts the value into the four path-related categories.
+// 'text' (default) means only Phase 1 shellInjection applies.
+type ValueKind = 'path' | 'text';
+```
+
+All four types are re-exported from the package entry point alongside `CustomConfig` and `DEFAULT_CUSTOM_CONFIG`.
+
+### 8.2 Caller-defined value option (the `kind` footgun)
+
+Value options registered by the caller default to `kind: 'text'`. Consequence: callers who treat their custom value option as a filesystem path get **no** path-traversal / absolute-path / home-expansion / control-char enforcement on it unless they explicitly opt in.
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+// FOOTGUN: --workspace defaults to kind: 'text' here. ../etc would slip through.
+const looseConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      workspace: {
+        shortForm: 'w',
+        description: 'Workspace directory',
+        valueRequired: true,
+        // kind omitted → defaults to 'text' → no path checks
+      },
+    },
+  },
+};
+
+// FIXED: declare kind: 'path' so Phase 2 enforces the four path categories.
+const safeConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      workspace: {
+        shortForm: 'w',
+        description: 'Workspace directory',
+        valueRequired: true,
+        kind: 'path',
+      },
+    },
+  },
+};
+```
+
+### 8.3 Per-option override
+
+Per-option `securityPolicy` overrides only the categories you specify; everything else inherits the global policy. The override is also constrained to the option's `kind`: path-related categories on a `kind: 'text'` option are forced to `'off'` regardless.
+
+Note: `shellInjection` cannot be relaxed per-option. Phase 1 runs before option identity is known, so an override of `shellInjection` on a single option has no effect.
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+const config: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      from: {
+        ...DEFAULT_CUSTOM_CONFIG.options.values.from,
+        // Allow ~/x and /abs/x for --from only. parentTraversal stays at 'safe'.
+        securityPolicy: {
+          absolutePath: 'off',
+          homeExpansion: 'off',
+        },
+      },
+    },
+  },
+};
+
+const parser = new ParamsParser(undefined, config);
+```
+
+### 8.4 Global strict
+
+Tightening the global policy to `'strict'` extends every category's pattern set. `shellInjection` then also rejects `` ` ``, `$`, newlines, and `$( )`; `parentTraversal` matches URL-encoded `%2e%2e`; and so on.
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+const strictConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  security: {
+    policy: 'strict',
+  },
+};
+
+const parser = new ParamsParser(undefined, strictConfig);
+```
+
+### 8.5 Restoring v1.2.x behaviour for `from` / `destination`
+
+Pre-v1.3.0, `--from=/abs/path` and `--from=~/data` were accepted because the parser only ran a global `parentTraversal` check. Default `'safe'` in v1.3.0 rejects them. Callers that need the old leniency can disable just the two newly-enforced categories on the affected options:
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+const v12CompatConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      from: {
+        ...DEFAULT_CUSTOM_CONFIG.options.values.from,
+        securityPolicy: {
+          absolutePath: 'off',
+          homeExpansion: 'off',
+        },
+      },
+      destination: {
+        ...DEFAULT_CUSTOM_CONFIG.options.values.destination,
+        securityPolicy: {
+          absolutePath: 'off',
+          homeExpansion: 'off',
+        },
+      },
+    },
+  },
+};
+```
+
+`parentTraversal`, `specialChars`, and the global `shellInjection` enforcement remain at `'safe'` — they were already enforced (or, in the case of `specialChars`, are new but desirable) and should not need relaxing for v1.2.x compatibility.
+
+## 9. Migration Guide
+
+### 9.1 Migration from Default to Custom Configuration
 
 1. Prepare configuration values
    - Define required patterns
@@ -372,7 +540,7 @@ const resultWithOptions = parser.parse(['update', 'product', '--from=data.json']
    - Check error handling
    - Verify return value types
 
-### 8.2 Migration from Custom to Default Configuration
+### 9.2 Migration from Custom to Default Configuration
 
 1. Use default configuration values
    - Remove custom configuration values

@@ -23,3 +23,12 @@ export type { CustomConfig } from './types/custom_config.ts';
 // Default configuration values - Used as base for creating custom configurations
 // Use spread operator to partially override: { ...DEFAULT_CUSTOM_CONFIG, params: {...} }
 export { DEFAULT_CUSTOM_CONFIG } from './types/custom_config.ts';
+
+// Security policy types - Used by callers to express security intent in CustomConfig.security
+export type {
+  Level,
+  SecurityCategory,
+  SecurityCategoryLevels,
+  SecurityPolicy,
+  ValueKind,
+} from './types/custom_config.ts';

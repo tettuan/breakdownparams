@@ -202,24 +202,91 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 
 ## セキュリティ検査
 
-パーサーは生の引数に対して、最小限のセキュリティ検査のみを実施します。これは「CLI引数として正当な用途を持たない入力を拒否する」ことに限定された検査であり、値をパス・ファイル・URLとして解釈することはしません。
+パーサーは宣言的な 2 フェーズのセキュリティバリデータを内蔵します。利用者は `CustomConfig.security.policy` を通じて意図を表明し、バリデータがそれをカテゴリごとの正規表現検査に変換します。既定ポリシーは全カテゴリ `'safe'` です。明示設定なしでも代表的なインジェクション・トラバーサル攻撃パターンを拒否します。`'safe'` 適用時もパーサーは値を normalize / resolve / stat しません。下記の正規表現検査のみを実施します。
 
-### 行うこと
+### 5 つのカテゴリ
 
-- **シェルインジェクション検査（全引数対象）**: いずれかの引数がメタ文字 `;`, `|`, `&`, `<`, `>` を含む場合に拒否します。オプションの値・位置引数を問わず、すべての引数に一律適用します。
-- **パストラバーサル検査（path系引数のみ対象）**: 意味的にパスを表す引数（`--from`, `--destination`, `--config`, `--input`, `--edition`, `--adaptation`, および位置引数）に対し、`../`、`..\\`、末尾の `..` を含む値を拒否します。これは代表的なトラバーサルパターンへの最小限の防御であり、後段のサニタイズを置き換えるものではありません。
+| カテゴリ            | 拒否する内容                                                                          | 適用範囲                                       |
+|--------------------|--------------------------------------------------------------------------------------|---------------------------------------------|
+| `shellInjection`   | シェル制御メタ文字（`;`, `|`, `&`, `<`, `>`、`strict` ではバッククォート / `$` / 改行 / `$( )` も）   | **全引数対象**。Phase 1 で raw args を検査。     |
+| `absolutePath`     | POSIX 絶対パス（`/x`）。`strict` は Windows ドライブ / UNC パスも拒否                          | Phase 2、`kind: 'path'` のオプションのみ。       |
+| `homeExpansion`    | `~/x`（`strict` では `~` 単体も）                                                     | Phase 2、`kind: 'path'` のオプションのみ。       |
+| `parentTraversal`  | `..` トラバーサル（`../`, `..\\`, 末尾の `..`）。`strict` は URL エンコード `%2e%2e` も対象       | Phase 2、`kind: 'path'` のオプションのみ。       |
+| `specialChars`     | 制御文字 `\x00`–`\x1F` および `\x7F`。`strict` は `\x7F`–`\x9F` まで拡張                  | Phase 2、`kind: 'path'` のオプションのみ。       |
+
+`shellInjection` を全引数対象としているのは、Phase 1 がオプション解決前に走るためオプション識別が不可能だからです。残り 4 カテゴリは *path-kind 限定* です。組み込みの `--from` / `--destination` は既定で `kind: 'path'`、その他組み込み value option（`--input`, `--adaptation`, `--config`, `--edition`）は既定で `kind: 'text'`。利用者が定義する value option も既定で `kind: 'text'` です。
+
+### カテゴリごとの 3 レベル
+
+各カテゴリは 3 レベルを取ります。
+
+| レベル     | 動作                                                                       |
+|-----------|----------------------------------------------------------------------------|
+| `'off'`   | 無効。検査を行いません。                                                     |
+| `'safe'`  | 既定。誤検知の少ない高確度パターンを拒否。                                     |
+| `'strict'`| パターン集合をさらに拡大。エンコード変種・追加メタ文字まで対象。                  |
+
+### 動作マトリクス
+
+各レベルで適用される正規表現の実体です。
+
+| Category × Level | `off` | `safe` | `strict` |
+|---|---|---|---|
+| `shellInjection`  | （検査なし） | `/[;\|&<>]/` | `/[;\|&<>` `` ` `` `$\n\r]\|\$\(/` |
+| `absolutePath`    | （検査なし） | `/^\/(?!\/)/` | `/^(\/\|[A-Za-z]:[\/\\]\|\\\\[^\\]+\\)/` |
+| `homeExpansion`   | （検査なし） | `/^~(?:\/\|$)/` | `/^~/` |
+| `parentTraversal` | （検査なし） | `/\.\.[\/\\]\|\.\.$/` | `/\.\.[\/\\]\|\.\.$\|%2[Ee]%2[Ee]\|%2[Ee]\.\|\.%2[Ee]/` |
+| `specialChars`    | （検査なし） | `/[\x00-\x1F\x7F]/` | `/[\x00-\x1F\x7F-\x9F]/` |
+
+safe レベルでの具体例：
+
+- `shellInjection safe`: `--from=foo;rm` は拒否。`foo$bar` は通過（`$` を拒否するのは `strict` のみ）。
+- `absolutePath safe`: `--from=/etc/passwd` は拒否。`--from=//double` は safe を通過（負の先読みで許可。`strict` では先頭スラッシュ分岐で拒否）。
+- `homeExpansion safe`: `--from=~/data` と `--from=~` は拒否。`--from=~README` は safe を通過するが `strict` では拒否。
+- `parentTraversal safe`: `--from=../sibling`, `--from=foo/..` は拒否。`--from=..README` は通過（`..` の後に `/` も `\` も無いため）。
+- `specialChars safe`: `--from=name\x00` は拒否。高位ビット `\x80`–`\x9F` は `strict` でのみ反応。
+
+### 2 フェーズアーキテクチャ
+
+検査は `ParamsParser.parse(...)` 内で 2 段に分かれます。
+
+1. **Phase 1（`SecurityValidator.validatePhase1(args)`）** は raw args 配列に対し、オプション解決前に走ります。`shellInjection` のみを実施。他カテゴリはオプション識別が必要なためここでは対象外です。
+2. **Phase 2（`SecurityValidator.validatePhase2(input)`）** はオプションファクトリが各引数を正規オプション名と値に解決した後に走ります。各解決済みオプションについて `kind` と `securityPolicy` を引いて `resolveEffectivePolicy(...)` を呼び、**先勝ちの順序** `shellInjection` → `absolutePath` → `homeExpansion` → `parentTraversal` → `specialChars` で値を検査します。
+
+ユーザー変数オプション（`--uv-*`）と裸の位置引数は `kind` を持たないため、4 つのパス系カテゴリの対象外です。Phase 1 の `shellInjection` 検査は引き続き適用されます。
+
+### 既定動作
+
+`CustomConfig.security` を省略した場合、ランタイムは `{ policy: 'safe' }` を全カテゴリに適用したものとして扱います。レガシーな `validate(args)` エントリポイント（standalone なユニットテストで使用）は、`--uv-*` 以外の全引数に対し v1.2.x 互換の `parentTraversal safe` 検査を追加で実施します。これにより `ParamsParser` を経由しない v1.2.x 利用者でも従来のトラバーサル動作が維持されます。
+
+### オプション単位オーバーライドのセマンティクス
+
+各 value `OptionDefinition` は独自の `securityPolicy` を持てます。リゾルバはある値に対するポリシーを次の順でマージします。
+
+1. グローバルな `CustomConfig.security.policy` を全カテゴリのレベルマップに展開（未指定キーは `'safe'` にフォールバック）。
+2. オプション単位ポリシーが単一の `Level` 文字列なら、そのレベルを全カテゴリに一律適用。
+3. 部分マップなら、利用者が指定したキーのみオーバーライド。
+4. 当該オプションの `kind` が `'path'` でなければ、マージ結果に関わらず `absolutePath` / `homeExpansion` / `parentTraversal` / `specialChars` を `'off'` に強制。
+
+**制約: オプション単位の `securityPolicy` で `shellInjection` を緩めることはできません。** Phase 1 はオプション識別を持たない時点で走るため、`shellInjection` のオプション単位オーバーライドは Phase 1 では無効化されます（Phase 2 自体はパス値に対し `shellInjection` を再実行しません — `shellInjection` は path-kind 非依存）。具体的には、あるオプションに `securityPolicy: { shellInjection: 'off' }` を指定しても、グローバルポリシーが `'safe'` ならその値に `;` を含めることはできません。
 
 ### 行わないこと
 
-- パスの normalize/resolve（`path.normalize`, `path.resolve` は呼ばない）
+- パスの normalize / resolve（`path.normalize`, `path.resolve` は呼ばない）
 - ファイルシステムへのアクセス（存在確認・権限確認・stat など）
 - ディレクトリ走査
-- パスのホワイトリスト/ブラックリスト判定
-- 上記検査を超える値の意味解釈
+- パスのホワイトリスト / ブラックリスト判定
+- 上記の正規表現検査を超える値の意味解釈
 
-### 例外: `--uv-*` ユーザー変数
+### エラーメッセージ形式
 
-`--uv-*` の値はテンプレート変数値であり、パスではありません。したがって**パストラバーサル検査の対象外**です。`../` や ellipsis (`...`)、narrative text、複数行などを含む任意のテキストをそのまま渡せます。なお、シェルインジェクション検査は引き続き適用されます。
+拒否時は `ErrorResult` を返し、`error.code` は `SECURITY_ERROR`、`error.category` は `security`、`error.message` は次の正準形式に統一されます。
+
+```
+Security error: <category> violation in <context>
+```
+
+`<context>` は `option <name>`（`--name=...` / `-x=...` の場合）、`argument`（`--uv-*` の場合）、`positional`（裸の位置引数の場合）のいずれかです。
 
 ## 制約事項
 

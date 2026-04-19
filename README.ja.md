@@ -185,9 +185,9 @@ if (result.type === 'two') {
 ライブラリは包括的な3層検証システムを実装しています：
 
 #### 1. セキュリティ検証
-- コマンドインジェクションとパストラバーサル攻撃を防止
-- 悪意のある入力パターンに対する検証
-- 解析パイプラインの最前線の防御
+- `CustomConfig.security.policy`（既定 `'safe'`）に従う宣言的な 2 フェーズ検査
+- 5 カテゴリ（`shellInjection`, `absolutePath`, `homeExpansion`, `parentTraversal`, `specialChars`）× 3 レベル（`'off'` / `'safe'` / `'strict'`）
+- **注意**: 既定 `'safe'` では `kind: 'path'` の value option（`--from`, `--destination`）は絶対パス（`/etc/...`）と `~/...` のホーム展開を拒否します。v1.2.x 互換の緩和が必要なら `securityPolicy` をオプション単位で設定してください。詳細は [セキュリティ検査](docs/development.ja.md#セキュリティ検査) を参照。
 
 #### 2. パラメータ検証
 - **ゼロパラメータ**: 位置引数がないことを確認
@@ -360,23 +360,12 @@ deno task ci
 
 ## バージョン管理
 
-バージョンを上げて新しいリリースを作成するには：
+リリースは Claude Code skill による2段階フローで実施します：
 
-```bash
-./scripts/bump_version.sh
-```
+1. `/release-branch-init [--major|--minor|--patch]` — `develop` から `release/vX.Y.Z` を作成、`deno.json` のバージョンを更新、ローカル CI を実行、ブランチを push。
+2. リリース作業完了後、`/release-procedure` — PR 作成（release → develop → main）、CI 待機、マージ、`vX.Y.Z` タグ作成、JSR publish 起動。
 
-このスクリプトは以下を実行します：
-
-- 未コミットの変更をチェック
-- GitHub Actionsのテストが成功したことを確認
-- JSRから最新バージョンをチェック
-- 最新のJSRバージョンより新しいタグを削除
-- パッチバージョンをインクリメント
-- `deno.json`を更新
-- 新しいgitタグを作成してプッシュ
-
-タグがプッシュされると、新しいバージョンが自動的にJSRにパブリッシュされます。
+タグがプッシュされると、新しいバージョンが自動的に JSR にパブリッシュされます。
 
 ## 貢献
 

@@ -267,9 +267,11 @@ Deno.test('Boundary Values - Special Characters and Symbols', async (t) => {
       description: 'Spaces and quotes',
     },
     // Path separators
+    // v1.3.0: default security policy 'safe' rejects absolute paths on
+    // path-kind options. Use a relative path here.
     {
-      args: [DEMO_TYPE, LAYER_TYPE, '--from=/path/to/file\\with\\backslashes.md'],
-      expected: { from: '/path/to/file\\with\\backslashes.md' },
+      args: [DEMO_TYPE, LAYER_TYPE, '--from=path/to/file\\with\\backslashes.md'],
+      expected: { from: 'path/to/file\\with\\backslashes.md' },
       description: 'Path separators',
     },
     // Simple URL (complex URLs may cause errors)
