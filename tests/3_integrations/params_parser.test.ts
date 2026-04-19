@@ -17,9 +17,12 @@ Deno.test('ParamsParser Integration Tests', async (t) => {
     const args = ['init', '--from=input.txt', '--destination=output.txt'];
     const result = parser.parse(args);
 
-    assertEquals(result.type, 'error'); // OneParam doesn't allow options
-    assertExists(result.error);
-    assertEquals(result.error.code, 'INVALID_OPTIONS');
+    // DEFAULT_CUSTOM_CONFIG.validation.one allows --from and --destination as value options.
+    assertEquals(result.type, 'one');
+    if (result.type === 'one') {
+      assertEquals(result.options.from, 'input.txt');
+      assertEquals(result.options.destination, 'output.txt');
+    }
   });
 
   await t.step('should parse two parameters with valid options', () => {

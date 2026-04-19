@@ -38,8 +38,15 @@ By using default configuration values, it supports standard usage patterns while
 ### 2.3 Validation Rules
 
 For each parameter mode (zero/one/two):
-- List of allowed options
+- List of allowed options (`validation.{zero,one,two}.allowedOptions`)
 - Allow/disallow user variables
+
+#### Semantics of `validation.{zero,one,two}.allowedOptions`
+
+- This list defines the canonical option names that the corresponding `OptionValidator`
+  (`ZeroOptionValidator` / `OneOptionValidator` / `TwoOptionValidator`) treats as allowed for that parameter mode.
+- It **replaces** the default list — it is not additive. Whatever the caller writes here becomes the allow-list used by the OptionValidator. To extend the defaults, spread `DEFAULT_CUSTOM_CONFIG.validation.{mode}.allowedOptions` and append.
+- `ParamsParser` injects the `CustomConfig` into each `OptionValidator` at construction time, so the values configured here directly determine which options are accepted in each mode.
 
 ## 3. Configuration Values
 

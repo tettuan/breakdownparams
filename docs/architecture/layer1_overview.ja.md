@@ -34,6 +34,11 @@ graph TD
 - **ParamsParser**: Optionインスタンスを使用してパラメータとオプションを処理
 - **バリデータ**: パラメータとオプションの組み合わせ検証に特化
 - パラメータの検証結果に基づいて適切なオプション検証を実行
+- **CustomConfig 駆動のオプション許可リスト**:
+  - 各 OptionValidator（ZeroOptionValidator / OneOptionValidator / TwoOptionValidator）は、
+    `CustomConfig.validation.{zero,one,two}.allowedOptions` を参照して許可オプションを判定する
+  - ParamsParser は OptionValidator を生成する際に CustomConfig を注入する
+  - 設計上は CustomConfig 駆動が正であり、現行実装に残るハードコードの validOptions は暫定とみなす
 
 ### 1.3 パラメータの3区分
 パラメータの検証結果は3つの型に分類される：
@@ -139,6 +144,11 @@ interface Option {
 4. **検証**:
    - パラメータの検証（3つのバリデータで同時に実行）
    - 各option.validate()を呼び出し
+   - **OptionValidator の生成と注入**:
+     ParamsParser はパラメータタイプに応じて
+     ZeroOptionValidator / OneOptionValidator / TwoOptionValidator を生成し、
+     その際に CustomConfig を注入する。各 OptionValidator は
+     `CustomConfig.validation.{zero,one,two}.allowedOptions` を許可リストとして使用する
    - オプションの組み合わせ検証を実行
 5. **結果統合**:
    - パラメータの結果にオプションの結果を含める

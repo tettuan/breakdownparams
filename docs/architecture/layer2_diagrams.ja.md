@@ -34,6 +34,9 @@ graph TD
         D --> K[ParserConfig]
         K --> L1[DEFAULT_CONFIG]
         K --> L2[CustomConfig]
+        L2 -. validation.{zero,one,two}.allowedOptions .-> I1
+        L2 -. validation.{zero,one,two}.allowedOptions .-> I2
+        L2 -. validation.{zero,one,two}.allowedOptions .-> I3
     end
 ```
 
@@ -70,6 +73,8 @@ sequenceDiagram
     Option-->>Parser: 個別検証結果
     
     alt パラメータタイプ判定
+        Note over Parser,OValidator: ParamsParser は OptionValidator 生成時に CustomConfig を注入し、<br/>OValidator は validation.{zero,one,two}.allowedOptions を参照する
+        Parser->>OValidator: new ZeroOption/OneOption/TwoOptionValidator(customConfig)
         Parser->>OValidator: validate(options, type)
         OValidator-->>Parser: オプション検証結果
         
@@ -221,6 +226,12 @@ classDiagram
         +validate(options: Option[], type: string): ValidationResult
     }
     
+    class CustomConfig {
+        +validation.zero.allowedOptions: string[]
+        +validation.one.allowedOptions: string[]
+        +validation.two.allowedOptions: string[]
+    }
+    
     Option <|.. FlagOption
     Option <|.. ValueOption
     Option <|.. UserVariableOption
@@ -228,6 +239,8 @@ classDiagram
     ParamsParser --> OptionFactory
     ParamsParser --> ParamsValidator
     ParamsParser --> OptionValidator
+    ParamsParser --> CustomConfig
+    OptionValidator ..> CustomConfig : 許可リストを参照
 ```
 
 ## 6. パッケージ図

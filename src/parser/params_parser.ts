@@ -257,7 +257,7 @@ export class ParamsParser {
      */
     if (zeroResult.isValid && !oneResult.isValid && !twoResult.isValid) {
       // 4.1.1. Check option existence
-      const optionValidator = new ZeroOptionValidator();
+      const optionValidator = new ZeroOptionValidator(this.customConfig);
       const optionResult = optionValidator.validate(args, 'zero', this.optionRule);
 
       if (!optionResult.isValid) {
@@ -301,7 +301,7 @@ export class ParamsParser {
      */
     if (!zeroResult.isValid && oneResult.isValid && !twoResult.isValid) {
       // 4.2.1. Check option existence
-      const optionValidator = new OneOptionValidator();
+      const optionValidator = new OneOptionValidator(this.customConfig);
       const optionResult = optionValidator.validate(args, 'one', this.optionRule);
 
       if (!optionResult.isValid) {
@@ -346,7 +346,7 @@ export class ParamsParser {
      */
     if (!zeroResult.isValid && !oneResult.isValid && twoResult.isValid) {
       // 4.3.1. Check option existence
-      const optionValidator = new TwoOptionValidator();
+      const optionValidator = new TwoOptionValidator(this.customConfig);
       const optionResult = optionValidator.validate(args, 'two', this.optionRule);
 
       if (!optionResult.isValid) {

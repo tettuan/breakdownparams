@@ -16,9 +16,11 @@ Deno.test('Command Line E2E Tests', async (t) => {
     const args = ['init', '--from=input.txt', '--destination=output.txt'];
     const result = parser.parse(args);
 
-    assertEquals(result.type, 'error'); // OneParam doesn't allow options
-    assertExists(result.error);
-    assertEquals(result.error.code, 'INVALID_OPTIONS');
+    // DEFAULT_CUSTOM_CONFIG.validation.one allows --from and --destination.
+    assertEquals(result.type, 'one');
+    assertExists(result.options);
+    assertEquals(result.options.from, 'input.txt');
+    assertEquals(result.options.destination, 'output.txt');
   });
 
   await t.step('should handle file comparison with two parameters', () => {
@@ -47,8 +49,9 @@ Deno.test('Command Line E2E Tests', async (t) => {
     const args = ['init', '--config=config.json'];
     const result = parser.parse(args);
 
-    assertEquals(result.type, 'error'); // OneParam doesn't allow options
-    assertExists(result.error);
-    assertEquals(result.error.code, 'INVALID_OPTIONS');
+    // Issue #23 regression: --config is allowed in one mode by DEFAULT_CUSTOM_CONFIG.
+    assertEquals(result.type, 'one');
+    assertExists(result.options);
+    assertEquals(result.options.config, 'config.json');
   });
 });
