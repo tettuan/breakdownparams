@@ -170,24 +170,91 @@ parser.parse(['to', 'project', '--uv-project=myproject', '--uv-version=1.0.0']);
 
 ## Security Validation
 
-The parser performs a minimum set of security checks on the raw arguments. These are intentionally narrow: they reject inputs that have no legitimate use as CLI arguments, but they do **not** attempt to interpret values as paths, files, or URLs.
+The parser ships a declarative, two-phase security validator. Callers express intent through `CustomConfig.security.policy`; the validator turns that policy into per-category regex enforcement. The default policy is `'safe'` for every category — the parser performs real enforcement out of the box and rejects classic injection / traversal patterns. Even with `'safe'` the parser does **not** normalize, resolve, or stat any value; only the regex checks below run.
 
-### What the parser does
+### Five categories
 
-- **Shell injection check (all arguments)**: Rejects any argument containing the metacharacters `;`, `|`, `&`, `<`, `>`. Applied uniformly to every argument, including option values and positional arguments.
-- **Path traversal check (path-like arguments only)**: For arguments that semantically denote a path (`--from`, `--destination`, `--config`, `--input`, `--edition`, `--adaptation`, and positional arguments), rejects values that contain `../`, `..\\`, or end with a trailing `..`. This is a minimal-defense check against the most common traversal patterns and is not a substitute for downstream sanitization.
+| Category          | What it rejects                                                                 | Scope                                              |
+|-------------------|---------------------------------------------------------------------------------|----------------------------------------------------|
+| `shellInjection`  | Shell control metacharacters (`;`, `|`, `&`, `<`, `>`, optionally backtick / `$` / newlines / `$( )`) | **Global.** Every raw argument (Phase 1).          |
+| `absolutePath`    | POSIX absolute paths (`/x`); `strict` also rejects Windows drive / UNC paths   | Phase 2, only options whose `kind` is `'path'`.    |
+| `homeExpansion`   | `~/x` (and `~` alone with `strict`)                                             | Phase 2, only options whose `kind` is `'path'`.    |
+| `parentTraversal` | `..` traversal (`../`, `..\\`, trailing `..`); `strict` also matches URL-encoded `%2e%2e` | Phase 2, only options whose `kind` is `'path'`.    |
+| `specialChars`    | Control characters `\x00`–`\x1F` and `\x7F`; `strict` extends to `\x7F`–`\x9F` | Phase 2, only options whose `kind` is `'path'`.    |
 
-### What the parser does **not** do
+`shellInjection` is intentionally global because Phase 1 runs before option resolution and cannot see option identity. The other four are *path-kind only*: built-in `--from` and `--destination` default to `kind: 'path'`; every other built-in value option (`--input`, `--adaptation`, `--config`, `--edition`) defaults to `kind: 'text'`. Caller-defined value options default to `kind: 'text'` as well.
 
-- No path normalization or resolution (`path.normalize`, `path.resolve` are not invoked)
+### Three levels per category
+
+Each category understands three levels:
+
+| Level    | Behaviour                                                                                         |
+|----------|---------------------------------------------------------------------------------------------------|
+| `'off'`  | Disabled. The category performs no check.                                                         |
+| `'safe'` | Default. Rejects high-confidence patterns with low false-positive rate.                           |
+| `'strict'` | Broader pattern set; covers encoded variants and additional metacharacters.                     |
+
+### Behaviour matrix
+
+The exact regex enforced at each level:
+
+| Category × Level | `off` | `safe` | `strict` |
+|---|---|---|---|
+| `shellInjection`  | (no check) | `/[;\|&<>]/` | `/[;\|&<>` `` ` `` `$\n\r]\|\$\(/` |
+| `absolutePath`    | (no check) | `/^\/(?!\/)/` | `/^(\/\|[A-Za-z]:[\/\\]\|\\\\[^\\]+\\)/` |
+| `homeExpansion`   | (no check) | `/^~(?:\/\|$)/` | `/^~/` |
+| `parentTraversal` | (no check) | `/\.\.[\/\\]\|\.\.$/` | `/\.\.[\/\\]\|\.\.$\|%2[Ee]%2[Ee]\|%2[Ee]\.\|\.%2[Ee]/` |
+| `specialChars`    | (no check) | `/[\x00-\x1F\x7F]/` | `/[\x00-\x1F\x7F-\x9F]/` |
+
+Concrete examples for every safe-level check:
+
+- `shellInjection safe`: `--from=foo;rm` is rejected; `foo$bar` passes (only `strict` rejects `$`).
+- `absolutePath safe`: `--from=/etc/passwd` is rejected; `--from=//double` passes safe (the negative lookahead allows it; `strict` rejects it via the leading-slash branch).
+- `homeExpansion safe`: `--from=~/data` and `--from=~` are rejected; `--from=~README` passes safe but is rejected by `strict`.
+- `parentTraversal safe`: `--from=../sibling`, `--from=foo/..` are rejected; `--from=..README` passes (no `/` or `\` after `..`).
+- `specialChars safe`: `--from=name\x00` is rejected; high-bit bytes `\x80`–`\x9F` only trigger at `strict`.
+
+### Two-phase architecture
+
+Validation is split across `ParamsParser.parse(...)`:
+
+1. **Phase 1 (`SecurityValidator.validatePhase1(args)`)** runs immediately on the raw argument array, before any option resolution. It enforces `shellInjection` only — all other categories are out of scope here because option identity is unknown.
+2. **Phase 2 (`SecurityValidator.validatePhase2(input)`)** runs after the option factory has resolved each argument into a canonical option name plus value. For each resolved option it looks up the option's `kind` and `securityPolicy`, calls `resolveEffectivePolicy(...)`, and tests the value against the four path-related categories using **first-hit-wins** ordering: `shellInjection` → `absolutePath` → `homeExpansion` → `parentTraversal` → `specialChars`.
+
+User variable options (`--uv-*`) and bare positional arguments have no `kind` association and are therefore never subjected to the four path categories. They still pass through Phase 1's `shellInjection` check.
+
+### Default behaviour
+
+When `CustomConfig.security` is omitted, the runtime treats it as `{ policy: 'safe' }` for every category. The legacy `validate(args)` entry point (used by standalone unit tests) additionally enforces a backward-compatible `parentTraversal safe` check on every non-`--uv-*` argument so v1.2.x callers that bypass `ParamsParser` retain the previous traversal behaviour.
+
+### Per-option override semantics
+
+Each value `OptionDefinition` may carry its own `securityPolicy`. The resolver merges the policies for a given value as follows:
+
+1. Expand the global `CustomConfig.security.policy` into a full per-category map (missing keys fall back to `'safe'`).
+2. If the per-option policy is a single `Level` string, use that level uniformly for every category.
+3. If it is a partial map, override only the keys the caller specifies.
+4. If the option's `kind` is not `'path'`, force `absolutePath`, `homeExpansion`, `parentTraversal`, and `specialChars` to `'off'` regardless of the merged value.
+
+**Constraint: per-option `securityPolicy` cannot relax `shellInjection`.** Phase 1 happens before option identity is known, so any per-option override of `shellInjection` is silently ineffective at Phase 1 (and Phase 2 itself never runs `shellInjection` against path values — `shellInjection` is path-kind-irrelevant). Concretely: setting `securityPolicy: { shellInjection: 'off' }` on an option does not allow `;` to appear in that option's value if the global policy is `'safe'`.
+
+### What the parser still does **not** do
+
+- No path normalization or resolution (`path.normalize`, `path.resolve` are never called)
 - No filesystem access (existence, permission, or stat checks)
 - No directory traversal of the filesystem
 - No allow-list / deny-list judgment of paths
-- No interpretation of value semantics beyond the checks above
+- No interpretation of value semantics beyond the regex enforcement above
 
-### Exemption: `--uv-*` user variables
+### Error message format
 
-`--uv-*` values are template variable values, not paths. They are explicitly **excluded from the path traversal check**, so any text — including `../`, ellipsis (`...`), narrative text, or multi-line content — may be passed through. The shell injection check still applies.
+A rejection produces an `ErrorResult` whose `error.code` is `SECURITY_ERROR`, `error.category` is `security`, and `error.message` follows the canonical shape:
+
+```
+Security error: <category> violation in <context>
+```
+
+`<context>` is `option <name>` (for `--name=...` / `-x=...`), `argument` (for `--uv-*`), or `positional` (for bare positional arguments).
 
 ## Constraints
 

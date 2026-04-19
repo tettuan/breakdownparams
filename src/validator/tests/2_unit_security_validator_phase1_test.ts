@@ -4,15 +4,14 @@ import { SecurityValidator } from '../security_validator.ts';
 
 const logger = new BreakdownLogger('security-phase1');
 
-// Phase 1 (v1.2.3) Issue #42 対応の受け入れ基準テスト
-// docs/development.ja.md, docs/errors.ja.md, docs/user_variable_options.ja.md
-// に基づく、新仕様の網羅テスト。
+// Phase 1 (v1.2.3) Issue #42 受け入れ基準テスト（v1.3.0 で error message 形式更新）
 //
-// 修正の趣旨:
-//   1. path traversal regex を /\.\.[\/\\]|\.\.$/ に厳密化
-//      （`...`、`..README`、`..foo` の誤検知を解消）
-//   2. path traversal 検査の前段で `--uv-*` を除外
-//      （shell injection 検査は全引数で維持）
+// v1.3.0 変更点:
+//   - error message が `'Security error: <category> violation in <context>'`
+//     に統一された。
+//   - 標準 `validate(args)`（CustomConfig 不指定）は Phase 1 (shellInjection)
+//     と back-compat の parentTraversal を順に実行する。
+//   - 詳細は design.md / CHANGELOG 参照。
 
 Deno.test('phase1: --uv-* に ellipsis を含む値は通る', () => {
   const validator = new SecurityValidator();
@@ -42,47 +41,50 @@ Deno.test('phase1: --uv-* に narrative ..text を含む値は通る', () => {
   assert(result.isValid, '--uv-* の narrative ..text 値は通るべき');
 });
 
-Deno.test('phase1: ../etc/passwd は path traversal で拒否される', () => {
+Deno.test('phase1: ../etc/passwd は parentTraversal で拒否される', () => {
   const validator = new SecurityValidator();
   const result = validator.validate(['../etc/passwd']);
   logger.debug('../etc/passwd', { data: result });
   assertFalse(result.isValid, 'path traversal は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: Path traversal attempt detected',
+    'Security error: parentTraversal violation in positional',
   );
 });
 
-Deno.test('phase1: --config=../sibling は path traversal で拒否される', () => {
+Deno.test('phase1: --from=../sibling は parentTraversal で拒否される', () => {
+  // v1.3.0: ParamsParser 経由なら config は text-kind で素通りだが、
+  // ここは validator.validate() スタンドアロン経路。`--uv-` 以外の全引数に
+  // back-compat parentTraversal が適用される。
   const validator = new SecurityValidator();
-  const result = validator.validate(['--config=../sibling']);
-  logger.debug('--config=../sibling', { data: result });
+  const result = validator.validate(['--from=../sibling']);
+  logger.debug('--from=../sibling', { data: result });
   assertFalse(result.isValid, 'path traversal は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: Path traversal attempt detected',
+    'Security error: parentTraversal violation in option from',
   );
 });
 
-Deno.test('phase1: ..\\windows\\sys は path traversal で拒否される', () => {
+Deno.test('phase1: ..\\windows\\sys は parentTraversal で拒否される', () => {
   const validator = new SecurityValidator();
   const result = validator.validate(['..\\windows\\sys']);
   logger.debug('..\\windows\\sys', { data: result });
   assertFalse(result.isValid, 'バックスラッシュ path traversal は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: Path traversal attempt detected',
+    'Security error: parentTraversal violation in positional',
   );
 });
 
-Deno.test('phase1: 末尾 .. は path traversal で拒否される', () => {
+Deno.test('phase1: 末尾 .. は parentTraversal で拒否される', () => {
   const validator = new SecurityValidator();
   const result = validator.validate(['foo/..']);
   logger.debug('foo/..', { data: result });
   assertFalse(result.isValid, '末尾 .. は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: Path traversal attempt detected',
+    'Security error: parentTraversal violation in positional',
   );
 });
 
@@ -93,7 +95,7 @@ Deno.test('phase1: --uv-* でも shell injection は拒否される', () => {
   assertFalse(result.isValid, '--uv-* でも shell injection は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: Shell command execution or redirection attempt detected',
+    'Security error: shellInjection violation in argument',
   );
 });
 
@@ -104,7 +106,7 @@ Deno.test('phase1: 通常引数の shell injection は拒否される', () => {
   assertFalse(result.isValid, '通常引数の shell injection は拒否されるべき');
   assertEquals(
     result.errorMessage,
-    'Security error: Shell command execution or redirection attempt detected',
+    'Security error: shellInjection violation in positional',
   );
 });
 

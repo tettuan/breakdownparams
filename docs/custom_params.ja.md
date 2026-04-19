@@ -78,6 +78,8 @@ interface CustomConfig {
       shortForm?: string;
       description: string;
       valueRequired?: boolean;
+      kind?: ValueKind;              // 'path' | 'text'。既定 'text'
+      securityPolicy?: SecurityPolicy; // オプション単位オーバーライド
     }>;
     userVariables: {
       pattern: string;
@@ -97,6 +99,11 @@ interface CustomConfig {
     unknownOption: 'error' | 'ignore' | 'warn';
     duplicateOption: 'error' | 'ignore' | 'warn';
     emptyValue: 'error' | 'ignore' | 'warn';
+  };
+
+  // セキュリティポリシー（任意。省略時は { policy: 'safe' } として扱う）
+  security?: {
+    policy: SecurityPolicy;
   };
 }
 ```
@@ -123,11 +130,12 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
       version: { shortForm: 'v', description: 'Display version information' },
     },
     values: {
-      from: { shortForm: 'f', description: 'Source file path', valueRequired: true },
-      destination: { shortForm: 'o', description: 'Output file path', valueRequired: true },
-      edition: { shortForm: 'e', description: 'Edition layer type', valueRequired: true },
-      adaptation: { shortForm: 'a', description: 'Prompt adaptation type', valueRequired: true },
-      config: { shortForm: 'c', description: 'Configuration file name', valueRequired: true },
+      from: { shortForm: 'f', description: 'Source file path', valueRequired: true, kind: 'path' },
+      destination: { shortForm: 'o', description: 'Output file path', valueRequired: true, kind: 'path' },
+      input: { shortForm: 'i', description: 'Input layer type', valueRequired: true, kind: 'text' },
+      adaptation: { shortForm: 'a', description: 'Prompt adaptation type', valueRequired: true, kind: 'text' },
+      config: { shortForm: 'c', description: 'Configuration file name', valueRequired: true, kind: 'text' },
+      edition: { shortForm: 'e', description: 'Input layer type', valueRequired: true, kind: 'text' },
     },
     userVariables: {
       pattern: '^uv-[a-zA-Z][a-zA-Z0-9_-]*$',
@@ -155,6 +163,9 @@ const DEFAULT_CUSTOM_CONFIG: CustomConfig = {
     unknownOption: 'error',
     duplicateOption: 'error',
     emptyValue: 'error',
+  },
+  security: {
+    policy: 'safe',
   },
 };
 ```
@@ -357,9 +368,166 @@ const resultWithOptions = parser.parse(['更新', '商品', '--from=data.json'])
    - パターンは適切に制限する
    - ユーザー入力の直接使用は避ける
 
-## 8. 移行ガイド
+## 8. セキュリティポリシー
 
-### 8.1 デフォルト設定値からカスタム設定値への移行
+`security` フィールドはパーサー組み込みのパス / シェルインジェクション検査を制御します。動作詳細とカテゴリ × レベルの全マトリクスは [セキュリティ検査](development.ja.md#セキュリティ検査) にあります。本節は公開型と利用者の組み込み方を説明します。
+
+### 8.1 型
+
+```typescript
+// カテゴリごとの強度。
+type Level = 'off' | 'safe' | 'strict';
+
+// 5 つの組み込みカテゴリ。shellInjection は全引数対象。残り 4 つは
+// kind が 'path' の value option のみに適用。
+type SecurityCategory =
+  | 'shellInjection'
+  | 'absolutePath'
+  | 'homeExpansion'
+  | 'parentTraversal'
+  | 'specialChars';
+
+// 部分マップ。未指定キーは外側のレベルにフォールバック。
+type SecurityCategoryLevels = Partial<Record<SecurityCategory, Level>>;
+
+// 単一 Level は「全カテゴリに同レベル適用」のショートハンド。
+// 部分マップは個別調整用。
+type SecurityPolicy = Level | SecurityCategoryLevels;
+
+// value option の値解釈方法を分類。'path' を指定すると
+// 4 つのパス系カテゴリの対象になる。'text'（既定）は Phase 1 の
+// shellInjection だけが適用される。
+type ValueKind = 'path' | 'text';
+```
+
+これら 4 つの型はパッケージのエントリポイントから `CustomConfig` / `DEFAULT_CUSTOM_CONFIG` と並んで再エクスポートされます。
+
+### 8.2 利用者定義 value option（`kind` の落とし穴）
+
+利用者が登録する value option は既定で `kind: 'text'` です。**結果として**、独自に追加したパス値オプションには明示的に `kind: 'path'` を指定しない限り、パストラバーサル / 絶対パス / ホーム展開 / 制御文字の各検査は **適用されません**。
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+// 落とし穴: --workspace は kind 既定 'text' のため ../etc が素通りする。
+const looseConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      workspace: {
+        shortForm: 'w',
+        description: 'Workspace directory',
+        valueRequired: true,
+        // kind 省略 → 'text' → パス検査なし
+      },
+    },
+  },
+};
+
+// 修正後: kind: 'path' を宣言して Phase 2 の 4 カテゴリを適用。
+const safeConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      workspace: {
+        shortForm: 'w',
+        description: 'Workspace directory',
+        valueRequired: true,
+        kind: 'path',
+      },
+    },
+  },
+};
+```
+
+### 8.3 オプション単位オーバーライド
+
+オプション単位の `securityPolicy` は指定したカテゴリのみを上書きし、それ以外はグローバルポリシーを継承します。さらに当該オプションの `kind` による制約も働き、`kind: 'text'` のオプションではパス系カテゴリは強制的に `'off'` です。
+
+注: `shellInjection` はオプション単位で緩められません。Phase 1 はオプション識別が無い段階で走るため、特定オプションへの `shellInjection` オーバーライドは効きません。
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+const config: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      from: {
+        ...DEFAULT_CUSTOM_CONFIG.options.values.from,
+        // --from に限り ~/x と /abs/x を許可。parentTraversal は 'safe' のまま。
+        securityPolicy: {
+          absolutePath: 'off',
+          homeExpansion: 'off',
+        },
+      },
+    },
+  },
+};
+
+const parser = new ParamsParser(undefined, config);
+```
+
+### 8.4 グローバル strict
+
+グローバルポリシーを `'strict'` に上げると、全カテゴリのパターン集合が拡張されます。`shellInjection` は `` ` ``, `$`, 改行, `$( )` も拒否、`parentTraversal` は URL エンコード `%2e%2e` にも反応、といった具合です。
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+const strictConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  security: {
+    policy: 'strict',
+  },
+};
+
+const parser = new ParamsParser(undefined, strictConfig);
+```
+
+### 8.5 `from` / `destination` を v1.2.x 互換に戻す
+
+v1.3.0 以前は `--from=/abs/path` と `--from=~/data` を受け入れていました（パーサーがグローバルな `parentTraversal` 検査しかしていなかったため）。v1.3.0 の既定 `'safe'` は両者を拒否します。旧来の挙動が必要な利用者は、対象オプションで新規施行された 2 カテゴリだけを無効化できます。
+
+```typescript
+import { ParamsParser, DEFAULT_CUSTOM_CONFIG, type CustomConfig } from 'jsr:@tettuan/breakdownparams';
+
+const v12CompatConfig: CustomConfig = {
+  ...DEFAULT_CUSTOM_CONFIG,
+  options: {
+    ...DEFAULT_CUSTOM_CONFIG.options,
+    values: {
+      ...DEFAULT_CUSTOM_CONFIG.options.values,
+      from: {
+        ...DEFAULT_CUSTOM_CONFIG.options.values.from,
+        securityPolicy: {
+          absolutePath: 'off',
+          homeExpansion: 'off',
+        },
+      },
+      destination: {
+        ...DEFAULT_CUSTOM_CONFIG.options.values.destination,
+        securityPolicy: {
+          absolutePath: 'off',
+          homeExpansion: 'off',
+        },
+      },
+    },
+  },
+};
+```
+
+`parentTraversal` / `specialChars` / グローバル `shellInjection` は `'safe'` のまま残します（前者は元から検査されており、`specialChars` は新規ですが望ましい挙動です）。v1.2.x 互換のために緩める必要はありません。
+
+## 9. 移行ガイド
+
+### 9.1 デフォルト設定値からカスタム設定値への移行
 
 1. 設定値の準備
    - 必要なパターンの定義
@@ -372,7 +540,7 @@ const resultWithOptions = parser.parse(['更新', '商品', '--from=data.json'])
    - エラーハンドリングの確認
    - 戻り値の型の確認
 
-### 8.2 カスタム設定値からデフォルト設定値への移行
+### 9.2 カスタム設定値からデフォルト設定値への移行
 
 1. デフォルト設定値の使用
    - カスタム設定値の削除

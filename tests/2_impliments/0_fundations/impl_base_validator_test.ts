@@ -51,7 +51,7 @@ Deno.test('test_security_validator_implementation', () => {
   assertEquals(shellCommandResult.errorCategory, 'security', 'Should have security category');
   assertEquals(
     shellCommandResult.errorMessage,
-    'Security error: Shell command execution or redirection attempt detected',
+    'Security error: shellInjection violation in positional',
     'Should have correct error message',
   );
 
@@ -78,7 +78,7 @@ Deno.test('test_security_validator_implementation', () => {
   assertEquals(pathTraversalResult.errorCategory, 'security', 'Should have security category');
   assertEquals(
     pathTraversalResult.errorMessage,
-    'Security error: Path traversal attempt detected',
+    'Security error: parentTraversal violation in positional',
     'Should have correct error message',
   );
 

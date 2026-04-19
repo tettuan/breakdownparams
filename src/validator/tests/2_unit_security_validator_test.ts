@@ -23,7 +23,7 @@ Deno.test('test_security_validator_unit', () => {
   assertFalse(shellCommandResult.isValid, 'Shell command should be rejected');
   assertEquals(
     shellCommandResult.errorMessage,
-    'Security error: Shell command execution or redirection attempt detected',
+    'Security error: shellInjection violation in positional',
     'Should return correct error message',
   );
   assertEquals(shellCommandResult.errorCode, 'SECURITY_ERROR', 'Should return correct error code');
@@ -33,7 +33,7 @@ Deno.test('test_security_validator_unit', () => {
   assertFalse(pathTraversalResult.isValid, 'Path traversal should be rejected');
   assertEquals(
     pathTraversalResult.errorMessage,
-    'Security error: Path traversal attempt detected',
+    'Security error: parentTraversal violation in positional',
     'Should return correct error message',
   );
   assertEquals(pathTraversalResult.errorCode, 'SECURITY_ERROR', 'Should return correct error code');
