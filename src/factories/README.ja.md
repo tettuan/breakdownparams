@@ -38,15 +38,15 @@ const STANDARD_OPTIONS = {
 
 ### 標準オプションの一覧
 
-| オプション名 | 長い名前      | 短い名前 | タイプ | 説明                   |
-| ------------ | ------------- | -------- | ------ | ---------------------- |
-| help         | --help        | -h       | flag   | ヘルプメッセージを表示 |
-| version      | --version     | -v       | flag   | バージョン情報を表示   |
-| from         | --from        | -f       | value  | 入力元を指定           |
-| destination  | --destination | -o       | value  | 出力先を指定           |
+| オプション名 | 長い名前      | 短い名前 | タイプ | 説明                       |
+| ------------ | ------------- | -------- | ------ | -------------------------- |
+| help         | --help        | -h       | flag   | ヘルプメッセージを表示     |
+| version      | --version     | -v       | flag   | バージョン情報を表示       |
+| from         | --from        | -f       | value  | 入力元を指定               |
+| destination  | --destination | -o       | value  | 出力先を指定               |
 | edition      | --edition     | -e       | value  | エディションレイヤーを指定 |
-| adaptation   | --adaptation  | -a       | value  | 適応設定を指定         |
-| config       | --config      | -c       | value  | 設定ファイルを指定     |
+| adaptation   | --adaptation  | -a       | value  | 適応設定を指定             |
+| config       | --config      | -c       | value  | 設定ファイルを指定         |
 
 ## インターフェース
 
